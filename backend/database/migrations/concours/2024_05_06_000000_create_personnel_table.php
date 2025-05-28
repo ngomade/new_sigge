@@ -37,10 +37,7 @@ return new class extends Migration
             $table->string('arrond_pers', 128)->nullable();
             $table->text('bibliographie_pers')->nullable();
             $table->smallInteger('nb_enfant_pers')->nullable();
-            $table->unsignedBigInteger('id_slide');
-            $table->foreign('id_slide')->references('id_slide')->on('slide')->onDelete('cascade');
-            $table->unsignedBigInteger('id');
-            $table->foreign('id')->references('id')->on('sessionconcour')->onDelete('cascade');
+            
             
             $table->timestamps();
         });

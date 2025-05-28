@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('first_title', 128);
             $table->string('second_title', 150);
             $table->string('photo', 180);
-            // $table->char('code_pers', 32);
+             $table->string('code_pers', 32);
             $table->timestamps();
-            // $table->foreign('code_pers')->references('code_pers')->on('some_table')->onDelete('cascade'); // Replace `some_table` with the correct table name
+             $table->foreign('code_pers')->references('code_pers')->on('personnel')->onDelete('cascade'); // Replace `some_table` with the correct table name
         });
     }
 

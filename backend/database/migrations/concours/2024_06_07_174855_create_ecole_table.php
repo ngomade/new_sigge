@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('tel_ecole',180);
             $table->string('email_ecole')->nullable();
             $table->string('bp_ecole');
+            $table->unsignedBigInteger('centre_depot_code');
+            $table->foreign('centre_depot_code')->references('centre_depot_code')->on('centre_depot')->onDelete('cascade');
             $table->timestamps();
         });
     }
