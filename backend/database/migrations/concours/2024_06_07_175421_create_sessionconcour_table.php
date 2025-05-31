@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('sessionconcour', function (Blueprint $table) {
             $table->id('id')->primary();
              $table->string('code_pers');
+            //   $table->string('ca_code');
             $table->year('annee');
             $table->date('debut');
             $table->date('cloture');
             $table->timestamps();
 
              $table->foreign('code_pers')->references('code_pers')->on('personnel')->onDelete('cascade');
+            //  $table->foreign('ca_code')->references('ca_code')->on('candidat')->onDelete('cascade');
         });
     }
 
