@@ -4,15 +4,22 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
+use App\Models\RoleHasPermission;
+use App\Models\concours\Sessionconcour;
+use App\Models\Slide;
 use Carbon\Carbon;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Class Personnel
- * 
+ *
  * @property string $code_pers
  * @property string $nom_pers
  * @property string|null $prenom_pers
@@ -38,15 +45,17 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $nb_enfant_pers
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Collection|RoleHasPermission[] $role_has_permissions
  * @property Collection|Sessionconcour[] $sessionconcours
  * @property Collection|Slide[] $slides
  *
  * @package App\Models
  */
-class Personnel extends Model
+class Personnel extends Authenticatable implements MustVerifyEmail
 {
+    use Notifiable, HasFactory, HasApiTokens;
+
 	protected $table = 'personnel';
 	protected $primaryKey = 'code_pers';
 	public $incrementing = false;
@@ -70,6 +79,9 @@ class Personnel extends Model
 		'cni_pers',
 		'date_deliv_cni_pers',
 		'email_pers',
+        'email_verified_at',
+        'reset_token',
+        'reset_token_expires_at',
 		'login_pers',
 		'pwd_pers',
 		'photo_pers',
@@ -81,6 +93,16 @@ class Personnel extends Model
 		'bibliographie_pers',
 		'nb_enfant_pers'
 	];
+
+    public function getAuthPassword(): string
+    {
+        return $this->pwd_pers;
+    }
+
+    public function routeNotificationForMail(): string
+    {
+        return $this->email_pers;
+    }
 
 	public function role_has_permissions()
 	{

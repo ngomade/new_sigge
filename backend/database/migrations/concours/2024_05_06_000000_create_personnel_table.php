@@ -26,7 +26,10 @@ return new class extends Migration
             $table->string('second_phone_pers', 128)->nullable();
             $table->string('cni_pers', 128);
             $table->date('date_deliv_cni_pers');
-            $table->string('email_pers', 128);
+            $table->string('email_pers', 128)->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('reset_token')->nullable()->unique();
+            $table->timestamp('reset_token_expires_at')->nullable();
             $table->string('login_pers', 128);
             $table->string('pwd_pers', 128);
             $table->string('photo_pers', 128)->nullable();
@@ -37,8 +40,8 @@ return new class extends Migration
             $table->string('arrond_pers', 128)->nullable();
             $table->text('bibliographie_pers')->nullable();
             $table->smallInteger('nb_enfant_pers')->nullable();
-            
-            
+
+
             $table->timestamps();
         });
     }

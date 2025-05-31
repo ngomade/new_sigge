@@ -1,47 +1,45 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
-namespace App\Models;
+namespace App\Models\concours;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\concours\Candidat;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-/**
- * Class Compte
- * 
- * @property string $ca_num_recu
- * @property string|null $ca_code
- * @property string $ca_pwd
- * @property string $ca_recu
- * @property string $ca_nom
- * @property string|null $ca_email
- * @property string $ca_prenom
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * 
- * @property Candidat|null $candidat
- *
- * @package App\Models
- */
-class Compte extends Model
+class Compte extends Authenticatable implements MustVerifyEmail
 {
+    use HasFactory, Notifiable, HasApiTokens;
 	protected $table = 'compte';
 	protected $primaryKey = 'ca_num_recu';
-	public $incrementing = false;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
 	protected $fillable = [
+        'ca_num_recu',
 		'ca_code',
 		'ca_pwd',
 		'ca_recu',
+        'email_verified_at',
+        'reset_token',
+        'reset_token_expires_at',
 		'ca_nom',
 		'ca_email',
 		'ca_prenom'
 	];
-
-	public function candidat()
+    public function getAuthPassword(): string
+    {
+        return $this->ca_pwd;
+    }
+    public function routeNotificationForMail(): string
+    {
+        return $this->ca_email;
+    }
+    public function candidat(): BelongsTo
 	{
 		return $this->belongsTo(Candidat::class, 'ca_code');
 	}

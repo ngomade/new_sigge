@@ -17,7 +17,10 @@ return new class extends Migration
             $table->string('ca_pwd');
             $table->string('ca_recu');
             $table->string('ca_nom');
-            $table->string('ca_email')->nullable();
+            $table->string('ca_email')->nullable()->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('reset_token')->nullable()->unique();
+            $table->timestamp('reset_token_expires_at')->nullable();
             $table->string('ca_prenom');
             $table->timestamps();
 

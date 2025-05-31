@@ -4,15 +4,16 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Sessionconcour
- * 
+ *
  * @property int $id
  * @property string $code_pers
  * @property Carbon $annee
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $cloture
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Personnel $personnel
  * @property Collection|Candidat[] $candidats
  *
@@ -28,10 +29,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Sessionconcour extends Model
 {
+    use HasFactory;
 	protected $table = 'sessionconcour';
 
 	protected $casts = [
-		'annee' => 'datetime',
 		'debut' => 'datetime',
 		'cloture' => 'datetime'
 	];

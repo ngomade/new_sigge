@@ -4,21 +4,23 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
+use App\Models\concours\Diplome;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Filiere
- * 
+ *
  * @property string $filiere_code
  * @property string $filiere_label
  * @property string|null $filiere_description
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Collection|Candidat[] $candidats
  * @property Collection|Diplome[] $diplomes
  *
@@ -26,6 +28,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Filiere extends Model
 {
+    use HasFactory;
+
 	protected $table = 'filiere';
 	protected $primaryKey = 'filiere_code';
 	public $incrementing = false;

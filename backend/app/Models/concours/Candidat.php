@@ -4,15 +4,18 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
+use App\Models\concours\Ecole;
+use App\Models\concours\Mail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Candidat
- * 
+ *
  * @property string $ca_code
  * @property int $id
  * @property string $filiere_code
@@ -50,7 +53,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $ca_recu
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property SiteEtude $site_etude
  * @property Filiere $filiere
  * @property Sessionconcour $sessionconcour
@@ -62,6 +65,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Candidat extends Model
 {
+    use HasFactory;
 	protected $table = 'candidat';
 	protected $primaryKey = 'ca_code';
 	public $incrementing = false;
@@ -70,10 +74,10 @@ class Candidat extends Model
 		'id' => 'int',
 		'code_site' => 'int',
 		'ca_date_naiss' => 'datetime',
-		'ca_annee_diplome' => 'datetime'
 	];
 
 	protected $fillable = [
+        'ca_code',
 		'id',
 		'filiere_code',
 		'code_site',
