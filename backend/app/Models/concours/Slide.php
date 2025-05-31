@@ -4,14 +4,14 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Slide
- * 
+ *
  * @property int $id_slide
  * @property string $first_title
  * @property string $second_title
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $code_pers
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Personnel $personnel
  *
  * @package App\Models

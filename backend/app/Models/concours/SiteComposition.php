@@ -4,7 +4,7 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,13 +12,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class SiteComposition
- * 
+ *
  * @property string $site_code
  * @property string $site_ville
  * @property string $site_lieu
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Collection|Composition[] $compositions
  *
  * @package App\Models

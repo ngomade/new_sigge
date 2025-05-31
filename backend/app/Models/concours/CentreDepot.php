@@ -1,23 +1,20 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class CentreDepot
- * 
+ *
  * @property int $centre_depot_code
  * @property string $centre_depot_label
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Collection|Ecole[] $ecoles
  *
  * @package App\Models
@@ -31,7 +28,7 @@ class CentreDepot extends Model
 		'centre_depot_label'
 	];
 
-	public function ecoles()
+	public function ecoles(): HasMany
 	{
 		return $this->hasMany(Ecole::class, 'centre_depot_code');
 	}

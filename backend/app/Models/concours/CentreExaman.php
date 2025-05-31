@@ -4,20 +4,20 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class CentreExaman
- * 
+ *
  * @property int $centre_exam_code
  * @property string $code_ecole
  * @property string $centre_exam_label
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Ecole $ecole
  *
  * @package App\Models

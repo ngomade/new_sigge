@@ -4,20 +4,20 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class EcoleElement
- * 
+ *
  * @property int $id
  * @property string $code_ecole
  * @property int $code_el
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Ecole $ecole
  * @property Dossier $dossier
  *

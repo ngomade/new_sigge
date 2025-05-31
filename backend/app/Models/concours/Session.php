@@ -4,13 +4,13 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Session
- * 
+ *
  * @property string $id
  * @property int|null $user_id
  * @property string|null $ip_address

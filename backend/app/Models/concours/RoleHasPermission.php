@@ -4,14 +4,14 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class RoleHasPermission
- * 
+ *
  * @property string $code_pers
  * @property int $id_role
  * @property Carbon $date_debut
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $statut_role
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Personnel $personnel
  * @property Role $role
  *

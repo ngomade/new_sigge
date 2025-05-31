@@ -4,21 +4,21 @@
  * Created by Reliese Model.
  */
 
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class FiliereDiplome
- * 
+ *
  * @property int $id
  * @property string $filiere_code
  * @property int $code_dip
  * @property int $code_serie
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Diplome $diplome
  * @property Serie $serie
  * @property Filiere $filiere

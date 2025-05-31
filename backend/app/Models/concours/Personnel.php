@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -104,17 +105,17 @@ class Personnel extends Authenticatable implements MustVerifyEmail
         return $this->email_pers;
     }
 
-	public function role_has_permissions()
+	public function role_has_permissions(): HasMany
 	{
 		return $this->hasMany(RoleHasPermission::class, 'code_pers');
 	}
 
-	public function sessionconcours()
+	public function sessionconcours(): HasMany
 	{
 		return $this->hasMany(Sessionconcour::class, 'code_pers');
 	}
 
-	public function slides()
+	public function slides(): HasMany
 	{
 		return $this->hasMany(Slide::class, 'code_pers');
 	}

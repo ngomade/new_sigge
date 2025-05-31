@@ -6,12 +6,13 @@
 
 namespace App\Models\concours;
 
-use App\Models\concours\Ecole;
-use App\Models\concours\Mail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Reliese\Coders\Model\Relations\BelongsToMany;
 
 /**
  * Class Candidat
@@ -114,33 +115,33 @@ class Candidat extends Model
 		'ca_recu'
 	];
 
-	public function site_etude()
+	public function site_etude(): BelongsTo
 	{
 		return $this->belongsTo(SiteEtude::class, 'code_site');
 	}
 
-	public function filiere()
-	{
+	public function filiere(): BelongsTo
+    {
 		return $this->belongsTo(Filiere::class, 'filiere_code');
 	}
 
-	public function sessionconcour()
+	public function sessionconcour(): BelongsTo
 	{
 		return $this->belongsTo(Sessionconcour::class, 'id');
 	}
 
-	public function ecoles()
+	public function ecoles(): HasMany
 	{
 		return $this->belongsToMany(Ecole::class, 'candidat_ecoles', 'ca_code', 'code_ecole')
 					->withTimestamps();
 	}
 
-	public function comptes()
+	public function comptes(): HasMany
 	{
 		return $this->hasMany(Compte::class, 'ca_code');
 	}
 
-	public function mails()
+	public function mails(): BelongsToMany
 	{
 		return $this->belongsToMany(Mail::class, 'mail_candidat', 'lca_code', 'email_code')
 					->withPivot('pk_mail_candidat')
