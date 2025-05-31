@@ -1,18 +1,17 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
-namespace App\Models;
+namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Ecole
- * 
+ *
  * @property string $code_ecole
  * @property string $label_ecole
  * @property string $logo_ecole
@@ -23,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $centre_depot_code
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property CentreDepot $centre_depot
  * @property Collection|Candidat[] $candidats
  * @property Collection|CentreExaman[] $centre_examen
@@ -52,28 +51,28 @@ class Ecole extends Model
 		'centre_depot_code'
 	];
 
-	public function centre_depot()
+	public function centre_depot(): BelongsTo
 	{
 		return $this->belongsTo(CentreDepot::class, 'centre_depot_code');
 	}
 
-	public function candidats()
+	public function candidats(): BelongsToMany
 	{
 		return $this->belongsToMany(Candidat::class, 'candidat_ecoles', 'code_ecole', 'ca_code')
 					->withTimestamps();
 	}
 
-	public function centre_examen()
+	public function centre_examen(): HasMany
 	{
 		return $this->hasMany(CentreExaman::class, 'code_ecole');
 	}
 
-	public function compositions()
+	public function compositions(): HasMany
 	{
 		return $this->hasMany(Composition::class, 'code_ecole');
 	}
 
-	public function ecole_elements()
+	public function ecole_elements(): HasMany
 	{
 		return $this->hasMany(EcoleElement::class, 'code_ecole');
 	}
