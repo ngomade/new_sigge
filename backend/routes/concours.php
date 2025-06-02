@@ -15,6 +15,8 @@ use App\Http\Controllers\concours\CentreExamenControllerApi;
 use App\Http\Controllers\concours\CentreDepotControllerApi;
 use App\Http\Controllers\concours\CompositionControllerApi;
 use App\Http\Controllers\concours\EcoleElementControllerApi;
+use App\Http\Controllers\concours\FiliereController;
+use App\Http\Controllers\concours\FiliereDiplomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,10 +119,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Routes désactivées (commentées)
+    | Routes pour la gestion des filières
     |--------------------------------------------------------------------------
     */
-    // Route::apiResource('candidat-ecoles', CandidatEcoleControllerApi::class);
-    // Route::apiResource('composition', CompositionControllerApi::class);
-    // Route::apiResource('ecole_element', EcoleElementControllerApi::class);
+    Route::apiResource('filiere', FiliereController::class);
+    Route::apiResource('filiere_diplome', FiliereDiplomeController::class);
+      // Diplome attachment routes
+      Route::post('/{filiereCode}/attach-diplome', [FiliereController::class, 'attachDiplome']);
+      Route::post('/{filiereCode}/detach-diplome', [FiliereController::class, 'detachDiplome']);
+      
+      // Get diplomes for a filiere
+      Route::get('/{filiereCode}/diplomes', [FiliereController::class, 'diplomes']);
+      // Additional routes
+    Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeController::class, 'byFiliere']);
+    Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeController::class, 'byDiplome']);
+
 });
