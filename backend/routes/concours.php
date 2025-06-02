@@ -15,8 +15,8 @@ use App\Http\Controllers\concours\CentreExamenControllerApi;
 use App\Http\Controllers\concours\CentreDepotControllerApi;
 use App\Http\Controllers\concours\CompositionControllerApi;
 use App\Http\Controllers\concours\EcoleElementControllerApi;
-use App\Http\Controllers\concours\FiliereController;
-use App\Http\Controllers\concours\FiliereDiplomeController;
+use App\Http\Controllers\concours\FiliereControllerAPI;
+use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,16 +122,16 @@ Route::middleware('auth:sanctum')->group(function () {
     | Routes pour la gestion des filières
     |--------------------------------------------------------------------------
     */
-    Route::apiResource('filiere', FiliereController::class);
-    Route::apiResource('filiere_diplome', FiliereDiplomeController::class);
+    Route::apiResource('filiere', FiliereControllerAPI::class);
+    Route::apiResource('filiere_diplome', FiliereDiplomeControllerAPI::class);
       // Diplome attachment routes
-      Route::post('/{filiereCode}/attach-diplome', [FiliereController::class, 'attachDiplome']);
-      Route::post('/{filiereCode}/detach-diplome', [FiliereController::class, 'detachDiplome']);
+      Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
+      Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
       
       // Get diplomes for a filiere
-      Route::get('/{filiereCode}/diplomes', [FiliereController::class, 'diplomes']);
+      Route::get('/{filiereCode}/diplomes', [FiliereControllerAPI::class, 'diplomes']);
       // Additional routes
-    Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeController::class, 'byFiliere']);
-    Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeController::class, 'byDiplome']);
+    Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
+    Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);
 
 });

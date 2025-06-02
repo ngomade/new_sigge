@@ -7,7 +7,7 @@ use App\Models\concours\Filiere;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class FiliereController extends Controller
+class FiliereControllerAPI extends Controller
 {
     /**
      * Display a listing of the resource.
