@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Notifications\concours\SendinfoOfConnection;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use App\Models\concours\Compte;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class CompteControllerApi extends Controller
@@ -17,40 +22,53 @@ class CompteControllerApi extends Controller
     public function index()
     {
         $comptes = Compte::with('candidat')->get();
-        return response()->json($comptes, 200);
+        return response()->json($comptes);
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws Throwable
      */
-    public function store(Request $request)
+    public function store(Request $request, AuthService $authService)
     {
         $validateData = $request->validate([
             'ca_num_recu' => 'required|string|unique:compte,ca_num_recu',
             'ca_code' => 'nullable|string|exists:candidat,ca_code',
-            'ca_pwd' => 'required|string|min:6',
-            'ca_recu' => 'required|string|max:255',
+            'ca_pwd' => 'required|string|min:3',
+            'ca_recu' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png', // Limite de 2 Mo pour le fichier
             'ca_nom' => 'required|string|max:255',
             'ca_email' => 'nullable|email|max:255',
             'ca_prenom' => 'required|string|max:255',
         ]);
+        // Hasher le mot de passe
+        $validateData['ca_pwd'] = Hash::make($validateData['ca_pwd']);
 
         try {
             DB::beginTransaction();
-            
-            // Hasher le mot de passe
-            $validateData['ca_pwd'] = Hash::make($validateData['ca_pwd']);
-            
+
+            $validateData['ca_recu'] = $this->storageRecu($request->file('ca_recu'), $validateData['ca_nom'], $validateData['ca_prenom']);
+
             $compte = Compte::create($validateData);
+            try {
+                $compte->notify(new SendinfoOfConnection());
+            } catch (Throwable $th) {
+                Log::error('Error sending connection info notification: ' . $th->getMessage());
+                return response()->json(['erreur' => 'Erreur lors de l\'envoi de l\'email'], 500);
+            }
+            User::create([
+                'name' => $compte->ca_nom,
+                'email' => $compte->ca_email,
+                'password' => $compte->ca_pwd,
+                'usertype' => 'candidat',
+            ]);
             DB::commit();
-            
-            // Ne pas retourner le mot de passe hashé
-            $compte->makeHidden('ca_pwd');
-            
-            return response()->json($compte, 201);
+
+            return $authService->generateTokenFromUser($compte);
+
         } catch (Throwable $th) {
-            DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la création du compte: ' . $th->getMessage()], 500);
+            DB::rollBack();
+            Log::error('Error creating compte: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la création du compte'], 500);
         }
     }
 
@@ -59,135 +77,94 @@ class CompteControllerApi extends Controller
      */
     public function show(string $ca_num_recu)
     {
-        $compte = Compte::with('candidat')->find($ca_num_recu);
-        
-        if (!$compte) {
-            return response()->json(['erreur' => 'Compte non trouvé'], 404);
-        }
-        
-        // Ne pas retourner le mot de passe
-        $compte->makeHidden('ca_pwd');
-        
-        return response()->json($compte, 200);
+        $compte = Compte::with('candidat')->findOrFail($ca_num_recu);
+
+        return response()->json($compte);
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws Throwable
      */
     public function update(Request $request, string $ca_num_recu)
     {
         $validateData = $request->validate([
             'ca_code' => 'nullable|string|exists:candidat,ca_code',
-            'ca_pwd' => 'sometimes|required|string|min:6',
-            'ca_recu' => 'sometimes|required|string|max:255',
+            'ca_pwd' => 'sometimes|string|min:3',
+            'ca_recu' => 'sometimes|file|max:2048|mimes:pdf,jpg,jpeg,png', // Limite de 2 Mo pour le fichier
             'ca_nom' => 'sometimes|required|string|max:255',
             'ca_email' => 'nullable|email|max:255',
-            'ca_prenom' => 'sometimes|required|string|max:255',
+            'ca_prenom' => 'sometimes|string|max:255',
         ]);
+        if ($request->has("ca_pwd")) {
+            $validateData['ca_pwd'] = Hash::make($validateData['ca_pwd']);
+        }
 
+        $compte = Compte::findOrFail($ca_num_recu);
         try {
             DB::beginTransaction();
-            $compte = Compte::findOrFail($ca_num_recu);
-            
-            // Hasher le mot de passe si fourni
-            if (isset($validateData['ca_pwd'])) {
-                $validateData['ca_pwd'] = Hash::make($validateData['ca_pwd']);
+
+            if ($request->hasFile('ca_recu')) {
+                Storage::delete($compte->ca_recu); // Supprimer l'ancien fichier
+                $validateData['ca_recu'] = $this->storageRecu($request->file('ca_recu'), $compte->ca_nom, $compte->ca_prenom);
             }
-            
+
             $compte->update($validateData);
+
+            // Mettre à jour l'utilisateur associé
+            $user = User::where('email', $compte->ca_email)->first();
+            $user?->update([
+                'name' => $compte->ca_nom,
+                'email' => $compte->ca_email,
+                'password' => $compte->ca_pwd,
+            ]);
+
             DB::commit();
-            
-            // Ne pas retourner le mot de passe
-            $compte->makeHidden('ca_pwd');
-            
-            return response()->json($compte, 200);
+
+            return response()->json($compte);
         } catch (Throwable $th) {
             DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la mise à jour du compte: ' . $th->getMessage()], 500);
+            Log::error('Error updating compte: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la mise à jour du compte'], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
+     * @throws Throwable
      */
     public function destroy(string $ca_num_recu)
     {
+        $compte = Compte::findOrFail($ca_num_recu);
         try {
             DB::beginTransaction();
-            $compte = Compte::findOrFail($ca_num_recu);
+            $compte->candidat()->delete();
             $compte->delete();
             DB::commit();
-            return response()->json(['succes' => 'Compte supprimé avec succès'], 200);
+            return response()->noContent();
         } catch (Throwable $th) {
             DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la suppression du compte: ' . $th->getMessage()], 500);
+            Log::error('Error deleting compte: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la suppression du compte'], 500);
         }
     }
 
-    /**
-     * Authentifier un utilisateur
-     */
-    public function login(Request $request)
+    public function showRecu($ca_num_recu)
     {
-        $validateData = $request->validate([
-            'ca_num_recu' => 'required|string',
-            'ca_pwd' => 'required|string',
-        ]);
+        $recu = Compte::findOrFail($ca_num_recu)->ca_recu;
 
-        try {
-            $compte = Compte::where('ca_num_recu', $validateData['ca_num_recu'])->first();
-            
-            if (!$compte || !Hash::check($validateData['ca_pwd'], $compte->ca_pwd)) {
-                return response()->json(['erreur' => 'Identifiants invalides'], 401);
-            }
-            
-            // Charger les relations
-            $compte->load('candidat');
-            
-            // Ne pas retourner le mot de passe
-            $compte->makeHidden('ca_pwd');
-            
-            return response()->json([
-                'message' => 'Connexion réussie',
-                'compte' => $compte
-            ], 200);
-            
-        } catch (Throwable $th) {
-            return response()->json(['erreur' => 'Erreur lors de la connexion: ' . $th->getMessage()], 500);
+        if (!Storage::exists($recu)) {
+            return response()->json(['erreur' => 'Reçu non trouvé'], 404);
         }
+        return Storage::download($recu);
     }
 
-    /**
-     * Changer le mot de passe
-     */
-    public function changePassword(Request $request, string $ca_num_recu)
+    public function statsCompte()
     {
-        $validateData = $request->validate([
-            'ancien_pwd' => 'required|string',
-            'nouveau_pwd' => 'required|string|min:6|confirmed',
+        return response()->json([
+            'total' => Compte::count(),
+            'comptes' => Compte::with('candidat')->get(),
         ]);
-
-        try {
-            DB::beginTransaction();
-            $compte = Compte::findOrFail($ca_num_recu);
-            
-            // Vérifier l'ancien mot de passe
-            if (!Hash::check($validateData['ancien_pwd'], $compte->ca_pwd)) {
-                return response()->json(['erreur' => 'Ancien mot de passe incorrect'], 400);
-            }
-            
-            // Mettre à jour avec le nouveau mot de passe
-            $compte->ca_pwd = Hash::make($validateData['nouveau_pwd']);
-            $compte->save();
-            
-            DB::commit();
-            
-            return response()->json(['succes' => 'Mot de passe modifié avec succès'], 200);
-            
-        } catch (Throwable $th) {
-            DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors du changement de mot de passe: ' . $th->getMessage()], 500);
-        }
     }
 
     /**
@@ -195,11 +172,15 @@ class CompteControllerApi extends Controller
      */
     public function byCandidat(string $ca_code)
     {
-        $comptes = Compte::where('ca_code', $ca_code)->get();
-        
-        // Ne pas retourner les mots de passe
-        $comptes->makeHidden(['ca_pwd']);
-        
-        return response()->json($comptes, 200);
+        $comptes = Compte::where('ca_code', $ca_code)->with('candidat')->get();
+
+        return response()->json($comptes);
+    }
+
+    private function storageRecu($file, $nom, $prenom)
+    {
+        $filename = $nom . '_' . $prenom . '_' . now()->format('M_d_H_i_s');
+
+        return $file->storeAs("private/" . getdate()['year'], $filename);
     }
 }

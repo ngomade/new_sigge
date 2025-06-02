@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\CentreDepot;
+use App\Models\concours\CentreDepot;
 
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CentreDepotControllerApi extends Controller
 {
@@ -16,9 +16,8 @@ class CentreDepotControllerApi extends Controller
      */
     public function index()
     {
-        //
         $centre = CentreDepot::All();
-        return response()->json($centre,200);
+        return response()->json($centre);
     }
 
     /**
@@ -28,20 +27,18 @@ class CentreDepotControllerApi extends Controller
     {
         //
         $validateData = $request->validate([
-            'centre_depot_label' => 'required|String|max:255'
-
+            'centre_depot_label' => 'required|string|max:255'
         ]);
-        try{
-            DB::beginTransaction();
-            $res = CentreDepot::create($request->all());
-            DB::commit();
-            return response()->json($res,200);
+        try {
+            $res = CentreDepot::create($validateData);
+            return response()->json([
+                'message' => 'centre de depot cree avec succes',
+                'data' => $res
+            ]);
 
-        }catch(Throwable $th){
-            DB::rollback();
-            return response()->json(['erreur ' => 'erreur l\'or de l\'enregistrement du centre'],500);
-            
-
+        } catch (Exception $e) {
+            Log::error('Error creating centre depot: ' . $e->getMessage());
+            return response()->json(['erreur ' => 'erreur l\'or de l\'enregistrement du centre'], 500);
         }
     }
 
@@ -50,12 +47,8 @@ class CentreDepotControllerApi extends Controller
      */
     public function show(string $id)
     {
-        //
-        $centre= CentreDepot::findOrfail($id);
-        if(!$centre){
-            return response()->json(['erreur' => 'centre non trouve'],404);
-        }
-        return response()->json($centre,200);
+        $centre = CentreDepot::findOrfail($id);
+        return response()->json($centre);
     }
 
     /**
@@ -63,23 +56,17 @@ class CentreDepotControllerApi extends Controller
      */
     public function update(Request $request, string $centre_depot_code)
     {
-        //
         $validateData = $request->validate([
-            'centre_depot_label' => 'required|String|max:255'
-
+            'centre_depot_label' => 'required|string|max:255'
         ]);
-        try{
-            DB::beginTransaction();
-            $centre = CentreDepot::findOrfail($centre_depot_code);
-            $centre->update($request->all());
-            DB::commit();
-            return response()->json($centre,200);
+        $centre = CentreDepot::findOrfail($centre_depot_code);
+        try {
+            $centre->update($validateData);
+            return response()->json($centre);
 
-        }catch(Throwable $th){
-            DB::rollback();
-            return response()->json(['erreur ' => 'erreur l\'or de la mse a jour du centre'],500);
-            
-
+        } catch (Exception $e) {
+            Log::error('Error updating centre depot: ' . $e->getMessage());
+            return response()->json(['erreur ' => 'erreur lors de la mise a jour du centre'], 500);
         }
     }
 
@@ -88,16 +75,14 @@ class CentreDepotControllerApi extends Controller
      */
     public function destroy(string $centre_depot_code)
     {
-        //
-        try{
-            $centre = CentreDepot::findOrfail($centre_depot_code);
+        $centre = CentreDepot::findOrfail($centre_depot_code);
+        try {
             $centre->delete();
-            DB::commit();
-            return response()->json(['succes' => 'centre supprime'],200);
+            return response()->noContent();
 
-        }catch(Throwable $th){
-            DB::rollback();
-            return response()->json(['erreur' => 'erreur lors de la suppression'],500);
+        } catch (Exception $e) {
+            Log::error('Error deleting centre depot: ' . $e->getMessage());
+            return response()->json(['erreur' => 'erreur lors de la suppression'], 500);
         }
     }
 }

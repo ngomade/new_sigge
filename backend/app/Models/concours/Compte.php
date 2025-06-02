@@ -20,7 +20,6 @@ class Compte extends Authenticatable implements MustVerifyEmail
     public $incrementing = false;
 
 	protected $fillable = [
-        'ca_num_recu',
 		'ca_code',
 		'ca_pwd',
 		'ca_recu',
@@ -31,6 +30,11 @@ class Compte extends Authenticatable implements MustVerifyEmail
 		'ca_email',
 		'ca_prenom'
 	];
+    protected $hidden = [
+        'ca_pwd',
+        'reset_token',
+        'reset_token_expires_at'
+    ];
     public function getAuthPassword(): string
     {
         return $this->ca_pwd;

@@ -1,13 +1,9 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models\concours;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Class EcoleElement
@@ -23,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class EcoleElement extends Model
+class EcoleElement extends Pivot
 {
 	protected $table = 'ecole_element';
 
@@ -35,14 +31,4 @@ class EcoleElement extends Model
 		'code_ecole',
 		'code_el'
 	];
-
-	public function ecole()
-	{
-		return $this->belongsTo(Ecole::class, 'code_ecole');
-	}
-
-	public function dossier()
-	{
-		return $this->belongsTo(Dossier::class, 'code_el');
-	}
 }

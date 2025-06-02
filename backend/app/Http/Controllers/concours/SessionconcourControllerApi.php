@@ -5,7 +5,7 @@ namespace App\Http\Controllers\concours;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\concours\Sessionconcour;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 use Carbon\Carbon;
 
@@ -16,8 +16,8 @@ class SessionconcourControllerApi extends Controller
      */
     public function index()
     {
-        $sessions = Sessionconcour::with('personnel')->orderBy('annee', 'desc')->get();
-        return response()->json($sessions, 200);
+        $sessions = Sessionconcour::with(['personnel', 'candidats'])->orderBy('annee', 'desc')->get();
+        return response()->json($sessions);
     }
 
     /**
@@ -33,13 +33,11 @@ class SessionconcourControllerApi extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
             $session = Sessionconcour::create($validateData);
-            DB::commit();
-            return response()->json($session->load('personnel'), 201);
+            return response()->json($session->load('personnel'));
         } catch (Throwable $th) {
-            DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la création de la session: ' . $th->getMessage()], 500);
+            Log::error('Error creating session: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la création de la session'], 500);
         }
     }
 
@@ -48,13 +46,9 @@ class SessionconcourControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $session = Sessionconcour::with(['personnel', 'candidats'])->find($id);
-        
-        if (!$session) {
-            return response()->json(['erreur' => 'Session non trouvée'], 404);
-        }
-        
-        return response()->json($session, 200);
+        $session = Sessionconcour::with(['personnel', 'candidats'])->findOrFail($id);
+
+        return response()->json($session);
     }
 
     /**
@@ -63,42 +57,18 @@ class SessionconcourControllerApi extends Controller
     public function update(Request $request, string $id)
     {
         $validateData = $request->validate([
-            'code_pers' => 'sometimes|required|string|exists:personnel,code_pers',
-            'annee' => 'sometimes|required|date',
-            'debut' => 'sometimes|required|date',
-            'cloture' => 'sometimes|required|date',
+            'code_pers' => 'sometimes|string|exists:personnel,code_pers',
+            'annee' => 'sometimes|date',
+            'debut' => 'sometimes|date|required_with:cloture',
+            'cloture' => 'sometimes|date|after:debut|required_with:debut',
         ]);
 
-        // Validation personnalisée pour s'assurer que cloture est après debut
-        if (isset($validateData['debut']) && isset($validateData['cloture'])) {
-            if (Carbon::parse($validateData['cloture'])->lte(Carbon::parse($validateData['debut']))) {
-                return response()->json(['erreur' => 'La date de clôture doit être après la date de début'], 422);
-            }
-        }
-
+        $session = Sessionconcour::findOrFail($id);
         try {
-            DB::beginTransaction();
-            $session = Sessionconcour::findOrFail($id);
-            
-            // Si seulement cloture est mise à jour, vérifier avec la date de début existante
-            if (isset($validateData['cloture']) && !isset($validateData['debut'])) {
-                if (Carbon::parse($validateData['cloture'])->lte($session->debut)) {
-                    return response()->json(['erreur' => 'La date de clôture doit être après la date de début'], 422);
-                }
-            }
-            
-            // Si seulement debut est mis à jour, vérifier avec la date de clôture existante
-            if (isset($validateData['debut']) && !isset($validateData['cloture'])) {
-                if (Carbon::parse($validateData['debut'])->gte($session->cloture)) {
-                    return response()->json(['erreur' => 'La date de début doit être avant la date de clôture'], 422);
-                }
-            }
-            
             $session->update($validateData);
-            DB::commit();
-            return response()->json($session->load('personnel'), 200);
+            return response()->json($session->load('personnel'));
         } catch (Throwable $th) {
-            DB::rollback();
+            Log::error('Error updating session: ' . $th->getMessage());
             return response()->json(['erreur' => 'Erreur lors de la mise à jour de la session: ' . $th->getMessage()], 500);
         }
     }
@@ -108,20 +78,12 @@ class SessionconcourControllerApi extends Controller
      */
     public function destroy(string $id)
     {
+        $session = Sessionconcour::findOrFail($id);
         try {
-            DB::beginTransaction();
-            $session = Sessionconcour::findOrFail($id);
-            
-            // Vérifier s'il y a des candidats associés
-            if ($session->candidats()->count() > 0) {
-                return response()->json(['erreur' => 'Impossible de supprimer une session avec des candidats'], 400);
-            }
-            
             $session->delete();
-            DB::commit();
-            return response()->json(['succes' => 'Session supprimée avec succès'], 200);
+            return response()->noContent();
         } catch (Throwable $th) {
-            DB::rollback();
+            Log::error('Error deleting session: ' . $th->getMessage());
             return response()->json(['erreur' => 'Erreur lors de la suppression de la session: ' . $th->getMessage()], 500);
         }
     }
@@ -133,15 +95,15 @@ class SessionconcourControllerApi extends Controller
     {
         $today = Carbon::now();
         $session = Sessionconcour::where('debut', '<=', $today)
-                                ->where('cloture', '>=', $today)
-                                ->with('personnel')
-                                ->first();
-        
+            ->where('cloture', '>=', $today)
+            ->with(['personnel', 'candidats'])
+            ->first();
+
         if (!$session) {
             return response()->json(['message' => 'Aucune session active'], 404);
         }
-        
-        return response()->json($session, 200);
+
+        return response()->json($session);
     }
 
     /**
@@ -150,11 +112,11 @@ class SessionconcourControllerApi extends Controller
     public function byYear($year)
     {
         $sessions = Sessionconcour::whereYear('annee', $year)
-                                 ->with('personnel')
-                                 ->orderBy('debut')
-                                 ->get();
-        
-        return response()->json($sessions, 200);
+            ->with(['personnel','candidats'])
+            ->orderBy('debut')
+            ->get();
+
+        return response()->json($sessions);
     }
 
     /**
@@ -163,7 +125,7 @@ class SessionconcourControllerApi extends Controller
     public function statistics(string $id)
     {
         $session = Sessionconcour::findOrFail($id);
-        
+
         $stats = [
             'total_candidats' => $session->candidats()->count(),
             'candidats_par_sexe' => $session->candidats()
@@ -181,8 +143,8 @@ class SessionconcourControllerApi extends Controller
                 ->groupBy('site_etude.label_site')
                 ->get(),
         ];
-        
-        return response()->json($stats, 200);
+
+        return response()->json($stats);
     }
 
     /**
@@ -191,11 +153,11 @@ class SessionconcourControllerApi extends Controller
     public function upcoming()
     {
         $sessions = Sessionconcour::where('debut', '>', Carbon::now())
-                                 ->with('personnel')
-                                 ->orderBy('debut')
-                                 ->get();
-        
-        return response()->json($sessions, 200);
+            ->with(['personnel', 'candidats'])
+            ->orderBy('debut')
+            ->get();
+
+        return response()->json($sessions);
     }
 
     /**
@@ -204,10 +166,10 @@ class SessionconcourControllerApi extends Controller
     public function past()
     {
         $sessions = Sessionconcour::where('cloture', '<', Carbon::now())
-                                 ->with('personnel')
-                                 ->orderBy('cloture', 'desc')
-                                 ->get();
-        
-        return response()->json($sessions, 200);
+            ->with(["personnel", "candidats"])
+            ->orderBy('cloture', 'desc')
+            ->get();
+
+        return response()->json($sessions);
     }
 }

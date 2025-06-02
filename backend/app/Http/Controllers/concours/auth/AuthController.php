@@ -10,8 +10,8 @@ use Exception;
 use Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
-
 
 class AuthController extends Controller
 {
@@ -59,7 +59,8 @@ class AuthController extends Controller
                 'message' => 'Déconnexion réussie.',
                 'status' => 'success'
             ]);
-        } catch (Exception) {
+        } catch (Exception $e) {
+            Log::error('Error in logout: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Erreur lors de la déconnexion.',
             ], 500);
@@ -87,7 +88,8 @@ class AuthController extends Controller
                 ], 401);
 
             return $this->authService->getUserFromToken($token);
-        } catch (Exception) {
+        } catch (Exception $e) {
+            Log::error('Error in checkToken: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Erreur lors de la verification du token.',
             ], 500);
@@ -107,7 +109,8 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'message' => 'Token rafraîchi avec succès.'
             ]);
-        } catch (Exception) {
+        } catch (Exception $e) {
+            Log::error('Error in refresh: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Erreur lors du rafraîchissement du token.'
             ], 500);

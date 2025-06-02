@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('ca_prenom');
             $table->timestamps();
 
-             $table->foreign('ca_code')->references('ca_code')->on('candidat')->onDelete('cascade');
+             $table->foreign('ca_code')->references('ca_code')->on('candidat')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

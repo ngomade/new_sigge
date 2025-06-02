@@ -50,7 +50,6 @@ class Ecole extends Model
 		'bp_ecole',
 		'centre_depot_code'
 	];
-
 	public function centre_depot(): BelongsTo
 	{
 		return $this->belongsTo(CentreDepot::class, 'centre_depot_code');
@@ -67,13 +66,17 @@ class Ecole extends Model
 		return $this->hasMany(CentreExaman::class, 'code_ecole');
 	}
 
-	public function compositions(): HasMany
+	public function site_composition(): belongsToMany
 	{
-		return $this->hasMany(Composition::class, 'code_ecole');
+		return $this->belongsToMany(SiteComposition::class, 'composition', 'code_ecole', 'site_code')
+            ->withPivot('code_ecole', 'site_code')
+            ->withTimestamps();
 	}
 
-	public function ecole_elements(): HasMany
+	public function ecole_elements(): BelongsToMany
 	{
-		return $this->hasMany(EcoleElement::class, 'code_ecole');
+		return $this->belongsToMany(EcoleElement::class, 'ecole_element', 'code_ecole', 'code_el')
+            ->withPivot('code_ecole', 'code_el')
+            ->withTimestamps();
 	}
 }

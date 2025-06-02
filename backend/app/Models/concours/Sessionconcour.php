@@ -1,15 +1,13 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Sessionconcour
@@ -44,12 +42,12 @@ class Sessionconcour extends Model
 		'cloture'
 	];
 
-	public function personnel()
+	public function personnel(): BelongsTo
 	{
 		return $this->belongsTo(Personnel::class, 'code_pers');
 	}
 
-	public function candidats()
+	public function candidats(): HasMany
 	{
 		return $this->hasMany(Candidat::class, 'id');
 	}

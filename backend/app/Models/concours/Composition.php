@@ -1,13 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Class Composition
@@ -22,18 +19,12 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Composition extends Model
+class Composition extends Pivot
 {
 	protected $table = 'composition';
-	public $incrementing = false;
 
-	public function ecole()
-	{
-		return $this->belongsTo(Ecole::class, 'code_ecole');
-	}
-
-	public function site_composition()
-	{
-		return $this->belongsTo(SiteComposition::class, 'site_code');
-	}
+    protected $fillable = [
+        "code_ecole",
+        "site_code"
+    ];
 }

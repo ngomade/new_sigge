@@ -70,7 +70,7 @@ return [
     'providers' => [
         'web-users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL' , \App\Models\concours\Compte::class),
+            'model' => env('AUTH_MODEL' , \App\Models\User::class),
         ],
         'admins' => [
             'driver' => 'eloquent',

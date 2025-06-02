@@ -4,8 +4,8 @@ namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\EcoleElement;
-use Illuminate\Support\Facades\DB;
+use App\Models\concours\EcoleElement;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class EcoleElementControllerApi extends Controller
@@ -16,7 +16,7 @@ class EcoleElementControllerApi extends Controller
     public function index()
     {
         $ecoleElements = EcoleElement::all();
-        return response()->json($ecoleElements, 200);
+        return response()->json($ecoleElements);
     }
 
     /**
@@ -29,12 +29,10 @@ class EcoleElementControllerApi extends Controller
             'code_el' => 'required|exists:dossier,code_el',
         ]);
         try {
-            DB::beginTransaction();
             $ecoleElement = EcoleElement::create($validateData);
-            DB::commit();
-            return response()->json($ecoleElement, 200);
+            return response()->json($ecoleElement);
         } catch (Throwable $th) {
-            DB::rollback();
+            Log::error('Error creating ecole element: ' . $th->getMessage());
             return response()->json(['erreur' => 'erreur lors de l\'enregistrement de l\'ecole element'], 500);
         }
     }
@@ -44,11 +42,9 @@ class EcoleElementControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $ecoleElement = EcoleElement::find($id);
-        if (!$ecoleElement) {
-            return response()->json(['erreur' => 'ecole element non trouvé'], 404);
-        }
-        return response()->json($ecoleElement, 200);
+        $ecoleElement = EcoleElement::findorFail($id);
+
+        return response()->json($ecoleElement);
     }
 
     /**
@@ -61,13 +57,11 @@ class EcoleElementControllerApi extends Controller
             'code_el' => 'required|exists:dossier,code_el',
         ]);
         try {
-            DB::beginTransaction();
             $ecoleElement = EcoleElement::findOrFail($id);
             $ecoleElement->update($validateData);
-            DB::commit();
-            return response()->json($ecoleElement, 200);
+            return response()->json($ecoleElement);
         } catch (Throwable $th) {
-            DB::rollback();
+            Log::error('Error updating ecole element: ' . $th->getMessage());
             return response()->json(['erreur' => 'erreur lors de la mise à jour de l\'ecole element'], 500);
         }
     }
@@ -80,10 +74,9 @@ class EcoleElementControllerApi extends Controller
         try {
             $ecoleElement = EcoleElement::findOrFail($id);
             $ecoleElement->delete();
-            DB::commit();
-            return response()->json(['succes' => 'ecole element supprimé'], 200);
+            return response()->json(['succes' => 'ecole element supprimé']);
         } catch (Throwable $th) {
-            DB::rollback();
+            Log::error('Error deleting ecole element: ' . $th->getMessage());
             return response()->json(['erreur' => 'erreur lors de la suppression de l\'ecole element'], 500);
         }
     }

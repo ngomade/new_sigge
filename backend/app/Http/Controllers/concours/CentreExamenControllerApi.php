@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\CentreExaman;
+use App\Models\concours\CentreExaman;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use Illuminate\Support\Facades\Log;
 
 class CentreExamenControllerApi extends Controller
 {
@@ -15,8 +15,8 @@ class CentreExamenControllerApi extends Controller
      */
     public function index()
     {
-        $centres = CentreExaman::all();
-        return response()->json($centres, 200);
+        $centres = CentreExaman::with("ecole")->get();
+        return response()->json($centres);
     }
 
     /**
@@ -31,13 +31,11 @@ class CentreExamenControllerApi extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
             $centre = CentreExaman::create($validatedData);
-            DB::commit();
-            return response()->json($centre, 201);
-        } catch (Throwable $th) {
-            DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de l\'enregistrement du centre d\'examen: ' . $th->getMessage()], 500);
+            return response()->json($centre);
+        } catch (Exception $e) {
+            Log::error('Error creating centre examen: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur lors de l\'enregistrement du centre d\'examen'], 500);
         }
     }
 
@@ -46,11 +44,8 @@ class CentreExamenControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $centre = CentreExaman::find($id);
-        if (!$centre) {
-            return response()->json(['error' => 'Centre d\'examen non trouvé'], 404);
-        }
-        return response()->json($centre, 200);
+        $centre = CentreExaman::findorfail($id);
+        return response()->json($centre->load("ecole"));
     }
 
     /**
@@ -63,15 +58,13 @@ class CentreExamenControllerApi extends Controller
             'centre_exam_label' => 'required|string|max:255',
         ]);
 
+        $centre = CentreExaman::findOrFail($id);
         try {
-            DB::beginTransaction();
-            $centre = CentreExaman::findOrFail($id);
             $centre->update($validatedData);
-            DB::commit();
-            return response()->json($centre, 200);
-        } catch (Throwable $th) {
-            DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de la mise à jour du centre d\'examen: ' . $th->getMessage()], 500);
+            return response()->json($centre);
+        } catch (Exception $e) {
+            Log::error('Error updating centre examen: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur lors de la mise à jour du centre d\'examen'], 500);
         }
     }
 
@@ -80,15 +73,13 @@ class CentreExamenControllerApi extends Controller
      */
     public function destroy(string $id)
     {
+        $centre = CentreExaman::findOrFail($id);
         try {
-            DB::beginTransaction();
-            $centre = CentreExaman::findOrFail($id);
             $centre->delete();
-            DB::commit();
-            return response()->json(['success' => 'Centre d\'examen supprimé'], 200);
-        } catch (Throwable $th) {
-            DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de la suppression du centre d\'examen: ' . $th->getMessage()], 500);
+            return response()->noContent();
+        } catch (Exception $e) {
+            Log::error('Error deleting centre examen: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur lors de la suppression du centre d\'examen'], 500);
         }
     }
 }

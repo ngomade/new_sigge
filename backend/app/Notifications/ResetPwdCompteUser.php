@@ -38,7 +38,7 @@ class ResetPwdCompteUser extends Notification
     {
         return (new MailMessage)
             ->subject('Réinitialisation de votre mot de passe')
-            ->view("concours.reset_password", [
+            ->view("concours.reset_password_mail", [
                 'code' => $this->code,
                 'user' => $notifiable,
             ]);

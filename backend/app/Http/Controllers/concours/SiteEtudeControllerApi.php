@@ -5,7 +5,7 @@ namespace App\Http\Controllers\concours;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\concours\SiteEtude;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class SiteEtudeControllerApi extends Controller
@@ -15,8 +15,8 @@ class SiteEtudeControllerApi extends Controller
      */
     public function index()
     {
-        $sites = SiteEtude::withCount('candidats')->get();
-        return response()->json($sites, 200);
+        $sites = SiteEtude::with('candidats')->get();
+        return response()->json($sites);
     }
 
     /**
@@ -30,13 +30,11 @@ class SiteEtudeControllerApi extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
             $site = SiteEtude::create($validateData);
-            DB::commit();
-            return response()->json($site, 201);
+            return response()->json($site);
         } catch (Throwable $th) {
-            DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la création du site d\'étude: ' . $th->getMessage()], 500);
+            Log::error('Error creating site: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la création du site d\'étude'], 500);
         }
     }
 
@@ -45,13 +43,9 @@ class SiteEtudeControllerApi extends Controller
      */
     public function show(string $code_site)
     {
-        $site = SiteEtude::withCount('candidats')->find($code_site);
-        
-        if (!$site) {
-            return response()->json(['erreur' => 'Site d\'étude non trouvé'], 404);
-        }
-        
-        return response()->json($site, 200);
+        $site = SiteEtude::with('candidats')->find($code_site);
+
+        return response()->json($site);
     }
 
     /**
@@ -64,15 +58,13 @@ class SiteEtudeControllerApi extends Controller
             'description_site' => 'sometimes|required|string',
         ]);
 
-        try {
-            DB::beginTransaction();
             $site = SiteEtude::findOrFail($code_site);
+        try {
             $site->update($validateData);
-            DB::commit();
-            return response()->json($site, 200);
+            return response()->json($site);
         } catch (Throwable $th) {
-            DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la mise à jour du site d\'étude: ' . $th->getMessage()], 500);
+            Log::error('Error updating site: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la mise à jour du site d\'étude'], 500);
         }
     }
 
@@ -81,33 +73,14 @@ class SiteEtudeControllerApi extends Controller
      */
     public function destroy(string $code_site)
     {
-        try {
-            DB::beginTransaction();
-            $site = SiteEtude::findOrFail($code_site);
-            
-            // Vérifier s'il y a des candidats associés
-            if ($site->candidats()->count() > 0) {
-                return response()->json(['erreur' => 'Impossible de supprimer un site avec des candidats'], 400);
-            }
-            
-            $site->delete();
-            DB::commit();
-            return response()->json(['succes' => 'Site d\'étude supprimé avec succès'], 200);
-        } catch (Throwable $th) {
-            DB::rollback();
-            return response()->json(['erreur' => 'Erreur lors de la suppression du site d\'étude: ' . $th->getMessage()], 500);
-        }
-    }
-
-    /**
-     * Récupérer les candidats d'un site
-     */
-    public function candidats(string $code_site)
-    {
         $site = SiteEtude::findOrFail($code_site);
-        $candidats = $site->candidats()->with(['filiere', 'ecoles'])->get();
-        
-        return response()->json($candidats, 200);
+        try {
+            $site->delete();
+            return response()->json(['succes' => 'Site d\'étude supprimé avec succès']);
+        } catch (Throwable $th) {
+            Log::error('Error deleting site: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la suppression du site d\'étude'], 500);
+        }
     }
 
     /**
@@ -116,28 +89,32 @@ class SiteEtudeControllerApi extends Controller
     public function statistics(string $code_site)
     {
         $site = SiteEtude::findOrFail($code_site);
-        
-        $stats = [
-            'site' => $site,
-            'total_candidats' => $site->candidats()->count(),
-            'candidats_par_sexe' => $site->candidats()
-                ->selectRaw('ca_sexe, count(*) as total')
-                ->groupBy('ca_sexe')
-                ->get(),
-            'candidats_par_filiere' => $site->candidats()
-                ->join('filiere', 'candidat.filiere_code', '=', 'filiere.filiere_code')
-                ->selectRaw('filiere.label_filiere, count(*) as total')
-                ->groupBy('filiere.label_filiere')
-                ->get(),
-            'candidats_par_nationalite' => $site->candidats()
-                ->selectRaw('ca_nationalite, count(*) as total')
-                ->groupBy('ca_nationalite')
-                ->orderBy('total', 'desc')
-                ->limit(10)
-                ->get(),
-        ];
-        
-        return response()->json($stats, 200);
+        try {
+            $stats = [
+                'site' => $site,
+                'total_candidats' => $site->candidats()->count(),
+                'candidats_par_sexe' => $site->candidats()
+                    ->selectRaw('ca_sexe, count(*) as total')
+                    ->groupBy('ca_sexe')
+                    ->get(),
+                'candidats_par_filiere' => $site->candidats()
+                    ->join('filiere', 'candidat.filiere_code', '=', 'filiere.filiere_code')
+                    ->selectRaw('filiere.label_filiere, count(*) as total')
+                    ->groupBy('filiere.label_filiere')
+                    ->get(),
+                'candidats_par_nationalite' => $site->candidats()
+                    ->selectRaw('ca_nationalite, count(*) as total')
+                    ->groupBy('ca_nationalite')
+                    ->orderBy('total', 'desc')
+                    ->limit(10)
+                    ->get(),
+            ];
+
+            return response()->json($stats);
+        } catch (Throwable $th) {
+            Log::error('Error getting site statistics: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la récupération des statistiques du site'], 500);
+        }
     }
 
     /**
@@ -145,18 +122,23 @@ class SiteEtudeControllerApi extends Controller
      */
     public function search(Request $request)
     {
-        $query = SiteEtude::query();
+        try {
+            $query = SiteEtude::query();
 
-        if ($request->has('label')) {
-            $query->where('label_site', 'like', '%' . $request->label . '%');
+            if ($request->has('label')) {
+                $query->where('label_site', 'like', '%' . $request->label . '%');
+            }
+
+            if ($request->has('description')) {
+                $query->where('description_site', 'like', '%' . $request->description . '%');
+            }
+
+            $sites = $query->withCount('candidats')->get();
+
+            return response()->json($sites);
+        } catch (Throwable $th) {
+            Log::error('Error searching sites: ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la recherche des sites'], 500);
         }
-
-        if ($request->has('description')) {
-            $query->where('description_site', 'like', '%' . $request->description . '%');
-        }
-
-        $sites = $query->withCount('candidats')->get();
-        
-        return response()->json($sites, 200);
     }
 }

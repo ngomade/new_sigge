@@ -9,6 +9,7 @@ namespace App\Models\concours;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class SiteComposition
@@ -34,8 +35,10 @@ class SiteComposition extends Model
 		'site_lieu'
 	];
 
-	public function compositions()
+	public function ecoles(): BelongsToMany
 	{
-		return $this->hasMany(Composition::class, 'site_code');
+		return $this->belongsToMany(Ecole::class, 'composition', 'site_code', 'code_ecole')
+            ->withPivot('code_ecole', 'site_code')
+            ->withTimestamps();
 	}
 }

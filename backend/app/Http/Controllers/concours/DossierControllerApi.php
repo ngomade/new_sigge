@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\Dossier;
+use App\Models\concours\Dossier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class DossierControllerApi extends Controller
@@ -16,27 +17,31 @@ class DossierControllerApi extends Controller
     public function index()
     {
         $dossiers = Dossier::all();
-        return response()->json($dossiers, 200);
+        return response()->json($dossiers->load('ecole_elements'));
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws Throwable
      */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'code_el' => 'required|integer|unique:dossier,code_el',
             'label_el' => 'required|string|max:255',
+            'ecole_elements' => 'required|array',
+            'ecole_elements.*' => 'exists:ecole_elements,code_ecole',
         ]);
 
         try {
             DB::beginTransaction();
             $dossier = Dossier::create($validatedData);
+            $dossier->ecole_elements()->attach($request->ecole_elements);
             DB::commit();
-            return response()->json($dossier, 201);
+            return response()->json($dossier);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de l\'enregistrement du dossier: ' . $th->getMessage()], 500);
+            Log::error('Error creating dossier: ' . $th->getMessage());
+            return response()->json(['error' => 'Erreur lors de l\'enregistrement du dossier'], 500);
         }
     }
 
@@ -45,48 +50,54 @@ class DossierControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $dossier = Dossier::find($id);
-        if (!$dossier) {
-            return response()->json(['error' => 'Dossier non trouvé'], 404);
-        }
-        return response()->json($dossier, 200);
+        $dossier = Dossier::findorfail($id);
+        return response()->json($dossier->load('ecole_elements'));
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws Throwable
      */
     public function update(Request $request, string $id)
     {
         $validatedData = $request->validate([
             'label_el' => 'required|string|max:255',
+            'ecole_elements' => 'sometimes|array',
+            'ecole_elements.*' => 'exists:ecole_elements,code_ecole',
         ]);
 
+        $dossier = Dossier::findOrFail($id);
         try {
             DB::beginTransaction();
-            $dossier = Dossier::findOrFail($id);
+            $dossier->ecole_elements()->sync($request->ecole_elements);
             $dossier->update($validatedData);
             DB::commit();
-            return response()->json($dossier, 200);
+            return response()->json($dossier);
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de la mise à jour du dossier: ' . $th->getMessage()], 500);
+            Log::error('Error updating dossier: ' . $th->getMessage());
+            return response()->json(['error' => 'Erreur lors de la mise à jour du dossier'], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
+     * @throws Throwable
      */
     public function destroy(string $id)
     {
+        $dossier = Dossier::findOrFail($id);
         try {
             DB::beginTransaction();
-            $dossier = Dossier::findOrFail($id);
             $dossier->delete();
+            $dossier->ecole_elements()->detach(); // Detach related ecole_elements
             DB::commit();
-            return response()->json(['success' => 'Dossier supprimé'], 200);
+
+            return response()->noContent();
         } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => 'Erreur lors de la suppression du dossier: ' . $th->getMessage()], 500);
+            Log::error('Error deleting dossier: ' . $th->getMessage());
+            return response()->json(['error' => 'Erreur lors de la suppression du dossier'], 500);
         }
     }
 }

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
-use App\Models\Composition;
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use App\Models\concours\Composition;
+use Illuminate\Support\Facades\Log;
 
 class CompositionControllerApi extends Controller
 {
@@ -29,12 +29,10 @@ class CompositionControllerApi extends Controller
             'site_code' => 'required|string|exists:site_composition,site_code',
         ]);
         try {
-            DB::beginTransaction();
             $composition = Composition::create($validateData);
-            DB::commit();
             return response()->json($composition, 201);
-        } catch (Throwable $th) {
-            DB::rollback();
+        } catch (Exception $e) {
+            Log::error('Error creating composition: ' . $e->getMessage());
             return response()->json(['erreur' => 'erreur lors de l\'enregistrement de la composition'], 500);
         }
     }
@@ -44,11 +42,8 @@ class CompositionControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $composition = Composition::find($id);
-        if (!$composition) {
-            return response()->json(['erreur' => 'composition non trouvée'], 404);
-        }
-        return response()->json($composition, 200);
+        $composition = Composition::findorFail($id);
+        return response()->json($composition);
     }
 
     /**
@@ -57,17 +52,15 @@ class CompositionControllerApi extends Controller
     public function update(Request $request, string $id)
     {
         $validateData = $request->validate([
-           'code_ecole' => 'required|string|exists:ecole,code_ecole',
+            'code_ecole' => 'required|string|exists:ecole,code_ecole',
             'site_code' => 'required|string|exists:site_composition,site_code',
         ]);
+        $composition = Composition::findOrFail($id);
         try {
-            DB::beginTransaction();
-            $composition = Composition::findOrFail($id);
             $composition->update($validateData);
-            DB::commit();
             return response()->json($composition, 200);
-        } catch (Throwable $th) {
-            DB::rollback();
+        } catch (Exception $e) {
+            Log::error('Error updating composition: ' . $e->getMessage());
             return response()->json(['erreur' => 'erreur lors de la mise à jour de la composition'], 500);
         }
     }
@@ -77,13 +70,12 @@ class CompositionControllerApi extends Controller
      */
     public function destroy(string $id)
     {
+        $composition = Composition::findOrFail($id);
         try {
-            $composition = Composition::findOrFail($id);
             $composition->delete();
-            DB::commit();
-            return response()->json(['succes' => 'composition supprimée'], 200);
-        } catch (Throwable $th) {
-            DB::rollback();
+            return response()->json(['succes' => 'composition supprimée']);
+        } catch (Exception $e) {
+            Log::error('Error deleting composition: ' . $e->getMessage());
             return response()->json(['erreur' => 'erreur lors de la suppression de la composition'], 500);
         }
     }

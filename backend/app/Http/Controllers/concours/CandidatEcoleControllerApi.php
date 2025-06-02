@@ -4,8 +4,9 @@ namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\CandidatEcole;
+use App\Models\concours\CandidatEcole;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class CandidatEcoleControllerApi extends Controller
@@ -16,7 +17,7 @@ class CandidatEcoleControllerApi extends Controller
     public function index()
     {
         $candidats = CandidatEcole::all();
-        return response()->json($candidats, 200);
+        return response()->json($candidats);
     }
 
     /**
@@ -35,6 +36,7 @@ class CandidatEcoleControllerApi extends Controller
             return response()->json($candidatEcole, 200);
         } catch (Throwable $th) {
             DB::rollback();
+            Log::error('Error creating candidat ecole: ' . $th->getMessage());
             return response()->json(['erreur' => 'erreur lors de l\'enregistrement du candidat ecole'], 500);
         }
     }
@@ -60,14 +62,15 @@ class CandidatEcoleControllerApi extends Controller
             'ca_code' => 'required|string|exists:candidat,ca_code',
             'code_ecole' => 'required|string|exists:ecole,code_ecole',
         ]);
+        $candidatEcole = CandidatEcole::findOrFail($id);
         try {
             DB::beginTransaction();
-            $candidatEcole = CandidatEcole::findOrFail($id);
             $candidatEcole->update($validateData);
             DB::commit();
             return response()->json($candidatEcole, 200);
         } catch (Throwable $th) {
             DB::rollback();
+            Log::error('Error updating candidat ecole: ' . $th->getMessage());
             return response()->json(['erreur' => 'erreur lors de la mise à jour du candidat ecole'], 500);
         }
     }
@@ -77,13 +80,14 @@ class CandidatEcoleControllerApi extends Controller
      */
     public function destroy(string $id)
     {
+        $candidatEcole = CandidatEcole::findOrFail($id);
         try {
-            $candidatEcole = CandidatEcole::findOrFail($id);
             $candidatEcole->delete();
             DB::commit();
             return response()->json(['succes' => 'candidat ecole supprimé'], 200);
         } catch (Throwable $th) {
             DB::rollback();
+            Log::error('Error deleting candidat ecole: ' . $th->getMessage());
             return response()->json(['erreur' => 'erreur lors de la suppression du candidat ecole'], 500);
         }
     }

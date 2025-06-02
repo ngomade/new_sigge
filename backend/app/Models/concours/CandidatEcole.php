@@ -1,14 +1,12 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Class CandidatEcole
@@ -23,18 +21,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @package App\Models
  */
-class CandidatEcole extends Model
+class CandidatEcole extends Pivot
 {
 	protected $table = 'candidat_ecoles';
-	public $incrementing = false;
+    protected $fillable = [
+        'ca_code',
+        'code_ecole',
+    ];
 
-	public function candidat(): BelongsTo
+	public function candidat(): BelongsToMany
 	{
-		return $this->belongsTo(Candidat::class, 'ca_code');
+		return $this->belongsToMany(Candidat::class, 'candidat_ecoles', 'ca_code', 'code_ecole')
+            ->withPivot('ca_code', 'code_ecole')
+            ->withTimestamps();
 	}
 
-	public function ecole(): BelongsTo
+	public function ecole(): BelongsToMany
 	{
-		return $this->belongsTo(Ecole::class, 'code_ecole');
+		return $this->belongsToMany(Ecole::class, 'candidat_ecoles', 'code_ecole', 'ca_code')
+            ->withPivot('ca_code', 'code_ecole')
+            ->withTimestamps();
 	}
 }

@@ -1,10 +1,7 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
-namespace App\Models\concours;
+namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +26,7 @@ class User extends Model
 	protected $table = 'users';
 
 	protected $casts = [
-		'email_verified_at' => 'datetime'
+		'email_verified_at' => 'datetime',
 	];
 
 	protected $hidden = [

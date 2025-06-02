@@ -1,13 +1,11 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class CentreExaman
@@ -32,7 +30,7 @@ class CentreExaman extends Model
 		'centre_exam_label'
 	];
 
-	public function ecole()
+	public function ecole(): BelongsTo
 	{
 		return $this->belongsTo(Ecole::class, 'code_ecole');
 	}

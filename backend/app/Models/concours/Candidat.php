@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
@@ -11,8 +8,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Reliese\Coders\Model\Relations\BelongsToMany;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 /**
  * Class Candidat
@@ -66,7 +65,7 @@ use Reliese\Coders\Model\Relations\BelongsToMany;
  */
 class Candidat extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 	protected $table = 'candidat';
 	protected $primaryKey = 'ca_code';
 	public $incrementing = false;
@@ -115,6 +114,18 @@ class Candidat extends Model
 		'ca_recu'
 	];
 
+    protected static function boot(): void
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            do {
+                $id = Str::upper(Str::substr($model->filiere_code, 0, 2));
+                $id .= rand(1000, 10000);
+            } while (Candidat::where('ca_code', $id)->exists());
+            $model->ca_code = $id;
+        });
+    }
+
 	public function site_etude(): BelongsTo
 	{
 		return $this->belongsTo(SiteEtude::class, 'code_site');
@@ -130,7 +141,7 @@ class Candidat extends Model
 		return $this->belongsTo(Sessionconcour::class, 'id');
 	}
 
-	public function ecoles(): HasMany
+	public function ecoles(): BelongsToMany
 	{
 		return $this->belongsToMany(Ecole::class, 'candidat_ecoles', 'ca_code', 'code_ecole')
 					->withTimestamps();

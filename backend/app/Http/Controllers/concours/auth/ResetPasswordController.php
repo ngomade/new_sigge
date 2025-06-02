@@ -9,6 +9,7 @@ use App\Notifications\ResetPwdCompteUser;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ResetPasswordController extends Controller
 {
@@ -45,6 +46,7 @@ class ResetPasswordController extends Controller
                 'message' => 'Un email de réinitialisation a été envoyé à votre adresse email.'
             ]);
         } catch (Exception $e) {
+            Log::error('Error in forgotPassword: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Une erreur est survenue lors de l\'envoi de l\'email de réinitialisation.',
                 'error' => $e->getMessage()
@@ -96,7 +98,8 @@ class ResetPasswordController extends Controller
             return response()->json([
                 'message' => 'Votre mot de passe a été réinitialisé avec succès.'
             ]);
-        } catch (Exception) {
+        } catch (Exception $e) {
+            Log::error('Error in resetPassword: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Une erreur est survenue lors de la réinitialisation du mot de passe.'
             ], 500);

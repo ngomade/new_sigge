@@ -4,8 +4,10 @@ namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Ecole;
+use App\Models\concours\Ecole;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class EcoleControllerApi extends Controller
@@ -16,12 +18,13 @@ class EcoleControllerApi extends Controller
     public function index()
     {
         //
-        $ecole = Ecole::all();
-        return response()->json($ecole,200);
+        $ecole = Ecole::with(["candidats", "centre_depot", "centre_examen", 'ecole_elements', 'sites_composition'])->get();
+        return response()->json($ecole);
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws Throwable
      */
     public function store(Request $request)
     {
@@ -29,24 +32,31 @@ class EcoleControllerApi extends Controller
         $validatedData = $request->validate([
             'code_ecole' => 'required|string|max:32',
             'label_ecole' => 'required|string|max:128',
-            'logo_ecole' => 'required|mimes:png,jpg,jpeg|max:512',
+            'logo_ecole' => 'required|file|mimes:png,jpg,jpeg|max:2048',
             'desc_ecole' => 'required|string|max:255',
             'tel_ecole' => 'required|string|max:32',
             'email_ecole' => 'nullable|email|max:128',
             'bp_ecole' => 'required|string|max:128',
-            
             'centre_depot' => 'required|exists:centre_depot,centre_depot_code',
-            
+            'sites_composition' => 'sometimes|array',
+            'sites_composition.*' => "required|exists:site_composition,code_site",
         ]);
-        
+
         try {
             DB::beginTransaction();
-            $res = Ecole::create($request->all());
+            $validatedData["logo_ecole"] = $this->storageLogo($request, $validatedData["label_ecole"]);
+
+            $res = Ecole::create($validatedData);
+            if ($request->has('sites_composition')) {
+                $res->ecole_elements()->attach($request->sites_composition);
+            }
+
             DB::commit();
-            return response()->json($res, 201);
-        } catch (\Throwable $th) {
+            return response()->json($res);
+        } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => 'Erreur l\'or de l\'enregistrement de l\'ecole: ' . $th->getMessage()], 500);
+            Log::error('Error creating ecole : ' . $th->getMessage());
+            return response()->json(['error' => 'Erreur lors de l\'enregistrement de l\'ecole'], 500);
         }
     }
 
@@ -55,62 +65,91 @@ class EcoleControllerApi extends Controller
      */
     public function show(string $id)
     {
-        //
         $ecole = Ecole::findOrfail($id);
-        if (!$ecole) {
-            return response()->json(['error' => 'Ecole non trouve'], 404);
-        }
-        return response()->json($ecole, 200);
+
+        return response()->json($ecole->load(['centre_depot', 'centre_examen', 'ecole_elements', 'sites_composition']));
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws Throwable
      */
     public function update(Request $request, string $code_ecole)
     {
         //
         $validatedData = $request->validate([
-            'code_ecole' => 'required|string|max:32',
-            'label_ecole' => 'required|string|max:128',
-            'logo_ecole' => 'required|mimes:png,jpg,jpeg|max:512',
-            'desc_ecole' => 'required|string|max:255',
-            'tel_ecole' => 'required|string|max:32',
+            'code_ecole' => 'sometimes|string|max:32',
+            'label_ecole' => 'sometimes|string|max:128',
+            'logo_ecole' => 'sometimes|mimes:png,jpg,jpeg|max:512',
+            'desc_ecole' => 'sometimes|string|max:255',
+            'tel_ecole' => 'sometimes|string|max:32',
             'email_ecole' => 'nullable|email|max:128',
-            'bp_ecole' => 'required|string|max:128',
-            
-            'centre_depot' => 'required|exists:centre_depot,centre_depot_code',
+            'bp_ecole' => 'sometimes|string|max:128',
+            'centre_depot' => 'sometimes|exists:centre_depot,centre_depot_code',
+            'sites_composition' => 'sometimes|array',
+            'sites_composition.*' => "required|exists:site_composition,code_site",
         ]);
-        try{
+        $ecole = Ecole::findOrfail($code_ecole);
+        try {
             DB::beginTransaction();
-            $ecole = Ecole::findOrfail($code_ecole);
-            $ecole->update($request->all());
-            DB::commit();
-            return response()->json($ecole, 200);
 
-        }catch(Throwable $th){
+            if ($request->hasFile('logo_ecole')) {
+                Storage::delete($ecole->logo_ecole);
+                $validatedData["logo_ecole"] = $this->storageLogo($request, $ecole->label_ecole);
+            }
+            $ecole->update($validatedData);
+            if ($request->has('sites_composition')) {
+                $ecole->ecole_elements()->sync($request->sites_composition);
+            }
+            DB::commit();
+
+            return response()->json($ecole);
+
+        } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => 'Erreur l\'or de la mise a jour de l\'ecole: ' . $th->getMessage()], 500);
+            Log::error('Error updating ecole : ' . $th->getMessage());
+            return response()->json(['error' => 'Erreur lors de la mise a jour de l\'ecole'], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
+     * @throws Throwable
      */
     public function destroy(string $code_ecole)
 
     {
         //
-        try{
+        $ecole = Ecole::findOrfail($code_ecole);
+        try {
             DB::beginTransaction();
-            $ecole = Ecole::findOrfail($code_ecole);
+            if (Storage::exists($ecole->logo_ecole)) {
+                Storage::delete($ecole->logo_ecole);
+            }
+            if ($ecole->ecole_elements()->exists()) {
+                $ecole->ecole_elements()->detach();
+            }
             $ecole->delete();
             DB::commit();
-            return response()->json(null,200);
+            return response()->noContent();
 
-        }catch(Throwable $th){
+        } catch (Throwable $th) {
             DB::rollBack();
-            return response()->json(['erreur' => 'Erreur l\'or de la suppression:' .$th->getMessage()],500);
-       }
-   }
-       
+            Log::error('Error deleting ecole : ' . $th->getMessage());
+            return response()->json(['erreur' => 'Erreur lors de la suppression'], 500);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param $ecole
+     * @return string
+     */
+    private function storageLogo(Request $request, $label_ecole): string
+    {
+        $logo_ecole = $request->file('logo_ecole');
+        $path = "logo_" . $label_ecole . "_" . now()->format("Y_m_d_H_i_s");
+        return $logo_ecole->store('private/logos', $path);
+    }
+
 }

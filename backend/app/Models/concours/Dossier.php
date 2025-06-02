@@ -1,14 +1,12 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class Dossier
@@ -31,8 +29,10 @@ class Dossier extends Model
 		'label_el'
 	];
 
-	public function ecole_elements()
+	public function ecole_elements(): BelongsToMany
 	{
-		return $this->hasMany(EcoleElement::class, 'code_el');
+		return $this->belongsToMany(EcoleElement::class, 'ecole_element', 'code_el', 'code_ecole')
+            ->withPivot('code_ecole')
+            ->withTimestamps();
 	}
 }
