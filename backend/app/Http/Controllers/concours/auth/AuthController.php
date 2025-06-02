@@ -7,11 +7,12 @@ use App\Models\concours\Compte;
 use App\Models\concours\Personnel;
 use App\Services\AuthService;
 use Exception;
-use Hash;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
