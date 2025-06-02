@@ -1,0 +1,1224 @@
+[
+  {
+    "country": "Algérie",
+    "regions": [
+      {
+        "region": "Adrar",
+        "departments": [
+          "Adrar",
+          "Aoulef",
+          "Reggane",
+          "Timimoun"
+        ]
+      },
+      {
+        "region": "Chlef",
+        "departments": [
+          "Chlef",
+          "El Karimia",
+          "Oued Fodda",
+          "Tenes"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Angola",
+    "regions": [
+      {
+        "region": "Bengo",
+        "departments": [
+          "Ambriz",
+          "Dande",
+          "Nambuangongo"
+        ]
+      },
+      {
+        "region": "Benguela",
+        "departments": [
+          "Benguela",
+          "Baía Farta",
+          "Catumbela",
+          "Lobito"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Bénin",
+    "regions": [
+      {
+        "region": "Alibori",
+        "departments": [
+          "Banikoara",
+          "Gogounou",
+          "Kandi",
+          "Karimama",
+          "Malanville",
+          "Segbana"
+        ]
+      },
+      {
+        "region": "Atacora",
+        "departments": [
+          "Boukoumbé",
+          "Cobly",
+          "Kérou",
+          "Kouandé",
+          "Matéri",
+          "Natitingou",
+          "Péhunco",
+          "Tanguiéta",
+          "Toucountouna"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Botswana",
+    "regions": [
+      {
+        "region": "Central",
+        "departments": [
+          "Boteti",
+          "Bobirwa",
+          "Mahalapye",
+          "Serowe Palapye",
+          "Tonota"
+        ]
+      },
+      {
+        "region": "Ghanzi",
+        "departments": [
+          "Charles Hill",
+          "Ghanzi"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Burkina Faso",
+    "regions": [
+      {
+        "region": "Boucle du Mouhoun",
+        "departments": [
+          "Dédougou",
+          "Nouna",
+          "Tugan"
+        ]
+      },
+      {
+        "region": "Cascades",
+        "departments": [
+          "Banfora",
+          "Soubakaniédougou"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Burundi",
+    "regions": [
+      {
+        "region": "Bubanza",
+        "departments": [
+          "Bubanza",
+          "Gihanga",
+          "Musigati"
+        ]
+      },
+      {
+        "region": "Bujumbura Mairie",
+        "departments": [
+          "Mukaza",
+          "Muha",
+          "Ntahangwa"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Cameroun",
+    "regions": [
+      {
+        "region": "Adamaoua",
+        "departments": [
+          "Djérem",
+          "Faro-et-Déo",
+          "Mayo-Banyo",
+          "Mbéré",
+          "Vina"
+        ]
+      },
+      {
+        "region": "Centre",
+        "departments": [
+          "Haute-Sanaga",
+          "Lekié",
+          "Mbam-et-Inoubou",
+          "Mbam-et-Kim",
+          "Méfou-et-Afamba",
+          "Méfou-et-Akono",
+          "Mfoundi",
+          "Nyong-et-Kellé",
+          "Nyong-et-Mfoumou",
+          "Nyong-et-So’o"
+        ]
+      },
+      {
+        "region": "Est",
+        "departments": [
+          "Boumba-et-Ngoko",
+          "Haut-Nyong",
+          "Kadey",
+          "Lom-et-Djérem"
+        ]
+      },
+      {
+        "region": "Extrême-Nord",
+        "departments": [
+          "Diamaré",
+          "Logone-et-Chari",
+          "Mayo-Danay",
+          "Mayo-Kani",
+          "Mayo-Sava",
+          "Mayo-Tsanaga"
+        ]
+      },
+      {
+        "region": "Littoral",
+        "departments": [
+          "Moungo",
+          "Nkam",
+          "Sanaga-Maritime",
+          "Wouri"
+        ]
+      },
+      {
+        "region": "Nord",
+        "departments": [
+          "Bénoué",
+          "Faro",
+          "Mayo-Louti",
+          "Mayo-Rey"
+        ]
+      },
+      {
+        "region": "Nord-Ouest",
+        "departments": [
+          "Boyo",
+          "Bui",
+          "Donga-Mantung",
+          "Menchum",
+          "Mezam",
+          "Momo",
+          "Ngo-Ketunjia"
+        ]
+      },
+      {
+        "region": "Ouest",
+        "departments": [
+          "Bamboutos",
+          "Haut-Nkam",
+          "Hauts-Plateaux",
+          "Koung-Khi",
+          "Menoua",
+          "Mifi",
+          "Ndé",
+          "Noun"
+        ]
+      },
+      {
+        "region": "Sud",
+        "departments": [
+          "Dja-et-Lobo",
+          "Mvila",
+          "Océan",
+          "Vallée-du-Ntem"
+        ]
+      },
+      {
+        "region": "Sud-Ouest",
+        "departments": [
+          "Fako",
+          "Koupé-Manengouba",
+          "Lebialem",
+          "Manyu",
+          "Meme",
+          "Ndian"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Cap-Vert",
+    "regions": [
+      {
+        "region": "Barlavento",
+        "departments": [
+          "Boa Vista",
+          "Paul",
+          "Porto Novo",
+          "Ribeira Grande",
+          "Sal",
+          "São Vicente",
+          "Santo Antão"
+        ]
+      },
+      {
+        "region": "Sotavento",
+        "departments": [
+          "Brava",
+          "Maio",
+          "Ribeira Grande de Santiago",
+          "Santa Catarina",
+          "Santa Cruz",
+          "São Domingos",
+          "São Filipe",
+          "São Salvador do Mundo",
+          "Tarrafal"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "République centrafricaine",
+    "regions": [
+      {
+        "region": "Bamingui-Bangoran",
+        "departments": [
+          "Bamingui",
+          "Ndélé"
+        ]
+      },
+      {
+        "region": "Bangui",
+        "departments": [
+          "1er arrondissement",
+          "2e arrondissement",
+          "3e arrondissement",
+          "4e arrondissement",
+          "5e arrondissement",
+          "6e arrondissement",
+          "7e arrondissement",
+          "8e arrondissement"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Tchad",
+    "regions": [
+      {
+        "region": "Batha",
+        "departments": [
+          "Fada",
+          "Faya"
+        ]
+      },
+      {
+        "region": "Chari-Baguirmi",
+        "departments": [
+          "Bousso",
+          "Massenya",
+          "N'Djamena"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Comores",
+    "regions": [
+      {
+        "region": "Anjouan",
+        "departments": [
+          "Domoni",
+          "Mutsamudu",
+          "Ouani"
+        ]
+      },
+      {
+        "region": "Grande Comore",
+        "departments": [
+          "Fomboni",
+          "Moroni",
+          "Mitsamiouli"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "République du Congo",
+    "regions": [
+      {
+        "region": "Bouenza",
+        "departments": [
+          "Madingo-Kayes",
+          "Mfouati"
+        ]
+      },
+      {
+        "region": "Brazzaville",
+        "departments": [
+          "Bacongo",
+          "Makélékélé",
+          "Poto-Poto",
+          "Talangaï"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "République démocratique du Congo",
+    "regions": [
+      {
+        "region": "Bas-Uele",
+        "departments": [
+          "Ango",
+          "Bambesa",
+          "Bondo",
+          "Poko"
+        ]
+      },
+      {
+        "region": "Equateur",
+        "departments": [
+          "Mbandaka",
+          "Bikoro",
+          "Bolenge",
+          "Ingende"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Djibouti",
+    "regions": [
+      {
+        "region": "Ali Sabieh",
+        "departments": [
+          "Ali Sabieh",
+          "Assamo",
+          "Dikhil"
+        ]
+      },
+      {
+        "region": "Arta",
+        "departments": [
+          "Arta",
+          "We`a"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Égypte",
+    "regions": [
+      {
+        "region": "Alexandrie",
+        "departments": [
+          "Dekhela",
+          "Moharam Bey",
+          "Ramleh",
+          "Sidi Gaber"
+        ]
+      },
+      {
+        "region": "Le Caire",
+        "departments": [
+          "Ain Shams",
+          "Nasr City",
+          "Heliopolis",
+          "Maadi"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Guinée équatoriale",
+    "regions": [
+      {
+        "region": "Annobón",
+        "departments": [
+          "San Antonio de Palé"
+        ]
+      },
+      {
+        "region": "Bioko Norte",
+        "departments": [
+          "Malabo",
+          "Baney"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Érythrée",
+    "regions": [
+      {
+        "region": "Anseba",
+        "departments": [
+          "Elabered",
+          "Hagaz",
+          "Keren"
+        ]
+      },
+      {
+        "region": "Maekel",
+        "departments": [
+          "Asmara",
+          "Berikh",
+          "Ghala Nefhi"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Eswatini",
+    "regions": [
+      {
+        "region": "Hhohho",
+        "departments": [
+          "Mbabane",
+          "Piggs Peak",
+          "Motshane"
+        ]
+      },
+      {
+        "region": "Lubombo",
+        "departments": [
+          "Siteki",
+          "Siphofaneni"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Éthiopie",
+    "regions": [
+      {
+        "region": "Addis-Abeba",
+        "departments": [
+          "Arada",
+          "Bole",
+          "Lideta"
+        ]
+      },
+      {
+        "region": "Afar",
+        "departments": [
+          "Assayita",
+          "Dubti",
+          "Samara"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Gabon",
+    "regions": [
+      {
+        "region": "Estuaire",
+        "departments": [
+          "Libreville",
+          "Owendo",
+          "Ntoum"
+        ]
+      },
+      {
+        "region": "Haut-Ogooué",
+        "departments": [
+          "Franceville",
+          "Moanda"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Gambie",
+    "regions": [
+      {
+        "region": "Banjul",
+        "departments": [
+          "Kanifing",
+          "Serekunda"
+        ]
+      },
+      {
+        "region": "Lower River",
+        "departments": [
+          "Mansa Konko"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Ghana",
+    "regions": [
+      {
+        "region": "Greater Accra",
+        "departments": [
+          "Accra",
+          "Tema",
+          "Madina"
+        ]
+      },
+      {
+        "region": "Ashanti",
+        "departments": [
+          "Kumasi",
+          "Obuasi"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Guinée",
+    "regions": [
+      {
+        "region": "Conakry",
+        "departments": [
+          "Kaloum",
+          "Matam",
+          "Ratoma"
+        ]
+      },
+      {
+        "region": "Kankan",
+        "departments": [
+          "Kankan",
+          "Siguiri"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Guinée-Bissau",
+    "regions": [
+      {
+        "region": "Bissau",
+        "departments": [
+          "Bissau",
+          "Bubaque"
+        ]
+      },
+      {
+        "region": "Bafatá",
+        "departments": [
+          "Bafatá",
+          "Bambadinca"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Kenya",
+    "regions": [
+      {
+        "region": "Nairobi",
+        "departments": [
+          "Dagoretti",
+          "Embakasi",
+          "Kasarani"
+        ]
+      },
+      {
+        "region": "Coast",
+        "departments": [
+          "Mombasa",
+          "Kwale",
+          "Kilifi"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Lesotho",
+    "regions": [
+      {
+        "region": "Maseru",
+        "departments": [
+          "Maseru",
+          "Mazenod",
+          "Morija"
+        ]
+      },
+      {
+        "region": "Leribe",
+        "departments": [
+          "Leribe",
+          "Maputsoe"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Libéria",
+    "regions": [
+      {
+        "region": "Montserrado",
+        "departments": [
+          "Monrovia",
+          "Paynesville",
+          "Virginia"
+        ]
+      },
+      {
+        "region": "Bong",
+        "departments": [
+          "Gbarnga",
+          "Jorquelleh"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Libye",
+    "regions": [
+      {
+        "region": "Tripoli",
+        "departments": [
+          "Tajura",
+          "Sarraj",
+          "Gargaresh"
+        ]
+      },
+      {
+        "region": "Benghazi",
+        "departments": [
+          "Alkwayfiya",
+          "Ganfouda"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Madagascar",
+    "regions": [
+      {
+        "region": "Analamanga",
+        "departments": [
+          "Antananarivo",
+          "Ambohidratrimo",
+          "Andramasina"
+        ]
+      },
+      {
+        "region": "Atsimo-Andrefana",
+        "departments": [
+          "Toliara",
+          "Betroka"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Malawi",
+    "regions": [
+      {
+        "region": "Central Region",
+        "departments": [
+          "Lilongwe",
+          "Kasungu",
+          "Nkhotakota"
+        ]
+      },
+      {
+        "region": "Northern Region",
+        "departments": [
+          "Mzuzu",
+          "Karonga"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Mali",
+    "regions": [
+      {
+        "region": "Bamako",
+        "departments": [
+          "Commune I",
+          "Commune II",
+          "Commune III"
+        ]
+      },
+      {
+        "region": "Kayes",
+        "departments": [
+          "Kayes",
+          "Nioro"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Mauritanie",
+    "regions": [
+      {
+        "region": "Nouakchott",
+        "departments": [
+          "Arafat",
+          "El Mina",
+          "Tevragh-Zeina"
+        ]
+      },
+      {
+        "region": "Nouadhibou",
+        "departments": [
+          "Chami",
+          "Nouadhibou"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Maurice",
+    "regions": [
+      {
+        "region": "Plaines Wilhems",
+        "departments": [
+          "Beau Bassin-Rose Hill",
+          "Quatre Bornes",
+          "Vacoas-Phoenix"
+        ]
+      },
+      {
+        "region": "Port Louis",
+        "departments": [
+          "Port Louis",
+          "Pamplemousses"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Maroc",
+    "regions": [
+      {
+        "region": "Casablanca-Settat",
+        "departments": [
+          "Casablanca",
+          "Mohammedia",
+          "El Jadida"
+        ]
+      },
+      {
+        "region": "Rabat-Salé-Kénitra",
+        "departments": [
+          "Rabat",
+          "Salé",
+          "Kénitra"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Mozambique",
+    "regions": [
+      {
+        "region": "Maputo",
+        "departments": [
+          "Matola",
+          "Boane",
+          "Marracuene"
+        ]
+      },
+      {
+        "region": "Sofala",
+        "departments": [
+          "Beira",
+          "Dondo"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Namibie",
+    "regions": [
+      {
+        "region": "Khomas",
+        "departments": [
+          "Windhoek",
+          "Okahandja",
+          "Rehoboth"
+        ]
+      },
+      {
+        "region": "Erongo",
+        "departments": [
+          "Swakopmund",
+          "Walvis Bay"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Niger",
+    "regions": [
+      {
+        "region": "Niamey",
+        "departments": [
+          "Niamey I",
+          "Niamey II",
+          "Niamey III"
+        ]
+      },
+      {
+        "region": "Agadez",
+        "departments": [
+          "Agadez",
+          "Arlit"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Nigéria",
+    "regions": [
+      {
+        "region": "Lagos",
+        "departments": [
+          "Ikeja",
+          "Lagos Island",
+          "Lekki"
+        ]
+      },
+      {
+        "region": "Abuja",
+        "departments": [
+          "Gwagwalada",
+          "Kuje"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Rwanda",
+    "regions": [
+      {
+        "region": "Kigali",
+        "departments": [
+          "Gasabo",
+          "Kicukiro",
+          "Nyarugenge"
+        ]
+      },
+      {
+        "region": "Northern Province",
+        "departments": [
+          "Musanze",
+          "Gicumbi"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Sao Tomé-et-Principe",
+    "regions": [
+      {
+        "region": "São Tomé",
+        "departments": [
+          "Água Grande",
+          "Cantagalo",
+          "Lembá",
+          "Lobata",
+          "Mé-Zóchi"
+        ]
+      },
+      {
+        "region": "Principe",
+        "departments": [
+          "Pagué"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Sénégal",
+    "regions": [
+      {
+        "region": "Dakar",
+        "departments": [
+          "Dakar",
+          "Guédiawaye",
+          "Pikine",
+          "Rufisque"
+        ]
+      },
+      {
+        "region": "Thiès",
+        "departments": [
+          "Mbour",
+          "Thiès"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Seychelles",
+    "regions": [
+      {
+        "region": "Mahé",
+        "departments": [
+          "Anse Boileau",
+          "Anse Royale",
+          "Bel Ombre"
+        ]
+      },
+      {
+        "region": "Praslin",
+        "departments": [
+          "Baie Sainte Anne",
+          "Grand Anse"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Sierra Leone",
+    "regions": [
+      {
+        "region": "Western Area",
+        "departments": [
+          "Freetown",
+          "Waterloo"
+        ]
+      },
+      {
+        "region": "Eastern Province",
+        "departments": [
+          "Kenema",
+          "Koidu"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Somalie",
+    "regions": [
+      {
+        "region": "Banaadir",
+        "departments": [
+          "Mogadiscio",
+          "Warta Nabadda",
+          "Xamar Weyne"
+        ]
+      },
+      {
+        "region": "Galguduud",
+        "departments": [
+          "Galkayo",
+          "Hobyo"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Afrique du Sud",
+    "regions": [
+      {
+        "region": "Gauteng",
+        "departments": [
+          "Johannesburg",
+          "Pretoria",
+          "Soweto"
+        ]
+      },
+      {
+        "region": "Western Cape",
+        "departments": [
+          "Cape Town",
+          "Stellenbosch"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Soudan du Sud",
+    "regions": [
+      {
+        "region": "Central Equatoria",
+        "departments": [
+          "Juba",
+          "Yei"
+        ]
+      },
+      {
+        "region": "Eastern Equatoria",
+        "departments": [
+          "Kapoeta",
+          "Torit"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Soudan",
+    "regions": [
+      {
+        "region": "Khartoum",
+        "departments": [
+          "Khartoum",
+          "Omdurman",
+          "Bahri"
+        ]
+      },
+      {
+        "region": "Gezira",
+        "departments": [
+          "Wad Medani",
+          "Rufaa"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Tanzanie",
+    "regions": [
+      {
+        "region": "Dar es Salaam",
+        "departments": [
+          "Ilala",
+          "Kinondoni",
+          "Temeke"
+        ]
+      },
+      {
+        "region": "Mwanza",
+        "departments": [
+          "Ilemela",
+          "Nyamagana"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Togo",
+    "regions": [
+      {
+        "region": "Maritime",
+        "departments": [
+          "Lomé",
+          "Tsévié",
+          "Aného"
+        ]
+      },
+      {
+        "region": "Plateaux",
+        "departments": [
+          "Atakpamé",
+          "Kpalimé",
+          "Agou",
+          "Okou",
+          "Kpélé",
+          "Kpélé-élé"
+        ]
+      },
+      {
+        "region": "Kara",
+        "departments": [
+          "Kozah",
+          "Kéran",
+          "Doufelgou",
+          "Assoli"
+        ]
+      },
+      {
+        "region": "Central",
+        "departments": [
+          "Tchaoudjo",
+          "Soutouboua",
+          "Aouda"
+        ]
+      },
+      {
+        "region": "Savane",
+        "departments": [
+          "Tône",
+          "Cinkassé",
+          "Oti",
+          "Tandjouaré",
+          "Kpendjal-ouest",
+          "Oti-sud"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Tunisie",
+    "regions": [
+      {
+        "region": "Tunis",
+        "departments": [
+          "Tunis",
+          "La Marsa",
+          "Le Bardo"
+        ]
+      },
+      {
+        "region": "Sfax",
+        "departments": [
+          "Sfax",
+          "Sakiet Eddaïer"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Ouganda",
+    "regions": [
+      {
+        "region": "Central Region",
+        "departments": [
+          "Kampala",
+          "Entebbe"
+        ]
+      },
+      {
+        "region": "Northern Region",
+        "departments": [
+          "Gulu",
+          "Lira"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Zambie",
+    "regions": [
+      {
+        "region": "Lusaka",
+        "departments": [
+          "Lusaka",
+          "Chongwe"
+        ]
+      },
+      {
+        "region": "Copperbelt",
+        "departments": [
+          "Kitwe",
+          "Ndola"
+        ]
+      }
+    ]
+  },
+  {
+    "country": "Zimbabwe",
+    "regions": [
+      {
+        "region": "Harare",
+        "departments": [
+          "Harare",
+          "Chitungwiza"
+        ]
+      },
+      {
+        "region": "Bulawayo",
+        "departments": [
+          "Bulawayo"
+        ]
+      }
+    ]
+  }
+]
