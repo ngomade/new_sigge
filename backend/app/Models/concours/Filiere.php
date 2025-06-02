@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
@@ -11,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Filiere
@@ -39,7 +37,7 @@ class Filiere extends Model
 		'filiere_description'
 	];
 
-	public function candidats()
+	public function candidats(): HasMany
 	{
 		return $this->hasMany(Candidat::class, 'filiere_code');
 	}
@@ -47,7 +45,7 @@ class Filiere extends Model
 	public function diplomes()
 	{
 		return $this->belongsToMany(Diplome::class, 'filiere_diplome', 'filiere_code', 'code_dip')
-					->withPivot('id', 'code_serie')
+					->withPivot('code_serie')
 					->withTimestamps();
 	}
 }

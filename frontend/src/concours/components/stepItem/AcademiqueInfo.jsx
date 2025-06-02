@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { nextStep, prevStep } from '../../app/modules/stepper';
 import { getFiliere } from '../../api/routes/filiere';
-import data from '../../data.json'
+import data from '../../../data.json'
 import { getSeries } from '../../api/routes/serie';
 import { getDiplome } from '../../api/routes/candidate';
 function AcademiqueInfo({ setLoadingState }) {
