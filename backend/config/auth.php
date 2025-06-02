@@ -38,6 +38,14 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'web-users',
+        ],
+        'api-admin' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
+        ],
+        'api-user' => [
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
     ],
@@ -60,9 +68,17 @@ return [
     */
 
     'providers' => [
+        'web-users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL' , \App\Models\User::class),
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_ADMIN_MODEL', App\Models\concours\Personnel::class),
+        ],
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\concours\Compte::class,
         ],
 
         // 'users' => [
@@ -92,7 +108,7 @@ return [
 
     'passwords' => [
         'users' => [
-            'provider' => 'users',
+            'provider' => 'web-users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,
