@@ -8,14 +8,23 @@ use App\Notifications\concours\SendinfoOfConnection;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use App\Models\concours\Compte;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
-class CompteControllerApi extends Controller
+class CompteControllerApi extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum', except: ['store']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,10 +41,10 @@ class CompteControllerApi extends Controller
     public function store(Request $request, AuthService $authService)
     {
         $validateData = $request->validate([
-            'ca_num_recu' => 'required|string|unique:compte,ca_num_recu',
+            'ca_num_recu' => 'required|string|unique:compte,ca_num_recu|min:6|max:6',
             'ca_code' => 'nullable|string|exists:candidat,ca_code',
-            'ca_pwd' => 'required|string|min:3',
-            'ca_recu' => 'required|file|max:2048|mimes:pdf,jpg,jpeg,png', // Limite de 2 Mo pour le fichier
+            'ca_pwd' => 'required|string|min:8',
+            'ca_recu' => 'required|file|max:2048|mimes:pdf,jpg,png,jpeg', // Limite de 2 Mo pour le fichier
             'ca_nom' => 'required|string|max:255',
             'ca_email' => 'nullable|email|max:255',
             'ca_prenom' => 'required|string|max:255',
@@ -46,7 +55,7 @@ class CompteControllerApi extends Controller
         try {
             DB::beginTransaction();
 
-            $validateData['ca_recu'] = $this->storageRecu($request->file('ca_recu'), $validateData['ca_nom'], $validateData['ca_prenom']);
+            $validateData['ca_recu'] = $this->storageRecu($request->file('ca_recu'), $validateData['ca_nom'], $validateData['ca_prenom'], $request->file('ca_recu')->getClientOriginalExtension());
 
             $compte = Compte::create($validateData);
             try {
@@ -63,7 +72,7 @@ class CompteControllerApi extends Controller
             ]);
             DB::commit();
 
-            return $authService->generateTokenFromUser($compte);
+            return $authService->generateTokenFromUser($compte, true);
 
         } catch (Throwable $th) {
             DB::rollBack();
@@ -90,7 +99,7 @@ class CompteControllerApi extends Controller
     {
         $validateData = $request->validate([
             'ca_code' => 'nullable|string|exists:candidat,ca_code',
-            'ca_pwd' => 'sometimes|string|min:3',
+            'ca_pwd' => 'sometimes|string|min:8',
             'ca_recu' => 'sometimes|file|max:2048|mimes:pdf,jpg,jpeg,png', // Limite de 2 Mo pour le fichier
             'ca_nom' => 'sometimes|required|string|max:255',
             'ca_email' => 'nullable|email|max:255',
@@ -106,7 +115,7 @@ class CompteControllerApi extends Controller
 
             if ($request->hasFile('ca_recu')) {
                 Storage::delete($compte->ca_recu); // Supprimer l'ancien fichier
-                $validateData['ca_recu'] = $this->storageRecu($request->file('ca_recu'), $compte->ca_nom, $compte->ca_prenom);
+                $validateData['ca_recu'] = $this->storageRecu($request->file('ca_recu'), $compte->ca_nom, $compte->ca_prenom, $request->file('ca_recu')->getClientOriginalExtension());
             }
 
             $compte->update($validateData);
@@ -177,10 +186,10 @@ class CompteControllerApi extends Controller
         return response()->json($comptes);
     }
 
-    private function storageRecu($file, $nom, $prenom)
+    private function storageRecu($file, $nom, $prenom, $extension)
     {
-        $filename = $nom . '_' . $prenom . '_' . now()->format('M_d_H_i_s');
+        $filename = $nom . '-' . $prenom . '-' . now()->format('M_d_H_i'). '.' . $extension;
 
-        return $file->storeAs("private/" . getdate()['year'], $filename);
+        return $file->storeAs(getdate()['year'], $filename);
     }
 }

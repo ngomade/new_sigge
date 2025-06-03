@@ -96,7 +96,6 @@ class SessionconcourControllerApi extends Controller
         $today = Carbon::now();
         $session = Sessionconcour::where('debut', '<=', $today)
             ->where('cloture', '>=', $today)
-            ->with(['personnel', 'candidats'])
             ->first();
 
         if (!$session) {

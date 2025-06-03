@@ -18,9 +18,7 @@ class FiliereControllerAPI extends Controller
     public function index()
     {
         $filieres = Filiere::with(['diplomes', 'candidats'])->get();
-        return response()->json([
-            'data' => $filieres
-        ]);
+        return response()->json($filieres);
     }
 
     /**

@@ -72,7 +72,6 @@
         <ul>
             <li><strong>Email :</strong> {{ $compte->ca_email ?? $compte->email_pers }}</li>
             <li><strong>Numéro de reçu :</strong> {{ $compte->ca_num_recu ?? $compte->login_pers }}</li>
-            <li><strong>Mot de passe :</strong> {{ $compte->ca_pwd ?? $compte->pwd_pers }}</li>
         </ul>
         <p>Merci de garder ces informations en sécurité.</p>
     </div>
