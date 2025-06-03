@@ -19,7 +19,7 @@ class CheckAlreadyAuthenticated
                 return response()->json([
                     'message' => 'Vous êtes déjà connecté',
                     'token' => $token
-                ]);
+                ], 401);
             }
         }
 

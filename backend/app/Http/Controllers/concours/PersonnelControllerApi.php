@@ -29,7 +29,6 @@ class PersonnelControllerApi extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'code_pers' => 'required|string|max:32|unique:personnel,code_pers',
             'nom_pers' => 'required|string|max:255',
             'prenom_pers' => 'nullable|string|max:255',
             'sexe_pers' => 'required|string|max:1',
@@ -66,7 +65,7 @@ class PersonnelControllerApi extends Controller
             $personnel = Personnel::create($validatedData);
 
             DB::commit();
-            return response()->json($personnel, 201);
+            return response()->json($personnel);
         } catch (Throwable $th) {
             DB::rollBack();
             Log::error('Error creating personnel: ' . $th->getMessage());

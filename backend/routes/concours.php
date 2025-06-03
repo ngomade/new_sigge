@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
+use App\Http\Controllers\concours\PersonnelControllerApi;
+use App\Models\concours\Diplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\concours\CandidatControllerApi;
@@ -34,7 +36,6 @@ Route::group(['prefix' => 'auth', 'middleware' => "guest.sanctum"], function () 
     Route::post("login", [AuthController::class, 'login']);
     Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
-    Route::get("logout", [AuthController::class, 'logout']);
     Route::get("refresh-token", [AuthController::class, 'refresh']);
 });
 
@@ -45,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::get("logout", [AuthController::class, 'logout']);
     /*
     |--------------------------------------------------------------------------
     | Routes pour la gestion des candidats
@@ -52,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::prefix('candidats')->group(function () {
         Route::get("stats", [CandidatControllerApi::class, 'statCandidat']);
-        Route::get("send-general-email", [CandidatControllerApi::class, 'sendGeneralMail']);
+        Route::post("send-general-email", [CandidatControllerApi::class, 'sendGeneralMail']);
         Route::get('filiere/{filiere_code}', [CandidatControllerApi::class, 'byFiliere']);
         Route::get('site/{code_site}', [CandidatControllerApi::class, 'bySite']);
         Route::post('search', [CandidatControllerApi::class, 'search']);
@@ -105,6 +107,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Routes pour les personnels
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource('personnel', PersonnelControllerApi::class);
+
+    /*
+    |--------------------------------------------------------------------------
     | Routes pour les centres (dépôt et examen)
     |--------------------------------------------------------------------------
     */
@@ -121,11 +130,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Routes pour les dossiers
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource("diplomes", Diplome::class);
+
+    /*
+    |--------------------------------------------------------------------------
     | Routes pour la gestion des filières
     |--------------------------------------------------------------------------
     */
     Route::apiResource('filiere', FiliereControllerAPI::class);
     Route::apiResource('filiere_diplome', FiliereDiplomeControllerAPI::class);
+<<<<<<< HEAD
       // Diplome attachment routes
       Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
       Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
@@ -135,6 +152,9 @@ Route::middleware('auth:sanctum')->group(function () {
       //routes slide
       Route::apiResource('slide',SlideControllerApi::class);
       
+=======
+
+>>>>>>> b384168680b88890d3be67ec73e8a9f584f9f3b6
       // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);
