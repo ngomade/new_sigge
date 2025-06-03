@@ -17,7 +17,7 @@ class DossierControllerApi extends Controller
     public function index()
     {
         $dossiers = Dossier::all();
-        return response()->json($dossiers->load('ecole_elements'));
+        return response()->json($dossiers->load('ecole_element'));
     }
 
     /**
@@ -28,8 +28,8 @@ class DossierControllerApi extends Controller
     {
         $validatedData = $request->validate([
             'label_el' => 'required|string|max:255',
-            'ecole_elements' => 'required|array',
-            'ecole_elements.*' => 'exists:ecole_elements,code_ecole',
+            'ecole_element' => 'required|array',
+            'ecole_element.*' => 'exists:ecole,code_ecole',
         ]);
 
         try {
@@ -51,7 +51,7 @@ class DossierControllerApi extends Controller
     public function show(string $id)
     {
         $dossier = Dossier::findorfail($id);
-        return response()->json($dossier->load('ecole_elements'));
+        return response()->json($dossier->load('ecole_element'));
     }
 
     /**
@@ -62,8 +62,8 @@ class DossierControllerApi extends Controller
     {
         $validatedData = $request->validate([
             'label_el' => 'required|string|max:255',
-            'ecole_elements' => 'sometimes|array',
-            'ecole_elements.*' => 'exists:ecole_elements,code_ecole',
+            'ecole_element' => 'sometimes|array',
+            'ecole_element.*' => 'exists:ecole,code_ecole',
         ]);
 
         $dossier = Dossier::findOrFail($id);

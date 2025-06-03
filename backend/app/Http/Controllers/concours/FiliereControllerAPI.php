@@ -125,10 +125,101 @@ class FiliereControllerAPI extends Controller
             DB::rollBack();
             Log::error("Error deleting filiere: " . $th->getMessage());
             return response()->json([
-                'message' => 'Une erreur est survenue lors de la suppression de la filière',
-            ], 500);
+                'status' => 'error',
+                'message' => 'Filiere non trouve'
+            ], 404);
         }
 
-        return response()->noContent();
+        $filiere->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Filiere supprime aev succes.'
+        ], 200);
+    }
+
+    /**
+     * Attach a diplome to filiere
+     */
+    public function attachDiplome(Request $request, string $filiereCode)
+    {
+        $validator = Validator::make($request->all(), [
+            'code_dip' => 'required|integer|exists:diplome,code_dip',
+            'code_serie' => 'required|integer|exists:serie,code_serie',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $filiere = Filiere::find($filiereCode);
+
+        if (!$filiere) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Filiere not found'
+            ], 404);
+        }
+
+        // Check if relation already exists
+        $exists = $filiere->diplomes()
+            ->where('code_dip', $request->code_dip)
+            ->wherePivot('code_serie', $request->code_serie)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ce dplome est deja attache a cette filiere avec ce meme nom de serie '
+            ], 409);
+        }
+
+        $filiere->diplomes()->attach($request->code_dip, [
+            'code_serie' => $request->code_serie
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => ' Le diplome a ete attacher avec succes'
+        ], 200);
+    }
+
+    /**
+     * Detach a diplome from filiere
+     */
+    public function detachDiplome(Request $request, string $filiereCode)
+    {
+        $validator = Validator::make($request->all(), [
+            'code_dip' => 'required|integer|exists:diplome,code_dip',
+            'code_serie' => 'required|integer|exists:serie,code_serie',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $filiere = Filiere::find($filiereCode);
+
+        if (!$filiere) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Filiere non retrouve'
+            ], 404);
+        }
+
+        $filiere->diplomes()->detach($request->code_dip, [
+            'code_serie' => $request->code_serie
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Diplome detache avec succes'
+        ], 200);
     }
 }

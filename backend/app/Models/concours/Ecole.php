@@ -42,6 +42,7 @@ class Ecole extends Model
 	];
 
 	protected $fillable = [
+		'code_ecole',
 		'label_ecole',
 		'logo_ecole',
 		'desc_ecole',

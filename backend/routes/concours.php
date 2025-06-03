@@ -20,6 +20,7 @@ use App\Http\Controllers\concours\CompositionControllerApi;
 use App\Http\Controllers\concours\EcoleElementControllerApi;
 use App\Http\Controllers\concours\FiliereControllerAPI;
 use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
+use App\Http\Controllers\concours\SlideControllerApi;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get("logout", [AuthController::class, 'logout']);
+    Route::post("logout", [AuthController::class, 'logout']);
     /*
     |--------------------------------------------------------------------------
     | Routes pour la gestion des candidats
@@ -63,7 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('site/{code_site}', [CandidatControllerApi::class, 'bySite']);
         Route::post('search', [CandidatControllerApi::class, 'search']);
     });
-    Route::apiResource('candidats', CandidatControllerApi::class);
+    Route::apiResource('candidat', CandidatControllerApi::class);
 
     /*
     |--------------------------------------------------------------------------
@@ -145,7 +147,15 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::apiResource('filiere', FiliereControllerAPI::class);
     Route::apiResource('filiere_diplome', FiliereDiplomeControllerAPI::class);
-
+      // Diplome attachment routes
+      Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
+      Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
+      
+      //routes personnel
+      Route::apiResource('personnel',PersonnelControllerApi::class);
+      //routes slide
+      Route::apiResource('slide',SlideControllerApi::class);
+      
       // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);

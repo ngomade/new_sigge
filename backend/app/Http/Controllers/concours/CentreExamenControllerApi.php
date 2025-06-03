@@ -16,7 +16,7 @@ class CentreExamenControllerApi extends Controller
     public function index()
     {
         $centres = CentreExaman::with("ecole")->get();
-        return response()->json($centres);
+        return response()->json($centres,200);
     }
 
     /**
@@ -32,7 +32,7 @@ class CentreExamenControllerApi extends Controller
 
         try {
             $centre = CentreExaman::create($validatedData);
-            return response()->json($centre);
+            return response()->json($centre,200);
         } catch (Exception $e) {
             Log::error('Error creating centre examen: ' . $e->getMessage());
             return response()->json(['error' => 'Erreur lors de l\'enregistrement du centre d\'examen'], 500);
@@ -76,7 +76,7 @@ class CentreExamenControllerApi extends Controller
         $centre = CentreExaman::findOrFail($id);
         try {
             $centre->delete();
-            return response()->noContent();
+            return response()->json(['message' => 'CentreExamen supprimé avec succès'], 200);
         } catch (Exception $e) {
             Log::error('Error deleting centre examen: ' . $e->getMessage());
             return response()->json(['error' => 'Erreur lors de la suppression du centre d\'examen'], 500);
