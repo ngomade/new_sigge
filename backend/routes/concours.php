@@ -19,7 +19,6 @@ use App\Http\Controllers\concours\CompositionControllerApi;
 use App\Http\Controllers\concours\EcoleElementControllerApi;
 use App\Http\Controllers\concours\FiliereControllerAPI;
 use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
-use App\Http\Controllers\concours\PersonnelControllerApi;
 use App\Http\Controllers\concours\SlideControllerApi;
 
 /*
@@ -47,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get("logout", [AuthController::class, 'logout']);
+    Route::post("logout", [AuthController::class, 'logout']);
     /*
     |--------------------------------------------------------------------------
     | Routes pour la gestion des candidats
@@ -142,7 +142,6 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::apiResource('filiere', FiliereControllerAPI::class);
     Route::apiResource('filiere_diplome', FiliereDiplomeControllerAPI::class);
-<<<<<<< HEAD
       // Diplome attachment routes
       Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
       Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
@@ -152,9 +151,6 @@ Route::middleware('auth:sanctum')->group(function () {
       //routes slide
       Route::apiResource('slide',SlideControllerApi::class);
       
-=======
-
->>>>>>> b384168680b88890d3be67ec73e8a9f584f9f3b6
       // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);
