@@ -29,18 +29,59 @@ class CandidatControllerApi extends Controller
      *
      * @throws Throwable
      */
-    public function store(CandidatRequest $request)
+    public function store(Request $request)
     {
+        $validatedData = $request->validate([
+            'id' => 'required|exists:sessionconcour,id',
+            'filiere_code' => 'required|string|exists:filiere,filiere_code',
+            'code_site' => 'required|integer|exists:site_etude,code_site',
+            'ca_nom' => 'required|string|max:255',
+            'ca_prenom' => 'required|string|max:255',
+            'ca_sexe' => 'required|string|max:1',
+            'ca_date_naiss' => 'required|date',
+            'ca_lieu_naiss' => 'required|string|max:255',
+            'ca_statut_mat' => 'required|string|max:255',
+            'ca_adresse' => 'nullable|string|max:255',
+            'ca_telephone' => 'required|string|max:180|unique:candidat,ca_telephone',
+            'ca_num_cni' => 'required|string|max:180|unique:candidat,ca_num_cni',
+            'ca_email' => 'required|email|max:255',
+            'ca_premiere_lang' => 'required|string|max:255',
+            'ca_nationalite' => 'required|string|max:255',
+            'ca_region_origine' => 'required|string|max:255',
+            'ca_depart_origine' => 'required|string|max:255',
+            'ca_diplome_admission' => 'required|string|max:255',
+            'ca_annee_diplome' => 'required|date_format:Y',
+            'ca_serie_diplome' => 'required|string|max:255',
+            'ca_mention_diplome' => 'required|string|max:255',
+            'ca_etab_diplome' => 'required|string|max:255',
+            'ca_pays_diplome' => 'required|string|max:255',
+            'ca_centre_examen' => 'required|string|max:255',
+            'ca_centre_depot' => 'required|string|max:255',
+            'ca_nom_pere' => 'required|string|max:255',
+            'ca_telephone_pere' => 'required|string|max:180',
+            'ca_nom_mere' => 'required|string|max:255',
+            'ca_telephone_mere' => 'required|string|max:180',
+            'ca_handicap' => 'nullable|string|max:255',
+            'ca_email_pere' => 'nullable|email|max:255',
+            'ca_deliv_cni' => 'required|string|max:255',
+            'ca_num_recu' => 'required|string|max:255',
+            'ca_recu' => 'required|string|max:255',
+            'ecoles' => 'nullable|array',
+            'ecoles.*' => 'integer',
+        ]);
+
         try {
             DB::beginTransaction();
-            $candidat = Candidat::create($request->validated());
-            if ($request->has('ecoles')) {
-                $candidat->ecoles()->attach($request->ecoles); // Synchroniser les écoles si fournies
+            $candidat = Candidat::create($validatedData);
+            if (!empty($validatedData['ecoles'])) {
+                $candidat->ecoles()->attach($validatedData['ecoles']); // Synchroniser les écoles si fournies
             }
             DB::commit();
 
+            $candidat->load(['site_etude', 'filiere', 'sessionconcour', 'ecoles']);
+
             return response()->json([
-                "message" => "Candidat enregistré avec success",
+                "message" => "Candidat enregistré avec succès",
                 "data" => $candidat
             ]);
         } catch (Throwable $th) {
@@ -68,20 +109,62 @@ class CandidatControllerApi extends Controller
      * Update the specified resource in storage.
      * @throws Throwable
      */
-    public function update(UpdateCandidatRequest $request, string $ca_code)
+    public function update(Request $request, string $ca_code)
     {
         $candidat = Candidat::findOrFail($ca_code);
+
+        $validatedData = $request->validate([
+            // 'ca_code' => 'required|string|max:32',
+             'id' => 'required|exists:sessionconcour,id',
+            'filiere_code' => 'required|string|exists:filiere,filiere_code',
+            'code_site' => 'required|integer|exists:site_etude,code_site',
+            'ca_nom' => 'sometimes|string|max:255',
+            'ca_prenom' => 'sometimes|string|max:255',
+            'ca_sexe' => 'sometimes|string|max:1',
+            'ca_date_naiss' => 'sometimes|date',
+            'ca_lieu_naiss' => 'sometimes|string|max:255',
+            'ca_statut_mat' => 'sometimes|string|max:255',
+            'ca_adresse' => 'nullable|string|max:255',
+            'ca_telephone' => 'sometimes|string|max:32',
+            'ca_num_cni' => 'sometimes|string|max:32',
+            'ca_email' => 'sometimes|email|max:255',
+            'ca_premiere_lang' => 'sometimes|string|max:255',
+            'ca_nationalite' => 'sometimes|string|max:255',
+            'ca_region_origine' => 'sometimes|string|max:255',
+            'ca_depart_origine' => 'sometimes|string|max:255',
+            'ca_diplome_admission' => 'sometimes|string|max:255',
+            'ca_annee_diplome' => 'required|',
+            'ca_serie_diplome' => 'sometimes|string|max:255',
+            'ca_mention_diplome' => 'sometimes|string|max:255',
+            'ca_etab_diplome' => 'sometimes|string|max:255',
+            'ca_pays_diplome' => 'sometimes|string|max:255',
+            'ca_centre_examen' => 'sometimes|string|max:255',
+            'ca_centre_depot' => 'sometimes|string|max:255',
+            'ca_nom_pere' => 'sometimes|string|max:255',
+            'ca_telephone_pere' => 'sometimes|string|max:32',
+            'ca_nom_mere' => 'sometimes|string|max:255',
+            'ca_telephone_mere' => 'sometimes|string|max:32',
+            'ca_handicap' => 'nullable|string|max:255',
+            'ca_email_pere' => 'nullable|email|max:255',
+            'ca_deliv_cni' => 'sometimes|string|max:255',
+            'ca_num_recu' => 'sometimes|string|max:255',
+            'ca_recu' => 'sometimes|string|max:255',
+            'ecole' => "sometimes|array",
+            'ecole.*' => "required|exists:ecole,code_ecole",
+        ]);
+
         try {
-            $validated = $request->validated();
             DB::beginTransaction();
-            $candidat->update($validated);
-            if ($request->has('ecoles')) {
-                $candidat->ecoles()->sync($request->ecoles); // Synchroniser les écoles si fournies
+            $candidat->update($validatedData);
+            if (!empty($validatedData['ecoles'])) {
+                $candidat->ecoles()->sync($validatedData['ecoles']); // Synchroniser les écoles si fournies
             }
             DB::commit();
 
+            $candidat->load(['site_etude', 'filiere', 'sessionconcour', 'ecoles']);
+
             return response()->json([
-                "message" => "Candidat mis à jour avec success",
+                "message" => "Candidat mis à jour avec succès",
                 "data" => $candidat
             ]);
         } catch (Throwable $th) {

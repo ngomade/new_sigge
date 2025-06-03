@@ -45,7 +45,7 @@ class SiteCompositionControllerApi extends Controller
         } catch (Throwable $th) {
             DB::rollBack();
             Log::error('Error creating site-composition : ' . $th->getMessage());
-            return response()->json(['error' => 'Erreur lors de l\'enregistrement du site'], 500);
+            return response()->json(['error' => 'Erreur lors de l\'enregistrement du site' . $th->getMessage()], 500);
         }
     }
 
@@ -62,17 +62,17 @@ class SiteCompositionControllerApi extends Controller
      * Update the specified resource in storage.
      * @throws Throwable
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $site_code)
     {
         $validatedData = $request->validate([
-            'site_code' => 'sometimes|string|max:255|unique:site_composition,site_code,' . $id,
+            'site_code' => 'sometimes|string|max:255|unique:site_composition,site_code,' . $site_code . ',site_code',
             'site_ville' => 'sometimes|string|max:255',
             'site_lieu' => 'sometimes|string|max:255',
             'ecoles' => 'sometimes|array',
             'ecoles.*' => "required|exists:ecole,code_ecole",
         ]);
 
-        $site = SiteComposition::findOrFail($id);
+        $site = SiteComposition::findOrFail($site_code);
         try {
             DB::beginTransaction();
             $site->update($validatedData);
@@ -84,7 +84,7 @@ class SiteCompositionControllerApi extends Controller
         } catch (Throwable $th) {
             DB::rollBack();
             Log::error('Error updating site-composition : ' . $th->getMessage());
-            return response()->json(['error' => 'Erreur lors de la mise à jour du site'], 500);
+            return response()->json(['error' => 'Erreur lors de la mise à jour du site'  . $th->getMessage()], 500);
         }
     }
 

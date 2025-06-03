@@ -17,6 +17,8 @@ use App\Http\Controllers\concours\CompositionControllerApi;
 use App\Http\Controllers\concours\EcoleElementControllerApi;
 use App\Http\Controllers\concours\FiliereControllerAPI;
 use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
+use App\Http\Controllers\concours\PersonnelControllerApi;
+use App\Http\Controllers\concours\SlideControllerApi;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,7 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('site/{code_site}', [CandidatControllerApi::class, 'bySite']);
         Route::post('search', [CandidatControllerApi::class, 'search']);
     });
-    Route::apiResource('candidats', CandidatControllerApi::class);
+    Route::apiResource('candidat', CandidatControllerApi::class);
 
     /*
     |--------------------------------------------------------------------------
@@ -128,8 +130,11 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
       Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
       
-      // Get diplomes for a filiere
-      Route::get('/{filiereCode}/diplomes', [FiliereControllerAPI::class, 'diplomes']);
+      //routes personnel
+      Route::apiResource('personnel',PersonnelControllerApi::class);
+      //routes slide
+      Route::apiResource('slide',SlideControllerApi::class);
+      
       // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);

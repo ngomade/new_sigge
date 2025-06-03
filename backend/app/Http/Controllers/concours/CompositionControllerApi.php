@@ -61,7 +61,7 @@ class CompositionControllerApi extends Controller
             return response()->json($composition, 200);
         } catch (Exception $e) {
             Log::error('Error updating composition: ' . $e->getMessage());
-            return response()->json(['erreur' => 'erreur lors de la mise à jour de la composition'], 500);
+            return response()->json(['erreur' => 'Erreur lors de la mise à jour de la composition.'], 500);
         }
     }
 
@@ -73,10 +73,10 @@ class CompositionControllerApi extends Controller
         $composition = Composition::findOrFail($id);
         try {
             $composition->delete();
-            return response()->json(['succes' => 'composition supprimée']);
+            return response()->json(['succes' => 'Composition supprimée.']);
         } catch (Exception $e) {
             Log::error('Error deleting composition: ' . $e->getMessage());
-            return response()->json(['erreur' => 'erreur lors de la suppression de la composition'], 500);
+            return response()->json(['erreur' => 'Erreur lors de la suppression de la composition.'], 500);
         }
     }
 }

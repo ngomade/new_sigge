@@ -77,7 +77,7 @@ class Candidat extends Model
 	];
 
 	protected $fillable = [
-        'ca_code',
+        // 'ca_code',
 		'id',
 		'filiere_code',
 		'code_site',

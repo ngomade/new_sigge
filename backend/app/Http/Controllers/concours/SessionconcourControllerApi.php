@@ -16,7 +16,8 @@ class SessionconcourControllerApi extends Controller
      */
     public function index()
     {
-        $sessions = Sessionconcour::with(['personnel', 'candidats'])->orderBy('annee', 'desc')->get();
+        // ::with(['personnel', 'candidat'])->orderBy('annee', 'desc')->get();
+        $sessions = Sessionconcour::all();
         return response()->json($sessions);
     }
 
@@ -27,7 +28,7 @@ class SessionconcourControllerApi extends Controller
     {
         $validateData = $request->validate([
             'code_pers' => 'required|string|exists:personnel,code_pers',
-            'annee' => 'required|date',
+            'annee' => 'required',
             'debut' => 'required|date',
             'cloture' => 'required|date|after:debut',
         ]);
@@ -58,7 +59,7 @@ class SessionconcourControllerApi extends Controller
     {
         $validateData = $request->validate([
             'code_pers' => 'sometimes|string|exists:personnel,code_pers',
-            'annee' => 'sometimes|date',
+            'annee' => 'sometimes',
             'debut' => 'sometimes|date|required_with:cloture',
             'cloture' => 'sometimes|date|after:debut|required_with:debut',
         ]);

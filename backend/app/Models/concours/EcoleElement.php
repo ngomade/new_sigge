@@ -2,33 +2,27 @@
 
 namespace App\Models\concours;
 
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Class EcoleElement
  *
- * @property int $id
- * @property string $code_ecole
- * @property int $code_el
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Ecole $ecole
- * @property Dossier $dossier
+ * * @property string $code_ecole
+ * @property string $code_el
+ * @property string $some_other_field
  *
  * @package App\Models
  */
 class EcoleElement extends Pivot
 {
-	protected $table = 'ecole_element';
+    protected $table = 'ecole_element';
+    // protected $primaryKey = 'code_el';
+    // public $incrementing = false;
 
-	protected $casts = [
-		'code_el' => 'int'
-	];
-
-	protected $fillable = [
+    protected $fillable = [
 		'code_ecole',
-		'code_el'
-	];
+        'code_el',
+        // Add other fillable fields as needed
+    ];
 }

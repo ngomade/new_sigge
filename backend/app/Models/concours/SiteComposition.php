@@ -31,8 +31,9 @@ class SiteComposition extends Model
 	public $incrementing = false;
 
 	protected $fillable = [
+		'site_code',
 		'site_ville',
-		'site_lieu'
+		'site_lieu',
 	];
 
 	public function ecoles(): BelongsToMany

@@ -35,6 +35,7 @@ class Filiere extends Model
 	public $incrementing = false;
 
 	protected $fillable = [
+		'filiere_code',
 		'filiere_label',
 		'filiere_description'
 	];

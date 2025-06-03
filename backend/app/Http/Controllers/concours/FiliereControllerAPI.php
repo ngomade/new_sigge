@@ -112,7 +112,7 @@ class FiliereControllerAPI extends Controller
         if (!$filiere) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Filiere not found'
+                'message' => 'Filiere non trouve'
             ], 404);
         }
 
@@ -120,7 +120,7 @@ class FiliereControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Filiere deleted successfully'
+            'message' => 'Filiere supprime aev succes.'
         ], 200);
     }
 
@@ -159,7 +159,7 @@ class FiliereControllerAPI extends Controller
         if ($exists) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'This diplome is already attached to this filiere with the same serie'
+                'message' => 'Ce dplome est deja attache a cette filiere avec ce meme nom de serie '
             ], 409);
         }
 
@@ -169,7 +169,7 @@ class FiliereControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Diplome attached successfully'
+            'message' => ' Le diplome a ete attacher avec succes'
         ], 200);
     }
 
@@ -195,7 +195,7 @@ class FiliereControllerAPI extends Controller
         if (!$filiere) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Filiere not found'
+                'message' => 'Filiere non retrouve'
             ], 404);
         }
 
@@ -205,7 +205,7 @@ class FiliereControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Diplome detached successfully'
+            'message' => 'Diplome detache avec succes'
         ], 200);
     }
 }

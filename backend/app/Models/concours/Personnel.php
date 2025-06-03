@@ -6,9 +6,9 @@
 
 namespace App\Models\concours;
 
-use App\Models\RoleHasPermission;
+use App\Models\concours\RoleHasPermission;
 use App\Models\concours\Sessionconcour;
-use App\Models\Slide;
+use App\Models\concours\Slide;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
@@ -68,6 +68,7 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 	];
 
 	protected $fillable = [
+		// 'code_pers',
 		'nom_pers',
 		'prenom_pers',
 		'sexe_pers',

@@ -92,6 +92,7 @@ class PersonnelControllerApi extends Controller
         $personnel = Personnel::findOrFail($id);
 
         $validatedData = $request->validate([
+            // 'code_pers' => 'sometimes|string|max:32|unique:personnel,code_pers,' . $id . ',code_pers',
             'nom_pers' => 'sometimes|string|max:255',
             'prenom_pers' => 'nullable|string|max:255',
             'sexe_pers' => 'sometimes|string|max:1',
