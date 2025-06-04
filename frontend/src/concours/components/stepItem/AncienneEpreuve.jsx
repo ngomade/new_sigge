@@ -7,32 +7,38 @@ function AncienneEpreuvePage() {
           <div>
             <div className='grid items-center grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-5'>
               <div className='shadow shadow-green-300 rounded m-auto p-1'>
-                <a className="px-4  py-3 rounded-lg text-black" href='./epreuves/Epreuve_de_Maths_EBTTL.pdf' target='_blank'>
-                  <img src={require('./../../img/pdf.jpg')} alt="Mathématiques TTL" className='w-20 rounded m-auto' />
+                <a className="px-4  py-3 rounded-lg text-black" href='/concours/epreuves/Epreuve_de_Maths_EBTTL.pdf' target='_blank'
+                   rel="noopener noreferrer"
+                >
+                  <img src={require('../../img/pdf.jpg')} alt="Mathématiques TTL" className='w-20 rounded m-auto' />
                   <div className='block mt-5'> Epreuve de Mathématiques TTL 2023</div>
                 </a>                
               </div>
               <div className='shadow shadow-green-300 rounded m-auto p-1'>
-                <a className="px-4  py-3 rounded-lg text-black" href='./epreuves/Epreuve_Specialite_EBTTL.pdf' target='_blank'>
-                  <img src={require('./../../img/pdf.jpg')} alt="Epreuve de Spécialité TTL" className='w-20 rounded m-auto'/>
+                <a className="px-4  py-3 rounded-lg text-black" href='/concours/epreuves/Epreuve_Specialite_EBTTL.pdf' target='_blank'
+                rel="noopener noreferrer">
+                  <img src={require('../../img/pdf.jpg')} alt="Epreuve de Spécialité TTL" className='w-20 rounded m-auto'/>
                   <div className='block mt-5'>Epreuve de Spécialité TTL 2023</div>
                 </a>                
               </div>
               <div className='shadow shadow-green-300 rounded m-auto p-1'>
-                <a className="px-4  py-3 rounded-lg text-black" href='./epreuves/Epreuve_de_Culture_Generale.pdf' target='_blank'>
-                  <img src={require('./../../img/pdf.jpg')} alt="Epreuve de Culture Générale" className='w-20 rounded m-auto'/>
+                <a className="px-4  py-3 rounded-lg text-black" href='/concours/epreuves/Epreuve_de_Culture_Generale.pdf' target='_blank'
+                   rel="noopener noreferrer">
+                  <img src={require('../../img/pdf.jpg')} alt="Epreuve de Culture Générale" className='w-20 rounded m-auto'/>
                   <div className='block mt-5'>Epreuve de Culture Générale 2023</div>
                 </a>                
               </div>
               <div className='shadow shadow-green-300 rounded m-auto p-1'>
-                <a className="px-4  py-3 rounded-lg text-black" href='./epreuves/Epreuve_de_Maths_GLTCO.pdf' target='_blank'>
-                  <img src={require('./../../img/pdf.jpg')} alt="Epreuve de Mathématiques GLTCO 2023" className='w-20 rounded m-auto'/>
+                <a className="px-4  py-3 rounded-lg text-black" href='/concours/epreuves/Epreuve_de_Maths_GLTCO.pdf' target='_blank'
+                   rel="noopener noreferrer">
+                  <img src={require('../../img/pdf.jpg')} alt="Epreuve de Mathématiques GLTCO 2023" className='w-20 rounded m-auto'/>
                   <div className='block mt-5'>Epreuve de Mathématiques GLTCO 2023</div>
                 </a>                
               </div>
-              <div className='shadow shadow-green-300 rounded m-auto p-1'>
-                <a className="px-4  py-3 rounded-lg text-black" href='./epreuves/Epreuve_Specialite_GLTCO.pdf' target='_blank'>
-                  <img src={require('./../../img/pdf.jpg')} alt="Epreuve de Specialite GLTCO 2023" className='w-20 rounded m-auto'/>
+              <div className='shadow shadow-green-300 rounded m-auto p-1'
+                   rel="noopener noreferrer">
+                <a className="px-4  py-3 rounded-lg text-black" href='/concours/epreuves/Epreuve_Specialite_GLTCO.pdf' target='_blank'>
+                  <img src={require('../../img/pdf.jpg')} alt="Epreuve de Specialite GLTCO 2023" className='w-20 rounded m-auto'/>
                   <div className='block mt-5'>Epreuve de Specialite GLTCO 2023</div>
                 </a>                
               </div>

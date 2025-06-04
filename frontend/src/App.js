@@ -4,28 +4,29 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
 
 // Pages
-import Home from "./pages/Home";
-import LoginPage from "./pages/Login";
-import Candidate from "./pages/Candidate";
-import AfficheDonnee from "./pages/AfficheDonnee";
-import SiteExam from "./pages/SiteExam";
-import AncienneEpreuvePage from "./components/stepItem/AncienneEpreuve";
-import Page500 from "./pages/errors/Page500";
-import Page404 from "./pages/errors/Page404";
-import PwdRecover from "./components/stepItem/PwdRecover"
+import Home from "./concours/pages/Home";
+import LoginPage from "./concours/pages/Login";
+import Candidate from "./concours/pages/Candidate";
+import AfficheDonnee from "./concours/pages/AfficheDonnee";
+import SiteExam from "./concours/pages/SiteExam";
+import AncienneEpreuvePage from "./concours/components/stepItem/AncienneEpreuve";
+import Page500 from "./concours/pages/errors/Page500";
+import Page404 from "./concours/pages/errors/Page404";
+import PwdRecover from "./concours/components/stepItem/PwdRecover"
+import PwdReset from "./concours/components/stepItem/resetPwd";
 
 // Components
-import Loading from "./components/stepModal/Loading";
-import PrivateRoute from "./components/PrivateRoute";
-import ClientLayout from "./components/layouts/ClientLayout";
-import BaseLayout from "./components/layouts/BaseLayout";
-import Dashboard from "./components/screens/dashboard/DashboardScreen";
+import Loading from "./concours/components/stepModal/Loading";
+import PrivateRoute from "./concours/components/PrivateRoute";
+import ClientLayout from "./concours/components/layouts/ClientLayout";
+import BaseLayout from "./concours/components/layouts/BaseLayout";
+import Dashboard from "./concours/components/screens/dashboard/DashboardScreen";
 
 // Store
-import { persistor } from "./app/store";
-import SuccessPage from "./pages/SuccessPage";
-import Compte from "./pages/admin/pages/Compte";
-import AdminCandidate from "./pages/admin/pages/AdminCandidate";
+import { persistor } from "./concours/app/store";
+import SuccessPage from "./concours/pages/SuccessPage";
+import Compte from "./concours/pages/admin/pages/Compte";
+import AdminCandidate from "./concours/pages/admin/pages/AdminCandidate";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             </Route>
             <Route path="/ancienne-epreuve" element={<AncienneEpreuvePage />} />
             <Route path="/pwd-recover" element={<PwdRecover />} />
+            <Route path="/reset-pwd" element={<PwdReset/>} />
             <Route path="*" element={<Page404 />} />
           </Route>
 

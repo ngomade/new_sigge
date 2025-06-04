@@ -2,7 +2,7 @@ import React from 'react'
 import Navbar from '../Navbar'
 import { Outlet } from 'react-router-dom'
 import Footer from '../Footer'
-import '../../index.css';
+import '../../../index.css';
 function ClientLayout() {
   return (
     <main>

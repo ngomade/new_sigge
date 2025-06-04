@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { fieldSet, notEmpty } from '../../utils/validation';
-import data from '../../data.json'
+import data from '../../../data.json'
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from 'react-toastify';
 import { push_candidate_info } from '../../app/modules/candidate';
@@ -88,7 +88,7 @@ function PersonnalInfo({  setLoadingState }) {
                     </div>
                     <div className='flex flex-col gap-3 mb-3'>
                         <label htmlFor="birthdate">Date de naissance <sup className='text-red-600'>*</sup></label>
-                        <input type="date" id='birthdate'max={`${new Date().getFullYear()-14}-01-01`} min={`${new Date().getFullYear()-45}-01-01`} name="ca_date_naiss" value={formData?.ca_date_naiss} placeholder='Exp 27/08/2000' className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange} />
+                        <input type="date" id='birthdate' max={`${new Date().getFullYear()-14}-01-01`} min={`${new Date().getFullYear()-45}-01-01`} name="ca_date_naiss" value={formData?.ca_date_naiss} placeholder='Exp 27/08/2000' className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange} />
                     </div>
                     <div className='flex flex-col gap-3 mb-3'>
                         <label htmlFor="birthplace">Lieu de naissance <sup className='text-red-600'>*</sup></label>

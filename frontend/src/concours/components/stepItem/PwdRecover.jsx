@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { resetPwdAPI } from '../../api/routes/auth';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 function PwdRecover() {
     const [formData, setFormData] = useState({
-        ca_num_recu: ''
+        login: ''
       });
       const [isLoad,setLoadingState] = useState(false)
       const [isVisible, setIsVisible] = useState(false);
@@ -57,6 +58,9 @@ function PwdRecover() {
                     <div className="border-2 border-gray-300 text-center text-lg mb-5" >Reinitialisation de mot de passe</div>
                     <div className="card-body p-10">
                         <div className='text-center text-sm italic mb-5'>Veuillez entrer le numéro de reçu afin que nous puissons vous reinitialiser votre motre de passe</div>
+                        <div className='text-center text-sm italic mb-5'>
+                            <Link to={"/reset-pwd"} className={"underline text-blue-500"}>je possede un code de réinitialisation !</Link>
+                        </div>
                         <form  onSubmit={onSubmit}>
                             <div className="flex flex-col gap-3 mb-3">
                                 <label htmlFor="ca_nom">
@@ -64,8 +68,8 @@ function PwdRecover() {
                                 </label>
                                 <input
                                 type="text"
-                                id="ca_num_recu"
-                                name="ca_num_recu"
+                                id="login"
+                                name="login"
                                 placeholder="Exp 040206"
                                 minLength={6}
                                 maxLength={6}

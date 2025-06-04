@@ -15,11 +15,11 @@ export const useAuthStatus = () => {
       try {
         const { url, ...rest } = AUTH_CHECK_API
 
-        fetch(url, { ...rest, credentials: "include", body: JSON.stringify({ access_token: token }) }).then(async (res) => {
+        fetch(url, { ...rest, credentials: "include" }).then(async (res) => {
           if (res.status === 200) {
 
             const data = await res.json()
-            const { access_token, token_type, user,candidat } = data
+            const { access_token, token_type, user, candidat } = data
             dispatch(push_candidate_info(candidat))
             setLoggedIn(true)
             sessionStorage.setItem('token', access_token)
@@ -52,7 +52,7 @@ export const useAuthStatus = () => {
     return () => {
       isMounted.current = false
     }
-  }, [isMounted, token])
+  }, [dispatch, isMounted, token])
   return { loggedIn, checkingStatus }
 }
 

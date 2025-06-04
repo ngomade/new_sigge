@@ -1,4 +1,4 @@
-import { DEL_COMPTE_API, GET_COMPTE_API, GET_COMPTE_SHOW_RECU, GET_COMPTE_STAT_API, STORE_COMPTE_API } from "..";
+import { DEL_COMPTE_API, GET_COMPTE_API, GET_COMPTE_SHOW_RECU, GET_COMPTE_STAT_API, STORE_COMPTE_API } from "../index";
 /**
  * Envoie des données de compte avec une image.
  * 

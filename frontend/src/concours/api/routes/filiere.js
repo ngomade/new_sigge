@@ -1,4 +1,4 @@
-import { GET_FILLIERE_API } from "..";
+import { GET_FILLIERE_API } from "../index";
 
 export async function getFiliere() {
     const { url, ...meta } = GET_FILLIERE_API;

@@ -1,11 +1,20 @@
-const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://backend.estlc-unv-ebolowa.com' : 'http://localhost:8000';
+const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://backend.estlc-unv-ebolowa.com' : 'http://localhost:8000/api/concours';
 
 const token = sessionStorage.getItem("token")
 export const LOGIN_API = {
-    url: `${BASE_URL}/login`,
+    url: `${BASE_URL}/auth/login`,
     method: "POST",
     headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token ?? ''}`
+    }
+}
+export const LOGOUT_API = {
+    url: `${BASE_URL}/logout`,
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
     }
 }
 export const GET_CANDIDATE_API = {
@@ -25,7 +34,7 @@ export const STORE_CANDIDATE_API = {
 
 }
 export const STORE_COMPTE_API = {
-    url: `${BASE_URL}/compte`,
+    url: `${BASE_URL}/comptes`,
     method: "POST",
     headers: {
         
@@ -41,8 +50,8 @@ export const GET_COMPTE_API = {
 
 
 export const AUTH_CHECK_API = {
-    url: `${BASE_URL}/check_token`,
-    method: "POST",
+    url: `${BASE_URL}/check-token`,
+    method: "GET",
     headers: {
         "Cookie":document.cookie,
         "Content-type":"application/json",
@@ -78,18 +87,19 @@ export const GET_DOSSIER_API = {
     }
 }
 export const GET_DIPLOME_API = {
-    url: `${BASE_URL}/get-diplomes`,
-    method: "POST",
+    url: `${BASE_URL}/diplomes`,
+    method: "GET",
     headers: {
        "Cookie": document.cookie,
-       "Content-Type": "application/json"
+       "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
     }
 }
 export const GET_FILLIERE_API = {
     url: `${BASE_URL}/filiere`,
     method: "GET",
     headers: {
-       //"Authorization": `Bearer ${token}`
+       "Authorization": `Bearer ${token}`
     }
 }
 
@@ -131,7 +141,7 @@ export const GET_SITE_ETUDE_API = {
     }
 }
 export const GET_SESSION_CONCOURS_API = {
-    url: `${BASE_URL}/get-session`,
+    url: `${BASE_URL}/sessions/active`,
     method: "GET",
     headers: {
        //"Authorization": `Bearer ${token}`
@@ -154,7 +164,7 @@ export const GET_CANDIDATE_DATA_API = {
 }
 
 export const GET_CANDIDATE_STAT_API = {
-    url: `${BASE_URL}/get-candidat-stat`,
+    url: `${BASE_URL}/candidats/stats`,
     method: "GET",
     headers: {
        "Authorization": `Bearer ${token}`
@@ -176,11 +186,18 @@ export const GET_CANDIDATE_BY_CENTRE_API = {
     }
 }
 export const RESET_PASSWAORD = {
-    url: `${BASE_URL}/reset-password`,
+    url: `${BASE_URL}/auth/forgot-password`,
     method: "POST",
     headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
+    }
+}
+export const RESET_PASSWORD_CONFIRM = {
+    url: `${BASE_URL}/auth/reset-password`,
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
     }
 }
 

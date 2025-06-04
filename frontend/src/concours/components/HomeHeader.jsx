@@ -61,10 +61,13 @@ function HomeHeader() {
     React.useEffect(() => {
 
         const handleScroll = () => {
-            if (window.pageYOffset > 100) {
-                document.querySelector("#header").classList.add("duration-500");
-            } else {
-                document.querySelector("#header").classList.remove("duration-500");
+            const header = document.querySelector("#header");
+            if (header) {
+                if (window.pageYOffset > 100) {
+                    header.classList.add("duration-500");
+                } else {
+                    header.classList.remove("duration-500");
+                }
             }
         };
 
@@ -88,10 +91,12 @@ function HomeHeader() {
                             LA DATE LIMITE DE DOSSIER QUANT À ELLE EST PROROGÉE AU MERCREDI 16 OCTOBRE À 15H30.
                         </p>
                         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='./arrete_ESTLC_EN_2024.pdf' target='_blank'>
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_ESTLC_EN_2024.pdf' target='_blank'
+                            rel="noopener noreferrer">
                                 Version Anglaise <IoDownload size={25} />
                             </a>
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='./arrete_ESTLC_FR_2024.pdf' target='_blank'>
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_ESTLC_FR_2024.pdf' target='_blank'
+                            rel="noopener noreferrer">
                                 Version Française <IoDownload size={25} />
                             </a>
                         </div>
@@ -100,7 +105,7 @@ function HomeHeader() {
                         </p>
                         <p className="text-lg text-center md:text-justify shadow-lg rounded-xl py-6">
                             <div className='p-5 text-center'>
-                            Pour tout problème d'inscription, veuillez contacter par WhatsApp les numeros suivant: <span className='text-blue-500 underline'><a href="https://api.whatsapp.com/send?phone=694915442" target='_blank'>694915442</a></span>, <span  className='text-blue-500'><a href="https://api.whatsapp.com/send?phone=695021036" className='underline' target='_blank'>695021036</a></span> ou ecrire à l'adresse  <a href="mailto:
+                            Pour tout problème d'inscription, veuillez contacter par WhatsApp les numeros suivant: <span className='text-blue-500 underline'><a href="https://api.whatsapp.com/send?phone=694915442" target='_blank' rel="noreferrer">694915442</a></span>, <span  className='text-blue-500'><a href="https://api.whatsapp.com/send?phone=695021036" className='underline' target='_blank' rel="noreferrer">695021036</a></span> ou ecrire à l'adresse  <a href="mailto:
                             estlc@estlc.unv-ebolowa.cm"  className='text-blue-500 underline'>estlc@estlc.unv-ebolowa.cm</a>
                             </div>
                         </p>
@@ -109,7 +114,7 @@ function HomeHeader() {
                         <Slide>
                             {sliderImg.map((slideImage, index) => (
                                 <div key={index}>
-                                    <div style={{ ...divStyle, 'backgroundImage': `url(${slideImage.img})` }}className='relative'>
+                                    <div style={{ ...divStyle, 'backgroundImage': `url(${slideImage.img})` }} className='relative'>
                                         <span className='absolute bottom-0 w-full bg-teal-200/50 p-3 text-xl font-bold'>{slideImage?.caption}</span>
                                     </div>
                                 </div>

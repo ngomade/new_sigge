@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { fieldSet, notEmpty } from '../../utils/validation';
 import { LuArrowRight } from 'react-icons/lu';
 import {  LuArrowLeft } from 'react-icons/lu';
-import data from '../../data.json'
+import data from '../../../data.json'
 import {useDispatch} from "react-redux"
 import { toast } from 'react-toastify';
 import { push_candidate_info } from '../../app/modules/candidate';

@@ -1,4 +1,4 @@
-import { GET_CANDIDATE_API, GET_CANDIDATE_BY_CENTRE_API, GET_CANDIDATE_DATA_API, GET_CANDIDATE_STAT_API, GET_COMPTE_STAT_API, GET_DIPLOME_API, STORE_CANDIDATE_API } from "..";
+import { GET_CANDIDATE_API, GET_CANDIDATE_BY_CENTRE_API, GET_CANDIDATE_DATA_API, GET_CANDIDATE_STAT_API, GET_COMPTE_STAT_API, GET_DIPLOME_API, STORE_CANDIDATE_API } from "../index";
 
 export async function createCandidate(body) {
     const { url, ...meta } = STORE_CANDIDATE_API;
@@ -12,7 +12,7 @@ export async function getCandidate() {
 
 export async function getDiplome(params) {
     const { url, ...meta } = GET_DIPLOME_API;
-    return await fetch(url, {...meta, body:JSON.stringify(params),credentials:'include'})
+    return await fetch(`${url}/${params.filiere_code}`, {...meta,credentials:'include'})
 }
 
 export async function getCandidateInfo(params) {

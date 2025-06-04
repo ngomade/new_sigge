@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getSiteComposition } from '../../src/api/routes/concours';
+import { getSiteComposition } from '../api/routes/concours';
 
 function SiteExam() {
   const [siteCompo, setSiteCompo] = useState([]);
