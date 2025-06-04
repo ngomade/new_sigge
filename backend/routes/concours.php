@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
-use App\Http\Controllers\concours\PersonnelControllerApi;
+// use App\Http\Controllers\concours\PersonnelControllerApi;
 use App\Models\concours\Diplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -142,7 +142,6 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::apiResource('filiere', FiliereControllerAPI::class);
     Route::apiResource('filiere_diplome', FiliereDiplomeControllerAPI::class);
-<<<<<<< HEAD
       // Diplome attachment routes
       Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
       Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
@@ -152,9 +151,6 @@ Route::middleware('auth:sanctum')->group(function () {
       //routes slide
       Route::apiResource('slide',SlideControllerApi::class);
       
-=======
-
->>>>>>> b384168680b88890d3be67ec73e8a9f584f9f3b6
       // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);
