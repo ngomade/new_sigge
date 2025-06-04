@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
@@ -34,7 +31,8 @@ class Diplome extends Model
 	public function filieres()
 	{
 		return $this->belongsToMany(Filiere::class, 'filiere_diplome', 'code_dip', 'filiere_code')
-					->withPivot('id', 'code_serie')
+					->withPivot('code_serie')
+                    ->using(FiliereDiplome::class)
 					->withTimestamps();
 	}
 }

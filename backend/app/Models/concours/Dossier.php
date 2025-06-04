@@ -31,8 +31,8 @@ class Dossier extends Model
 
 	public function ecole_elements(): BelongsToMany
 	{
-		return $this->belongsToMany(EcoleElement::class, 'ecole_element', 'code_el', 'code_ecole')
-            ->withPivot('code_ecole')
+		return $this->belongsToMany(Ecole::class, 'ecole_element', 'code_el', 'code_ecole')
+            ->using(EcoleElement::class)
             ->withTimestamps();
 	}
 }

@@ -1,6 +1,5 @@
 <?php
 
-// CentreExamenFactory.php
 namespace Database\Factories\concours;
 
 use App\Models\concours\CentreExaman;

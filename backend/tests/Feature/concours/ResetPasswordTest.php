@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,7 +45,7 @@ class ResetPasswordTest extends TestCase
     {
         $compte = Compte::factory()->create([
             'reset_token' => '12345',
-            'reset_token_expires_at' => now()->addHours(1)
+            'reset_token_expires_at' => now()->addHours()
         ]);
 
         $response = $this->postJson('/api/concours/auth/reset-password', [
@@ -66,9 +66,9 @@ class ResetPasswordTest extends TestCase
     /** @test */
     public function cannot_reset_password_with_expired_token()
     {
-        $compte = Compte::factory()->create([
+        Compte::factory()->create([
             'reset_token' => '12345',
-            'reset_token_expires_at' => now()->subHours(1)
+            'reset_token_expires_at' => now()->subHours()
         ]);
 
         $response = $this->postJson('/api/concours/auth/reset-password', [

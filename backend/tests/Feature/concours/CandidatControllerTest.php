@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,7 +21,7 @@ class CandidatControllerTest extends TestCase
         $this->createRequiredData();
     }
 
-    private function createRequiredData()
+    private function createRequiredData(): void
     {
         $this->filiere = Filiere::factory()->create();
         $this->site = SiteEtude::factory()->create();
@@ -86,7 +86,7 @@ class CandidatControllerTest extends TestCase
     /** @test */
     public function can_search_candidats_by_various_criteria()
     {
-        $candidat = Candidat::factory()->create([
+        Candidat::factory()->create([
             'ca_nom' => 'Searchable',
             'ca_prenom' => 'Test',
             'ca_email' => 'search@example.com',

@@ -3,9 +3,7 @@
 namespace App\Models\concours;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
@@ -23,23 +21,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class CandidatEcole extends Pivot
 {
-	protected $table = 'candidat_ecoles';
+    protected $table = 'candidat_ecoles';
     protected $fillable = [
         'ca_code',
         'code_ecole',
     ];
-
-	public function candidat(): BelongsToMany
-	{
-		return $this->belongsToMany(Candidat::class, 'candidat_ecoles', 'ca_code', 'code_ecole')
-            ->withPivot('ca_code', 'code_ecole')
-            ->withTimestamps();
-	}
-
-	public function ecole(): BelongsToMany
-	{
-		return $this->belongsToMany(Ecole::class, 'candidat_ecoles', 'code_ecole', 'ca_code')
-            ->withPivot('ca_code', 'code_ecole')
-            ->withTimestamps();
-	}
 }

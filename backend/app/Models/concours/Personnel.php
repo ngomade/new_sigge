@@ -28,7 +28,7 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 	];
 
 	protected $fillable = [
-		// 'code_pers',
+		'code_pers',
 		'nom_pers',
 		'prenom_pers',
 		'sexe_pers',
@@ -84,16 +84,16 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 
 	public function role_has_permissions(): HasMany
 	{
-		return $this->hasMany(\App\Models\concours\RoleHasPermission::class, 'code_pers');
+		return $this->hasMany(RoleHasPermission::class, 'code_pers');
 	}
 
 	public function sessionconcours(): HasMany
 	{
-		return $this->hasMany(\App\Models\concours\Sessionconcour::class, 'code_pers');
+		return $this->hasMany(Sessionconcour::class, 'code_pers');
 	}
 
 	public function slides(): HasMany
 	{
-		return $this->hasMany(\App\Models\concours\Slide::class, 'code_pers');
+		return $this->hasMany(Slide::class, 'code_pers');
 	}
 }

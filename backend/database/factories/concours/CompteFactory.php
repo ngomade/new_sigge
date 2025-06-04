@@ -1,15 +1,15 @@
 <?php
 
-namespace Database\Factories\Concours;
+namespace Database\Factories\concours;
 
+use App\Models\concours\Compte;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\concours\Personnel;
 
-class PersonnelFactory extends Factory
+class CompteFactory extends Factory
 {
-    protected $model = Personnel::class;
+    protected $model = Compte::class;
 
-    public function definition()
+    public function definition(): array
     {
         return [
             'code_pers' => 'PERS' . $this->faker->unique()->numberBetween(1000, 9999),

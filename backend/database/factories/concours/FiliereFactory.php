@@ -9,7 +9,7 @@ class FiliereFactory extends Factory
 {
     protected $model = Filiere::class;
 
-    public function definition()
+    public function definition(): array
     {
         static $index = 1;
         $filieres = [

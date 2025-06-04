@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,7 +36,7 @@ class SessionConcourTest extends TestCase
             'cloture' => now()->addDays(10)
         ]);
 
-        $pastSession = Sessionconcour::factory()->create([
+        Sessionconcour::factory()->create([
             'debut' => now()->subMonths(3),
             'cloture' => now()->subMonths(2)
         ]);
@@ -66,7 +66,7 @@ class SessionConcourTest extends TestCase
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 
-        $response = $this->getJson("/api/concours/sessions/{$session->id}/stats");
+        $response = $this->getJson("/api/concours/sessions/$session->id/stats");
 
         $response->assertStatus(200)
             ->assertJsonStructure([

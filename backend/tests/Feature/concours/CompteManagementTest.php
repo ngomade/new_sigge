@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
+use Exception;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\concours\{Compte, Candidat};
@@ -22,11 +23,13 @@ class CompteManagementTest extends TestCase
         Notification::fake();
     }
 
-    /** @test */
+    /** @test
+     * @throws Exception
+     */
     public function can_create_compte_with_valid_data()
     {
         $candidat = Candidat::factory()->create();
-        
+
         $response = $this->postJson('/api/concours/comptes', [
             'ca_num_recu' => 'RECU2024001',
             'ca_code' => $candidat->ca_code,
@@ -49,7 +52,7 @@ class CompteManagementTest extends TestCase
             'ca_email' => 'john.doe@example.com'
         ]);
 
-        Notification::assertSentTo($compte = Compte::first(), SendinfoOfConnection::class);
+        Notification::assertSentTo(Compte::first(), SendinfoOfConnection::class);
     }
 
     /** @test */
@@ -75,13 +78,13 @@ class CompteManagementTest extends TestCase
         $compte = Compte::factory()->create();
         Sanctum::actingAs($compte);
 
-        $response = $this->putJson("/api/concours/comptes{$compte->ca_num_recu}", [
+        $response = $this->putJson("/api/concours/comptes$compte->ca_num_recu", [
             'ca_nom' => 'Updated Name',
             'ca_email' => 'updated@example.com'
         ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('compte', [
             'ca_num_recu' => $compte->ca_num_recu,
             'ca_nom' => 'Updated Name',
@@ -94,10 +97,10 @@ class CompteManagementTest extends TestCase
     {
         $compte = Compte::factory()->create();
         Storage::put($compte->ca_recu, 'fake receipt content');
-        
+
         Sanctum::actingAs($compte);
 
-        $response = $this->get("/api/concours/comptes/download-recu/{$compte->ca_num_recu}");
+        $response = $this->get("/api/concours/comptes/download-recu/$compte->ca_num_recu");
 
         $response->assertStatus(200)
             ->assertDownload();

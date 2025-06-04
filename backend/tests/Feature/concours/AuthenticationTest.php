@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,7 +29,7 @@ class AuthenticationTest extends TestCase
     /** @test */
     public function candidat_can_login_with_valid_credentials()
     {
-        $compte = Compte::factory()->create([
+        Compte::factory()->create([
             'ca_num_recu' => 'TEST123',
             'ca_pwd' => Hash::make('password123')
         ]);
@@ -54,7 +54,7 @@ class AuthenticationTest extends TestCase
    /** @test */
     public function personnel_can_login_with_valid_credentials()
     {
-        $personnel = Personnel::factory()->create([
+        Personnel::factory()->create([
             'login_pers' => 'admin123',
             'pwd_pers' => Hash::make('password123')
         ]);
@@ -79,7 +79,7 @@ class AuthenticationTest extends TestCase
     /** @test */
     public function login_fails_with_missing_credentials()
     {
-        $response = $this->postJson('/api/concours/auth/login', []);
+        $response = $this->postJson('/api/concours/auth/login');
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['login', 'password']);
@@ -97,7 +97,7 @@ class AuthenticationTest extends TestCase
                 'errors' => 'Information de connexion incorrect.'
             ]);
     }
-    public function login_fails_with_invalid_credentials()
+    public function login_fails_with_invalid_credentials(): void
     {
         $response = $this->postJson('/api/concours/auth/login', [
             'login' => 'invalid',

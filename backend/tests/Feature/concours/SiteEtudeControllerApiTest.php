@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
 use App\Models\concours\SiteEtude;
 use App\Models\User;
@@ -22,7 +22,7 @@ class SiteEtudeControllerApiTest extends TestCase
 
     public function test_can_list_sites()
     {
-        $sites = SiteEtude::factory()->count(3)->create();
+        SiteEtude::factory()->count(3)->create();
 
         $response = $this->actingAs($this->user)
             ->getJson('/api/concours/sites');
@@ -52,7 +52,7 @@ class SiteEtudeControllerApiTest extends TestCase
         $site = SiteEtude::factory()->create();
 
         $response = $this->actingAs($this->user)
-            ->getJson("/api/concours/sites{$site->code_site}");
+            ->getJson("/api/concours/sites$site->code_site");
 
         $response->assertStatus(200)
             ->assertJsonFragment([
@@ -70,7 +70,7 @@ class SiteEtudeControllerApiTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->putJson("/api/concours/sites{$site->code_site}", $updateData);
+            ->putJson("/api/concours/sites$site->code_site", $updateData);
 
         $response->assertStatus(200)
             ->assertJsonFragment($updateData);
@@ -83,7 +83,7 @@ class SiteEtudeControllerApiTest extends TestCase
         $site = SiteEtude::factory()->create();
 
         $response = $this->actingAs($this->user)
-            ->deleteJson("/api/concours/sites/{$site->code_site}");
+            ->deleteJson("/api/concours/sites/$site->code_site");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('site_etude', ['code_site' => $site->code_site]);
@@ -94,7 +94,7 @@ class SiteEtudeControllerApiTest extends TestCase
         $site = SiteEtude::factory()->create();
 
         $response = $this->actingAs($this->user)
-            ->getJson("/api/concours/sites/{$site->code_site}/stats");
+            ->getJson("/api/concours/sites/$site->code_site/stats");
 
         $response->assertStatus(200)
             ->assertJsonStructure([

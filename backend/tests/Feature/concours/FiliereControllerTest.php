@@ -15,7 +15,7 @@ class FiliereControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Créer un utilisateur et l'authentifier
         $user = User::factory()->create([
             'usertype' => 'admin'
@@ -77,7 +77,7 @@ class FiliereControllerTest extends TestCase
     {
         $filiere = Filiere::factory()->create();
 
-        $response = $this->getJson("/api/concours/filiere/{$filiere->filiere_code}");
+        $response = $this->getJson("/api/concours/filiere/$filiere->filiere_code");
 
         $response->assertStatus(200)
                 ->assertJsonStructure([
@@ -99,7 +99,7 @@ class FiliereControllerTest extends TestCase
             'filiere_description' => 'Description mise à jour'
         ];
 
-        $response = $this->putJson("/api/concours/filiere/{$filiere->filiere_code}", $updateData);
+        $response = $this->putJson("/api/concours/filiere/$filiere->filiere_code", $updateData);
 
         $response->assertStatus(200)
                 ->assertJsonStructure([
@@ -122,7 +122,7 @@ class FiliereControllerTest extends TestCase
     {
         $filiere = Filiere::factory()->create();
 
-        $response = $this->deleteJson("/api/concours/filiere/{$filiere->filiere_code}");
+        $response = $this->deleteJson("/api/concours/filiere/$filiere->filiere_code");
 
         $response->assertStatus(204);
 
@@ -156,9 +156,9 @@ class FiliereControllerTest extends TestCase
             'filiere_code' => $filiere2->filiere_code
         ];
 
-        $response = $this->putJson("/api/concours/filiere/{$filiere1->filiere_code}", $updateData);
+        $response = $this->putJson("/api/concours/filiere/$filiere1->filiere_code", $updateData);
 
         $response->assertStatus(422)
                 ->assertJsonValidationErrors(['filiere_code']);
     }
-} 
+}

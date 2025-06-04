@@ -39,7 +39,7 @@ class SiteComposition extends Model
 	public function ecoles(): BelongsToMany
 	{
 		return $this->belongsToMany(Ecole::class, 'composition', 'site_code', 'code_ecole')
-            ->withPivot('code_ecole', 'site_code')
+            ->using(Composition::class)
             ->withTimestamps();
 	}
 }

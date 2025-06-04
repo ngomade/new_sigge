@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Concours;
+namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,7 +58,7 @@ class EcoleManagementTest extends TestCase
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 
-        $response = $this->putJson("/api/concours/ecole/{$ecole->code_ecole}", [
+        $response = $this->putJson("/api/concours/ecole/$ecole->code_ecole", [
             'label_ecole' => 'École Supérieure',
             'logo_ecole' => UploadedFile::fake()->image('new_logo.png'),
             'desc_ecole' => 'Nouvelle description de l\'école',
@@ -89,7 +89,7 @@ class EcoleManagementTest extends TestCase
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 
-        $response = $this->deleteJson("/api/concours/ecole/{$ecole->code_ecole}");
+        $response = $this->deleteJson("/api/concours/ecole/$ecole->code_ecole");
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('ecole', [
@@ -99,8 +99,8 @@ class EcoleManagementTest extends TestCase
     /** @test */
     public function can_list_ecoles()
     {
-        $ecole1 = Ecole::factory()->create(['label_ecole' => 'École A']);
-        $ecole2 = Ecole::factory()->create(['label_ecole' => 'École B']);
+        Ecole::factory()->create(['label_ecole' => 'École A']);
+        Ecole::factory()->create(['label_ecole' => 'École B']);
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 
@@ -117,7 +117,7 @@ class EcoleManagementTest extends TestCase
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 
-        $response = $this->getJson("/api/concours/ecole/{$ecole->code_ecole}");
+        $response = $this->getJson("/api/concours/ecole/$ecole->code_ecole");
         $response->assertStatus(200)
             ->assertJsonFragment(['label_ecole' => $ecole->label_ecole]);
     }
@@ -142,7 +142,7 @@ class EcoleManagementTest extends TestCase
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 
-        $response = $this->putJson("/api/concours/ecole/{$ecole->code_ecole}", [
+        $response = $this->putJson("/api/concours/ecole/$ecole->code_ecole", [
             'label_ecole' => '', // Invalid data
             'logo_ecole' => UploadedFile::fake()->image('invalid_logo.png'),
             'desc_ecole' => 'Updated description',
