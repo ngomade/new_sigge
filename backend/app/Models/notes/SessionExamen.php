@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models\notes
  */
-class SessionExaman extends Model
+class SessionExamen extends Model
 {
 	protected $table = 'session_examen';
 	protected $primaryKey = 'code_session';
@@ -61,6 +61,6 @@ class SessionExaman extends Model
 
 	public function examen()
 	{
-		return $this->hasMany(Examan::class, 'code_session');
+		return $this->hasMany(Examen::class, 'code_session');
 	}
 }

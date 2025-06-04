@@ -40,8 +40,7 @@ return new class extends Migration
             $table->string('arrond_pers', 128)->nullable();
             $table->text('bibliographie_pers')->nullable();
             $table->smallInteger('nb_enfant_pers')->nullable();
-            // $table->unsignedBigInteger('code_ass');
-            // $table->foreign('code_ass')->references('code_ass')->on('assignations')->onDelete('cascade');
+            
 
 
             $table->timestamps();

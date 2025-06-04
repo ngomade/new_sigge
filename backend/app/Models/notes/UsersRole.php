@@ -8,6 +8,7 @@ namespace App\Models\notes;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Role;
 
 /**
  * Class UsersRole
@@ -27,18 +28,18 @@ use Illuminate\Database\Eloquent\Model;
 class UsersRole extends Model
 {
 	protected $table = 'users_role';
-	protected $primaryKey = 'code_user';
+	protected $primaryKey = ['code_user','id_role'];
 	public $incrementing = false;
 
 	protected $casts = [
-		'annee_dip' => 'datetime',
+		// 'annee_dip' => 'datetime',
 		'date_debut_role' => 'datetime',
 		'date_fin_role' => 'datetime',
 		'etat_role' => 'int'
 	];
 
 	protected $fillable = [
-		'annee_dip',
+		// 'annee_dip',
 		'date_debut_role',
 		'date_fin_role',
 		'etat_role'
@@ -47,5 +48,9 @@ class UsersRole extends Model
 	public function user()
 	{
 		return $this->belongsTo(User::class, 'code_user');
+	}
+	public function role()
+	{
+		return $this->belongsTo(Role::class, 'id_role');
 	}
 }

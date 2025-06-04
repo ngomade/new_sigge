@@ -38,7 +38,7 @@ class Niveau extends Model
 
 	public function class()
 	{
-		return $this->belongsTo(Class::class, 'code_class');
+		return $this->belongsTo(Classe::class, 'code_class');
 	}
 
 	public function filiere_niveaus()

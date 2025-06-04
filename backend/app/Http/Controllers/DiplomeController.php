@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\concours\Diplome;
+use App\Models\Diplome;
 use Illuminate\Http\Request;
 
 class DiplomeController extends Controller

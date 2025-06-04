@@ -8,6 +8,7 @@ namespace App\Models\notes;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Diplome;
 
 /**
  * Class UsersDiplome
@@ -27,7 +28,7 @@ use Illuminate\Database\Eloquent\Model;
 class UsersDiplome extends Model
 {
 	protected $table = 'users_diplome';
-	protected $primaryKey = 'code_user';
+	protected $primaryKey = ['code_user','code_dip'];
 	public $incrementing = false;
 
 	protected $casts = [
@@ -44,5 +45,9 @@ class UsersDiplome extends Model
 	public function user()
 	{
 		return $this->belongsTo(User::class, 'code_user');
+	}
+	public function diplome()
+	{
+		return $this->belongsTo(Diplome::class, 'code_dip');
 	}
 }

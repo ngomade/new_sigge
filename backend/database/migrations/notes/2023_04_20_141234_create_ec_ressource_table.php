@@ -19,9 +19,9 @@ return new class extends Migration
             
             $table->unsignedInteger('code_res');
              $table->foreign('code_res')->references('code_res')->on('ressource')->onDelete('cascade');
-            // $table->char('code_pers', 32);
-            //  $table->foreign('code_pers')->references('code_pers')->on('personnel')->onDelete('cascade');
-            $table->primary(['code_ec', 'code_res']);
+             $table->char('code_pers', 32);
+             $table->foreign('code_pers')->references('code_pers')->on('personnel')->onDelete('cascade');
+            $table->primary(['code_ec', 'code_res','code_pers']);
             $table->timestamps();
         });
     }

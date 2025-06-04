@@ -32,8 +32,8 @@ class Anneescolaire extends Model
 
 	protected $casts = [
 		'code_annee' => 'int',
-		'debut_annee' => 'datetime',
-		'fin_annee' => 'datetime'
+		'debut_annee' => 'dateTime',
+		'fin_annee' => 'dateTime'
 	];
 
 	protected $fillable = [
@@ -48,6 +48,6 @@ class Anneescolaire extends Model
 
 	public function session_examen()
 	{
-		return $this->hasMany(SessionExaman::class, 'code_annee');
+		return $this->hasMany(SessionExamen::class, 'code_annee');
 	}
 }

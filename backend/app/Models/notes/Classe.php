@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models\notes
  */
-class Class extends Model
+class Classe extends Model
 {
 	protected $table = 'classes';
 	protected $primaryKey = 'code_class';

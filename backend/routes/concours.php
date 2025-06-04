@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
- use App\Http\Controllers\concours\PersonnelControllerApi;
+ use App\Http\Controllers\PersonnelControllerApi;
 use App\Models\concours\Diplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,8 +16,8 @@ use App\Http\Controllers\concours\DossierControllerApi;
 use App\Http\Controllers\concours\CentreExamenControllerApi;
 use App\Http\Controllers\concours\CentreDepotControllerApi;
 use App\Http\Controllers\concours\CompositionControllerApi;
-use App\Http\Controllers\concours\DiplomeController;
-use App\Http\Controllers\concours\FiliereControllerAPI;
+use App\Http\Controllers\DiplomeController;
+use App\Http\Controllers\FiliereControllerAPI;
 use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
 use App\Http\Controllers\concours\SlideControllerApi;
 

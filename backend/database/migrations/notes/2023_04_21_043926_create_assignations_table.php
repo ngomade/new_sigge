@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('assignations', function (Blueprint $table) {
             $table->id('code_ass');
              $table->char('code_ec', 32);
+              $table->char('code_pers', 32);
              $table->foreign('code_ec')->references('code_ec')->on('ec')->onDelete('cascade');
               $table->string('code_class');
             $table->foreign('code_class')->references('code_class')->on('classes')->onDelete('cascade');
+            $table->foreign('code_pers')->references('code_pers')->on('personnel')->onDelete('cascade');
 
             
 

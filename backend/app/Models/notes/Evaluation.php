@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $updated_at
  * 
  * @property Ec $ec
- * @property Examan $examan
+ * @property Examen $examen
  * @property User $user
  *
  * @package App\Models\notes
@@ -53,7 +53,7 @@ class Evaluation extends Model
 
 	public function examan()
 	{
-		return $this->belongsTo(Examan::class, 'code_examen');
+		return $this->belongsTo(Examen::class, 'code_examen');
 	}
 
 	public function user()

@@ -19,12 +19,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property SessionExaman $session_examan
+ * @property SessionExamen $session_examen
  * @property Collection|Evaluation[] $evaluations
  *
  * @package App\Models\notes
  */
-class Examan extends Model
+class Examen extends Model
 {
 	protected $table = 'examen';
 	protected $primaryKey = 'code_examen';
@@ -37,7 +37,7 @@ class Examan extends Model
 
 	public function session_examan()
 	{
-		return $this->belongsTo(SessionExaman::class, 'code_session');
+		return $this->belongsTo(SessionExamen::class, 'code_session');
 	}
 
 	public function evaluations()

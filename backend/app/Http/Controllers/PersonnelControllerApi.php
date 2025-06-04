@@ -5,7 +5,7 @@ namespace App\Http\Controllers\concours;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePersonnelRequest;
 use App\Http\Requests\UpdatePersonnelRequest;
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
