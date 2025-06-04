@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
-// use App\Http\Controllers\concours\PersonnelControllerApi;
+ use App\Http\Controllers\concours\PersonnelControllerApi;
 use App\Models\concours\Diplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,10 +16,9 @@ use App\Http\Controllers\concours\DossierControllerApi;
 use App\Http\Controllers\concours\CentreExamenControllerApi;
 use App\Http\Controllers\concours\CentreDepotControllerApi;
 use App\Http\Controllers\concours\CompositionControllerApi;
-use App\Http\Controllers\concours\EcoleElementControllerApi;
+use App\Http\Controllers\concours\DiplomeController;
 use App\Http\Controllers\concours\FiliereControllerAPI;
 use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
-use App\Http\Controllers\concours\PersonnelControllerApi;
 use App\Http\Controllers\concours\SlideControllerApi;
 
 /*
@@ -38,6 +37,11 @@ Route::group(['prefix' => 'auth', 'middleware' => "guest.sanctum"], function () 
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
     Route::get("refresh-token", [AuthController::class, 'refresh']);
 });
+
+// Routes non protégées par authentification
+
+Route::apiResource('site_composition', SiteCompositionControllerApi::class);
+Route::post('comptes', [CompteControllerApi::class, 'store']);
 
 // Routes protégées par authentification
 Route::middleware('auth:sanctum')->group(function () {
@@ -71,7 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("download-recu/{ca_num_recu}", [CompteControllerApi::class, 'showRecu']);
         Route::get("stats", [CompteControllerApi::class, 'statsCompte']);
     });
-    Route::apiResource('comptes', CompteControllerApi::class);
+    Route::apiResource('comptes', CompteControllerApi::class)->except('store');
 
     /*
     |--------------------------------------------------------------------------
@@ -79,7 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('sessions')->group(function () {
-        Route::get('active', [SessionconcourControllerApi::class, 'active']);
+        Route::get('active', [SessionconcourControllerApi::class, 'active'])->withoutMiddleware("auth:sanctum");
         Route::get('year/{year}', [SessionconcourControllerApi::class, 'byYear']);
         Route::get('{id}/stats', [SessionconcourControllerApi::class, 'statistics']);
         Route::get('upcoming', [SessionconcourControllerApi::class, 'upcoming']);
@@ -122,18 +126,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Routes pour les dossiers et sites de composition
+    | Routes pour les dossiers
     |--------------------------------------------------------------------------
     */
     Route::apiResource('dossier', DossierControllerApi::class);
-    Route::apiResource('site_composition', SiteCompositionControllerApi::class);
 
     /*
     |--------------------------------------------------------------------------
     | Routes pour les dossiers
     |--------------------------------------------------------------------------
     */
-    Route::apiResource("diplomes", Diplome::class);
+    Route::apiResource("diplomes", DiplomeController::class);
 
     /*
     |--------------------------------------------------------------------------
@@ -145,7 +148,7 @@ Route::middleware('auth:sanctum')->group(function () {
       // Diplome attachment routes
       Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
       Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
-      
+
       //routes personnel
       Route::apiResource('personnel',PersonnelControllerApi::class);
       //routes slide

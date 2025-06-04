@@ -16,7 +16,7 @@ class CompositionControllerApi extends Controller
     public function index()
     {
         $compositions = Composition::all();
-        return response()->json($compositions, 200);
+        return response()->json($compositions);
     }
 
     /**
@@ -30,7 +30,7 @@ class CompositionControllerApi extends Controller
         ]);
         try {
             $composition = Composition::create($validateData);
-            return response()->json($composition, 201);
+            return response()->json($composition);
         } catch (Exception $e) {
             Log::error('Error creating composition: ' . $e->getMessage());
             return response()->json(['erreur' => 'erreur lors de l\'enregistrement de la composition'], 500);
@@ -58,7 +58,7 @@ class CompositionControllerApi extends Controller
         $composition = Composition::findOrFail($id);
         try {
             $composition->update($validateData);
-            return response()->json($composition, 200);
+            return response()->json($composition);
         } catch (Exception $e) {
             Log::error('Error updating composition: ' . $e->getMessage());
             return response()->json(['erreur' => 'Erreur lors de la mise à jour de la composition.'], 500);

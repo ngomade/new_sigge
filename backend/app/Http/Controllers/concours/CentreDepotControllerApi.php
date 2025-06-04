@@ -8,7 +8,6 @@ use App\Models\concours\CentreDepot;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class CentreDepotControllerApi extends Controller
 {
@@ -17,8 +16,8 @@ class CentreDepotControllerApi extends Controller
      */
     public function index()
     {
-        $centre = CentreDepot::All();
-        return response()->json($centre,200);
+        $centre = CentreDepot::all();
+        return response()->json($centre);
     }
 
     /**
@@ -26,21 +25,19 @@ class CentreDepotControllerApi extends Controller
      */
     public function store(Request $request)
     {
-        //
         $validateData = $request->validate([
             'centre_depot_label' => 'required|string|max:255'
         ]);
         try {
-            DB::beginTransaction();
-
             $res = CentreDepot::create($validateData);
-            DB::commit();
-            return response()->json($res, 201);
-            
+            return response()->json([
+                'message' => 'centre de depot cree avec succes',
+                'data' => $res
+            ]);
 
-        } catch (\Throwable $th) {
-            Log::error('Error creating centre depot: ' . $th->getMessage());
-            return response()->json(['error ' => 'Erreur l\'ors de l\'enregistrement du centre'], 500);
+        } catch (Exception $e) {
+            Log::error('Error creating centre depot: ' . $e->getMessage());
+            return response()->json(['erreur ' => 'erreur lors de l\'enregistrement du centre'], 500);
         }
     }
 
@@ -80,7 +77,7 @@ class CentreDepotControllerApi extends Controller
         $centre = CentreDepot::findOrfail($centre_depot_code);
         try {
             $centre->delete();
-            return response()->json(['message' => 'CentreDepot supprimé avec succès.'], 200);
+            return response()->json(['message' => 'CentreDepot supprimé avec succès.']);
         } catch (Exception $e) {
             Log::error('Error deleting centre depot: ' . $e->getMessage());
             return response()->json(['error' => 'Erreur de suppression.'], 500);

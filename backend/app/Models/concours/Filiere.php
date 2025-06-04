@@ -3,7 +3,6 @@
 
 namespace App\Models\concours;
 
-use App\Models\concours\Diplome;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,25 +27,26 @@ class Filiere extends Model
 {
     use HasFactory;
 
-	protected $table = 'filiere';
-	protected $primaryKey = 'filiere_code';
-	public $incrementing = false;
+    protected $table = 'filiere';
+    protected $primaryKey = 'filiere_code';
+    public $incrementing = false;
 
-	protected $fillable = [
-		'filiere_code',
-		'filiere_label',
-		'filiere_description'
-	];
+    protected $fillable = [
+        'filiere_code',
+        'filiere_label',
+        'filiere_description'
+    ];
 
-	public function candidats(): HasMany
-	{
-		return $this->hasMany(Candidat::class, 'filiere_code');
-	}
+    public function candidats(): HasMany
+    {
+        return $this->hasMany(Candidat::class, 'filiere_code');
+    }
 
-	public function diplomes()
-	{
-		return $this->belongsToMany(Diplome::class, 'filiere_diplome', 'filiere_code', 'code_dip')
-					->withPivot('code_serie')
-					->withTimestamps();
-	}
+    public function diplomes()
+    {
+        return $this->belongsToMany(Diplome::class, 'filiere_diplome', 'filiere_code', 'code_dip')
+            ->withPivot('code_serie')
+            ->using(FiliereDiplome::class)
+            ->withTimestamps();
+    }
 }

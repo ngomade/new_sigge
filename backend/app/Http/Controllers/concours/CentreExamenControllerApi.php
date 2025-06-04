@@ -16,7 +16,7 @@ class CentreExamenControllerApi extends Controller
     public function index()
     {
         $centres = CentreExaman::with("ecole")->get();
-        return response()->json($centres,200);
+        return response()->json($centres);
     }
 
     /**
@@ -32,7 +32,7 @@ class CentreExamenControllerApi extends Controller
 
         try {
             $centre = CentreExaman::create($validatedData);
-            return response()->json($centre,200);
+            return response()->json($centre);
         } catch (Exception $e) {
             Log::error('Error creating centre examen: ' . $e->getMessage());
             return response()->json(['error' => 'Erreur lors de l\'enregistrement du centre d\'examen'], 500);

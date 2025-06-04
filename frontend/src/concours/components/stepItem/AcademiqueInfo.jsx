@@ -28,7 +28,7 @@ function AcademiqueInfo({ setLoadingState }) {
     }
     function fetchDiplome(data){
         setLoadingState(true)
-        getDiplome({filiere_code:data}).then(async(res)=>{
+        getDiplome({filiere_code: data}).then(async(res)=>{
             if (res.status ===200) {
                 
                 const data = await res.json()

@@ -8,6 +8,7 @@ namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class FiliereDiplome
@@ -27,6 +28,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class FiliereDiplome extends Model
 {
+	use HasFactory;
+
 	protected $table = 'filiere_diplome';
 
 	protected $casts = [
@@ -40,18 +43,18 @@ class FiliereDiplome extends Model
 		'code_serie'
 	];
 
+	public function filiere()
+	{
+		return $this->belongsTo(Filiere::class, 'filiere_code', 'filiere_code');
+	}
+
 	public function diplome()
 	{
-		return $this->belongsTo(Diplome::class, 'code_dip');
+		return $this->belongsTo(Diplome::class, 'code_dip', 'code_dip');
 	}
 
 	public function serie()
 	{
-		return $this->belongsTo(Serie::class, 'code_serie');
-	}
-
-	public function filiere()
-	{
-		return $this->belongsTo(Filiere::class, 'filiere_code');
+		return $this->belongsTo(Serie::class, 'code_serie', 'code_serie');
 	}
 }

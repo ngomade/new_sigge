@@ -20,6 +20,7 @@ class Compte extends Authenticatable implements MustVerifyEmail
     public $incrementing = false;
 
 	protected $fillable = [
+        'ca_num_recu',
 		'ca_code',
 		'ca_pwd',
 		'ca_recu',

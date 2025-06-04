@@ -88,7 +88,7 @@ class AuthController extends Controller
                     'message' => 'Session invalide ou expiré.'
                 ], 401);
 
-            return $this->authService->getUserFromToken($token);
+            return $this->authService->getUserFromToken($token, $request->bearerToken());
         } catch (Exception $e) {
             Log::error('Error in checkToken: ' . $e->getMessage());
             return response()->json([

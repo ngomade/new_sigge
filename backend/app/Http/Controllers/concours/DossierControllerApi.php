@@ -17,7 +17,7 @@ class DossierControllerApi extends Controller
     public function index()
     {
         $dossiers = Dossier::all();
-        return response()->json($dossiers->load('ecole_element'));
+        return response()->json($dossiers->load('ecole_elements'));
     }
 
     /**
@@ -28,14 +28,14 @@ class DossierControllerApi extends Controller
     {
         $validatedData = $request->validate([
             'label_el' => 'required|string|max:255',
-            'ecole_element' => 'required|array',
-            'ecole_element.*' => 'exists:ecole,code_ecole',
+            'ecoles' => 'required|array',
+            'ecoles.*' => 'exists:ecole,code_ecole',
         ]);
 
         try {
             DB::beginTransaction();
             $dossier = Dossier::create($validatedData);
-            $dossier->ecole_elements()->attach($request->ecole_elements);
+            $dossier->ecole_elements()->attach($request->ecoles);
             DB::commit();
             return response()->json($dossier);
         } catch (Throwable $th) {
@@ -51,7 +51,7 @@ class DossierControllerApi extends Controller
     public function show(string $id)
     {
         $dossier = Dossier::findorfail($id);
-        return response()->json($dossier->load('ecole_element'));
+        return response()->json($dossier->load('ecole_elements'));
     }
 
     /**
@@ -62,14 +62,14 @@ class DossierControllerApi extends Controller
     {
         $validatedData = $request->validate([
             'label_el' => 'required|string|max:255',
-            'ecole_element' => 'sometimes|array',
-            'ecole_element.*' => 'exists:ecole,code_ecole',
+            'ecoles' => 'sometimes|array',
+            'ecoles.*' => 'exists:ecole,code_ecole',
         ]);
 
         $dossier = Dossier::findOrFail($id);
         try {
             DB::beginTransaction();
-            $dossier->ecole_elements()->sync($request->ecole_elements);
+            $dossier->ecole_elements()->sync($request->ecoles);
             $dossier->update($validatedData);
             DB::commit();
             return response()->json($dossier);

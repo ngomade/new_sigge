@@ -4,6 +4,7 @@ namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Ecole extends Model
 {
+    use HasFactory;
 	protected $table = 'ecole';
 	protected $primaryKey = 'code_ecole';
 	public $incrementing = false;
@@ -59,6 +61,7 @@ class Ecole extends Model
 	public function candidats(): BelongsToMany
 	{
 		return $this->belongsToMany(Candidat::class, 'candidat_ecoles', 'code_ecole', 'ca_code')
+                    ->using(CandidatEcole::class)
 					->withTimestamps();
 	}
 
@@ -71,13 +74,14 @@ class Ecole extends Model
 	{
 		return $this->belongsToMany(SiteComposition::class, 'composition', 'code_ecole', 'site_code')
             ->withPivot('code_ecole', 'site_code')
+            ->using(Composition::class)
             ->withTimestamps();
 	}
 
 	public function ecole_elements(): BelongsToMany
 	{
-		return $this->belongsToMany(EcoleElement::class, 'ecole_element', 'code_ecole', 'code_el')
-            ->withPivot('code_ecole', 'code_el')
+		return $this->belongsToMany(Dossier::class, 'ecole_element', 'code_ecole', 'code_el')
+            ->using(EcoleElement::class)
             ->withTimestamps();
 	}
 }

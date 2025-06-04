@@ -18,7 +18,7 @@ class EcoleControllerApi extends Controller
     public function index()
     {
         //
-        $ecole = Ecole::All();
+        $ecole = Ecole::all();
         //with(["candidat", "centre_depot", "centre_examen", 'ecole_element', 'site_composition'])->get();
         return response()->json($ecole);
     }
@@ -38,9 +38,11 @@ class EcoleControllerApi extends Controller
             'tel_ecole' => 'required|string|max:32',
             'email_ecole' => 'nullable|email|max:128',
             'bp_ecole' => 'required|string|max:128',
-            'centre_depot_code' => 'required|exists:centre_depot,centre_depot_code',
+            'centre_depot' => 'required|exists:centre_depot,centre_depot_code',
             'sites_composition' => 'sometimes|array',
             'sites_composition.*' => "required|exists:site_composition,code_site",
+            'dossier_element' => 'sometimes|array',
+            'dossier_element.*' => "required|exists:dossier,code_el",
             'candidat' => 'sometimes|array',
             'candidat.*' => "required|exists:candidat,ca_code",
         ]);
@@ -89,12 +91,12 @@ class EcoleControllerApi extends Controller
             'email_ecole' => 'nullable|email|max:128',
             'bp_ecole' => 'sometimes|string|max:128',
             'centre_depot' => 'sometimes|exists:centre_depot,centre_depot_code',
-            
-            'sites_composition.*' => "required|exists:site_composition,code_site",
             'sites_composition' => 'sometimes|array',
             'sites_composition.*' => "required|exists:site_composition,code_site",
-            'ecole_element' => 'sometimes|array',
-            'ecole_element.*' => "required|exists:dossier,code_el",
+            'dossier_element' => 'sometimes|array',
+            'dossier_element.*' => "required|exists:dossier,code_el",
+            'candidat' => 'sometimes|array',
+            'candidat.*' => "required|exists:candidat,ca_code",
         ]);
         $ecole = Ecole::findOrfail($code_ecole);
         try {
@@ -149,14 +151,14 @@ class EcoleControllerApi extends Controller
 
     /**
      * @param Request $request
-     * @param $ecole
+     * @param $label_ecole
      * @return string
      */
     private function storageLogo(Request $request, $label_ecole): string
     {
         $logo_ecole = $request->file('logo_ecole');
-        $filename = "logo_" . $label_ecole . "_" . now()->format("Y_m_d_H_i_s") . '.' . $logo_ecole->extension();
-        return $logo_ecole->storeAs('private/logos', $filename);
+        $filename = "logo_" . $label_ecole . "_" . now()->format("Y-m-d_H_i_s") . '.' . $logo_ecole->extension();
+        return $logo_ecole->storeAs('logos', $filename);
     }
 
 }
