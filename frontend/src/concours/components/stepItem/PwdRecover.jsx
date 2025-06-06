@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { resetPwdAPI } from '../../api/routes/auth';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import Loading from "../stepModal/Loading";
 
 function PwdRecover() {
     const [formData, setFormData] = useState({
@@ -58,9 +58,9 @@ function PwdRecover() {
                     <div className="border-2 border-gray-300 text-center text-lg mb-5" >Reinitialisation de mot de passe</div>
                     <div className="card-body p-10">
                         <div className='text-center text-sm italic mb-5'>Veuillez entrer le numéro de reçu afin que nous puissons vous reinitialiser votre motre de passe</div>
-                        <div className='text-center text-sm italic mb-5'>
-                            <Link to={"/reset-pwd"} className={"underline text-blue-500"}>je possede un code de réinitialisation !</Link>
-                        </div>
+                        {/*<div className='text-center text-sm italic mb-5'>*/}
+                        {/*    <Link to={"/reset-pwd"} className={"underline text-blue-500"}>je possede un code de réinitialisation !</Link>*/}
+                        {/*</div>*/}
                         <form  onSubmit={onSubmit}>
                             <div className="flex flex-col gap-3 mb-3">
                                 <label htmlFor="ca_nom">
@@ -82,10 +82,11 @@ function PwdRecover() {
                             <button type="submit" className="w-1/2 p-2 text-white bg-teal-600 rounded-md" onClick={showLoading}>
                                 Envoyer
                             </button>
+                                {isLoad && <Loading/>}
                         </div>
                         </form>
                         {isVisible &&
-                            <div className='grid bg-white font-bold text-lg grid-cols-1 h-15 w-85 place-items-center rounded  m-auto shadow-lg shadow-green-800 rounded p-3 '>
+                            <div className='grid bg-white font-bold text-lg grid-cols-1 h-15 w-85 place-items-center  m-auto shadow-lg shadow-green-800 rounded p-3 '>
                                 <div className='text-justify p-3 text-l text-gray-800 leading-10' dangerouslySetInnerHTML={{__html:notif}}/>
                             </div>
                         }

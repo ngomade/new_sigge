@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { initStep, prevStep } from '../../app/modules/stepper';
 import CustomCheckbox from '../CustomCheckbox';
 import { createCandidate } from '../../api/routes/candidate';
-import { useNavigate } from 'react-router-dom';
 import { getDossier } from '../../api/routes/concours';
 
 function Confirmation({ setLoadingState }) {
@@ -43,7 +42,7 @@ function Confirmation({ setLoadingState }) {
     }, []);
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     function onSubmit(e) {
         e.preventDefault();

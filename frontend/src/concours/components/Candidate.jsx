@@ -16,8 +16,8 @@ import { Link } from 'react-router-dom'
 
 function Candidate({ isLoad, setLoadingState }) {
     const [showModal, setModalShow] = React.useState(false);
-    const token = sessionStorage.getItem('token');
-    const candidat = sessionStorage.getItem('candidat');
+    const token = localStorage.getItem('token');
+    const candidat = localStorage.getItem('candidat');
     const navigate = useNavigate();
     const viewerRef = useRef(null);
     const startRef = useRef(null);

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {loginAPI} from '../api/routes/auth';
-import {useNavigate} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import Loading from '../components/stepModal/Loading';
 import {toast} from 'react-toastify';
 
@@ -10,7 +10,7 @@ function LoginPage() {
         password: '',
     });
     const [isLoad, setLoadingState] = useState(false)
-    const navigate = useNavigate()
+    const location = useLocation();
 
     function onChange(e) {
         setFormData({...formData, [e.target.name]: e.target.value});
@@ -26,20 +26,20 @@ function LoginPage() {
                     setLoadingState(false)
                     const data = await res.json()
                     const {access_token, token_type, user, user_type, candidat} = data
-                    sessionStorage.setItem('token', access_token)
-                    sessionStorage.setItem('type_token', token_type)
-                    sessionStorage.setItem('user', JSON.stringify(user))
-                    sessionStorage.setItem('user_type', user_type)
+                    localStorage.setItem('token', access_token)
+                    localStorage.setItem('type_token', token_type)
+                    localStorage.setItem('user', JSON.stringify(user))
+                    localStorage.setItem('user_type', user_type)
                     if (user_type === 'candidat') {
-                        sessionStorage.setItem("candidat", candidat)
-                        window.location.href = '/success'
+                        localStorage.setItem("candidat", candidat)
+                        window.location.href = location.state?.from?.pathname || '/success'
                         // return navigate('/success')
                     } else {
                         if (user_type === 'admin') {
-                            window.location.href = '/admin'
+                            window.location.href = location.state?.from?.pathname || '/admin'
                         } else {
                             //return navigate('/candidate')
-                            window.location.href = '/candidate'
+                            window.location.href = location.state?.from?.pathname || '/candidate'
                         }
                     }
                 } else if (res.status === 401) {
@@ -112,3 +112,4 @@ function LoginPage() {
 }
 
 export default LoginPage;
+

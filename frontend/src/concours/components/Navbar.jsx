@@ -15,7 +15,7 @@ function Navbar() {
     const [hasToken, setToken] = useState('')
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    const candidat = sessionStorage.getItem('candidat');
+    const candidat = localStorage.getItem('candidat');
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -26,15 +26,18 @@ function Navbar() {
         setIsLoggingOut(true);
         try {
             logoutAPI().then((r) => {
-                if (r.status === 200) {
+                if (r.ok) {
                     dispatch(logout())
                     persistor.purge()
-                    sessionStorage.removeItem('candidat');
-                    sessionStorage.removeItem('user_type');
-                    sessionStorage.removeItem('type_token');
-                    window.location.href = '/'
+                    localStorage.removeItem('candidat');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('user_type');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('type_token');
                     toast.success('Déconnexion réussie');
-                }else {
+                    setToken("");
+                    window.location.href = '/'
+                } else {
                     setIsLoggingOut(false);
                     toast.error("Erreur lors de la déconnexion");
                 }
@@ -46,8 +49,14 @@ function Navbar() {
     }
 
     React.useEffect(() => {
-        const token = sessionStorage.getItem("token")
+        const token = localStorage.getItem("token")
         setToken(token)
+
+        const handleStorage = (event) => {
+            if (event.key === "token") {
+                setToken(event.newValue);
+            }
+        };
         const handleScroll = () => {
             if (window.pageYOffset > 100) {
                 document.querySelector("nav").classList.add("fixed", "top-0", "transition", "duration-300", "w-full", "bg-white", "shadow-lg");
@@ -55,11 +64,13 @@ function Navbar() {
                 document.querySelector("nav").classList.remove("fixed", "top-0", "transition", "duration-300", "w-full", "bg-white", "shadow-lg");
             }
         };
+        window.addEventListener("storage", handleStorage);
 
         window.addEventListener("scroll", handleScroll);
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("storage", handleStorage);
         };
     }, []);
 
@@ -68,7 +79,7 @@ function Navbar() {
             <div className='bg-teal-400 w-full p-2 flex items-center justify-center'>
                 <h1 className='text-white text-center'>
                     Inscription en cours {(candidat === 'null' || candidat === null) ?
-                    <Link to={'/candidate'}>Veuillez vous inscrire </Link> : ""}
+                    <Link to={'/candidate'}>Veuillez vous inscrire -> </Link> : ""}
                 </h1>
             </div>
             <nav className='shadow flex justify-between items-center z-[500] px-8 py-5 '>
@@ -85,7 +96,7 @@ function Navbar() {
                         <Link to={'/site-exam'}>Nos sites</Link>
                     </li>
                     <li>
-                        <Link to={'/ancienne-epreuve'}>Nos Anciennes épreuves</Link>
+                        <a href={'/ancienne-epreuve'}>Nos Anciennes épreuves</a>
                     </li>
                     <li>
                         <Link to={'/faq'}>FaQ</Link>
@@ -93,13 +104,16 @@ function Navbar() {
                 </ul>
                 <div className='hidden md:block'>
                     {
-                        hasToken !== null ? (<div className='flex gap-2'>
-                            <Link to={'/success'} className='p-2 text-white bg-slate-400 rounded-md'>Mon Compte</Link>
-                            <button className='p-2 text-white bg-red-600 rounded-md'
-                                    onClick={logoutAction} disabled={isLoggingOut}
-                            >        {isLoggingOut ? "Déconnexion..." : "Déconnexion"}
-                            </button>
-                        </div>) : <Link to={'/login'} className='p-2 text-white bg-teal-400 rounded-md'>Connexion</Link>
+                        hasToken ? (
+                            <div className='flex gap-2'>
+                                <Link to={'/success'} className='p-2 text-white bg-slate-400 rounded-md'>Mon
+                                    Compte</Link>
+                                <button className='p-2 text-white bg-red-600 rounded-md'
+                                        onClick={logoutAction} disabled={isLoggingOut}
+                                >        {isLoggingOut ? "Déconnexion..." : "Déconnexion"}
+                                </button>
+                            </div>
+                        ) : <Link to={'/login'} className='p-2 text-white bg-teal-400 rounded-md'>Connexion</Link>
                     }
                 </div>
                 <button
@@ -131,13 +145,16 @@ function Navbar() {
 
                         <li>
                             {
-                                hasToken !== null ? (<div className='flex gap-2'>
-                                    <Link to={'/success'} className='p-2 text-white bg-slate-400 rounded-md'>Mon
-                                        Compte</Link>
-                                    <Link to={'/logout'} className='p-2 text-white bg-red-600 rounded-md'
-                                          onClick={logoutAction}>Déconnexion</Link>
-                                </div>) : <Link to={'/login'} className='p-2 text-white bg-teal-400 rounded-md'
-                                                onClick={toggleMobileMenu}>Connexion</Link>
+                                hasToken ? (
+                                    <div className='flex gap-2'>
+                                        <Link to={'/success'} className='p-2 text-white bg-slate-400 rounded-md'>Mon
+                                            Compte</Link>
+                                        <button className='p-2 text-white bg-red-600 rounded-md'
+                                                onClick={logoutAction}>Déconnexion
+                                        </button>
+                                    </div>
+                                ) : <Link to={'/login'} className='p-2 text-white bg-teal-400 rounded-md'
+                                          onClick={toggleMobileMenu}>Connexion</Link>
                             }
                         </li>
                     </ul>

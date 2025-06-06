@@ -62,10 +62,8 @@ const AfficheDonnee = () => {
         orientation: 'portrait',
       },
     };
-    if (html2pdf().set(opt).from(element).save()) {
-      return true
-    }
-    return false
+    return !!html2pdf().set(opt).from(element).save();
+
   }
 
   return (

@@ -6,6 +6,7 @@ import {createCompte} from '../../api/routes/compte';
 import {useDispatch} from 'react-redux';
 import {push_candidate_info} from '../../app/modules/candidate';
 import {useNavigate} from 'react-router-dom';
+import Loading from "./Loading";
 
 
 function PaymentInfo({onClose, isLoad, setLoadingState}) {
@@ -57,9 +58,9 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                     onClose();
                     const data = await response.json()
                     const {access_token, compte, user, user_type} = data
-                    sessionStorage.setItem('token', access_token)
-                    sessionStorage.setItem('user', JSON.stringify(user))
-                    sessionStorage.setItem('user_type', user_type)
+                    localStorage.setItem('token', access_token)
+                    localStorage.setItem('user', JSON.stringify(user))
+                    localStorage.setItem('user_type', user_type)
                     fieldSet('#form_pay', setFormData, {});
                     dispatch(push_candidate_info(compte));
                     toast.success("Les informations ont été soumises avec succès");
@@ -216,6 +217,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                         >
                             {isSubmitting ? "En cours..." : "Soumettre"}
                         </button>
+                        {isSubmitting && <Loading/>}
                     </div>
                 </form>
             </div>
