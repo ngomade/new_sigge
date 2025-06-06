@@ -1,8 +1,6 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models\notes;
 
@@ -12,14 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Ue
- * 
+ *
  * @property string $code_ue
  * @property string $code_sem
  * @property string $intitule_ue
  * @property string|null $desc_ue
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Semestre $semestre
  * @property Collection|Ec[] $ecs
  * @property Collection|Inscription[] $inscriptions

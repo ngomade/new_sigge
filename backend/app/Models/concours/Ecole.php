@@ -2,36 +2,20 @@
 
 namespace App\Models\concours;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\concours\CentreDepot;
+use App\Models\concours\Candidat;
+use App\Models\concours\CentreExaman;
+use App\Models\concours\SiteComposition;
+use App\Models\concours\Composition;
+use App\Models\concours\EcoleElement;
+use App\Models\concours\CandidatEcole;
 
-/**
- * Class Ecole
- *
- * @property string $code_ecole
- * @property string $label_ecole
- * @property string $logo_ecole
- * @property string $desc_ecole
- * @property string $tel_ecole
- * @property string|null $email_ecole
- * @property string $bp_ecole
- * @property int $centre_depot_code
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property CentreDepot $centre_depot
- * @property Collection|Candidat[] $candidats
- * @property Collection|CentreExaman[] $centre_examen
- * @property Collection|Composition[] $compositions
- * @property Collection|EcoleElement[] $ecole_elements
- *
- * @package App\Models
- */
 class Ecole extends Model
 {
     use HasFactory;

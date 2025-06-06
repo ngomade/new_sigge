@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
@@ -12,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class SessionExaman
- * 
+ *
  * @property string $code_session
  * @property int $code_annee
  * @property string $label_session
@@ -21,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $statut_session
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Anneescolaire $anneescolaire
  * @property Collection|Document[] $documents
  * @property Collection|Examan[] $examen

@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
@@ -11,19 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-/**
- * Class SiteComposition
- *
- * @property string $site_code
- * @property string $site_ville
- * @property string $site_lieu
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Collection|Composition[] $compositions
- *
- * @package App\Models
- */
+
 class SiteComposition extends Model
 {
 	protected $table = 'site_composition';

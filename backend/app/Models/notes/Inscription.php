@@ -1,18 +1,16 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Inscription
- * 
+ *
  * @property string $code_ins
  * @property string $code_user
  * @property int $code_annee
@@ -20,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $statut_ins
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Anneescolaire $anneescolaire
  * @property User $user
  * @property Collection|FiliereNiveau[] $filiere_niveaus

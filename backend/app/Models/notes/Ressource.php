@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
@@ -12,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Ressource
- * 
+ *
  * @property int $code_res
  * @property string $label_res
  * @property string|null $code_ec
@@ -20,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $desc_res
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Collection|Ec[] $ecs
  *
  * @package App\Models\notes

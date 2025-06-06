@@ -3,23 +3,9 @@
 
 namespace App\Models\concours;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Class CentreExaman
- *
- * @property int $centre_exam_code
- * @property string $code_ecole
- * @property string $centre_exam_label
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Ecole $ecole
- *
- * @package App\Models
- */
 class CentreExaman extends Model
 {
 	protected $table = 'centre_examen';

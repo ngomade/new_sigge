@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
@@ -11,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class SemestreNiveau
- * 
+ *
  * @property string $code_niveau
  * @property string $code_sem
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Niveau $niveau
  * @property Semestre $semestre
  *

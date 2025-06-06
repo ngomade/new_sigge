@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\concours;
+namespace App\Models;
 
 use App\Models\concours\RoleHasPermission;
 use App\Models\concours\Sessionconcour;

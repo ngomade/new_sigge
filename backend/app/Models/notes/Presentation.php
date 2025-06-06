@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
@@ -11,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Presentation
- * 
+ *
  * @property int $code_pres
  * @property string $code_bureau
  * @property string $photo_chef
@@ -23,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $nom_chef
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Bureau $bureau
  *
  * @package App\Models\notes

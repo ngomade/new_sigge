@@ -1,19 +1,17 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class EtudiantEc
- * 
+ *
  * @property string $code_user
  * @property string $code_ec
- * 
+ *
  * @property Ec $ec
  * @property User $user
  *

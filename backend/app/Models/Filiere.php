@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Models\concours;
+namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;

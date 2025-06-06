@@ -6,19 +6,20 @@
 
 namespace App\Models\notes;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Class
- * 
+ *
  * @property string $code_class
  * @property string $label_class
  * @property string $code_user
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property User $user
  * @property Collection|Assignation[] $assignations
  * @property Collection|Niveau[] $niveaux

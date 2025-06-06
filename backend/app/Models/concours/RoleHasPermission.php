@@ -1,13 +1,11 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class RoleHasPermission
@@ -42,12 +40,12 @@ class RoleHasPermission extends Model
 		'statut_role'
 	];
 
-	public function personnel()
+	public function personnel(): BelongsTo
 	{
 		return $this->belongsTo(Personnel::class, 'code_pers');
 	}
 
-	public function role()
+	public function role(): BelongsTo
 	{
 		return $this->belongsTo(Role::class, 'id_role');
 	}

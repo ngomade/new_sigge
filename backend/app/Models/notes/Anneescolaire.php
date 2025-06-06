@@ -12,15 +12,15 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Anneescolaire
- * 
+ *
  * @property int $code_annee
  * @property Carbon $debut_annee
  * @property Carbon $fin_annee
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Collection|Inscription[] $inscriptions
- * @property Collection|SessionExaman[] $session_examen
+ * @property Collection|SessionExamen[] $session_examen
  *
  * @package App\Models\notes
  */

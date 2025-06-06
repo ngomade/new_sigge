@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Document
- * 
+ *
  * @property int $code_doc
  * @property string $code_session
  * @property string $code_bureau
@@ -21,9 +21,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $nom_fichier
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Bureau $bureau
- * @property SessionExaman $session_examan
+ * @property SessionExamen $session_examan
  *
  * @package App\Models\notes
  */

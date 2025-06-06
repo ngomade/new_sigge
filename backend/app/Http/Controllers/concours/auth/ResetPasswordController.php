@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class ResetPasswordController extends Controller
 {
@@ -36,8 +37,9 @@ class ResetPasswordController extends Controller
             }
             // Générer un code à 5 chiffres
             $code = (string) random_int(10000, 99999);
-            $user->reset_token = $code;
-            $user->reset_token_expires_at = now()->addHours(24);
+//            $user->reset_token = $code;
+//            $user->reset_token_expires_at = now()->addHours(24);
+            $user->ca_pwd  =  Hash::make($code);
             $user->save();
 
             $user->notify(new ResetPwdCompteUser($code));

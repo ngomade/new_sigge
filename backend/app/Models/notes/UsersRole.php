@@ -1,18 +1,16 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Role;
 
 /**
  * Class UsersRole
- * 
+ *
  * @property string $code_user
  * @property Carbon $annee_dip
  * @property Carbon $date_debut_role
@@ -20,7 +18,7 @@ use App\Models\Role;
  * @property int $etat_role
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property User $user
  *
  * @package App\Models\notes

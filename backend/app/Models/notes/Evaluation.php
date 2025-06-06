@@ -6,12 +6,13 @@
 
 namespace App\Models\notes;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Evaluation
- * 
+ *
  * @property string $code_ec
  * @property string $code_examen
  * @property string $code_user
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $date_evalu
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Ec $ec
  * @property Examen $examen
  * @property User $user

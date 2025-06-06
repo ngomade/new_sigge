@@ -1,14 +1,12 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\concours;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class FiliereDiplome
@@ -43,17 +41,17 @@ class FiliereDiplome extends Model
 		'code_serie'
 	];
 
-	public function filiere()
+	public function filiere(): BelongsTo
 	{
 		return $this->belongsTo(Filiere::class, 'filiere_code', 'filiere_code');
 	}
 
-	public function diplome()
+	public function diplome(): BelongsTo
 	{
 		return $this->belongsTo(Diplome::class, 'code_dip', 'code_dip');
 	}
 
-	public function serie()
+	public function serie(): BelongsTo
 	{
 		return $this->belongsTo(Serie::class, 'code_serie', 'code_serie');
 	}

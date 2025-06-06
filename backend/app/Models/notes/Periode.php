@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
 
 namespace App\Models\notes;
 
@@ -11,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Periode
- * 
+ *
  * @property string $code_salle
  * @property string $code_ec
  * @property int|null $code_periode
@@ -21,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $duree_periode
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Ec $ec
  * @property Salle $salle
  *

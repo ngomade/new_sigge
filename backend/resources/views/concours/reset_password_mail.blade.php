@@ -131,7 +131,8 @@
                 Bonjour {{ $user->ca_prenom ?? $user->prenom_pers ?? '' }} {{ $user->ca_nom ?? $user->nom_pers ?? '' }},
             </div>
 
-            <p>Vous avez demandé la réinitialisation de votre mot de passe. Voici votre code de réinitialisation :</p>
+            <p>Vous avez demandé la réinitialisation de votre mot de passe. Voici votre nouveau de connexion :</p>
+            <p>Vous pourriez changer ce mot de passe, en définissant le votre dans vos réglages. </p>
 
             <div class="code-container">
                 <div class="code">{{ $code }}</div>
@@ -155,9 +156,9 @@
                 @endif
             </ul>
 
-            <div class="warning">
-                <p>⚠️ Ce code est valable pendant 24 heures. Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet email.</p>
-            </div>
+{{--            <div class="warning">--}}
+{{--                <p>⚠️ Ce code est valable pendant 24 heures. Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet email.</p>--}}
+{{--            </div>--}}
         </div>
         <div class="footer">
             <p>Pour toute assistance, contactez le support</p>
