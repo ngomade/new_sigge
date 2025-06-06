@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\concours\Filiere;
+use App\Models\Filiere;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

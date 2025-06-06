@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
-use App\Http\Controllers\concours\DiplomeController;
-use App\Http\Controllers\concours\PersonnelControllerApi;
+ use App\Http\Controllers\PersonnelControllerApi;
+use App\Models\concours\Diplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\concours\CandidatControllerApi;
@@ -16,8 +16,8 @@ use App\Http\Controllers\concours\DossierControllerApi;
 use App\Http\Controllers\concours\CentreExamenControllerApi;
 use App\Http\Controllers\concours\CentreDepotControllerApi;
 use App\Http\Controllers\concours\CompositionControllerApi;
-use App\Http\Controllers\concours\EcoleElementControllerApi;
-use App\Http\Controllers\concours\FiliereControllerAPI;
+use App\Http\Controllers\DiplomeController;
+use App\Http\Controllers\FiliereControllerAPI;
 use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
 use App\Http\Controllers\concours\SlideControllerApi;
 
@@ -153,7 +153,7 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::apiResource('personnel',PersonnelControllerApi::class);
       //routes slide
       Route::apiResource('slide',SlideControllerApi::class);
-
+      
       // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);
