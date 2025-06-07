@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import headerImg from '../img/header.png';
@@ -162,8 +163,21 @@ const AfficheDonnee = () => {
           <div className="imp">Imprimée le {new Date().toLocaleDateString()}</div>
         </footer>
       </div>
+=======
+import React from 'react';
+
+const AfficheDonnee = () => {
+  return (
+    <div className="container">
+      <h1>Affiche Donnée</h1>
+      {/* Contenu à implémenter */}
+>>>>>>> Stashed changes
     </div>
   );
 };
 
+<<<<<<< Updated upstream
 export default AfficheDonnee;
+=======
+export default AfficheDonnee; 
+>>>>>>> Stashed changes
