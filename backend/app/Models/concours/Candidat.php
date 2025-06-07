@@ -7,11 +7,11 @@ namespace App\Models\concours;
 use App\Models\concours\CandidatEcole;
 use App\Models\concours\Compte;
 use App\Models\concours\Ecole;
-use App\Models\concours\Filiere;
 use App\Models\concours\Mail;
 use App\Models\concours\Sessionconcour;
 use App\Models\concours\SiteEtude;
 
+use App\Models\Filiere;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

@@ -29,7 +29,7 @@ class UpdateCandidatRequest extends FormRequest
             'code_site' => ['sometimes', 'integer', 'exists:site_etude,code_site'],
             'ca_nom' => ['sometimes', 'string', 'max:255'],
             'ca_prenom' => ['sometimes', 'string', 'max:255'],
-            'ca_sexe' => ['sometimes', 'string', 'in:M,F'],
+            'ca_sexe' => ['sometimes', 'string', 'in:Masculin,Feminin'],
             'ca_date_naiss' => ['sometimes', 'date'],
             'ca_lieu_naiss' => ['sometimes', 'string', 'max:255'],
             'ca_statut_mat' => ['sometimes', 'string', 'max:50'],

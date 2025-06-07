@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Diplome;
+use App\Models\Filiere;
 use Illuminate\Http\Request;
 
 class DiplomeController extends Controller
@@ -31,8 +32,16 @@ class DiplomeController extends Controller
 
     public function show(string $id)
     {
-        $diplome = Diplome::with('filieres')->findOrFail($id);
+        $diplome = Diplome::findOrFail($id);
         return response()->json($diplome);
+    }
+
+    public function showByFiliere(string $id)
+    {
+        // $id est l'identifiant de la filière, on retourne les diplômes associés à cette filière sans doublons
+        $filiere = Filiere::with('diplomes')->findOrFail($id);
+        $diplomes = $filiere->diplomes->unique('code_dip')->values();
+        return response()->json($diplomes);
     }
 
     public function update(Request $request, string $id)

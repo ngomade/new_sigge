@@ -1,9 +1,9 @@
 <?php
 
 // DiplomeFactory.php
-namespace Database\Factories\concours;
+namespace Database\Factories;
 
-use App\Models\concours\Diplome;
+use App\Models\Diplome;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DiplomeFactory extends Factory

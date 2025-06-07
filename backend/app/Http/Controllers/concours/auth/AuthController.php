@@ -4,7 +4,7 @@ namespace App\Http\Controllers\concours\auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\concours\Compte;
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use App\Services\AuthService;
 use Exception;
 

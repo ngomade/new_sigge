@@ -3,26 +3,14 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\concours\Candidat;
+use App\Models\concours\FiliereDiplome;
+use App\Models\concours\Serie;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * Class Filiere
- *
- * @property string $filiere_code
- * @property string $filiere_label
- * @property string|null $filiere_description
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Collection|Candidat[] $candidats
- * @property Collection|Diplome[] $diplomes
- *
- * @package App\Models
- */
+
 class Filiere extends Model
 {
     use HasFactory;
@@ -45,8 +33,16 @@ class Filiere extends Model
     public function diplomes()
     {
         return $this->belongsToMany(Diplome::class, 'filiere_diplome', 'filiere_code', 'code_dip')
-            ->withPivot('code_serie')
             ->using(FiliereDiplome::class)
+            ->withPivot(['code_serie'])
+            ->withTimestamps();
+    }
+
+    public function series()
+    {
+        return $this->belongsToMany(Serie::class, 'filiere_diplome', 'filiere_code', 'code_serie')
+            ->using(FiliereDiplome::class)
+            ->withPivot(['code_dip'])
             ->withTimestamps();
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Database\Factories\concours;
+namespace Database\Factories;
 
-use App\Models\concours\Filiere;
+use App\Models\Filiere;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class FiliereFactory extends Factory
@@ -11,7 +11,6 @@ class FiliereFactory extends Factory
 
     public function definition(): array
     {
-        static $index = 1;
         $filieres = [
             'Génie Informatique',
             'Génie Civil',
@@ -36,8 +35,8 @@ class FiliereFactory extends Factory
         ];
 
         return [
-            'filiere_code' => 'FIL' . str_pad($index++, 4, '0', STR_PAD_LEFT),
-            'filiere_label' => $filieres[($index - 2) % count($filieres)],
+            'filiere_code' => $this->faker->numerify("FIL#####"),
+            'filiere_label' =>  $this->faker->randomElement($filieres),
             'filiere_description' => $this->faker->paragraph()
         ];
     }

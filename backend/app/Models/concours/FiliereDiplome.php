@@ -3,28 +3,15 @@
 
 namespace App\Models\concours;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+
+use App\Models\Diplome;
+use App\Models\Filiere;
+use App\Models\concours\Serie;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-/**
- * Class FiliereDiplome
- *
- * @property int $id
- * @property string $filiere_code
- * @property int $code_dip
- * @property int $code_serie
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Diplome $diplome
- * @property Serie $serie
- * @property Filiere $filiere
- *
- * @package App\Models
- */
-class FiliereDiplome extends Model
+class FiliereDiplome extends Pivot
 {
 	use HasFactory;
 
@@ -43,16 +30,16 @@ class FiliereDiplome extends Model
 
 	public function filiere(): BelongsTo
 	{
-		return $this->belongsTo(Filiere::class, 'filiere_code', 'filiere_code');
+		return $this->belongsTo(Filiere::class, 'filiere_code');
 	}
 
 	public function diplome(): BelongsTo
 	{
-		return $this->belongsTo(Diplome::class, 'code_dip', 'code_dip');
+		return $this->belongsTo(Diplome::class, 'code_dip');
 	}
 
 	public function serie(): BelongsTo
 	{
-		return $this->belongsTo(Serie::class, 'code_serie', 'code_serie');
+		return $this->belongsTo(Serie::class, 'code_serie');
 	}
 }

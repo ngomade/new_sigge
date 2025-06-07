@@ -2,7 +2,7 @@
 
 namespace Database\Factories\concours;
 
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use App\Models\concours\Sessionconcour;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Http\Controllers\Controller;
 use App\Models\concours\Candidat;
 use App\Models\concours\Compte;
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
 

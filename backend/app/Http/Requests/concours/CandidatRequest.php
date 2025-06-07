@@ -28,7 +28,7 @@ class CandidatRequest extends FormRequest
             'code_site' => 'required|integer|exists:site_etude,code_site',
             'ca_nom' => 'required|string|max:255',
             'ca_prenom' => 'required|string|max:255',
-            'ca_sexe' => 'required|string|in:M,F',
+            'ca_sexe' => 'required|string|in:Masculin,Feminin',
             'ca_date_naiss' => 'required|date',
             'ca_lieu_naiss' => 'required|string|max:255',
             'ca_statut_mat' => 'required|string|max:50',

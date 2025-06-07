@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
- use App\Http\Controllers\PersonnelControllerApi;
+use App\Http\Controllers\concours\SerieController;
+use App\Http\Controllers\PersonnelControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\concours\CandidatControllerApi;
@@ -94,11 +95,11 @@ Route::middleware('auth:sanctum')->group(function () {
     | Routes pour la gestion des sites d'étude
     |--------------------------------------------------------------------------
     */
-    Route::prefix('sites')->group(function () {
+    Route::prefix('sites-etude')->group(function () {
         Route::get('{code_site}/stats', [SiteEtudeControllerApi::class, 'statistics']);
         Route::post('search', [SiteEtudeControllerApi::class, 'search']);
     });
-    Route::apiResource('sites', SiteEtudeControllerApi::class);
+    Route::apiResource('sites-etude', SiteEtudeControllerApi::class);
 
     /*
     |--------------------------------------------------------------------------
@@ -113,6 +114,14 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::apiResource('personnel', PersonnelControllerApi::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Routes pour les series
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource('series', SerieController::class);
+    Route::get('/series/{filiere_id}/{diplome_id}', [SerieController::class, 'showByIdDiplomeAndFiliere']);
 
     /*
     |--------------------------------------------------------------------------
@@ -135,6 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::apiResource("diplomes", DiplomeController::class);
+    Route::get("diplomes/{code_filiere}/filiere", [DiplomeController::class, 'showByFiliere']);
 
     /*
     |--------------------------------------------------------------------------

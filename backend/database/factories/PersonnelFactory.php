@@ -1,8 +1,8 @@
 <?php
 
-namespace Database\Factories\concours;
+namespace Database\Factories;
 
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PersonnelFactory extends Factory
