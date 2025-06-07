@@ -112,7 +112,7 @@ function Compte() {
               placeholder="Rechercher par critère..."
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              className="p-2 border mb-4 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
+              className="p-2 border mb-4 border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
             />
           </div>
           <div className='overflow-x-auto mb-2 mr-2'>

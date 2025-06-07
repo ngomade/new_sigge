@@ -12,7 +12,7 @@ export async function getCandidate() {
 
 export async function getDiplome(params) {
     const { url, ...meta } = GET_DIPLOME_API;
-    return await fetch(`${url}/${params.filiere_code}`, {...meta,credentials:'include'})
+    return await fetch(`${url}/${params.filiere_code}/filiere`, {...meta,credentials:'include'})
 }
 
 export async function getCandidateInfo(params) {

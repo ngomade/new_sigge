@@ -26,8 +26,8 @@ export const candidateSlice = createSlice({
       }
     },
     logout(state){
-      sessionStorage.removeItem("user");
-      sessionStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
       state.candidate_state = {}
     }
   },

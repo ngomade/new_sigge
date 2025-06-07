@@ -88,6 +88,7 @@ export const GET_DOSSIER_API = {
     url: `${BASE_URL}/dossier`,
     method: "GET",
     headers: {
+        "Authorization": `Bearer ${getToken()}`,
        "Cookie": document.cookie,
         "Accept": "application/json",
     }
@@ -96,7 +97,6 @@ export const GET_DIPLOME_API = {
     url: `${BASE_URL}/diplomes`,
     method: "GET",
     headers: {
-       "Cookie": document.cookie,
        "Content-Type": "application/json",
         "Authorization": `Bearer ${getToken()}`,
         "Accept": "application/json",
@@ -112,11 +112,10 @@ export const GET_FILLIERE_API = {
 }
 
 export const GET_SERIES_API = {
-    url: `${BASE_URL}/get-series`,
-    method: "POST",
+    url: `${BASE_URL}/series`,
+    method: "GET",
     headers: {
-       //"Authorization": `Bearer ${token}`
-       "Cookie": document.cookie,
+       "Authorization": `Bearer ${getToken()}`,
        "Content-Type": "application/json",
         "Accept": "application/json",
     }
@@ -125,7 +124,7 @@ export const GET_CENTRE_DEPOT = {
     url: `${BASE_URL}/centre_depot`,
     method: "GET",
     headers: {
-       //"Authorization": `Bearer ${token}`
+       "Authorization": `Bearer ${getToken()}`,
         "Accept": "application/json",
     }
 }
@@ -133,7 +132,7 @@ export const GET_CENTRE_EXAMEN = {
     url: `${BASE_URL}/centre_examen`,
     method: "GET",
     headers: {
-       //"Authorization": `Bearer ${token}`,
+       "Authorization": `Bearer ${getToken()}`,
         "Accept": "application/json",
 
     }
@@ -148,12 +147,11 @@ export const GET_SITE_COMPO = {
     }
 }
 export const GET_SITE_ETUDE_API = {
-    url: `${BASE_URL}/site_etude`,
+    url: `${BASE_URL}/sites-etude`,
     method: "GET",
     headers: {
-       //"Authorization": `Bearer ${token}`,
+       "Authorization": `Bearer ${getToken()}`,
         "Accept": "application/json",
-
     }
 }
 export const GET_SESSION_CONCOURS_API = {
@@ -175,7 +173,7 @@ export const GET_SITE_COMPO_API = {
     }
 }
 export const GET_CANDIDATE_DATA_API = {
-    url: `${BASE_URL}/get-candidat-all-info`,
+    url: `${BASE_URL}/candidat`,
     method: "GET",
     headers: {
         "Authorization": `Bearer ${getToken()}`,
@@ -194,7 +192,7 @@ export const GET_CANDIDATE_STAT_API = {
 }
 
 export const GET_COMPTE_STAT_API = {
-    url: `${BASE_URL}/get-compte-stat`,
+    url: `${BASE_URL}/comptes/stats`,
     method: "GET",
     headers: {
         "Authorization": `Bearer ${getToken()}`,

@@ -78,8 +78,13 @@ function Navbar() {
         <div>
             <div className='bg-teal-400 w-full p-2 flex items-center justify-center'>
                 <h1 className='text-white text-center'>
-                    Inscription en cours {(candidat === 'null' || candidat === null) ?
-                    <Link to={'/candidate'}>Veuillez vous inscrire -> </Link> : ""}
+                    {(!candidat || candidat === 'null') ? (
+                        <>
+                            <Link to={'/candidate'}>Veuillez vous inscrire &rarr;</Link>
+                        </>
+                    ) : (
+                        <>Votre candidature est complete :)</>
+                    )}
                 </h1>
             </div>
             <nav className='shadow flex justify-between items-center z-[500] px-8 py-5 '>

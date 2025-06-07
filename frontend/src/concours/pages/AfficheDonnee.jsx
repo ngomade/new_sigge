@@ -10,7 +10,7 @@ const AfficheDonnee = () => {
   const { finish, ...candidate } = useSelector((state) => state.candidate.candidate_state);
   const [ca, setCandidate] = useState(candidate??{});
   const docRef = useRef();
-  const ca_store = JSON.parse(sessionStorage.getItem("candidat"));
+  const ca_store = JSON.parse(localStorage.getItem("candidat"));
   const navigate = useNavigate()
   const [boot,setBoot] = useState(false)
   

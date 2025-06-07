@@ -2,43 +2,66 @@ import React, { useState } from 'react';
 import { fieldSet, notEmpty } from '../../utils/validation';
 import { LuArrowRight } from 'react-icons/lu';
 import { LuArrowLeft } from 'react-icons/lu';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { push_candidate_info } from '../../app/modules/candidate';
 import { toast } from 'react-toastify';
 import { nextStep, prevStep } from '../../app/modules/stepper';
-function OtherInfo({  setLoadingState }) {
+
+function OtherInfo({ setLoadingState }) {
     const step = useSelector((state) => state.stepper.step);
     const totalSteps = useSelector((state) => state.stepper.totalSteps);
     const [formData, setFormData] = useState({});
-    const {finish,...userData} = useSelector((state)=>state.candidate.candidate_state)
+    const { finish, ...userData } = useSelector((state) => state.candidate.candidate_state);
+
     function onChange(e) {
-        setFormData(prevData => ({
-            ...prevData,
-            [e.target?.name]: e.target?.value
-        }));
+        setFormData(prevData => {
+            const newData = {
+                ...prevData,
+                [e.target?.name]: e.target?.value
+            };
+            // Synchronisation Redux
+            dispatch(push_candidate_info(newData));
+            // Synchronisation localStorage
+            localStorage.setItem('candidate_step_data', JSON.stringify({
+                ...JSON.parse(localStorage.getItem('candidate_step_data') || '{}'),
+                ...newData
+            }));
+            return newData;
+        });
     }
+
     React.useEffect(() => {
-        fieldSet('#form_other_info', setFormData, {})
+        // Initialisation depuis localStorage si dispo
+        const localData = localStorage.getItem('candidate_step_data');
+        if (localData) {
+            setFormData(JSON.parse(localData));
+        } else if (userData && Object.keys(userData).length > 0) {
+            setFormData(userData);
+        } else {
+            fieldSet('#form_other_info', setFormData, {})
+        }
         return () => {
             setLoadingState(false)
             fieldSet('#form_other_info', setFormData, {})
         };
-    }, [])
-    const dispatch = useDispatch()
+    }, []);
+
+    const dispatch = useDispatch();
+
     function onSubmit(e) {
         try {
             e.preventDefault();
-            if (notEmpty(formData,["ca_email_pere"])) {
-                // Form processing logic
-                setLoadingState(true)
-                dispatch(push_candidate_info(formData))
+            if (notEmpty(formData, ["ca_email_pere"])) {
+                setLoadingState(true);
+                // Merge des anciennes données avec les nouvelles
+                dispatch(push_candidate_info({ ...userData, ...formData }));
                 setTimeout(() => {
-                    setLoadingState(false)
-                    dispatch(nextStep())
+                    setLoadingState(false);
+                    dispatch(nextStep());
                 }, 2000);
             } else {
                 // Handle empty form error
-                toast.error("Veuillew remplir tous les champs...")
+                toast.error("Veuillew remplir tous les champs...");
             }
         } catch (error) {
             console.error(error);
@@ -60,10 +83,6 @@ function OtherInfo({  setLoadingState }) {
                         <label htmlFor="num">Numero de téléphone du père / Tuteur<sup className='text-red-600'>*</sup></label>
                         <input type="tel" id='num' name="ca_telephone_pere" value={formData.ca_telephone_pere} placeholder='Exp 697123455' minLength={9} maxLength={9} className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange} />
                     </div>
-                    {/* <div className='flex flex-col gap-3 mb-3'>
-                        <label htmlFor="email">Email</label>
-                        <input type="text" id='email' name="ca_email_pere" value={formData.ca_email_pere} placeholder='Exp nonomartin2004@gmail.com' className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange} />
-                    </div> */}
                     <div className='flex flex-col gap-3 mb-3'>
                         <label htmlFor="mum_name">Nom complet de la mère / Tuteur<sup className='text-red-600'>*</sup></label>
                         <input type="text" id='mum_name' name="ca_nom_mere" value={formData.ca_nom_mere} placeholder='Exp MAMOU chantou' className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange} />
@@ -73,25 +92,17 @@ function OtherInfo({  setLoadingState }) {
                         <input type="tel" id='mum_num' name="ca_telephone_mere" value={formData.ca_telephone_mere} placeholder='Exp 697123455' minLength={9} maxLength={9} className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange} />
                     </div>
                 </div>
-                {/* <div className="flex items-center justify-between">
-                    <button type='submit' className='flex items-center justify-center gap-2 p-2 text-white bg-teal-600 rounded-md'>
-                        <LuArrowLeft /> Précédent
-                    </button>
-                    <button type='submit' className='flex items-center justify-center gap-2 p-2 text-white bg-teal-600 rounded-md'>
-                        Suivant <LuArrowRight />
-                    </button>
-                </div> */}
                 <div className="flex justify-between">
                     <button
-                    type='button'
+                        type='button'
                         onClick={() => dispatch(prevStep())}
                         className={`px-4 flex items-center gap-4 py-2 rounded ${step === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-teal-600 text-white hover:bg-teal-700'}`}
                         disabled={step === 1}
                     >
-                      <LuArrowLeft />  Précédent
+                        <LuArrowLeft />  Précédent
                     </button>
                     <button
-                    type='submit'
+                        type='submit'
                         className={`px-4 flex items-center gap-4 py-2 rounded ${step === totalSteps ? 'bg-gray-300 cursor-not-allowed' : 'bg-teal-600 text-white hover:bg-teal-700'}`}
                         disabled={step === totalSteps}
                     >
@@ -104,3 +115,4 @@ function OtherInfo({  setLoadingState }) {
 }
 
 export default OtherInfo;
+
