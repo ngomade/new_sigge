@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, {useEffect, useState} from 'react';
 import {LuArrowLeft} from 'react-icons/lu';
 import {useDispatch, useSelector} from 'react-redux';
@@ -119,3 +120,17 @@ function Confirmation({setLoadingState}) {
 
 export default Confirmation;
 
+=======
+import React from 'react';
+
+const Confirmation = () => {
+  return (
+    <div className="confirmation-step">
+      <h2>Confirmation</h2>
+      {/* Contenu à implémenter */}
+    </div>
+  );
+};
+
+export default Confirmation; 
+>>>>>>> Stashed changes
