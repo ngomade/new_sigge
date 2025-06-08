@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::prefix('candidats')->group(function () {
         Route::get("stats", [CandidatControllerApi::class, 'statCandidat']);
+        Route::get("get-candidats-by-centre/{id}", [CandidatControllerApi::class, 'getCandidatsBycentre']);
         Route::post("send-general-email", [CandidatControllerApi::class, 'sendGeneralMail']);
         Route::get('filiere/{filiere_code}', [CandidatControllerApi::class, 'byFiliere']);
         Route::get('site/{code_site}', [CandidatControllerApi::class, 'bySite']);

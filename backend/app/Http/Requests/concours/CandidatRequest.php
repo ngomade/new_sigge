@@ -52,7 +52,7 @@ class CandidatRequest extends FormRequest
             'ca_telephone_pere' => 'required|string|max:20',
             'ca_nom_mere' => 'required|string|max:255',
             'ca_telephone_mere' => 'required|string|max:20',
-            'ca_handicap' => 'required|string|max:50',
+            'ca_handicap' => 'sometimes|string|max:50',
             'ca_email_pere' => 'nullable|email|max:255',
             'ca_deliv_cni' => 'required|string|max:255',
             'ca_num_recu' => 'required|string|max:50',

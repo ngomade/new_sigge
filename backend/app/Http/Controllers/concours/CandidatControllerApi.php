@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\concours\CandidatRequest;
 use App\Http\Requests\concours\UpdateCandidatRequest;
 use App\Models\concours\Candidat;
+use App\Models\concours\CentreDepot;
+use App\Models\concours\CentreExaman;
+use App\Models\concours\Compte;
+use App\Models\concours\Serie;
+use App\Models\Diplome;
 use App\Notifications\concours\GeneralNotifForCandidat;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,9 +38,15 @@ class CandidatControllerApi extends Controller
     {
         $validatedData = $request->validated();
 
+        if (! isset($validatedData["ca_handicap"])  ) {
+            $validatedData["ca_handicap"] = "Non"; // Assurer que ca_handicap est nullable
+        }
         try {
             DB::beginTransaction();
             $candidat = Candidat::create($validatedData);
+            $compte = Compte::where("ca_num_recu", $candidat->ca_num_recu)->first();
+            $compte->ca_code = $candidat->ca_code;
+            $compte->save();
             if (!empty($validatedData['ecoles'])) {
                 $candidat->ecoles()->attach($validatedData['ecoles']); // Synchroniser les écoles si fournies
             }
@@ -64,6 +75,13 @@ class CandidatControllerApi extends Controller
         }
 
         return response()->json($candidat);
+    }
+    public function getCandidatsBycentre(string $id_centre)
+    {
+        $candidats = Candidat::where("ca_centre_examen", $id_centre)->get();
+        return response()->json([
+            "candidats" => $candidats
+        ]);
     }
 
     /**
@@ -196,87 +214,109 @@ class CandidatControllerApi extends Controller
     public function statCandidat()
     {
         try {
-            // Nombre total de candidats
-            $totalCandidats = Candidat::count();
+            $candidats = Candidat::all();
 
-            // Répartition par sexe
-            $candidatsParSexe = Candidat::select('ca_sexe', DB::raw('count(*) as total'))
-                ->groupBy('ca_sexe')
-                ->get()
-                ->pluck('total', 'ca_sexe')
-                ->toArray();
-
-            // Répartition par filière
-            $candidatsParFiliere = Candidat::select('filiere_code', DB::raw('count(*) as total'))
-                ->groupBy('filiere_code')
-                ->get();
-
-            // Répartition par site d'étude
-            $candidatsParSite = Candidat::select('code_site', DB::raw('count(*) as total'))
-                ->groupBy('code_site')
-                ->get();
-
-            // Répartition par nationalité
-            $candidatsParNationalite = Candidat::select('ca_nationalite', DB::raw('count(*) as total'))
-                ->groupBy('ca_nationalite')
-                ->get();
-
-            // Répartition par région d'origine
-            $candidatsParRegion = Candidat::select('ca_region_origine', DB::raw('count(*) as total'))
-                ->groupBy('ca_region_origine')
-                ->get();
-
-            // Répartition par diplôme d'admission
-            $candidatsParDiplome = Candidat::select('ca_diplome_admission', DB::raw('count(*) as total'))
-                ->groupBy('ca_diplome_admission')
-                ->get();
-
-            // Répartition par année de diplôme
-            $candidatsParAnneeDiplome = Candidat::select('ca_annee_diplome', DB::raw('count(*) as total'))
-                ->groupBy('ca_annee_diplome')
-                ->orderBy('ca_annee_diplome', 'desc')
-                ->get();
-
-            // Répartition par mention de diplôme
-            $candidatsParMention = Candidat::select('ca_mention_diplome', DB::raw('count(*) as total'))
-                ->groupBy('ca_mention_diplome')
-                ->get();
-
-            // Candidats avec handicap
-            $candidatsAvecHandicap = Candidat::whereNotNull('ca_handicap')
-                ->where('ca_handicap', '!=', '')
-                ->count();
-
-            // Candidats par centre d'examen
-            $candidatsParCentreExamen = Candidat::select('ca_centre_examen', DB::raw('count(*) as total'))
-                ->groupBy('ca_centre_examen')
-                ->get();
-
-            // Candidats par centre de dépôt
-            $candidatsParCentreDepot = Candidat::select('ca_centre_depot', DB::raw('count(*) as total'))
-                ->groupBy('ca_centre_depot')
-                ->get();
-
-            // Âge moyen des candidats (si date de naissance disponible)
-            $ageMoyen = Candidat::whereNotNull('ca_date_naiss')
-                ->select(DB::raw('AVG(YEAR(CURRENT_DATE) - YEAR(ca_date_naiss)) as age_moyen'))
-                ->first();
+//            // Répartition par sexe
+//            $candidatsParSexe = Candidat::select('ca_sexe', DB::raw('count(*) as total'))
+//                ->groupBy('ca_sexe')
+//                ->get()
+//                ->pluck('total', 'ca_sexe')
+//                ->toArray();
+//
+//            // Répartition par filière
+//            $candidatsParFiliere = Candidat::select('filiere_code', DB::raw('count(*) as total'))
+//                ->groupBy('filiere_code')
+//                ->get();
+//
+//            // Répartition par site d'étude
+//            $candidatsParSite = Candidat::select('code_site', DB::raw('count(*) as total'))
+//                ->groupBy('code_site')
+//                ->get();
+//
+//            // Répartition par nationalité
+//            $candidatsParNationalite = Candidat::select('ca_nationalite', DB::raw('count(*) as total'))
+//                ->groupBy('ca_nationalite')
+//                ->get();
+//
+//            // Répartition par région d'origine
+//            $candidatsParRegion = Candidat::select('ca_region_origine', DB::raw('count(*) as total'))
+//                ->groupBy('ca_region_origine')
+//                ->get();
+//
+//            // Répartition par diplôme d'admission
+//            $candidatsParDiplome = Candidat::select('ca_diplome_admission', DB::raw('count(*) as total'))
+//                ->groupBy('ca_diplome_admission')
+//                ->get();
+//
+//            // Répartition par année de diplôme
+//            $candidatsParAnneeDiplome = Candidat::select('ca_annee_diplome', DB::raw('count(*) as total'))
+//                ->groupBy('ca_annee_diplome')
+//                ->orderBy('ca_annee_diplome', 'desc')
+//                ->get();
+//
+//            // Répartition par mention de diplôme
+//            $candidatsParMention = Candidat::select('ca_mention_diplome', DB::raw('count(*) as total'))
+//                ->groupBy('ca_mention_diplome')
+//                ->get();
+//
+//            // Candidats avec handicap
+//            $candidatsAvecHandicap = Candidat::whereNotNull('ca_handicap')
+//                ->where('ca_handicap', '!=', '')
+//                ->count();
+//
+//            // Candidats par centre d'examen
+//            $candidatsParCentreExamen = Candidat::select('ca_centre_examen', DB::raw('count(*) as total'))
+//                ->groupBy('ca_centre_examen')
+//                ->get();
+//
+//            // Candidats par centre de dépôt
+//            $candidatsParCentreDepot = Candidat::select('ca_centre_depot', DB::raw('count(*) as total'))
+//                ->groupBy('ca_centre_depot')
+//                ->get();
+//
+//            // Âge moyen des candidats (si date de naissance disponible)
+//            $ageMoyen = Candidat::whereNotNull('ca_date_naiss')
+//                ->select(DB::raw('AVG(YEAR(CURRENT_DATE) - YEAR(ca_date_naiss)) as age_moyen'))
+//                ->first();
 
             // Regrouper toutes les statistiques
             $stats = [
-                'total_candidats' => $totalCandidats,
-                'repartition_par_sexe' => $candidatsParSexe,
-                'repartition_par_filiere' => $candidatsParFiliere,
-                'repartition_par_site' => $candidatsParSite,
-                'repartition_par_nationalite' => $candidatsParNationalite,
-                'repartition_par_region' => $candidatsParRegion,
-                'repartition_par_diplome' => $candidatsParDiplome,
-                'repartition_par_annee_diplome' => $candidatsParAnneeDiplome,
-                'repartition_par_mention' => $candidatsParMention,
-                'candidats_avec_handicap' => $candidatsAvecHandicap,
-                'repartition_par_centre_examen' => $candidatsParCentreExamen,
-                'repartition_par_centre_depot' => $candidatsParCentreDepot,
-                'age_moyen' => $ageMoyen?->age_moyen,
+                'total' => count($candidats),
+                't_estlc'   => $candidats->where("code_site", 1)->count(),
+                'nb_f_estlc'=>$candidats->where("code_site", 1)->where("ca_sexe", "Féminin")->count(),
+                'nb_g_estlc'=>$candidats->where("code_site", 1)->where("ca_sexe", "Masculin")->count(),
+                'total_ttl_estlc'=>$candidats->where("code_site", 1)->where("filiere_code", "TTL")->count(),
+                'total_f_ttl_estlc'=>$candidats->where("code_site", 1)->where("filiere_code", "TTL")->where("ca_sexe", "Féminin")->count(),
+                'total_g_ttl_estlc'=>$candidats->where("code_site", 1)->where("filiere_code", "TTL")->where("ca_sexe", "Masculin")->count(),
+                'total_gltco_estlc'=>$candidats->where("code_site", 1)->where("filiere_code", "GLTCO")->count(),
+                'total_f_gltco_estlc'=>$candidats->where("code_site", 1)->where("filiere_code", "GLTCO")->where("ca_sexe", "Féminin")->count(),
+                'total_g_gltco_estlc'=>$candidats->where("code_site", 1)->where("filiere_code", "GLTCO")->where("ca_sexe", "Masculin")->count(),
+                't_islape'  => $candidats->where("code_site", 2)->count(),
+                'nb_f_islape'=>$candidats->where("code_site", 2)->where("ca_sexe", "Feminin")->count(),
+                'nb_g_islape'=>$candidats->where("code_site", 2)->where("ca_sexe", "Masculin")->count(),
+                'total_ttl_islape'=>$candidats->where("code_site", 2)->where("filiere_code", "TTL")->count(),
+                'total_f_ttl_islape'=>$candidats->where("code_site", 2)->where("filiere_code", "TTL")->where("ca_sexe", "Féminin")->count(),
+                'total_g_ttl_islape'=>$candidats->where("code_site", 2)->where("filiere_code", "TTL")->where("ca_sexe", "Masculin")->count(),
+                'total_gltco_islape'=>$candidats->where("code_site", 2)->where("filiere_code", "GLTCO")->count(),
+                'total_f_gltco_islape'=>$candidats->where("code_site", 2)->where("filiere_code", "GLTCO")->where("ca_sexe", "Féminin")->count(),
+                'total_g_gltco_islape'=>$candidats->where("code_site", 2)->where("filiere_code", "GLTCO")->where("ca_sexe", "Masculin")->count(),
+//                'repartition_par_sexe' => $candidatsParSexe,
+//                'repartition_par_filiere' => $candidatsParFiliere,
+//                'repartition_par_site' => $candidatsParSite,
+//                'repartition_par_nationalite' => $candidatsParNationalite,
+//                'repartition_par_region' => $candidatsParRegion,
+//                'repartition_par_diplome' => $candidatsParDiplome,
+//                'repartition_par_annee_diplome' => $candidatsParAnneeDiplome,
+//                'repartition_par_mention' => $candidatsParMention,
+//                'candidats_avec_handicap' => $candidatsAvecHandicap,
+//                'repartition_par_centre_examen' => $candidatsParCentreExamen,
+//                'repartition_par_centre_depot' => $candidatsParCentreDepot,
+//                'age_moyen' => $ageMoyen?->age_moyen,
+                'centre_examen' => CentreExaman::all(),
+                'centre_depot' => CentreDepot::all(),
+                'candidats' => $candidats,
+                'diplomes' => Diplome::all(),
+                'series' => Serie::all()
             ];
 
             return response()->json($stats);

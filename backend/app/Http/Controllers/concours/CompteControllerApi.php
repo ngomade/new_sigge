@@ -42,8 +42,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
     {
         $validateData = $request->validate([
             'ca_num_recu' => 'required|string|unique:compte,ca_num_recu|min:6|max:6',
-            'ca_code' => 'nullable|string|exists:candidat,ca_code',
-            'ca_pwd' => 'required|string|min:8',
+            'ca_pwd' => 'required|string|min:6|max:255',
             'ca_recu' => 'required|file|max:2048|mimes:pdf,jpg,png,jpeg', // Limite de 2 Mo pour le fichier
             'ca_nom' => 'required|string|max:255',
             'ca_email' => 'nullable|email|max:255',
@@ -64,12 +63,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 Log::error('Error sending connection info notification: ' . $th->getMessage());
                 return response()->json(['erreur' => 'Erreur lors de l\'envoi de l\'email'], 500);
             }
-            User::create([
-                'name' => $compte->ca_nom,
-                'email' => $compte->ca_email,
-                'password' => $compte->ca_pwd,
-                'usertype' => 'candidat',
-            ]);
             DB::commit();
 
             return $authService->generateTokenFromUser($compte, true);
@@ -98,9 +91,8 @@ class CompteControllerApi extends Controller implements HasMiddleware
     public function update(Request $request, string $ca_num_recu)
     {
         $validateData = $request->validate([
-            'ca_code' => 'nullable|string|exists:candidat,ca_code',
+            'ca_num_recu' => 'string|min:6|max:6|exists:compte,ca_num_recu',
             'ca_pwd' => 'sometimes|string|min:8',
-            'ca_recu' => 'sometimes|file|max:2048|mimes:pdf,jpg,jpeg,png', // Limite de 2 Mo pour le fichier
             'ca_nom' => 'sometimes|required|string|max:255',
             'ca_email' => 'nullable|email|max:255',
             'ca_prenom' => 'sometimes|string|max:255',
@@ -119,14 +111,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
             }
 
             $compte->update($validateData);
-
-            // Mettre à jour l'utilisateur associé
-            $user = User::where('email', $compte->ca_email)->first();
-            $user?->update([
-                'name' => $compte->ca_nom,
-                'email' => $compte->ca_email,
-                'password' => $compte->ca_pwd,
-            ]);
 
             DB::commit();
 
@@ -147,7 +131,9 @@ class CompteControllerApi extends Controller implements HasMiddleware
         $compte = Compte::findOrFail($ca_num_recu);
         try {
             DB::beginTransaction();
-            $compte->candidat()->delete();
+            if ($compte->candidat) {
+                $compte->candidat()->delete();
+            }
             $compte->delete();
             DB::commit();
             return response()->noContent();
@@ -165,7 +151,13 @@ class CompteControllerApi extends Controller implements HasMiddleware
         if (!Storage::exists($recu)) {
             return response()->json(['erreur' => 'Reçu non trouvé'], 404);
         }
-        return Storage::download($recu);
+        $fileContent = Storage::get($recu);
+        $base64 = base64_encode($fileContent);
+        return response()->json([
+            'file_name' => 'document.pdf',
+            'mime_type' => 'application/pdf',
+            'base64_pdf' => $base64
+        ]);
     }
 
     public function statsCompte()
@@ -188,7 +180,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
     private function storageRecu($file, $nom, $prenom, $extension)
     {
-        $filename = $nom . '-' . $prenom . '-' . now()->format('M_d_H_i'). '.' . $extension;
+        $filename = $nom . '-' . $prenom . '-' . now()->format('M_d_H_i') . '.' . $extension;
 
         return $file->storeAs(getdate()['year'], $filename);
     }
