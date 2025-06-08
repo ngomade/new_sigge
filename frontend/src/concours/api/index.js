@@ -42,7 +42,6 @@ export const STORE_COMPTE_API = {
     method: "POST",
     headers: {
         "Accept": "application/json",
-        "Content-Type": "application/json"
     }
 }
 export const GET_COMPTE_API = {
@@ -200,7 +199,7 @@ export const GET_COMPTE_STAT_API = {
     }
 }
 export const GET_CANDIDATE_BY_CENTRE_API = {
-    url: `${BASE_URL}/get-candidat-by-centre`,
+    url: `${BASE_URL}/candidats/get-candidats-by-centre`,
     method: "GET",
     headers: {
         "Authorization": `Bearer ${getToken()}`,
@@ -228,7 +227,7 @@ export const RESET_PASSWORD_CONFIRM = {
 }
 
 export const GET_COMPTE_SHOW_RECU = {
-    url: `${BASE_URL}/compte-show-recu`,
+    url: `${BASE_URL}/comptes/download-recu`,
     method: "GET",
     headers: {
         "Authorization": `Bearer ${getToken()}`,
@@ -238,7 +237,7 @@ export const GET_COMPTE_SHOW_RECU = {
 }
 
 export const DEL_COMPTE_API = {
-    url: `${BASE_URL}/compte`,
+    url: `${BASE_URL}/comptes`,
     method: "DELETE",
     headers: {
         "Authorization": `Bearer ${getToken()}`,

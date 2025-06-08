@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import React, {useEffect, useState} from 'react';
 import {LuArrowLeft} from 'react-icons/lu';
 import {useDispatch, useSelector} from 'react-redux';
@@ -54,7 +53,7 @@ function Confirmation({setLoadingState}) {
         console.log('id envoyé à l\'API:', id);
         // Vérification des champs obligatoires
         const requiredFields = [
-            'id', 'filiere_code', 'code_site', 'ca_nom', 'ca_prenom', 'ca_sexe', 'ca_date_naiss', 'ca_lieu_naiss', 'ca_statut_mat', 'ca_telephone', 'ca_num_cni', 'ca_email', 'ca_premiere_lang', 'ca_nationalite', 'ca_region_origine', 'ca_depart_origine', 'ca_diplome_admission', 'ca_annee_diplome', 'ca_serie_diplome', 'ca_mention_diplome', 'ca_etab_diplome', 'ca_pays_diplome', 'ca_centre_examen', 'ca_centre_depot', 'ca_nom_pere', 'ca_telephone_pere', 'ca_nom_mere', 'ca_telephone_mere', 'ca_handicap', 'ca_deliv_cni', 'ca_num_recu', 'ca_recu'
+            'id', 'filiere_code', 'code_site', 'ca_nom', 'ca_prenom', 'ca_sexe', 'ca_date_naiss', 'ca_lieu_naiss', 'ca_statut_mat', 'ca_telephone', 'ca_num_cni', 'ca_email', 'ca_premiere_lang', 'ca_nationalite', 'ca_region_origine', 'ca_depart_origine', 'ca_diplome_admission', 'ca_annee_diplome', 'ca_serie_diplome', 'ca_mention_diplome', 'ca_etab_diplome', 'ca_pays_diplome', 'ca_centre_examen', 'ca_centre_depot', 'ca_nom_pere', 'ca_telephone_pere', 'ca_nom_mere', 'ca_telephone_mere', 'ca_deliv_cni', 'ca_num_recu', 'ca_recu'
         ];
         const missing = requiredFields.filter(f => (f === 'id' ? !id : !allData[f]));
         if (missing.length > 0) {
@@ -76,7 +75,6 @@ function Confirmation({setLoadingState}) {
                     } else {
                         const {erreur} = res.json();
                         setLoadingState(false);
-                        const data = await res.json()
                         return toast.error(JSON.stringify(erreur), {autoClose: 5000});
                     }
                 })
@@ -119,18 +117,3 @@ function Confirmation({setLoadingState}) {
 }
 
 export default Confirmation;
-
-=======
-import React from 'react';
-
-const Confirmation = () => {
-  return (
-    <div className="confirmation-step">
-      <h2>Confirmation</h2>
-      {/* Contenu à implémenter */}
-    </div>
-  );
-};
-
-export default Confirmation; 
->>>>>>> Stashed changes

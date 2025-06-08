@@ -5,7 +5,6 @@ import {toast} from 'react-toastify';
 import {createCompte} from '../../api/routes/compte';
 import {useDispatch} from 'react-redux';
 import {push_candidate_info} from '../../app/modules/candidate';
-import {useNavigate} from 'react-router-dom';
 import Loading from "./Loading";
 
 
@@ -16,7 +15,6 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
     const [isSubmitting, setIsSubmitting] = useState(false); // Nouvel état
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     useEffect(() => {
         fieldSet('#form_pay', setFormData, {});
@@ -44,15 +42,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
             const {ca_recu, ...data} = formData;
             try {
                 const response = await createCompte(data, ca_recu);
-                if (response.status === 500) {
-                    const error = await response.json()
-                    const {erreur} = error
-                    setLoadingState(false);
-                    setIsSubmitting(false); // Réinitialiser l'état de soumission
-                    //onClose();
-                    return toast.error(erreur, {autoClose: 5000});
-                }
-                if (response.status === 200) {
+                if (response.ok) {
                     setLoadingState(false);
                     setIsSubmitting(false); // Fin du traitement
                     onClose();
@@ -65,12 +55,18 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                     dispatch(push_candidate_info(compte));
                     toast.success("Les informations ont été soumises avec succès");
                     window.location.href = "/candidate";
+                } else {
+                    const error = await response.json()
+                    const {erreur} = error
+                    setLoadingState(false);
+                    setIsSubmitting(false); // Réinitialiser l'état de soumission
+                    //onClose();
+                    return toast.error(erreur, {autoClose: 5000});
                 }
             } catch (error) {
                 setIsSubmitting(false); // Fin du traitement en cas d'erreur
                 setLoadingState(false);
                 toast.error("Une erreur s'est produite lors de la soumission des informations", {autoClose: 5000});
-                console.error(error);
             }
         } else {
             toast.error("Veuillez remplir tous les champs...");
@@ -98,7 +94,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
     return (
         <div className="flex flex-col gap-5 lg:flex-row" id="form_pay">
             <div className="flex-1">
-                <form onSubmit={onSubmit}>
+                <form onSubmit={onSubmit} content={"multipart/form-data"}>
                     <div className="flex flex-col gap-3 mb-3">
                         <label htmlFor="ca_nom">
                             Nom<sup className="text-red-600">*</sup> <i>(En Majuscule)</i>

@@ -57,7 +57,7 @@ function Dashboard() {
           </div>
         <div className='grid items-center grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2 text-center'>
           <div className='rounded-3xl mr-3 border-2 border-gray-300 w-30 p-1 mt-1 items-center justify-center flex-initial'>
-            <div className="text-lg text-gray-700 mb-1 text-xl shadow-green-800 font-bold text-green-800">GLTCO : <span>{data['total_gltco_estlc']}
+            <div className="text-lg text-gray-700 mb-1 shadow-green-800 font-bold text-green-800">GLTCO : <span>{data['total_gltco_estlc']}
             <span className='text-sm mr-6'>({((data['total_gltco_estlc']/data["t_estlc"])*100).toFixed(2)}%)</span></span></div>
             <div>
               <div  className='text-xl shadow-green-800 font-bold text-green-800'>

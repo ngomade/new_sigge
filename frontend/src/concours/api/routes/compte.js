@@ -8,10 +8,10 @@ import { DEL_COMPTE_API, GET_COMPTE_API, GET_COMPTE_SHOW_RECU, GET_COMPTE_STAT_A
  */
 export async function createCompte(data, image) {
     const { url, ...meta } = STORE_COMPTE_API;
-
+    console.log(data, image)
     // Utilisation de FormData pour envoyer des données et un fichier
     const formData = new FormData();
-    
+
     // Ajouter les données au FormData
     for (const key in data) {
         if (data.hasOwnProperty(key)) {
@@ -29,6 +29,7 @@ export async function createCompte(data, image) {
         ...meta,
         body: formData,
     };
+    console.log(fetchOptions)
 
     return await fetch(url, fetchOptions);
 }
