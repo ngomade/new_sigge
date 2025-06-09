@@ -56,7 +56,7 @@ function AdminCandidate() {
   }
   function onChange(e) {
     getCandidatesByCentre(e.target?.value).then(async(res)=>{
-        if (res.status ===200) {
+        if (res.ok) {
             const new_candidats = await res.json()
             setData((prevData) => ({
               ...prevData, 
@@ -127,7 +127,7 @@ function AdminCandidate() {
           placeholder="Rechercher par critère..."
           value={filter}
           onChange={e => setFilter(e.target.value)}
-          className="p-2 border mb-4 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
+          className="p-2 border mb-4 border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
         />
       </div>
       <div  className=' text-center text-teal-600 mb-1 grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-2'>

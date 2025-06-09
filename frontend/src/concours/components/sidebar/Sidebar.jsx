@@ -12,7 +12,7 @@ import { logout } from '../../app/modules/candidate';
 import { Link, useHref } from "react-router-dom";
 import "./Sidebar.scss";
 import {SidebarContext } from "../context/SidebarContext";
-import { LuUser, LuUsers2 } from "react-icons/lu";
+import { LuUsers } from "react-icons/lu";
 
 
 
@@ -77,7 +77,7 @@ const Sidebar = () => {
             <li className="menu-item">
               <Link to="/admin/candidates" className={path==="/admin/candidates"?"menu-link active":"menu-link "} >
                 <span className="menu-link-icon">
-                  <LuUsers2 size={20} />
+                  <LuUsers size={20} />
                 </span>
                 <span className="menu-link-text">Candidats</span>
               </Link>
@@ -85,7 +85,7 @@ const Sidebar = () => {
             <li className="menu-item">
               <Link to="/admin/comptes" className={path==="/admin/comptes"?"menu-link active":"menu-link "}>
                 <span className="menu-link-icon">
-                  <LuUser size={20} />
+                  <LuUsers size={20} />
                 </span>
                 <span className="menu-link-text">Comptes</span>
               </Link>

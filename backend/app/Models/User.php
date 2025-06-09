@@ -70,6 +70,7 @@ class User extends Model
 	];
 
 	protected $fillable = [
+        "code_user",
 		'code_info_extra',
 		'nom_user',
 		'prenom_user',

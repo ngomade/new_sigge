@@ -71,10 +71,10 @@ function PersonnalInfo({ setLoadingState }) {
     function onSubmit(e) {
         try {
             e.preventDefault();
+            console.log(formData)
             if (notEmpty(formData)) {
                 setLoadingState(true);
                 dispatch(push_candidate_info({ ...userData, ...formData, ca_recu: user?.ca_recu, ca_num_recu: user?.ca_num_recu }));
-                console.log(formData)
                 setTimeout(() => {
                     setLoadingState(false);
                     dispatch(nextStep());
@@ -141,7 +141,7 @@ function PersonnalInfo({ setLoadingState }) {
                     </div>
                     <div className='flex flex-col gap-3 mb-3'>
                         <label htmlFor="status_matrimonial">Status matrimonial <sup className='text-red-600'>*</sup></label>
-                        <select defaultValue={'Célibataire'} value={formData?.ca_statut_mat} id="status_matrimonial" name="ca_statut_mat" className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange}>
+                        <select value={formData?.ca_statut_mat} id="status_matrimonial" name="ca_statut_mat" className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange}>
                             <option value="">Selectionner </option>
                             <option value="Marié">Marié</option>
                             <option value="Célibataire" >Célibataire</option>
@@ -178,7 +178,7 @@ function PersonnalInfo({ setLoadingState }) {
                         <label htmlFor="department_origin">Département d'origine <sup className='text-red-600'>*</sup></label>
                         <select id="department_origin" name="ca_depart_origine" value={formData?.ca_depart_origine} className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1' onChange={onChange}>
                             <option value="">Selectionner </option>
-                            {formData?.ca_region_origine !== '' && data.filter((d) => d.country === formData?.ca_nationalite)?.at(0)?.regions?.filter((r) => r.region === formData?.ca_region_origine).at(0).departments?.map((c, k) => (
+                            {formData?.ca_region_origine !== '' && data.filter((d) => d.country === formData?.ca_nationalite)?.at(0)?.regions?.filter((r) => r.region === formData?.ca_region_origine).at(0)?.departments?.map((c, k) => (
                                 <option value={c} key={k}>{c}</option>
                             ))}
                         </select>
