@@ -28,6 +28,8 @@ use App\Http\Controllers\concours\SlideControllerApi;
 
 // Routes pour verifier le token
 Route::get("check-token", [AuthController::class, 'checkToken']);
+// Route pour l'extraction OCR (accessible sans authentification pour la création de compte)
+Route::post('comptes/extract-receipt', [CompteControllerApi::class, 'extractReceiptData']);
 
 // Routes d'authentification
 Route::group(['prefix' => 'auth', 'middleware' => "guest.sanctum"], function () {
