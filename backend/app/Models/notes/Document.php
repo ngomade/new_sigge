@@ -6,6 +6,7 @@
 
 namespace App\Models\notes;
 
+use App\Models\Bureau;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 

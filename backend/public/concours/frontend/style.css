@@ -1,0 +1,47 @@
+.info-ins {
+    width: 85%;
+    margin: auto;
+    margin-top: 0.5%;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+.info-ins img{
+    box-shadow: 5xp 5px 3px gray;
+}
+.card-inscription{
+    width: 85%;
+    margin: auto;
+}
+fieldset{
+    border: 3px double rgb(161, 161, 161);
+}
+legend{
+    border-bottom: 1px solid gray;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+.card-result{
+    width: 50%;
+    margin: auto;
+}
+#download{
+    width: 70px;
+    margin-left: 45%;
+}
+#download:hover{
+    width: 72px;
+}
+
+@media (max-width: 768px) {
+    .card-result{
+        width: 90%;
+        margin: auto;
+    }
+
+}
+.info_detail{
+    font-weight: bold;
+}
+.english{
+    font-style: italic;
+    color: brown;
+}

@@ -38,15 +38,19 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'web-users',
+            'provider' => 'users',
+        ],
+        'personnel' => [
+            'driver' => 'session',
+            'provider' => 'personnel',
         ],
         'api-admin' => [
             'driver' => 'sanctum',
-            'provider' => 'admins',
+            'provider' => 'api-admins',
         ],
         'api-user' => [
             'driver' => 'sanctum',
-            'provider' => 'users',
+            'provider' => 'api-users',
         ],
     ],
 
@@ -68,15 +72,19 @@ return [
     */
 
     'providers' => [
-        'web-users' => [
+        'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL' , \App\Models\User::class),
         ],
-        'admins' => [
+        'personnel' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_ADMIN_MODEL', App\Models\concours\Personnel::class),
+            'model' => App\Models\Personnel::class,
         ],
-        'users' => [
+        'apit-admins' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_ADMIN_MODEL', App\Models\Personnel::class),
+        ],
+        'api-users' => [
             'driver' => 'eloquent',
             'model' => App\Models\concours\Compte::class,
         ],

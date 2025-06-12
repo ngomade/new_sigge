@@ -1,0 +1,107 @@
+header{
+    width: 100%;
+}
+header img{
+    width: 100%;
+}
+body{
+    border: 8px double black;
+    margin: -18px;
+}
+table.entete, td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+}
+.entete img{
+    width: 100px;
+    height: 100px;
+}
+.entete .titre{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.05em;
+}
+.info{
+    width: 99%;
+    margin: auto;
+    margin-top: 0px !important;
+    font-family: "Arial Narrow";
+    font-size: 0.9em;
+}
+.info h3{
+    border-bottom: 1px solid black;
+
+}
+.info h3 span{
+    background-color: rgb(31, 30, 30);
+    color: white;
+    padding: 2px;
+}
+.item-info-2{
+    width: 46%;
+    display: inline-block;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-left: 3%;
+    margin-bottom: 13px;
+    overflow: hidden;
+}
+.item-info-2 span, .item-info-3 span, .item-info-4 span{
+    font-weight: bolder;
+}
+.item-info-3{
+    width: 29%;
+    display: inline-block;
+    padding-left: 3%;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 13px;
+    overflow: hidden;
+}
+.item-info-4{
+    width: 20%;
+    display: inline-block;
+    padding-left: 1%;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 13px;
+    overflow: hidden;
+}
+footer{
+    position: fixed;
+    bottom: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+}
+
+.connexion{
+    width: 48%;
+    text-align: center;
+    display: inline-block;
+}
+.imp{
+    font-style: italic;
+    text-align: right;
+    width: 49%;
+    display: inline-block;
+}
+.consigne h3{
+    font-size: 1.01em;
+    border-bottom: 1px solid black;
+    color: red;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.consigne li{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7em;
+    margin-top: 2.5px;
+}
+table, th, td{
+    border: 1px solid black;
+}
+
+.english{
+    font-style: italic;
+    color: brown;
+}

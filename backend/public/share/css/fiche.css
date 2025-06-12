@@ -1,0 +1,131 @@
+header{
+    width: 100%;
+}
+header img{
+    width: 100%;
+}
+body{
+    border-width: 10px !important; /* Épaisseur de la bordure */
+    border-style: double !important; /* Nécessaire pour appliquer border-image */
+    border-color: green !important;
+    /*border-image: url('{{public_path()."/share/img/entete_fiche.png"}}') 30 round;  Image utilisée pour la bordure */
+    margin: -5px !important;
+    padding: 5px !important;
+}
+ header img{
+    width: 100%;
+    height: 220px;
+}
+.titre{
+    margin-top:3% ;
+    margin-bottom: 5%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.02em;
+}
+.row{
+    display: block;
+    width: 100%;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.15em;
+}
+.col-sm-10{
+    display: inline-block;
+    padding-bottom: 5px;
+    width: 78%;
+}
+.col-sm-2{
+    width: 19%;
+    display: inline-block;
+    border: 1px solid rgb(38, 175, 40);
+    height: 135px;
+    margin-left: 1%;
+    text-align: center;
+}
+.col-sm-6{
+    width: 48%;
+    padding-bottom: -0px !important;
+    display: inline-block;
+    border-bottom: dashed 1px black;
+    height: fit-content;
+    margin-bottom: 1.5%;
+}
+.col-sm-6 p{
+    padding-bottom: 0px !important;
+}
+.col-sm-6 .text_label, .col-sm-6 .text_value{
+    width: 46%;
+    display: inline-block;
+    padding-bottom: 0px !important;
+}
+.col-sm-6 .text_value{
+    font-weight: bold;
+    padding-left: 10px;
+}
+.item-info{
+    border-bottom: dashed 1px black;
+    padding: 10px;
+    padding-bottom: 0px;
+}
+span+span{
+    font-weight: bold;
+}
+.item-info .label-fiche{
+    display: inline-block;
+    width: 45%;
+    margin-right: 2%;
+}
+.col-sm-11{
+    width: 95%;
+    margin: auto;
+    padding-bottom: 0px !important;
+    display: inline-block;
+    border-bottom: dashed 1px black;
+    height: fit-content;
+    margin-bottom: 1.5%;
+}
+.col-sm-11 .text_label{
+    width: 45% !important;
+    display: inline-block;
+}
+.dsse{
+    margin-top: 15px;
+    margin-left: 20px;
+    width: 30%;
+    float: left;
+    text-align: justify;
+    font-size: 0.6em;
+    font-weight: bold;
+}
+.daarc{
+    margin-top: 15px;
+    margin-right: 20px;
+    width: 30%;
+    float: right;
+    text-align: justify;
+    font-size: 0.6em;
+    font-weight: bold;
+}
+
+footer{
+    margin-top: 30px;
+    clear: both;
+    text-align: right;
+    font-style: italic;
+    font-size: 0.7em;
+    vertical-align: bottom;
+    margin-right: 10px;
+}
+.imp{
+    margin-top: 5px;
+}
+
+.note-imp{
+    color:red;
+    clear:both;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 80px;
+    text-align: center;
+}
