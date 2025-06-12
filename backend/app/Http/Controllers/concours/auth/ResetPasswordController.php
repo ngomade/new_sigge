@@ -4,7 +4,7 @@ namespace App\Http\Controllers\concours\auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\concours\Compte;
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use App\Notifications\ResetPwdCompteUser;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -45,7 +45,8 @@ class ResetPasswordController extends Controller
             $user->notify(new ResetPwdCompteUser($code));
 
             return response()->json([
-                'message' => 'Un email de réinitialisation a été envoyé à votre adresse email.'
+                'message' => 'Un email de réinitialisation a été envoyé à votre adresse email.',
+                "email" => $user->ca_email
             ]);
         } catch (Exception $e) {
             Log::error('Error in forgotPassword: ' . $e->getMessage());
