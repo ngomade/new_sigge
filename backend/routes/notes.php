@@ -53,4 +53,4 @@ Route::apiResource('ue', UeControllerApi::class);
 Route::apiResource('usersdiplome', UsersDiplomeControllerApi::class);
 Route::apiResource('usersrole', UsersRoleControllerApi::class);
 Route::apiResource('semestreniveau', SemestreNiveauControllerApi::class);
-Route::apiResource('tenantuser', UserControllerApi::class);
+Route::apiResource('user', UserControllerApi::class);

@@ -46,4 +46,11 @@ class Bureau extends Model
 	{
 		return $this->hasMany(Presentation::class, 'code_bureau');
 	}
+	public function sousBureau(){
+		return $this->belongsToMany(Bureau::class, 'sous_bureau', 'code_bureau', 'code_sous_bureau');
+	}
+	public function bureauParents(){
+		return $this->belongsToMany(Bureau::class, 'sous_bureau', 'code_sous_bureau', 'code_bureau');
+	}
+
 }
