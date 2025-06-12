@@ -9,6 +9,7 @@ function PwdRecover() {
       });
       const [isLoad,setLoadingState] = useState(false)
       const [isVisible, setIsVisible] = useState(false);
+      const [email, setEmail] = useState("");
       
       const hideElement = () => {
         setIsVisible(true);
@@ -31,7 +32,8 @@ function PwdRecover() {
             if(res.status===200){
                 setLoadingState(false)
                 const data = await res.json()
-                const {message} = data
+                const {message, email} = data
+                setEmail(email)
                 hideElement()
                 setNotifState(message)
             }else{
@@ -88,6 +90,7 @@ function PwdRecover() {
                         {isVisible &&
                             <div className='grid bg-white font-bold text-lg grid-cols-1 h-15 w-85 place-items-center  m-auto shadow-lg shadow-green-800 rounded p-3 '>
                                 <div className='text-justify p-3 text-l text-gray-800 leading-10' dangerouslySetInnerHTML={{__html:notif}}/>
+                                { email && <p>Le mot de passe a été envoyé a l'adresse : {email}</p>}
                             </div>
                         }
                     </div>

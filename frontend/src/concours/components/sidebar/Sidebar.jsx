@@ -13,17 +13,32 @@ import { Link, useHref } from "react-router-dom";
 import "./Sidebar.scss";
 import {SidebarContext } from "../context/SidebarContext";
 import { LuUsers } from "react-icons/lu";
-
+import {logoutAPI} from "../../api/routes/auth";
+import {toast} from "react-toastify";
 
 
 const Sidebar = () => {
   const dispatch = useDispatch()
 
   function logoutAction() {
-    dispatch(logout())
-    persistor.purge()
-    sessionStorage.removeItem('candidat');
-    window.location.href ='/'
+    try {
+      logoutAPI().then((r) => {
+        if (r.ok) {
+          dispatch(logout())
+          persistor.purge()
+          localStorage.removeItem('user');
+          localStorage.removeItem('user_type');
+          localStorage.removeItem('token');
+          localStorage.removeItem('type_token');
+          toast.success('Déconnexion réussie');
+          window.location.href = '/'
+        } else {
+          toast.error("Erreur lors de la déconnexion");
+        }
+      })
+    } catch (e) {
+      toast.error("Erreur lors de la déconnexion")
+    }
   }
   //const { theme } = useContext(ThemeContext);
   const [isSidebarOpen, closeSidebar ] = useState(SidebarContext);

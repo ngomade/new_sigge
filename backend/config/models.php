@@ -25,7 +25,7 @@ return [
         |
         */
 
-        'path' => app_path('Models/Requetes'),
+        'path' => app_path('Models/notes'),
 
         /*
         |--------------------------------------------------------------------------
@@ -38,7 +38,7 @@ return [
         |
         */
 
-        'namespace' => 'App\Models\Requetes',
+        'namespace' => 'App\Models\notes',
 
         /*
         |--------------------------------------------------------------------------
@@ -281,6 +281,8 @@ return [
 
         'except' => [
             'migrations',
+            'notes',
+            'concours',
             'failed_jobs',
             'password_resets',
             'personal_access_tokens',
@@ -531,9 +533,9 @@ return [
 //            ]
 //        ],
 //    ],
-    // 'notes' => [
-    //     'path' => app_path('Models/notes'),
-    //     'namespace' => 'App\Models\notes',
+    // 'requetes' => [
+    //     'path' => app_path('Models/requetes'),
+    //     'namespace' => 'App\Models\requetes',
     //     'parent' => Illuminate\Database\Eloquent\Model::class,
     //     'use' => [
     //         // Reliese\Database\Eloquent\BitBooleans::class,

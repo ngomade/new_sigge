@@ -150,7 +150,7 @@ function Navbar() {
 
                         <li>
                             {
-                                hasToken ? (
+                                (hasToken !== "" || hasToken !== null) ? (
                                     <div className='flex gap-2'>
                                         <Link to={'/success'} className='p-2 text-white bg-slate-400 rounded-md'>Mon
                                             Compte</Link>

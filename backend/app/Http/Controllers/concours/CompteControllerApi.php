@@ -7,6 +7,9 @@ use App\Models\User;
 use App\Notifications\concours\SendinfoOfConnection;
 use App\Services\AuthService;
 use App\Services\ReceiptOCRService;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use App\Models\concours\Compte;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -15,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class CompteControllerApi extends Controller implements HasMiddleware
@@ -49,14 +53,14 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
             return response()->json($result);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Validation échouée',
                 'errors' => $e->errors(),
                 'data' => []
             ], 422);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Erreur extraction OCR: ' . $e->getMessage());
 
             return response()->json([
@@ -83,7 +87,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 'ca_email' => 'nullable|email|max:255',
                 'ca_prenom' => 'required|string|max:255',
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'erreur' => 'Données de validation incorrectes',
                 'errors' => $e->errors()
@@ -110,7 +114,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 $pdfPath = $ocrService->convertImageToPdf($fullTempPath);
 
                 // Créer un nouveau fichier uploadé depuis le PDF
-                $pdfFile = new \Illuminate\Http\File($pdfPath);
+                $pdfFile = new File($pdfPath);
                 $filename = $validateData['ca_nom'] . '-' . $validateData['ca_prenom'] . '-' . now()->format('M_d_H_i') . '.pdf';
                 $storedPath = Storage::putFileAs(getdate()['year'], $pdfFile, $filename);
 
@@ -165,7 +169,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
         try {
             $compte = Compte::with('candidat')->findOrFail($ca_num_recu);
             return response()->json($compte);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         }
     }
@@ -185,7 +189,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 'ca_email' => 'nullable|email|max:255',
                 'ca_prenom' => 'sometimes|string|max:255',
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'erreur' => 'Données de validation incorrectes',
                 'errors' => $e->errors()
@@ -230,7 +234,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
             return response()->json($compte);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         } catch (Throwable $th) {
             DB::rollback();
@@ -267,7 +271,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
             return response()->noContent();
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         } catch (Throwable $th) {
             DB::rollback();
@@ -286,9 +290,15 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 return response()->json(['erreur' => 'Reçu non trouvé'], 404);
             }
 
-            return Storage::download($recu);
+            $fileContent = Storage::get($recu);
+            $base64 = base64_encode($fileContent);
+            return response()->json([
+                'file_name' => 'document.pdf',
+                'mime_type' => 'application/pdf',
+                'base64_pdf' => $base64
+            ]);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         }
     }

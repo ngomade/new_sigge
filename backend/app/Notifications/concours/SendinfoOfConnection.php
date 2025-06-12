@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SendinfoOfConnection extends Notification implements ShouldQueue
+class SendinfoOfConnection extends Notification
 {
     use Queueable;
 
