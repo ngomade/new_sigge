@@ -16,6 +16,7 @@ class Bureau extends Model
 	public $incrementing = false;
 
 	protected $fillable = [
+		'code_bureau',
 		'label_bureau',
 		'desc_bureau',
 		'type_bureau'

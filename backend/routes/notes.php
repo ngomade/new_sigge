@@ -30,7 +30,7 @@ use App\Http\Controllers\UserControllerApi;
 
 Route::apiResource('anneescolaire', AnneescolaireControllerApi::class);
 Route::apiResource('assignation', AssignationControllerApi::class);
-Route::apiResource('bureau', BureauControllerApi::class);
+// Route::apiResource('bureau', BureauControllerApi::class);
 Route::apiResource('classe', ClasseControllerApi::class);
 Route::apiResource('documents', DocumentsControllerApi::class);
 Route::apiResource('ec', EcControllerApi::class);
@@ -53,4 +53,4 @@ Route::apiResource('ue', UeControllerApi::class);
 Route::apiResource('usersdiplome', UsersDiplomeControllerApi::class);
 Route::apiResource('usersrole', UsersRoleControllerApi::class);
 Route::apiResource('semestreniveau', SemestreNiveauControllerApi::class);
-Route::apiResource('user', UserControllerApi::class);
+// Route::apiResource('user', UserControllerApi::class);

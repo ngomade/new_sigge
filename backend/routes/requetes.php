@@ -3,6 +3,7 @@
 // routes/api.php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\requetes\BureauControllerApi;
+use App\Http\Controllers\requetes\BureauController;
 
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
@@ -16,8 +17,6 @@ Route::prefix('requete')->group(function () {
     ]);
 });
 
-// routes/web.php
-use App\Http\Controllers\requetes\BureauController;
 
 // Routes personnalisées AVANT les routes de ressource
 Route::get('bureaux/search', [BureauController::class, 'search'])->name('bureaux.search');
