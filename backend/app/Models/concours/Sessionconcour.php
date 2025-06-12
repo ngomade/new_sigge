@@ -3,7 +3,7 @@
 namespace App\Models\concours;
 
 use App\Models\concours\Candidat;
-use App\Models\concours\Personnel;
+use App\Models\Personnel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
