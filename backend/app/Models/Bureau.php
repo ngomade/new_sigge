@@ -1,10 +1,8 @@
 <?php
 
-
 namespace App\Models;
 
-use App\Models\notes\Document;
-use App\Models\notes\Presentation;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -15,7 +13,7 @@ class Bureau extends Model
 	public $incrementing = false;
 
 	protected $fillable = [
-        'code_bureau',
+		'code_bureau',
 		'label_bureau',
 		'desc_bureau',
 		'type_bureau'

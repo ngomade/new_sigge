@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fichier_requtes', function (Blueprint $table) {
+        Schema::create('fichier_requetes', function (Blueprint $table) {
             $table->string('id_fichier',32)->primary();
             $table->string('chemin',180);
              $table->string('code_requete');

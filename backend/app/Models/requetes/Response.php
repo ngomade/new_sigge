@@ -5,17 +5,17 @@ namespace App\Models\requetes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Response extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category_name',
-        'description'
+        'response_text',
+        'request_id'
     ];
 
-    public function requests()
+    public function request()
     {
-        return $this->hasMany(StudentRequest::class);
+        return $this->belongsTo(StudentRequest::class);
     }
 }

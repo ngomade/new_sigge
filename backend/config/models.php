@@ -25,7 +25,7 @@ return [
         |
         */
 
-        'path' => app_path('Models/requetes'),
+        'path' => app_path('Models/notes'),
 
         /*
         |--------------------------------------------------------------------------
@@ -38,7 +38,7 @@ return [
         |
         */
 
-        'namespace' => 'App\Models\requetes',
+        'namespace' => 'App\Models\notes',
 
         /*
         |--------------------------------------------------------------------------

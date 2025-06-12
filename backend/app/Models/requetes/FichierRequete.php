@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class FichierRequte extends Model
 {
-	protected $table = 'fichier_requtes';
+	protected $table = 'fichier_requetes';
 	protected $primaryKey = 'id_fichier';
 	public $incrementing = false;
 
