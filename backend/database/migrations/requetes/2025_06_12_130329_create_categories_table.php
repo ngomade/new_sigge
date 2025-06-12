@@ -12,14 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->string('cose_requete')->primary();
-            $table->string('code_requete');
-            $table->string('cose_requete')->primary();
-            $table->string('cose_requete')->primary();
-            $table->string('cose_requete')->primary();
-            $table->string('cose_requete')->primary();
-
+            $table->string('code_cat')->primary();
+            $table->string('label_cat',100);
+            $table->string('desc_cat',100);
             $table->timestamps();
+           
+           
+           
+           
+           
+           
+           
+
+           
         });
     }
 

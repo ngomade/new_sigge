@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reponses', function (Blueprint $table) {
-            $table->id();
+            $table->string('code_res',32)->primary();
+            $table->string('text_repone',180);
+             $table->string('code_requete');
+            $table->foreign('code_requete')->references('code_requete')->on('requetes')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
