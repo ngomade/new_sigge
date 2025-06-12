@@ -92,7 +92,6 @@ class EcController extends Controller
 
     public function destroy($id)
     {
-
         try {
             DB::beginTransaction();
             $res = Ressource::destroy(Ressource::where("code_ec", $id)->first()->code_res);

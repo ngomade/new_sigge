@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\notes\Document;
+use App\Models\notes\Presentation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
