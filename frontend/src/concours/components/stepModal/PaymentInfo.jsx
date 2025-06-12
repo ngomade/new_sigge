@@ -36,7 +36,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
             const response = await fetch('http://localhost:8000/api/concours/comptes/extract-receipt', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: formData
             });
@@ -102,26 +102,26 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
             const {ca_recu, ...data} = formData;
             try {
                 const response = await createCompte(data, ca_recu);
-                if (response.status === 500) {
-                    const error = await response.json()
-                    const {erreur} = error
+                if (response.ok) {
                     setLoadingState(false);
-                    setIsSubmitting(false);
-                    return toast.error(erreur, {autoClose: 5000});
-                }
-                if (response.status === 200) {
-                    setLoadingState(false);
-                    setIsSubmitting(false);
+                    setIsSubmitting(false); // Fin du traitement
                     onClose();
                     const data = await response.json()
                     const {access_token, compte, user, user_type} = data
-                    sessionStorage.setItem('token', access_token)
-                    sessionStorage.setItem('user', JSON.stringify(user))
-                    sessionStorage.setItem('user_type', user_type)
+                    localStorage.setItem('token', access_token)
+                    localStorage.setItem('user', JSON.stringify(user))
+                    localStorage.setItem('user_type', user_type)
                     fieldSet('#form_pay', setFormData, {});
                     dispatch(push_candidate_info(compte));
                     toast.success("Les informations ont été soumises avec succès");
                     window.location.href = "/candidate";
+                } else {
+                    const error = await response.json()
+                    const {erreur} = error
+                    setLoadingState(false);
+                    setIsSubmitting(false); // Réinitialiser l'état de soumission
+                    //onClose();
+                    return toast.error(erreur, {autoClose: 5000});
                 }
             } catch (error) {
                 setIsSubmitting(false);
@@ -181,6 +181,27 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                     )}
 
                     <div className="flex flex-col gap-3 mb-3">
+                        <div className="relative flex flex-col gap-3 mb-3">
+                            <label htmlFor="recu_image">
+                                Votre reçu<sup className="text-red-600">*</sup>
+                                {selectedFile && <span className="text-sm text-green-600 ml-2">✓ Fichier sélectionné</span>}
+                            </label>
+                            <input
+                                type="file"
+                                id="recu_image"
+                                name="ca_recu"
+                                onChange={onFileSelected}
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                className="z-10 p-2 border opacity-0 appearance-none file:appearance-none file:bg-transparent file:border"
+                            />
+                            <span className="absolute text-5xl text-teal-500 top-9 left-3">
+                            <FileUp/>
+                        </span>
+                            <p className="text-red-500">
+                                Reçu scanné en PDF, ou en Image( jpg, png, jpeg ) ne dépassant pas 2 Mo
+                            </p>
+                        </div>
+
                         <label htmlFor="ca_nom">
                             Nom<sup className="text-red-600">*</sup> <i>(En Majuscule)</i>
                         </label>
@@ -275,33 +296,13 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                             </div>
                         </div>
                     </div>
-                    <div className="relative flex flex-col gap-3 mb-3">
-                        <label htmlFor="recu_image">
-                            Votre reçu<sup className="text-red-600">*</sup>
-                            {selectedFile && <span className="text-sm text-green-600 ml-2">✓ Fichier sélectionné</span>}
-                        </label>
-                        <input
-                            type="file"
-                            id="recu_image"
-                            name="ca_recu"
-                            onChange={onFileSelected}
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            className="z-10 p-2 border opacity-0 appearance-none file:appearance-none file:bg-transparent file:border"
-                        />
-                        <span className="absolute text-5xl text-teal-500 top-9 left-3">
-                            <FileUp/>
-                        </span>
-                        <p className="text-red-500">
-                            Reçu scanné en PDF, ou en Image( jpg, png, jpeg ) ne dépassant pas 2 Mo
-                        </p>
-                    </div>
                     <div className="w-full flex items-center justify-center">
                         <button
                             type="submit"
                             className="w-1/2 p-2 text-white bg-teal-600 rounded-md"
                             disabled={isSubmitting || isExtracting}
                         >
-                            {isSubmitting ? "En cours..." : "Soumettre"}
+                            {isSubmitting ? "Verification du recu..." : "Soumettre"}
                         </button>
                     </div>
                 </form>
