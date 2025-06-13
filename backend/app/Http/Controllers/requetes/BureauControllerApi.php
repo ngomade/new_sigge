@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
-use App\Models\notes\Bureau;
+use App\Models\Bureau;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;

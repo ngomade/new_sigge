@@ -4,6 +4,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\requetes\BureauControllerApi;
 use App\Http\Controllers\requetes\BureauController;
+use App\Http\Controllers\requetes\AffectationPersonnelController;
+use App\Http\Controllers\requetes\AffectationPersonnelControllerApi;
 
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
@@ -31,15 +33,26 @@ Route::resource('bureaux', BureauController::class)->parameters([
 ]);
 
 
-// Alternative recommandée pour éviter les conflits :
-// Route::prefix('bureaux')->name('bureaux.')->group(function () {
-//     Route::get('search', [BureauController::class, 'search'])->name('search');
-//     Route::get('{code_bureau}/sous-bureaux', [BureauController::class, 'sousBureaux'])->name('sous-bureaux');
-//     Route::get('{code_bureau}/bureau-parents', [BureauController::class, 'bureauParents'])->name('bureau-parents');
-//     Route::get('{code_bureau}/documents', [BureauController::class, 'documents'])->name('documents');
-//     Route::get('{code_bureau}/presentations', [BureauController::class, 'presentations'])->name('presentations');
-// });
-// 
-// Route::resource('bureaux', BureauController::class)->parameters([
-//     'bureaux' => 'code_bureau'
-// ]);
+
+
+
+
+
+// use App\Http\Controllers\requetes\AffectationController;
+
+// Route::resource('affectations', AffectationController::class);
+
+Route::resource('affectation', AffectationPersonnelController::class);
+
+Route::prefix('affectations')->group(function () {
+    // CRUD de base
+    Route::get('/', [AffectationPersonnelControllerApi::class, 'index']); // Liste toutes les affectations
+    Route::post('/', [AffectationPersonnelControllerApi::class, 'store']); // Créer une affectation
+    Route::get('/personnel/{code_pers}', [AffectationPersonnelControllerApi::class, 'show']); // Affectations d'un personnel
+    Route::get('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'showAffectation']); // Affectation spécifique
+    Route::put('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'update']); // Modifier affectation
+    Route::delete('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'destroy']); // Supprimer affectation
+
+    
+});
+

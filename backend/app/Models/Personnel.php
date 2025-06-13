@@ -96,4 +96,6 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 	{
 		return $this->hasMany(Slide::class, 'code_pers');
 	}
+
+	
 }
