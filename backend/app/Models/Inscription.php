@@ -1,31 +1,11 @@
 <?php
 
 
-namespace App\Models\notes;
+namespace App\Models;
 
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\notes\Ue;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Inscription
- *
- * @property string $code_ins
- * @property string $code_user
- * @property int $code_annee
- * @property Carbon $date_ins
- * @property int $statut_ins
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Anneescolaire $anneescolaire
- * @property User $user
- * @property Collection|FiliereNiveau[] $filiere_niveaus
- * @property Collection|Ue[] $ues
- *
- * @package App\Models\notes
- */
 class Inscription extends Model
 {
 	protected $table = 'inscription';

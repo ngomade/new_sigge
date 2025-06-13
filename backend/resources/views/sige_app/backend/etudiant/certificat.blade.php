@@ -33,7 +33,11 @@
                                 <div class="col-2">
                                     <select name="code_annee" id="code_annee" class="form-select">
                                         @foreach (\App\Models\Anneescolaire::orderBy("debut_annee", "desc")->get() as $anneescolaire)
-                                            <option value="{{$anneescolaire->code_annee}}"> {{$anneescolaire->debut_annee->year}}- {{$anneescolaire->fin_annee->year}}  </option>
+                                            {{
+            \Carbon\Carbon::parse($anneescolaire->debut_annee)->format('Y')
+        }}-{{
+            \Carbon\Carbon::parse($anneescolaire->fin_annee)->format('Y')
+        }}
                                         @endforeach
                                     </select>
                                 </div>

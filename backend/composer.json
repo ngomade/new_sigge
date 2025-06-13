@@ -10,8 +10,9 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "tymon/jwt-auth": "^2.2",
-        "thiagoprz/eloquent-composite-key": "^1.0"
+        "spatie/laravel-permission": "^6.19",
+        "thiagoprz/eloquent-composite-key": "^1.0",
+        "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

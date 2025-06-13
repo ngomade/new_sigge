@@ -1,24 +1,24 @@
 <?php
 
+use App\Http\Controllers\api\PersonnelControllerApi;
 use App\Http\Controllers\concours\auth\AuthController;
 use App\Http\Controllers\concours\auth\ResetPasswordController;
-use App\Http\Controllers\concours\SerieController;
-use App\Http\Controllers\PersonnelControllerApi;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\concours\CandidatControllerApi;
-use App\Http\Controllers\concours\CompteControllerApi;
-use App\Http\Controllers\concours\SessionconcourControllerApi;
-use App\Http\Controllers\concours\SiteEtudeControllerApi;
-use App\Http\Controllers\concours\EcoleControllerApi;
-use App\Http\Controllers\concours\SiteCompositionControllerApi;
-use App\Http\Controllers\concours\DossierControllerApi;
-use App\Http\Controllers\concours\CentreExamenControllerApi;
 use App\Http\Controllers\concours\CentreDepotControllerApi;
+use App\Http\Controllers\concours\CentreExamenControllerApi;
+use App\Http\Controllers\concours\CompteControllerApi;
+use App\Http\Controllers\concours\DossierControllerApi;
+use App\Http\Controllers\concours\EcoleControllerApi;
+use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
+use App\Http\Controllers\concours\SerieController;
+use App\Http\Controllers\concours\SessionconcourControllerApi;
+use App\Http\Controllers\concours\SiteCompositionControllerApi;
+use App\Http\Controllers\concours\SiteEtudeControllerApi;
+use App\Http\Controllers\concours\SlideControllerApi;
 use App\Http\Controllers\DiplomeController;
 use App\Http\Controllers\FiliereControllerAPI;
-use App\Http\Controllers\concours\FiliereDiplomeControllerAPI;
-use App\Http\Controllers\concours\SlideControllerApi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

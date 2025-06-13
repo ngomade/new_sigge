@@ -1,30 +1,12 @@
 <?php
 
 
-namespace App\Models\notes;
+namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\notes\Examen;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Class SessionExaman
- *
- * @property string $code_session
- * @property int $code_annee
- * @property string $label_session
- * @property Carbon $date_debut_session
- * @property Carbon|null $date_fin_session
- * @property int $statut_session
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Anneescolaire $anneescolaire
- * @property Collection|Document[] $documents
- * @property Collection|Examan[] $examen
- *
- * @package App\Models\notes
- */
 class SessionExamen extends Model
 {
 	protected $table = 'session_examen';
@@ -46,8 +28,8 @@ class SessionExamen extends Model
 		'statut_session'
 	];
 
-	public function anneescolaire()
-	{
+	public function anneescolaire(): BelongsTo
+    {
 		return $this->belongsTo(Anneescolaire::class, 'code_annee');
 	}
 

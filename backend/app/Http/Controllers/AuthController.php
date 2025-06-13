@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\notes\FiliereNiveau;
-use App\Models\notes\Inscription;
-use App\Models\User;
+use App\Models\FiliereNiveau;
+use App\Models\Inscription;
 use App\Models\Personnel;
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller

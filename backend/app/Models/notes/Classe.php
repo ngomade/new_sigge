@@ -6,6 +6,7 @@
 
 namespace App\Models\notes;
 
+use App\Models\Niveau;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
