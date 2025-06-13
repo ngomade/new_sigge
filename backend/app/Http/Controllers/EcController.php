@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\notes\Semestre;
-use Response;
+use App\Models\FiliereNiveau;
+use App\Models\Inscription;
 use App\Models\notes\Ec;
-use App\Models\notes\Ue;
-use App\Models\notes\Ressource;
 use App\Models\notes\EcRessource;
-use App\Models\notes\Inscription;
-use Illuminate\Support\Str;
+use App\Models\notes\Ressource;
+use App\Models\notes\Semestre;
+use App\Models\notes\Ue;
 use Illuminate\Http\Request;
-use App\Models\notes\FiliereNiveau;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Response;
 use Throwable;
 
 class EcController extends Controller

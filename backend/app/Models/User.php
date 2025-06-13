@@ -4,9 +4,6 @@ namespace App\Models;
 
 use App\Models\notes\EtudiantEc;
 use App\Models\notes\Evaluation;
-use App\Models\notes\InfoExtra;
-use App\Models\notes\Inscription;
-use App\Models\notes\UsersDiplome;
 use App\Models\notes\UsersRole;
 use Illuminate\Database\Eloquent\Model;
 

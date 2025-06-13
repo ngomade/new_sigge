@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\notes\Document;
-use App\Models\notes\Presentation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 

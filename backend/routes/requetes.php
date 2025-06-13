@@ -3,7 +3,7 @@
 // routes/api.php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\requetes\BureauControllerApi;
-use App\Http\Controllers\requetes\BureauController;
+use App\Http\Controllers\BureauController;
 use App\Http\Controllers\requetes\AffectationPersonnelController;
 use App\Http\Controllers\requetes\AffectationPersonnelControllerApi;
 

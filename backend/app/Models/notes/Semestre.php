@@ -2,6 +2,7 @@
 
 namespace App\Models\notes;
 
+use App\Models\Niveau;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;

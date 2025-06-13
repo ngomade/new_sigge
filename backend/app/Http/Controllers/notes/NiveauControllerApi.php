@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
+use App\Models\Niveau;
 use Illuminate\Http\Request;
-use App\Models\notes\Niveau;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;

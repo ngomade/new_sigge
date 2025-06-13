@@ -49,14 +49,14 @@
             <form action="/changer_pwd_first" method="post">
                 {{ csrf_field() }}
                 <div class="modal-body p-3 ">
-                    <input type="hidden" name="code_user" value="{{\Session::get('user')->code_user}}">
+                    <input type="hidden" name="code_user" value="{{Session::get('user')->code_user}}">
                         <div class="row">
                            <div class="col-sm-11 m-auto mb-4">
                                 <input type="text" name="apwd" id="apwd" class="form-control" placeholder="votre ancien mot de passe">
                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-11  m-auto m-auto mb-4">
+                            <div class="col-sm-11 m-auto mb-4">
                                 <input type="password" name="npwd" id="npwd" class="form-control" required placeholder="votre nouveau mot de passe">
 
                             </div>

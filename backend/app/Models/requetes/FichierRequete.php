@@ -11,18 +11,18 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class FichierRequte
- * 
+ *
  * @property string $id_fichier
  * @property string $chemin
  * @property string $code_requete
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Requete $requete
  *
  * @package App\Models\requetes
  */
-class FichierRequte extends Model
+class FichierRequete extends Model
 {
 	protected $table = 'fichier_requetes';
 	protected $primaryKey = 'id_fichier';
