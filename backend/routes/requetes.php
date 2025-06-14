@@ -4,8 +4,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\requetes\BureauControllerApi;
 use App\Http\Controllers\BureauController;
+use App\Http\Controllers\requetes\RequetteController;
+use App\Http\Controllers\requetes\AdminRequeteController;
 use App\Http\Controllers\requetes\AffectationPersonnelController;
 use App\Http\Controllers\requetes\AffectationPersonnelControllerApi;
+use App\Http\Controllers\requetes\AdminRequetteControllerApi;
+use App\Http\Controllers\requetes\RequetteControllerApi;
 
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
@@ -44,6 +48,9 @@ Route::resource('bureaux', BureauController::class)->parameters([
 
 Route::resource('affectation', AffectationPersonnelController::class);
 
+
+
+
 Route::prefix('affectations')->group(function () {
     // CRUD de base
     Route::get('/', [AffectationPersonnelControllerApi::class, 'index']); // Liste toutes les affectations
@@ -54,5 +61,37 @@ Route::prefix('affectations')->group(function () {
     Route::delete('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'destroy']); // Supprimer affectation
 
     
+});
+
+// routes pour requetes
+
+
+Route::resource('requetes', RequetteController::class, ['parameters' => ['requetes' => 'code_requete']]);
+
+Route::delete('requetes/fichiers/{id_fichier}', [RequetteController::class, 'deleteFichier'])->name('requetes.deleteFichier');
+Route::get('requetes/fichiers/{id_fichier}/download', [RequetteController::class, 'downloadFichier'])->name('requetes.downloadFichier');
+
+Route::prefix('api/requete')->group(function () {
+    Route::get('/', [RequetteControllerApi::class, 'index']);
+    Route::post('/', [RequetteControllerApi::class, 'store']);
+    Route::get('/{code_requete}', [RequetteControllerApi::class, 'show']);
+    Route::put('/{code_requete}', [RequetteControllerApi::class, 'update']);
+    Route::delete('/{code_requete}', [RequetteControllerApi::class, 'destroy']);
+});
+
+Route::prefix('api/admin/requete')->group(function () {
+    Route::get('/', [AdminRequetteControllerApi::class, 'index']);
+    Route::get('/{code_requete}', [AdminRequetteControllerApi::class, 'show']);
+    Route::put('/{code_requete}/status', [AdminRequetteControllerApi::class, 'updateStatus']);
+    Route::post('/{code_requete}/assign', [AdminRequetteControllerApi::class, 'assign']);
+    Route::post('/{code_requete}/response', [AdminRequetteControllerApi::class, 'addResponse']);
+});
+
+Route::prefix('admin/requetes')->group(function () {
+    Route::get('/', [AdminRequeteController::class, 'index'])->name('admin.requetes.index');
+    Route::get('/{code_requete}', [AdminRequeteController::class, 'show'])->name('admin.requetes.show');
+    Route::put('/{code_requete}/status', [AdminRequeteController::class, 'updateStatus'])->name('admin.requetes.updateStatus');
+    Route::post('/{code_requete}/assign', [AdminRequeteController::class, 'assign'])->name('admin.requetes.assign');
+    Route::post('/{code_requete}/response', [AdminRequeteController::class, 'addResponse'])->name('admin.requetes.addResponse');
 });
 
