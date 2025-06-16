@@ -9,6 +9,8 @@ namespace App\Models\requetes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Bureau;
 
 /**
  * Class Requete
@@ -77,7 +79,7 @@ class Requete extends Model
 
 	public function fichier_requtes()
 	{
-		return $this->hasMany(FichierRequte::class, 'code_requete');
+		return $this->hasMany(FichierRequete::class, 'code_requete');
 	}
 
 	public function reponses()

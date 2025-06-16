@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\concours\SessionConcours;
 use App\Models\Slide;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Personnel extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasFactory, HasApiTokens, HasRoles;
+    use Notifiable, HasFactory, HasApiTokens,HasRoles;
 
 	protected $table = 'personnel';
 	protected $primaryKey = 'code_pers';

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->char('code_examen', 32);
              $table->foreign('code_examen')->references('code_examen')->on('examen')->onDelete('cascade');
             $table->char('code_user', 32);
-             $table->foreign('code_user')->references('code_user')->on('user')->onDelete('cascade');
+             $table->foreign('code_user')->references('code_user')->on('users')->onDelete('cascade');
             $table->date('date_evaluation');
             $table->char('code_ano', 32)->nullable();
             $table->decimal('note_eval', 10);

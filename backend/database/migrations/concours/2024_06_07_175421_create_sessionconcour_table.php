@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('sessionconcour', function (Blueprint $table) {
-            $table->id('id')->primary();
+            $table->id('id');
              $table->string('code_pers');
             //   $table->string('ca_code');
             $table->year('annee');

@@ -32,7 +32,7 @@ class AffectationPersonnelController extends Controller
             });
         }
 
-        if ($request->filled('id_role')) {
+        if ($request->filled('id')) {
             $query->whereHas('roles', function($q) use ($request) {
                 $q->where('pers_role.id_role', $request->id_role);
             });
@@ -91,7 +91,7 @@ class AffectationPersonnelController extends Controller
             $personnel = Personnel::find($validated['code_pers']);
 
             $existingAffectation = $personnel->roles()
-                ->wherePivot('id_role', $validated['id_role'])
+                ->wherePivot('id', $validated['id'])
                 ->wherePivot('code_bureau', $validated['code_bureau'])
                 ->wherePivot('statut_role', 'actif')
                 ->first();
@@ -100,7 +100,7 @@ class AffectationPersonnelController extends Controller
                 return redirect()->back()->withInput()->withErrors('Cette affectation existe déjà');
             }
 
-            $personnel->roles()->attach($validated['id_role'], [
+            $personnel->roles()->attach($validated['id'], [
                 'date_debut' => $validated['date_debut'],
                 'date_fin' => $validated['date_fin'],
                 'statut_role' => $validated['statut_role'],
@@ -121,7 +121,7 @@ class AffectationPersonnelController extends Controller
     {
         $personnel = Personnel::with([
             'roles' => function($query) use ($id_role) {
-                $query->where('roles.id_role', $id_role)
+                $query->where('roles.id', $id_role)
                       ->withPivot('date_debut', 'date_fin', 'statut_role', 'code_bureau', 'created_at', 'updated_at');
             },
             'roles.bureau'

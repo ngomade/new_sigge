@@ -17,7 +17,7 @@ return new class extends Migration
             $table->char('code_user', 32);
             $table->char('code_ec', 32);
              $table->foreign('code_ec')->references('code_ec')->on('ec')->onDelete('cascade');
-              $table->foreign('code_user')->references('code_user')->on('user')->onDelete('cascade');
+              $table->foreign('code_user')->references('code_user')->on('users')->onDelete('cascade');
             $table->primary(['code_user', 'code_ec']);
         });
     }
