@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Models\notes;
+namespace App\Models;
 
 use App\Models\User;
 use Carbon\Carbon;
@@ -26,7 +26,7 @@ use App\Models\Role;
 class UsersRole extends Model
 {
 	protected $table = 'users_role';
-	protected $primaryKey = ['code_user','id_role'];
+	protected $primaryKey = ['code_user','id'];
 	public $incrementing = false;
 
 	protected $casts = [
@@ -49,6 +49,6 @@ class UsersRole extends Model
 	}
 	public function role()
 	{
-		return $this->belongsTo(Role::class, 'id_role');
+		return $this->belongsTo(Role::class, 'id');
 	}
 }

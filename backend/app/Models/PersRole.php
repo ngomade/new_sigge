@@ -10,7 +10,7 @@ class PersRole extends Model
 {
     use HasCompositeKey;
     protected $table = 'pers_role';
-    protected $primaryKey = ['code_bureau', 'code_pers', 'code_role'];
+    protected $primaryKey = ['code_bureau', 'code_pers', 'id'];
     public $incrementing = false;
     public $timestamps = true;
 
@@ -18,7 +18,7 @@ class PersRole extends Model
         'code_role' => 'int',
         'date_debut_role' => 'datetime',
         'date_fin_role' => 'date',
-        'satut_role' => 'int'
+        'statut_role' => 'int'
     ];
 
     protected $fillable = [
@@ -27,7 +27,7 @@ class PersRole extends Model
         'code_pers',
         'date_debut_role',
         'date_fin_role',
-        'satut_role'
+        'statut_role'
     ];
 
     // Constantes pour le statut du rôle
@@ -53,13 +53,13 @@ class PersRole extends Model
 
     public function isActif()
     {
-        return $this->satut_role === self::STATUT_ACTIF &&
+        return $this->statut_role === self::STATUT_ACTIF &&
                ($this->date_fin_role === null || $this->date_fin_role > now());
     }
 
     public function isExpire()
     {
-        return $this->satut_role === self::STATUT_ACTIF &&
+        return $this->statut_role === self::STATUT_ACTIF &&
                $this->date_fin_role !== null &&
                $this->date_fin_role < now();
     }
@@ -76,6 +76,6 @@ class PersRole extends Model
 
     public function role()
     {
-        return $this->belongsTo(Role::class, 'code_role', 'id');
+        return $this->belongsTo(Role::class, 'id', 'id');
     }
 }

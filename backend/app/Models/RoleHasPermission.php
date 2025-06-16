@@ -12,13 +12,13 @@ class RoleHasPermission extends Model
 {
     use HasCompositeKey;
     protected $table = 'role_has_permissions';
-    protected $primaryKey = ['permission_id', 'role_id'];
+    protected $primaryKey = ['id', 'id'];
     public $incrementing = false;
     public $timestamps = false;
 
     protected $casts = [
-        'permission_id' => 'int',
-        'role_id' => 'int'
+        'id' => 'int',
+        'id' => 'int'
     ];
     protected $fillable = [
         'permission_id',
@@ -37,6 +37,6 @@ class RoleHasPermission extends Model
 
 	public function role(): BelongsTo
 	{
-		return $this->belongsTo(Role::class, 'id_role');
+		return $this->belongsTo(Role::class, 'id');
 	}
 }

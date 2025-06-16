@@ -4,7 +4,8 @@ namespace App\Models;
 
 use App\Models\notes\EtudiantEc;
 use App\Models\notes\Evaluation;
-use App\Models\notes\UsersRole;
+use App\Models\notes\Classe;
+use App\Models\UsersRole;
 use Illuminate\Database\Eloquent\Model;
 
 class User extends Model

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\concours\SessionConcours;
-use App\Models\concours\Slide;
+use App\Models\Slide;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;

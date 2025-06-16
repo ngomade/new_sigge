@@ -15,12 +15,12 @@ return new class extends Migration
             // Clés primaires composites
             $table->string('code_bureau', 20);
             $table->string('code_pers', 20);
-            $table->unsignedBigInteger('code_role');
+            $table->unsignedBigInteger('id');
 
             // Autres colonnes
             $table->dateTime('date_debut_role');
             $table->dateTime('date_fin_role')->nullable();
-            $table->tinyInteger('satut_role')->default(1); // 1 = actif, 0 = inactif
+            $table->tinyInteger('statut_role')->default(1); // 1 = actif, 0 = inactif
             $table->text('notes')->nullable();
 
             // Timestamps
@@ -29,21 +29,21 @@ return new class extends Migration
             // Clés étrangères
             $table->foreign('code_bureau')
                 ->references('code_bureau')
-                ->on('bureaux')
+                ->on('bureau')
                 ->onDelete('cascade');
 
             $table->foreign('code_pers')
                 ->references('code_pers')
-                ->on('personnels')
+                ->on('personnel')
                 ->onDelete('cascade');
 
-            $table->foreign('code_role')
+            $table->foreign('id')
                 ->references('id')
                 ->on('roles')
                 ->onDelete('cascade');
 
             // Clé primaire composite
-            $table->primary(['code_bureau', 'code_pers', 'code_role']);
+            $table->primary(['code_bureau', 'code_pers', 'id']);
         });
     }
 
