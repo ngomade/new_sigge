@@ -4,7 +4,7 @@ namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Sessionconcour, Personnel, Candidat};
+use App\Models\concours\{SessionConcours, Personnel, Candidat};
 use Laravel\Sanctum\Sanctum;
 
 class SessionConcourTest extends TestCase
@@ -31,12 +31,12 @@ class SessionConcourTest extends TestCase
     /** @test */
     public function can_get_active_session()
     {
-        $activeSession = Sessionconcour::factory()->create([
+        $activeSession = SessionConcours::factory()->create([
             'debut' => now()->subDays(10),
             'cloture' => now()->addDays(10)
         ]);
 
-        Sessionconcour::factory()->create([
+        SessionConcours::factory()->create([
             'debut' => now()->subMonths(3),
             'cloture' => now()->subMonths(2)
         ]);
@@ -50,7 +50,7 @@ class SessionConcourTest extends TestCase
     /** @test */
     public function can_get_session_statistics()
     {
-        $session = Sessionconcour::factory()->create();
+        $session = SessionConcours::factory()->create();
 
         // Create candidats for this session
         Candidat::factory()->count(10)->create([

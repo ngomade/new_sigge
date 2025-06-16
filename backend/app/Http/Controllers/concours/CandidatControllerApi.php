@@ -143,8 +143,8 @@ class CandidatControllerApi extends Controller
     public function byFiliere(string $filiere_code)
     {
         $candidats = Candidat::where('filiere_code', $filiere_code)
-            ->with(['site_etude', 'filiere', 'ecoles'])
-            ->get();
+                            ->with(['site_etude', 'filiere', 'ecoles'])
+                            ->get();
 
         return response()->json($candidats);
     }
@@ -155,8 +155,8 @@ class CandidatControllerApi extends Controller
     public function bySite(int $code_site)
     {
         $candidats = Candidat::where('code_site', $code_site)
-            ->with(['site_etude', 'filiere', 'ecoles'])
-            ->get();
+                            ->with(['site_etude', 'filiere', 'ecoles'])
+                            ->get();
 
         return response()->json($candidats);
     }

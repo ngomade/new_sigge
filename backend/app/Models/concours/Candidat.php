@@ -8,7 +8,7 @@ use App\Models\concours\CandidatEcole;
 use App\Models\concours\Compte;
 use App\Models\concours\Ecole;
 use App\Models\concours\Mail;
-use App\Models\concours\Sessionconcour;
+use App\Models\concours\SessionConcours;
 use App\Models\concours\SiteEtude;
 
 use App\Models\Filiere;
@@ -97,7 +97,7 @@ class Candidat extends Model
 
     public function sessionconcour(): BelongsTo
     {
-        return $this->belongsTo(Sessionconcour::class, 'id');
+        return $this->belongsTo(SessionConcours::class, 'id');
     }
 
     public function ecoles(): BelongsToMany

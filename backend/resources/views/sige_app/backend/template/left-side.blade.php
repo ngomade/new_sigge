@@ -314,7 +314,7 @@
                 <a href="/basculement_index" class="menu-link"><div data-i18n="Ecole">Basculement</div></a>
               </li>
           <li class="menu-item">
-            <a href="#" class="menu-link"><div data-i18n="Cellule">Cellule</div></a>
+            <a href="/bureau/Cellule" class="menu-link"><div data-i18n="Cellule">Cellule</div></a>
           </li>
           <li class="menu-item">
             <a href="/bureau/Division" class="menu-link"><div data-i18n="Division">Division</div></a>

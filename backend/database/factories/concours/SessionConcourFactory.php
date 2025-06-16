@@ -3,12 +3,12 @@
 namespace Database\Factories\concours;
 
 use App\Models\Personnel;
-use App\Models\concours\Sessionconcour;
+use App\Models\concours\SessionConcours;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SessionConcourFactory extends Factory
 {
-    protected $model = Sessionconcour::class;
+    protected $model = SessionConcours::class;
 
     public function definition(): array
     {

@@ -4,7 +4,7 @@ namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Candidat, Personnel, Filiere, SiteEtude, Sessionconcour, Ecole};
+use App\Models\concours\{Candidat, Personnel, Filiere, SiteEtude, SessionConcours, Ecole};
 use Laravel\Sanctum\Sanctum;
 
 class CandidatControllerTest extends TestCase
@@ -25,7 +25,7 @@ class CandidatControllerTest extends TestCase
     {
         $this->filiere = Filiere::factory()->create();
         $this->site = SiteEtude::factory()->create();
-        $this->session = Sessionconcour::factory()->create();
+        $this->session = SessionConcours::factory()->create();
         $this->ecole = Ecole::factory()->create();
     }
 

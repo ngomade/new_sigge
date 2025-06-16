@@ -9,25 +9,48 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('pers_role', function (Blueprint $table) {
-            $table->String('code_pers');
-            $table->unsignedBigInteger('id_role');
-            $table->primary(['id_role', 'code_pers']);
-            $table->date('date_debut');
-            $table->date('date_fin');
-            $table->String('statut_role');
+            // Clés primaires composites
+            $table->string('code_bureau', 20);
+            $table->string('code_pers', 20);
+            $table->unsignedBigInteger('code_role');
 
-           
-            $table->foreign('code_pers')->references('code_pers')->on('personnel')->onDelete('cascade');
-            $table->foreign('id_role')->references('id_role')->on('roles')->onDelete('cascade');
+            // Autres colonnes
+            $table->dateTime('date_debut_role');
+            $table->dateTime('date_fin_role')->nullable();
+            $table->tinyInteger('satut_role')->default(1); // 1 = actif, 0 = inactif
+            $table->text('notes')->nullable();
+
+            // Timestamps
             $table->timestamps();
-           
+
+            // Clés étrangères
+            $table->foreign('code_bureau')
+                ->references('code_bureau')
+                ->on('bureaux')
+                ->onDelete('cascade');
+
+            $table->foreign('code_pers')
+                ->references('code_pers')
+                ->on('personnels')
+                ->onDelete('cascade');
+
+            $table->foreign('code_role')
+                ->references('id')
+                ->on('roles')
+                ->onDelete('cascade');
+
+            // Clé primaire composite
+            $table->primary(['code_bureau', 'code_pers', 'code_role']);
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::dropIfExists('pers_role');
     }

@@ -4,7 +4,7 @@ namespace Tests\Feature\concours;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Compte, Candidat, Personnel, Filiere, SiteEtude, Sessionconcour, Ecole};
+use App\Models\concours\{Compte, Candidat, Personnel, Filiere, SiteEtude, SessionConcours, Ecole};
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Http\UploadedFile;
 
@@ -18,7 +18,7 @@ class IntegrationTest extends TestCase
         // 1. Create required data
         $filiere = Filiere::factory()->create();
         $site = SiteEtude::factory()->create();
-        $session = Sessionconcour::factory()->create([
+        $session = SessionConcours::factory()->create([
             'debut' => now()->subDays(5),
             'cloture' => now()->addDays(30)
         ]);

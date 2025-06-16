@@ -4,7 +4,7 @@ namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\concours\Sessionconcour;
+use App\Models\concours\SessionConcours;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Carbon\Carbon;
@@ -17,7 +17,7 @@ class SessionconcourControllerApi extends Controller
     public function index()
     {
         // ::with(['personnel', 'candidat'])->orderBy('annee', 'desc')->get();
-        $sessions = Sessionconcour::all();
+        $sessions = SessionConcours::all();
         return response()->json($sessions);
     }
 
@@ -34,7 +34,7 @@ class SessionconcourControllerApi extends Controller
         ]);
 
         try {
-            $session = Sessionconcour::create($validateData);
+            $session = SessionConcours::create($validateData);
             return response()->json($session->load('personnel'));
         } catch (Throwable $th) {
             Log::error('Error creating session: ' . $th->getMessage());
@@ -47,7 +47,7 @@ class SessionconcourControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $session = Sessionconcour::with(['personnel', 'candidats'])->findOrFail($id);
+        $session = SessionConcours::with(['personnel', 'candidats'])->findOrFail($id);
 
         return response()->json($session);
     }
@@ -64,7 +64,7 @@ class SessionconcourControllerApi extends Controller
             'cloture' => 'sometimes|date|after:debut|required_with:debut',
         ]);
 
-        $session = Sessionconcour::findOrFail($id);
+        $session = SessionConcours::findOrFail($id);
         try {
             $session->update($validateData);
             return response()->json($session->load('personnel'));
@@ -79,7 +79,7 @@ class SessionconcourControllerApi extends Controller
      */
     public function destroy(string $id)
     {
-        $session = Sessionconcour::findOrFail($id);
+        $session = SessionConcours::findOrFail($id);
         try {
             $session->delete();
             return response()->noContent();
@@ -95,7 +95,7 @@ class SessionconcourControllerApi extends Controller
     public function active()
     {
         $today = Carbon::now();
-        $session = Sessionconcour::where('debut', '<=', $today)
+        $session = SessionConcours::where('debut', '<=', $today)
             ->where('cloture', '>=', $today)
             ->first();
 
@@ -111,7 +111,7 @@ class SessionconcourControllerApi extends Controller
      */
     public function byYear($year)
     {
-        $sessions = Sessionconcour::whereYear('annee', $year)
+        $sessions = SessionConcours::whereYear('annee', $year)
             ->with(['personnel','candidats'])
             ->orderBy('debut')
             ->get();
@@ -124,7 +124,7 @@ class SessionconcourControllerApi extends Controller
      */
     public function statistics(string $id)
     {
-        $session = Sessionconcour::findOrFail($id);
+        $session = SessionConcours::findOrFail($id);
 
         $stats = [
             'total_candidats' => $session->candidats()->count(),
@@ -152,7 +152,7 @@ class SessionconcourControllerApi extends Controller
      */
     public function upcoming()
     {
-        $sessions = Sessionconcour::where('debut', '>', Carbon::now())
+        $sessions = SessionConcours::where('debut', '>', Carbon::now())
             ->with(['personnel', 'candidats'])
             ->orderBy('debut')
             ->get();
@@ -165,7 +165,7 @@ class SessionconcourControllerApi extends Controller
      */
     public function past()
     {
-        $sessions = Sessionconcour::where('cloture', '<', Carbon::now())
+        $sessions = SessionConcours::where('cloture', '<', Carbon::now())
             ->with(["personnel", "candidats"])
             ->orderBy('cloture', 'desc')
             ->get();

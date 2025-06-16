@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Sessionconcour extends Model
+class SessionConcours extends Model
 {
     use HasFactory;
-	protected $table = 'sessionconcour';
+	protected $table = 'session_concours';
 
 	protected $casts = [
 		'debut' => 'datetime',

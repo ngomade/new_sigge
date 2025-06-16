@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\EcController;
+use App\Http\Controllers\BasculementController;
 use App\Http\Controllers\BureauController;
+use App\Http\Controllers\concours\AdminConcoursController;
+use App\Http\Controllers\EcController;
 use App\Http\Controllers\EtudiantController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\RolePermissionController;
@@ -63,3 +65,20 @@ Route::post("/find_candidats", [EtudiantController::class ,'find_candidats'])->n
 Route::get("/liste_site_formation", [EtudiantController::class ,'liste_site_formation'])->name("liste_site_formation");
 Route::post("/changement_site_save", [EtudiantController::class ,'changement_site_save'])->name("changement_site_save");
 Route::post("/find_candidats_site", [EtudiantController::class ,'find_candidats_site'])->name("find_candidats_site");
+
+// Routes pour la gestion du basculement
+Route::get('/basculement_index',  [BasculementController::class, 'index'])->name("basculement_index");
+Route::post('/basculement_save',  [BasculementController::class, 'store']);
+Route::post('/search_user/{view}',  [BasculementController::class, 'search_user']);
+
+Route::get("/index_admin_concours", [AdminConcoursController::class ,'index'])->name("index_admin_concours");
+Route::post("/search_candidat", [AdminConcoursController::class ,'search'])->name("search_candidat");
+Route::post("/search_candidat_imp", [AdminConcoursController::class ,'search_imp'])->name("search_candidat_imp");
+Route::get("/liste_candidat", [AdminConcoursController::class ,'create'])->name("liste_candidat");
+Route::get("/ouvrir_fermer", [AdminConcoursController::class ,'show_session'])->name("ouvrir_fermer");
+Route::post("/add_session", [AdminConcoursController::class ,'add_session'])->name("add_session");
+Route::post("/delete_session", [AdminConcoursController::class ,'delete_session'])->name("delete_session");
+Route::post("/update_session", [AdminConcoursController::class ,'update_session'])->name("update_session");
+Route::post("/delete_cand", [AdminConcoursController::class ,'destroy'])->name("delete_cand");
+
+require __DIR__."/requetes.php";

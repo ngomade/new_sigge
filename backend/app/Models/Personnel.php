@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\concours\Sessionconcour;
+use App\Models\concours\SessionConcours;
 use App\Models\concours\Slide;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Personnel extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasFactory, HasApiTokens;
+    use Notifiable, HasFactory, HasApiTokens, HasRoles;
 
 	protected $table = 'personnel';
 	protected $primaryKey = 'code_pers';
@@ -88,7 +88,7 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 
 	public function sessionconcours(): HasMany
 	{
-		return $this->hasMany(Sessionconcour::class, 'code_pers');
+		return $this->hasMany(SessionConcours::class, 'code_pers');
 	}
 
 	public function slides(): HasMany
@@ -96,5 +96,5 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 		return $this->hasMany(Slide::class, 'code_pers');
 	}
 
-	
+
 }

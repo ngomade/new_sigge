@@ -26,18 +26,25 @@
       href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
       rel="stylesheet"
     />
+      <!-- Dans la section head -->
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+
+      <!-- Avant la fermeture du body -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <link rel="stylesheet" href=" {{asset("vendor/fonts/boxicons.css")}}" />
     <link rel="stylesheet" href=" {{asset("vendor/css/core.css")}}" />
     <link rel="stylesheet" href=" {{asset("vendor/css/theme-default.css")}}" />
     <link rel="stylesheet" href=" {{asset("sige_app/backend/css/demo.css")}}" />
     <link href="{{asset('/vendor/simple-datatables/style.css')}}" rel="stylesheet">
     <link rel="stylesheet" href=" {{asset("vendor/libs/perfect-scrollbar/perfect-scrollbar.css")}}" />
-    <link href="{{asset('vendor/remixicon/remixicon.css')}}" rel="stylesheet">
-    <link href="{{asset('share/css/basic_style.css')}}" rel="stylesheet">
-
+    <link href="{{asset('vendor/remixicon/remixicon.css')}}" rel="stylesheet"/>
+    <link href="{{asset('share/css/basic_style.css')}}" rel="stylesheet"/>
     <link rel="stylesheet" href=" {{asset('vendor/libs/apex-charts/apex-charts.css')}}" />
     <script src=" {{asset("vendor/js/helpers.js")}}"></script>
     <script src=" {{asset("sige_app/backend/js/config.js")}}"></script>
+      <link href="{{ asset('vendor/toastr/build/toastr.css') }}" rel="stylesheet"/>
+      <link href="{{ asset('vendor/sweetalert2/dist/sweetalert2.css')  }}" />
+
   </head>
 
   <body>
@@ -90,6 +97,30 @@
     <script src=" {{asset("sige_app/backend/js/dashboards-analytics.js")}}"></script>
     <script src=" {{asset("sige_app/frontend/js/script.js")}}"></script>
     <script src=" {{asset("sige_app/backend/js/main.js")}}"></script>
+    <script src="{{ asset('vendor/toastr/build/toastr.min.js') }}"></script>
+    <script src="{{ asset("vendor/sweetalert2/dist/sweetalert2.all.js") }}"></script>
+    <script>
+        $(document).ready(function() {
+            // Configuration de base de Toastr
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        });
+    </script>
 
     @yield("js")
     <script>

@@ -9,3 +9,109 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+.modal-xxl-hauteur {
+    max-width: 100vw;
+    min-height: 90vh;
+}
+
+/* Styles pour la modal d'affectation du personnel */
+#affecterPersonnelModal .modal-dialog {
+    max-width: 90%;
+    width: 90%;
+    margin: 1.75rem auto;
+}
+
+#affecterPersonnelModal .table-responsive {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+#affecterPersonnelModal .table th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 10;
+}
+
+#affecterPersonnelModal .table td, 
+#affecterPersonnelModal .table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+#affecterPersonnelModal .form-select {
+    min-width: 150px;
+}
+
+#affecterPersonnelModal .personnel-actions {
+    white-space: nowrap;
+}
+
+/* Style pour les lignes sélectionnées */
+#affecterPersonnelModal tr.selected {
+    background-color: #e9ecef;
+}
+
+/* Style pour les rôles */
+.role-badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.role-chef {
+    background-color: #dc3545;
+    color: white;
+}
+
+.role-adjoint {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.role-membre {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Style pour le champ de recherche */
+#searchPersonnel {
+    margin-bottom: 1rem;
+}
+
+/* Style pour les boutons d'action */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+/* Style pour les messages toastr */
+#toast-container > .toast {
+    opacity: 1;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+#toast-container > .toast-success {
+    background-color: #198754;
+}
+
+#toast-container > .toast-error {
+    background-color: #dc3545;
+}
+
+#toast-container > .toast-info {
+    background-color: #0dcaf0;
+}
+
+#toast-container > .toast-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
