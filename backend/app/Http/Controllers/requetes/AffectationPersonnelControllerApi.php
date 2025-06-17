@@ -12,9 +12,13 @@ class AffectationPersonnelControllerApi extends Controller
     // ===== CREATE - Créer une affectation =====
     public function store(Request $request)
     {
+        $personnel = session('pers');
+        if (!$personnel) {
+            return response()->json(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
         $validated = $request->validate([
-            'code_pers' => 'required|exists:personnel,code_pers',
-            'id_role' => 'required|exists:roles,id_role',
+            'id' => 'required|exists:roles,id',
             'code_bureau' => 'required|exists:bureau,code_bureau',
             'date_debut' => 'required|date',
             'date_fin' => 'nullable|date|after:date_debut',
@@ -22,10 +26,10 @@ class AffectationPersonnelControllerApi extends Controller
         ]);
 
         try {
-            $personnel = Personnel::find($validated['code_pers']);
+            $personnelModel = Personnel::find($personnel->code_pers);
             
             // Vérifier si l'affectation existe déjà
-            $existingAffectation = $personnel->roles()
+            $existingAffectation = $personnelModel->roles()
                 ->wherePivot('id', $validated['id'])
                 ->wherePivot('code_bureau', $validated['code_bureau'])
                 ->wherePivot('statut_role', 'actif')
@@ -38,7 +42,7 @@ class AffectationPersonnelControllerApi extends Controller
             }
 
             // Créer l'affectation
-            $personnel->roles()->attach($validated['id'], [
+            $personnelModel->roles()->attach($validated['id'], [
                 'date_debut' => $validated['date_debut'],
                 'date_fin' => $validated['date_fin'],
                 'statut_role' => $validated['statut_role'],
@@ -49,7 +53,7 @@ class AffectationPersonnelControllerApi extends Controller
 
             return response()->json([
                 'message' => 'Affectation créée avec succès',
-                'data' => $this->getAffectationDetails($validated['code_pers'], $validated['id'])
+                'data' => $this->getAffectationDetails($personnel->code_pers, $validated['id'])
             ], 201);
 
         } catch (\Exception $e) {
@@ -66,28 +70,35 @@ class AffectationPersonnelControllerApi extends Controller
     public function index(Request $request)
     {
         $query = Personnel::with([
-            'roles' => function($query) {
-                $query->withPivot('date_debut', 'date_fin', 'statut_role', 'code_bureau', 'created_at', 'updated_at');
-            },
-            'roles.bureau'
+            'pers_roles' => function($query) {
+                $query->with('role', 'bureau');
+            }
         ]);
 
         // Filtres optionnels
         if ($request->has('code_bureau')) {
-            $query->whereHas('roles', function($q) use ($request) {
-                $q->where('pers_role.code_bureau', $request->code_bureau);
+            $query->whereHas('pers_roles', function($q) use ($request) {
+                $q->where('code_bureau', $request->code_bureau);
             });
         }
 
         if ($request->has('statut_role')) {
-            $query->whereHas('roles', function($q) use ($request) {
-                $q->where('pers_role.statut_role', $request->statut_role);
-            });
+            $statutMap = [
+                'actif' => \App\Models\PersRole::STATUT_ACTIF,
+                'inactif' => \App\Models\PersRole::STATUT_INACTIF,
+                'expire' => \App\Models\PersRole::STATUT_EXPIRE,
+            ];
+            $statutValue = $statutMap[strtolower($request->statut_role)] ?? null;
+            if ($statutValue !== null) {
+                $query->whereHas('pers_roles', function($q) use ($statutValue) {
+                    $q->where('statut_role', $statutValue);
+                });
+            }
         }
 
         if ($request->has('id')) {
-            $query->whereHas('roles', function($q) use ($request) {
-                $q->where('pers_role.id', $request->id_role);
+            $query->whereHas('pers_roles', function($q) use ($request) {
+                $q->where('id', $request->id_role);
             });
         }
 
@@ -107,6 +118,14 @@ class AffectationPersonnelControllerApi extends Controller
     // Affectations d'un personnel spécifique
     public function show($code_pers)
     {
+        $personnelSession = session('pers');
+        if (!$personnelSession) {
+            return response()->json(['error' => 'Utilisateur non authentifié'], 401);
+        }
+        if ($personnelSession->code_pers !== $code_pers) {
+            return response()->json(['error' => 'Accès non autorisé'], 403);
+        }
+
         $personnel = Personnel::with([
             'roles' => function($query) {
                 $query->withPivot('date_debut', 'date_fin', 'statut_role', 'code_bureau', 'created_at', 'updated_at')

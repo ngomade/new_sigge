@@ -16,13 +16,13 @@ Route::prefix('requete')->group(function () {
     Route::get('bureaux/search', [BureauControllerApi::class, 'search'])->name('api.bureaux.search');
     Route::get('bureaux/{code_bureau}/sous-bureaux', [BureauControllerApi::class, 'getSousBureaux'])->name('api.bureaux.sous-bureaux');
     Route::get('bureaux/{code_bureau}/bureau-parents', [BureauControllerApi::class, 'getBureauParents'])->name('api.bureaux.bureau-parents');
-    
     // Routes de ressource APRÈS les routes personnalisées
     Route::apiResource('bureaux', BureauControllerApi::class)->parameters([
         'bureaux' => 'code_bureau'
     ]);
+    
+    
 });
-
 
 // Routes personnalisées AVANT les routes de ressource
 Route::get('bureaux/search', [BureauController::class, 'search'])->name('bureaux.search');
@@ -31,24 +31,11 @@ Route::get('bureaux/{code_bureau}/bureau-parents', [BureauController::class, 'bu
 Route::get('bureaux/{code_bureau}/documents', [BureauController::class, 'documents'])->name('bureaux.documents');
 Route::get('bureaux/{code_bureau}/presentations', [BureauController::class, 'presentations'])->name('bureaux.presentations');
 
-// Routes de ressource APRÈS les routes personnalisées
-Route::resource('bureaux', BureauController::class)->parameters([
-    'bureaux' => 'code_bureau'
-]);
-
-
-
-
-
 
 
 // use App\Http\Controllers\requetes\AffectationController;
 
 // Route::resource('affectations', AffectationController::class);
-
-Route::resource('affectation', AffectationPersonnelController::class);
-
-
 
 
 Route::prefix('affectations')->group(function () {
@@ -63,10 +50,20 @@ Route::prefix('affectations')->group(function () {
     
 });
 
-// routes pour requetes
+// routes pour web
 
 
-Route::resource('requetes', RequetteController::class, ['parameters' => ['requetes' => 'code_requete']]);
+ Route::middleware('web')->group(function () {
+    Route::resource('requetes', RequetteController::class, ['parameters' => ['requetes' => 'code_requete']]);
+
+
+ Route::resource('affectation', AffectationPersonnelController::class);
+
+// Routes de ressource APRÈS les routes personnalisées
+Route::resource('bureaux', BureauController::class)->parameters([
+    'bureaux' => 'code_bureau'
+]);
+});
 
 Route::delete('requetes/fichiers/{id_fichier}', [RequetteController::class, 'deleteFichier'])->name('requetes.deleteFichier');
 Route::get('requetes/fichiers/{id_fichier}/download', [RequetteController::class, 'downloadFichier'])->name('requetes.downloadFichier');
@@ -94,4 +91,6 @@ Route::prefix('admin/requetes')->group(function () {
     Route::post('/{code_requete}/assign', [AdminRequeteController::class, 'assign'])->name('admin.requetes.assign');
     Route::post('/{code_requete}/response', [AdminRequeteController::class, 'addResponse'])->name('admin.requetes.addResponse');
 });
+
+
 

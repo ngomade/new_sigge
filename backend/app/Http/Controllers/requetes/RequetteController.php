@@ -20,11 +20,22 @@ class RequetteController extends Controller
     //
      /**
      * Display a listing of the resource.
+     * 
+     * 
      */
+
+    
     public function index(Request $request)
+
     {
+        $user = session('user');
+        if (!$user) {
+            abort(401, 'Utilisateur non authentifié');
+        }
+        $userCode = $user->code_user;
+
         $query = Requete::with(['category', 'user', 'bureau'])
-            ->where('code_user', Auth::user()->code_user);
+            ->where('code_user', $userCode);
 
         // Filtres
         if ($request->filled('status')) {
@@ -45,7 +56,7 @@ class RequetteController extends Controller
 
         $requetes = $query->orderBy('date_sousmis', 'desc')->paginate(10);
         $categories = Category::all();
-        
+        // $personnel = session('user');
         return view('sige_app.backend.requetes.index', compact('requetes', 'categories'));
     }
 
@@ -56,13 +67,17 @@ class RequetteController extends Controller
     {
         $categories = Category::all();
         $bureaux = Bureau::all();
-        
+        // $personnel = session('user');
         return view('sige_app.backend.requetes.create', compact('categories', 'bureaux'));
     }
 
     /**
      * Store a newly created resource in storage.
-     */
+    
+    
+    */
+
+     
     public function store(Request $request)
     {
         $request->validate([
@@ -76,17 +91,17 @@ class RequetteController extends Controller
 
         try {
             // Générer un code unique pour la requête
-            $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
-
+            // $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
+              $user = session('user'); 
             // Créer la requête
             $requete = Requete::create([
-                'code_requete' => $codeRequete,
+                // 'code_requete' => $codeRequete,
                 'titre_requete' => $request->titre_requete,
                 'desc_requete' => $request->desc_requete,
                 'status' => 'en attente',
                 'date_sousmis' => now(),
                 'code_cat' => $request->code_cat,
-                'code_user' => Auth::user()->code_user,
+                'code_user' => $user->code_user,
                 'code_bureau' => $request->code_bureau,
                 'priorite' => $request->priorite ?? 'standard'
             ]);
@@ -108,16 +123,21 @@ class RequetteController extends Controller
             }
 
             // Envoyer email de confirmation à l'étudiant
-            Mail::to(Auth::user()->email_user)->send(new RequeteSubmittedMail($requete));
+             $user = session('user');
+            // if (!$user) {
+            //     abort(401, 'Utilisateur non authentifié');
+            // }
+            Mail::to($user->email_user)->send(new RequeteSubmittedMail($requete));
 
             
 
-            return redirect()->route('requetes.show', $requete->code_requete)
+            return redirect()->route('requetes.index', $requete->code_requete)
                 ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $codeRequete);
 
         } catch (\Exception $e) {
+            // Log::error('Erreur lors de la soumission de la requête: ' . $e->getMessage());
             return back()->withInput()
-                ->with('error', 'Erreur lors de la soumission de la requête. Veuillez réessayer.');
+                ->with('error', 'Erreur lors de la soumission de la requête. Veuillez réessayer. Détails: ' . $e->getMessage());
         }
     }
 
@@ -130,7 +150,7 @@ class RequetteController extends Controller
             ->where('code_requete', $code_requete)
             ->where('code_user', Auth::user()->code_user)
             ->firstOrFail();
-
+        // $personnel = session('user');
         return view('sige_app.backend.requetes.show', compact('requete'));
     }
 
@@ -146,7 +166,7 @@ class RequetteController extends Controller
 
         $categories = Category::all();
         $bureaux = Bureau::all();
-
+        // $personnel = session('user');
         return view('sige_app.backend.requetes.edit', compact('requete', 'categories', 'bureaux'));
     }
 

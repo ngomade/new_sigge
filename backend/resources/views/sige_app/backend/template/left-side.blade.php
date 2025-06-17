@@ -33,14 +33,14 @@
                 </a>
             </li>
         @endif
-        @if ($personnel->hasRole("ADMIN") || $personnel->hasRole("PERSONNEL_APPUI"))
+        @if ($personnel && ($personnel->hasRole("ADMIN") || $personnel->hasRole("PERSONNEL_APPUI")))
         <li class="menu-item">
             <a href="/liste_etudiant/0" class="menu-link">
                 <div data-i18n="Without menu">Production de liste</div>
             </a>
             </li>
         @endif
-        @if ($personnel->hasRole("ADMIN"))
+        @if ($personnel && $personnel->hasRole("ADMIN"))
           <li class="menu-item">
             <a href="/liste_etudiant/0" class="menu-link">
               <div data-i18n="Without navbar">Changement de filière</div>
@@ -176,36 +176,36 @@
           </li>
         </ul>
       </li>
-      @if ($personnel->hasRole("ENSEIGNANT"))
-      <li class="menu-item">
-        <a href="javascript:void(0);" class="menu-link menu-toggle">
-          <i class="menu-icon tf-icons bx bx-dock-top"></i>
-          <div data-i18n="Account Settings">Académie</div>
-        </a>
-        <ul class="menu-sub">
+            @if ($personnel->hasRole("ENSEIGNANT"))
             <li class="menu-item">
-                <a href="/gestion_semestre" class="menu-link">
-                  <div data-i18n="Account">Gestion des semestres</div>
-                </a>
-              </li>
-          {{-- <li class="menu-item">
-            <a href="/gestion_grille" class="menu-link">
-              <div data-i18n="Account">Gestion des grilles UE</div>
-            </a>
-          </li> --}}
-          <li class="menu-item">
-            <a href="/gestion_ue" class="menu-link">
-              <div data-i18n="Notifications">Gestion des UEs</div>
-            </a>
-          </li>
-          <li class="menu-item">
-            <a href="/gestion_ec" class="menu-link">
-              <div data-i18n="Connections">Gestion des ECs</div>
-            </a>
-          </li>
-        </ul>
-      </li>
-      @endif
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-dock-top"></i>
+                <div data-i18n="Account Settings">Académie</div>
+              </a>
+              <ul class="menu-sub">
+                  <li class="menu-item">
+                      <a href="/gestion_semestre" class="menu-link">
+                        <div data-i18n="Account">Gestion des semestres</div>
+                      </a>
+                    </li>
+                {{-- <li class="menu-item">
+                  <a href="/gestion_grille" class="menu-link">
+                    <div data-i18n="Account">Gestion des grilles UE</div>
+                  </a>
+                </li> --}}
+                <li class="menu-item">
+                  <a href="/gestion_ue" class="menu-link">
+                    <div data-i18n="Notifications">Gestion des UEs</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/gestion_ec" class="menu-link">
+                    <div data-i18n="Connections">Gestion des ECs</div>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            @endif
 
       @if ($personnel->hasRole("CHEF_SERV") || $personnel->hasRole("ADMIN"))
       <!-- Components -->

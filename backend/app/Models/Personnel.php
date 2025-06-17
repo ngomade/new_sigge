@@ -15,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Personnel extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasFactory, HasApiTokens,HasRoles;
+use Notifiable, HasFactory, HasApiTokens,HasRoles;
 
 	protected $table = 'personnel';
 	protected $primaryKey = 'code_pers';
@@ -95,6 +95,11 @@ class Personnel extends Authenticatable implements MustVerifyEmail
 	public function slides(): HasMany
 	{
 		return $this->hasMany(Slide::class, 'code_pers');
+	}
+
+	public function pers_roles()
+	{
+		return $this->hasMany(PersRole::class, 'code_pers', 'code_pers');
 	}
 
 

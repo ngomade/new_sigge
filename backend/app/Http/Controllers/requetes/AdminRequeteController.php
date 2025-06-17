@@ -30,8 +30,10 @@ class AdminRequeteController extends Controller
         $query = Requete::with(['category', 'user', 'bureau']);
 
         // Filtres pour les agents (selon leur bureau)
-        if (Auth::Personnel()->hasRole('agent')) {
-            $query->where('code_bureau', Auth::user()->code_bureau);
+        $personnel = session('pers');
+        $user = session('user');
+        if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
+            $query->where('code_bureau', $personnel->code_bureau);
         }
 
         // Filtres
@@ -79,8 +81,9 @@ class AdminRequeteController extends Controller
         $query = Requete::with(['category', 'user', 'bureau', 'fichiers', 'reponses']);
 
         // Restriction pour les agents
-        if (Auth::Personnel()->hasRole('agent')) {
-            $query->where('code_bureau', Auth::user()->code_bureau);
+        $personnel = session('pers');
+        if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
+            $query->where('code_bureau', $personnel->code_bureau);
         }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
@@ -102,8 +105,9 @@ class AdminRequeteController extends Controller
         $query = Requete::query();
         
         // Restriction pour les agents
-        if (Auth::Personnel()->hasRole('agent')) {
-            $query->where('code_bureau', Auth::user()->code_bureau);
+        $personnel = session('pers');
+        if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
+            $query->where('code_bureau', $personnel->code_bureau);
         }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
@@ -138,14 +142,18 @@ class AdminRequeteController extends Controller
                 $updateData['date_asignation'] = null;
                 
                 // Notification de transfert
-                Mail::to($requete->user->email_user)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
+                $user = session('user');
+                // if (!$user) {
+                    // abort(401, 'Utilisateur non authentifié');
+                // }
+                Mail::to($user->email_user)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
             }
 
             $requete->update($updateData);
 
             // Notification de changement de statut
             if ($oldStatus !== $newStatus) {
-                Mail::to($requete->user->email_user)->send(new RequeteStatusChangeMail($requete, $oldStatus, $newStatus));
+                Mail::to($user->email_user)->send(new RequeteStatusChangeMail($requete, $oldStatus, $newStatus));
             }
 
             return back()->with('success', 'Statut de la requête mis à jour avec succès.');
@@ -178,7 +186,8 @@ class AdminRequeteController extends Controller
             ]);
 
             // Notification d'assignation
-            Mail::to($requete->user->email_user)->send(new RequeteAssignedMail($requete, $request->code_bureau));
+            $user = session('user');
+            Mail::to($user->email_user)->send(new RequeteAssignedMail($requete, $request->code_bureau));
 
             return back()->with('success', 'Requête assignée avec succès.');
 
@@ -218,7 +227,8 @@ class AdminRequeteController extends Controller
             }
 
             // Notification de réponse
-            Mail::to($requete->user->email_user)->send(new RequeteResponseMail($requete, $reponse));
+            $user = session('user');
+            Mail::to($user->email_user)->send(new RequeteResponseMail($requete, $reponse));
 
             return back()->with('success', 'Réponse ajoutée avec succès.');
 

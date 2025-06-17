@@ -1,4 +1,4 @@
-@extends("sige_app.backend.template.backend")
+@extends("sige_app.frontend.template.frontend")
 @section("js")
     
 @endsection
