@@ -26,7 +26,7 @@ class AffectationPersonnelControllerApi extends Controller
             
             // Vérifier si l'affectation existe déjà
             $existingAffectation = $personnel->roles()
-                ->wherePivot('id_role', $validated['id_role'])
+                ->wherePivot('id', $validated['id'])
                 ->wherePivot('code_bureau', $validated['code_bureau'])
                 ->wherePivot('statut_role', 'actif')
                 ->first();
@@ -38,7 +38,7 @@ class AffectationPersonnelControllerApi extends Controller
             }
 
             // Créer l'affectation
-            $personnel->roles()->attach($validated['id_role'], [
+            $personnel->roles()->attach($validated['id'], [
                 'date_debut' => $validated['date_debut'],
                 'date_fin' => $validated['date_fin'],
                 'statut_role' => $validated['statut_role'],
@@ -49,7 +49,7 @@ class AffectationPersonnelControllerApi extends Controller
 
             return response()->json([
                 'message' => 'Affectation créée avec succès',
-                'data' => $this->getAffectationDetails($validated['code_pers'], $validated['id_role'])
+                'data' => $this->getAffectationDetails($validated['code_pers'], $validated['id'])
             ], 201);
 
         } catch (\Exception $e) {
@@ -85,9 +85,9 @@ class AffectationPersonnelControllerApi extends Controller
             });
         }
 
-        if ($request->has('id_role')) {
+        if ($request->has('id')) {
             $query->whereHas('roles', function($q) use ($request) {
-                $q->where('pers_role.id_role', $request->id_role);
+                $q->where('pers_role.id', $request->id_role);
             });
         }
 
@@ -146,7 +146,7 @@ class AffectationPersonnelControllerApi extends Controller
 
             // Vérifier que l'affectation existe
             $affectationExists = $personnel->roles()
-                ->wherePivot('id_role', $id_role)
+                ->wherePivot('id', $id_role)
                 ->exists();
 
             if (!$affectationExists) {
@@ -212,7 +212,7 @@ class AffectationPersonnelControllerApi extends Controller
     {
         return Personnel::with([
             'roles' => function($query) use ($id_role) {
-                $query->where('roles.id_role', $id_role)
+                $query->where('roles.id', $id_role)
                       ->withPivot('date_debut', 'date_fin', 'statut_role', 'code_bureau', 'created_at', 'updated_at');
             },
             'roles.bureau'

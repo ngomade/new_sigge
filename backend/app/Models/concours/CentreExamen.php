@@ -7,7 +7,7 @@ use App\Models\Ecole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class CentreExaman extends Model
+class CentreExamen extends Model
 {
 	protected $table = 'centre_examen';
 	protected $primaryKey = 'centre_exam_code';

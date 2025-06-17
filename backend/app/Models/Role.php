@@ -17,12 +17,12 @@ class Role extends Model
 
 	public function permissions()
 	{
-		return $this->belongsToMany(Permission::class, 'role_has_permission', 'id_role', 'id_perm')
+		return $this->belongsToMany(Permission::class, 'role_has_permission', 'id', 'id_perm')
 					->withTimestamps();
 	}
 
 	public function role_has_permissions()
 	{
-		return $this->hasMany(RoleHasPermission::class, 'id_role');
+		return $this->hasMany(RoleHasPermission::class, 'id');
 	}
 }

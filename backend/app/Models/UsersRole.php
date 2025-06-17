@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
 class UsersRole extends Model
 {
 	protected $table = 'users_role';
-	protected $primaryKey = ['code_user','id_role'];
+	protected $primaryKey = ['code_user','id'];
 	public $incrementing = false;
 
 	protected $casts = [
@@ -48,6 +48,6 @@ class UsersRole extends Model
 	}
 	public function role()
 	{
-		return $this->belongsTo(Role::class, 'id_role');
+		return $this->belongsTo(Role::class, 'id');
 	}
 }

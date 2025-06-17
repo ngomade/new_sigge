@@ -28,6 +28,6 @@ class Document extends Model
 
 	public function session_examan()
 	{
-		return $this->belongsTo(SessionExaman::class, 'code_session');
+		return $this->belongsTo(SessionExamen::class, 'code_session');
 	}
 }
