@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\concours;
 
-use Tests\TestCase;
+use App\Models\concours\{App\Models\Ecole, App\Models\SiteEtude, Candidat, Filiere, Personnel, SessionConcours};
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Candidat, Personnel, Filiere, SiteEtude, SessionConcours, Ecole};
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class CandidatControllerTest extends TestCase
 {
@@ -24,9 +24,9 @@ class CandidatControllerTest extends TestCase
     private function createRequiredData(): void
     {
         $this->filiere = Filiere::factory()->create();
-        $this->site = SiteEtude::factory()->create();
+        $this->site = \App\Models\SiteEtude::factory()->create();
         $this->session = SessionConcours::factory()->create();
-        $this->ecole = Ecole::factory()->create();
+        $this->ecole = \App\Models\Ecole::factory()->create();
     }
 
     /** @test */

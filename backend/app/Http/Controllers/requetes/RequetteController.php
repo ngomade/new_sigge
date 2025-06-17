@@ -23,8 +23,9 @@ class RequetteController extends Controller
      */
     public function index(Request $request)
     {
+        $id = $request->session()->get('user')->code_user;
         $query = Requete::with(['category', 'user', 'bureau'])
-            ->where('code_user', Auth::user()->code_user);
+            ->where('code_user', $id);
 
         // Filtres
         if ($request->filled('status')) {
@@ -45,7 +46,7 @@ class RequetteController extends Controller
 
         $requetes = $query->orderBy('date_sousmis', 'desc')->paginate(10);
         $categories = Category::all();
-        
+
         return view('sige_app.backend.requetes.index', compact('requetes', 'categories'));
     }
 
@@ -56,7 +57,7 @@ class RequetteController extends Controller
     {
         $categories = Category::all();
         $bureaux = Bureau::all();
-        
+
         return view('sige_app.backend.requetes.create', compact('categories', 'bureaux'));
     }
 
@@ -110,7 +111,7 @@ class RequetteController extends Controller
             // Envoyer email de confirmation à l'étudiant
             Mail::to(Auth::user()->email_user)->send(new RequeteSubmittedMail($requete));
 
-            
+
 
             return redirect()->route('requetes.show', $requete->code_requete)
                 ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $codeRequete);
@@ -274,6 +275,6 @@ class RequetteController extends Controller
     /**
      * Tableau de bord des statistiques
      */
-    
+
 
 }

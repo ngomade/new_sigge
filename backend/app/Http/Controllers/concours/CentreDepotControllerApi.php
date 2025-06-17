@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\concours\CentreDepot;
-
+use App\Models\CentreDepot;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\concours;
 
-use Tests\TestCase;
+use App\Models\concours\{App\Models\CentreDepot, Personnel};
+use App\Models\Ecole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Personnel, CentreDepot};
-use Laravel\Sanctum\Sanctum;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Models\concours\Ecole;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class EcoleManagementTest extends TestCase
 {
@@ -26,7 +26,7 @@ class EcoleManagementTest extends TestCase
     /** @test */
     public function can_create_ecole_with_logo()
     {
-        $centreDepot = CentreDepot::factory()->create();
+        $centreDepot = \App\Models\CentreDepot::factory()->create();
         $personnel = Personnel::factory()->create();
         Sanctum::actingAs($personnel);
 

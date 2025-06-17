@@ -6,29 +6,10 @@
 
 namespace App\Models\notes;
 
-use App\Models\User;
+use App\Models\concours\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Evaluation
- *
- * @property string $code_ec
- * @property string $code_examen
- * @property string $code_user
- * @property Carbon $date_evaluation
- * @property string|null $code_ano
- * @property float $note_eval
- * @property Carbon $date_evalu
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Ec $ec
- * @property Examen $examen
- * @property User $user
- *
- * @package App\Models\notes
- */
 class Evaluation extends Model
 {
 	protected $table = 'evaluation';
@@ -41,6 +22,9 @@ class Evaluation extends Model
 	];
 
 	protected $fillable = [
+        'code_ec',
+        'code_examen',
+        'code_user',
 		'date_evaluation',
 		'code_ano',
 		'note_eval',

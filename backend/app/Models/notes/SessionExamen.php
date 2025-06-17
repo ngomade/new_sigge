@@ -1,9 +1,9 @@
 <?php
 
 
-namespace App\Models;
+namespace App\Models\notes;
 
-use App\Models\notes\Examen;
+use App\Models\Anneescolaire;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,6 +21,7 @@ class SessionExamen extends Model
 	];
 
 	protected $fillable = [
+        'code_session',
 		'code_annee',
 		'label_session',
 		'date_debut_session',

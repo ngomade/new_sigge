@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\concours\Compte;
+use App\Models\concours\User;
 use App\Notifications\concours\SendinfoOfConnection;
 use App\Services\AuthService;
 use App\Services\ReceiptOCRService;
@@ -11,7 +12,6 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
-use App\Models\concours\Compte;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;

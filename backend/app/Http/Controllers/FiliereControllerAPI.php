@@ -28,9 +28,9 @@ class FiliereControllerAPI extends Controller
     public function store(Request $request)
     {
         $validator = $request->validate([
-            'filiere_code' => 'required|string|unique:filiere,filiere_code',
-            'filiere_label' => 'required|string',
-            'filiere_description' => 'nullable|string',
+            'code_filiere' => 'required|string|unique:filiere,code_filiere',
+            'label_filiere' => 'required|string',
+            'filiere_desc' => 'nullable|string',
             'diplomes' => "sometimes|array",
             "diplomes.*" => "required_with:diplomes|integer|exists:diplome,code_dip",
         ]);
@@ -76,9 +76,9 @@ class FiliereControllerAPI extends Controller
     {
 
         $validator = $request->validate([
-            'filiere_code' => 'string|unique:filiere,filiere_code,' . $id . ',filiere_code',
-            'filiere_label' => 'string',
-            'filiere_description' => 'nullable|string',
+            'code_filiere' => 'string|unique:filiere,code_filiere,' . $id . ',code_filiere',
+            'label_filiere' => 'string',
+            'desc_filiere' => 'nullable|string',
             "diplomes" => "sometimes|array",
             "diplomes.*" => "required_with:diplomes|integer|exists:diplome,code_dip",
         ]);

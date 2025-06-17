@@ -2,7 +2,7 @@
 
 namespace Database\Factories\concours;
 
-use App\Models\concours\SiteEtude;
+use App\Models\SiteEtude;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SiteEtudeFactory extends Factory

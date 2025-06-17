@@ -17,7 +17,7 @@ return new class extends Migration
             $table->char('code_user', 32);
              $table->unsignedBigInteger('code_dip');
               $table->foreign('code_dip')->references('code_dip')->on('diplome')->onDelete('cascade');
-              $table->foreign('code_user')->references('code_user')->on('user')->onDelete('cascade');
+              $table->foreign('code_user')->references('code_user')->on('users')->onDelete('cascade');
             $table->date('annee_dip');
             $table->string('institution_dip', 128);
             $table->string('mention_dip', 128);

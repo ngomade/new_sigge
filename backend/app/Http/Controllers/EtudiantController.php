@@ -3,24 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\concours\Candidat;
-use PDF;
-use Image;
-use App\Models\User;
-use App\Models\Quitus;
+use App\Models\concours\User;
 use App\Models\InfoExtra;
-use App\Models\Inscription;
+use App\Models\notes\FiliereNiveau;
+use App\Models\notes\Inscription;
+use App\Models\Quitus;
 use App\Models\UsersDiplome;
 use Illuminate\Http\Request;
-use App\Models\FiliereNiveau;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\File;
+use Image;
+use PDF;
 use Throwable;
 use function App\Helper\get_filiere;
 use function App\Helper\update_matricule_pers;
-
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class EtudiantController extends Controller
 {

@@ -24,8 +24,8 @@ class UpdateCandidatRequest extends FormRequest
     {
         $ca_code = $this->route('ca_code');
         return [
-            'id' => ['sometimes', 'integer', 'exists:sessionconcour,id'],
-            'filiere_code' => ['sometimes', 'string', 'exists:filiere,filiere_code'],
+            'id' => ['sometimes', 'integer', 'exists:session_concours,id'],
+            'filiere_code' => ['sometimes', 'string', 'exists:filiere,code_filiere'],
             'code_site' => ['sometimes', 'integer', 'exists:site_etude,code_site'],
             'ca_nom' => ['sometimes', 'string', 'max:255'],
             'ca_prenom' => ['sometimes', 'string', 'max:255'],

@@ -16,15 +16,6 @@ return new class extends Migration
             $table->string('label_cat',100);
             $table->string('desc_cat',100);
             $table->timestamps();
-           
-           
-           
-           
-           
-           
-           
-
-           
         });
     }
 

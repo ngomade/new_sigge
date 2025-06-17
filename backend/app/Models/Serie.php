@@ -1,14 +1,11 @@
 <?php
 
 
-namespace App\Models\concours;
+namespace App\Models;
 
-use App\Models\Diplome;
-use App\Models\Filiere;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Serie

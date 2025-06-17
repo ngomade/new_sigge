@@ -1,9 +1,10 @@
 <?php
 
 
-namespace App\Models;
+namespace App\Models\notes;
 
-use App\Models\notes\Ue;
+use App\Models\Anneescolaire;
+use App\Models\concours\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Inscription extends Model
@@ -19,6 +20,7 @@ class Inscription extends Model
 	];
 
 	protected $fillable = [
+        'code_ins',
 		'code_user',
 		'code_annee',
 		'date_ins',

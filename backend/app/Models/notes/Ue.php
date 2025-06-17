@@ -4,27 +4,8 @@
 
 namespace App\Models\notes;
 
-use App\Models\Inscription;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Ue
- *
- * @property string $code_ue
- * @property string $code_sem
- * @property string $intitule_ue
- * @property string|null $desc_ue
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Semestre $semestre
- * @property Collection|Ec[] $ecs
- * @property Collection|Inscription[] $inscriptions
- *
- * @package App\Models\notes
- */
 class Ue extends Model
 {
 	protected $table = 'ue';
@@ -32,6 +13,7 @@ class Ue extends Model
 	public $incrementing = false;
 
 	protected $fillable = [
+        'code_ue',
 		'code_sem',
 		'intitule_ue',
 		'desc_ue'

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->char('code_user', 32)->primary();
             $table->unsignedInteger('code_info_extra');
             $table->foreign('code_info_extra')->references('code_info_extra')->on('info_extra')->onDelete('cascade');
@@ -49,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('users');
     }
 };

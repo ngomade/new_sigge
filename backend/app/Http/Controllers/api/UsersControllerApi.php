@@ -1,21 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\Users;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class UserControllerApi extends Controller
+class UsersControllerApi extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = Users::all();
         return response()->json($users);
     }
 
@@ -25,7 +24,7 @@ class UserControllerApi extends Controller
 
         try {
             DB::beginTransaction();
-            $user = User::create($validatedData);
+            $user = Users::create($validatedData);
             DB::commit();
             return response()->json($user);
         } catch (Throwable $th) {
@@ -37,7 +36,7 @@ class UserControllerApi extends Controller
 
     public function show(string $code_user)
     {
-        $user = User::findOrFail($code_user);
+        $user = Users::findOrFail($code_user);
         return response()->json($user);
     }
 
@@ -45,7 +44,7 @@ class UserControllerApi extends Controller
     {
         $validatedData = $request->validated();
 
-        $user = User::findOrFail($code_user);
+        $user = Users::findOrFail($code_user);
 
         try {
             DB::beginTransaction();
@@ -61,7 +60,7 @@ class UserControllerApi extends Controller
 
     public function destroy(string $code_user)
     {
-        $user = User::findOrFail($code_user);
+        $user = Users::findOrFail($code_user);
 
         try {
             DB::beginTransaction();

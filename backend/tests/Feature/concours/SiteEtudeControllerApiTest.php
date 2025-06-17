@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\concours;
 
-use App\Models\concours\SiteEtude;
-use App\Models\User;
+use App\Models\concours\User;
+use App\Models\SiteEtude;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

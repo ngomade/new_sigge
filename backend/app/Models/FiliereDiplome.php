@@ -1,12 +1,9 @@
 <?php
 
 
-namespace App\Models\concours;
+namespace App\Models;
 
 
-use App\Models\Diplome;
-use App\Models\Filiere;
-use App\Models\concours\Serie;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;

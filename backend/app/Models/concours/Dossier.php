@@ -3,7 +3,7 @@
 
 namespace App\Models\concours;
 
-use App\Models\concours\Ecole;
+use App\Models\Ecole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 

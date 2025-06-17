@@ -1,12 +1,11 @@
 <?php
 
 
-namespace App\Models\notes;
+namespace App\Models;
 
-use App\Models\User;
+use App\Models\concours\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Role;
 
 /**
  * Class UsersRole

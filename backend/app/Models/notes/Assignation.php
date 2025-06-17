@@ -3,23 +3,9 @@
 
 namespace App\Models\notes;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use app\Models\Personnel;
 
-/**
- * Class Assignation
- *
- * @property int $code_ass
- * @property string $code_ec
- * @property string $code_class
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Ec $ec
- *
- * @package App\Models\notes
- */
 class Assignation extends Model
 {
 	protected $table = 'assignations';

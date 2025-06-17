@@ -4,14 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\concours\Candidat;
 use App\Models\concours\Compte;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Diplome;
-use App\Models\Filiere;
-use App\Models\Personnel;
-use App\Models\concours\SiteEtude;
-use App\Models\concours\SessionConcours;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {

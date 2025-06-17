@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ecole;
 use Illuminate\Http\Request;
-use App\Models\concours\Ecole;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;

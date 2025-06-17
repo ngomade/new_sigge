@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\notes\AnneescolaireControllerApi;
 use App\Http\Controllers\notes\AssignationControllerApi;
-use App\Http\Controllers\notes\BureauControllerApi;
 use App\Http\Controllers\notes\ClasseControllerApi;
 use App\Http\Controllers\notes\DocumentsControllerApi;
 use App\Http\Controllers\notes\EcControllerApi;
@@ -21,12 +19,12 @@ use App\Http\Controllers\notes\PresentationControllerApi;
 use App\Http\Controllers\notes\RessourceControllerApi;
 use App\Http\Controllers\notes\SalleControllerApi;
 use App\Http\Controllers\notes\SemestreControllerApi;
+use App\Http\Controllers\notes\SemestreNiveauControllerApi;
 use App\Http\Controllers\notes\SessionExamenControllerApi;
 use App\Http\Controllers\notes\UeControllerApi;
 use App\Http\Controllers\notes\UsersDiplomeControllerApi;
 use App\Http\Controllers\notes\UsersRoleControllerApi;
-use App\Http\Controllers\notes\SemestreNiveauControllerApi;
-use App\Http\Controllers\UserControllerApi;
+use Illuminate\Support\Facades\Route;
 
 Route::apiResource('anneescolaire', AnneescolaireControllerApi::class);
 Route::apiResource('assignation', AssignationControllerApi::class);
@@ -53,4 +51,4 @@ Route::apiResource('ue', UeControllerApi::class);
 Route::apiResource('usersdiplome', UsersDiplomeControllerApi::class);
 Route::apiResource('usersrole', UsersRoleControllerApi::class);
 Route::apiResource('semestreniveau', SemestreNiveauControllerApi::class);
-// Route::apiResource('user', UserControllerApi::class);
+// Route::apiResource('user', UsersControllerApi::class);

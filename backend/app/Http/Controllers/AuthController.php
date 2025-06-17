@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FiliereNiveau;
-use App\Models\Inscription;
+use App\Models\notes\FiliereNiveau;
+use App\Models\notes\Inscription;
 use App\Models\Personnel;
-use App\Models\User;
+use App\Models\Users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -14,6 +15,7 @@ class AuthController extends Controller
 
     public function index()
     {
+        Auth::logout();
         Session::flush();
         $success = "Vous êtes désormais déconnecté";
         Session::flash('success', $success);
@@ -24,9 +26,10 @@ class AuthController extends Controller
 
     public function store(Request $request)
     {
-        $user = User::where("login_user",$request->login_user)
+        $user = Users::where("login_user",$request->login_user)
             ->where("pwd_user", md5($request->pwd_user))->first();
         if($user != null){
+            Auth::login($user);
             $new_password = $request->login_user == $request->pwd_user;
             $success = "Vous êtes désormais connecté.";
             $request->session()->flash('success', $success);
@@ -46,6 +49,7 @@ class AuthController extends Controller
             $personnel = Personnel::where("login_pers",$request->login_user)
                 ->where("pwd_pers", md5($request->pwd_user))->first();
             if($personnel != null){
+                Auth::guard("personnel")->login($personnel);
                 $success = "Vous êtes désormais connecté.";
                 $request->session()->flash('success', $success);
                 $request->session()->put('pers', $personnel);

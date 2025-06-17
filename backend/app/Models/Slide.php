@@ -11,8 +11,6 @@ class Slide extends Model
 {
     use HasFactory;
 	protected $table = 'slide';
-	public $timestamps = false;
-    public $incrementing = true;
 
 	protected $fillable = [
         'code_pers',
@@ -21,7 +19,7 @@ class Slide extends Model
 		'photo'
 	];
 
-	public function user(): BelongsTo
+	public function personnel(): BelongsTo
     {
 		return $this->belongsTo(Personnel::class, 'code_pers');
 	}

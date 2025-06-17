@@ -6,24 +6,6 @@ namespace App\Models\notes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Periode
- *
- * @property string $code_salle
- * @property string $code_ec
- * @property int|null $code_periode
- * @property Carbon $debut_periode
- * @property int $jour_periode
- * @property Carbon $fin_periode
- * @property int $duree_periode
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Ec $ec
- * @property Salle $salle
- *
- * @package App\Models\notes
- */
 class Periode extends Model
 {
 	protected $table = 'periode';
@@ -39,6 +21,8 @@ class Periode extends Model
 
 	protected $fillable = [
 		'code_periode',
+        'code_salle',
+        'code_ec',
 		'debut_periode',
 		'jour_periode',
 		'fin_periode',

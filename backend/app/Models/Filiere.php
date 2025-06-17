@@ -4,8 +4,6 @@
 namespace App\Models;
 
 use App\Models\concours\Candidat;
-use App\Models\concours\FiliereDiplome;
-use App\Models\concours\Serie;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,18 +14,19 @@ class Filiere extends Model
     use HasFactory;
 
     protected $table = 'filiere';
-    protected $primaryKey = 'filiere_code';
+    protected $primaryKey = 'code_filiere';
     public $incrementing = false;
 
     protected $fillable = [
-        'filiere_code',
-        'filiere_label',
-        'filiere_description'
+        'code_filiere',
+        'code_bureau',
+        'label_filiere',
+        'desc_filiere'
     ];
 
     public function candidats(): HasMany
     {
-        return $this->hasMany(Candidat::class, 'filiere_code');
+        return $this->hasMany(Candidat::class, 'filiere_code', 'code_filiere');
     }
 
     public function diplomes()

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\concours\FiliereDiplome;
+use App\Models\FiliereDiplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 

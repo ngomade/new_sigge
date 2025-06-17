@@ -3,7 +3,7 @@
 // SerieFactory.php
 namespace Database\Factories\concours;
 
-use App\Models\concours\Serie;
+use App\Models\Serie;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SerieFactory extends Factory

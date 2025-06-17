@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('requetes', function (Blueprint $table) {
-           
-           
+
+
              $table->string('code_requete',32)->primary();
             $table->string('titre_requete',180);
             $table->string('desc_requete',180);
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('code_cat');
             $table->foreign('code_cat')->references('code_cat')->on('categories')->onDelete('cascade');
             $table->string('code_user');
-            $table->foreign('code_user')->references('code_user')->on('user')->onDelete('cascade');
+            $table->foreign('code_user')->references('code_user')->on('users')->onDelete('cascade');
             $table->string('code_bureau');
             $table->foreign('code_bureau')->references('code_bureau')->on('bureau')->onDelete('cascade');
             $table->timestamps();

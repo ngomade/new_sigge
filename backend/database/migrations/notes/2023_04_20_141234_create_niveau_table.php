@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('niveau', function (Blueprint $table) {
             $table->char('code_niveau', 32)->primary();
             $table->string('label_niveau', 128)->nullable();
-            $table->string('code_class');
+            $table->string('code_class')->nullable();
             $table->foreign('code_class')->references('code_class')->on('classes')->onDelete('cascade');
             $table->timestamps();
         });

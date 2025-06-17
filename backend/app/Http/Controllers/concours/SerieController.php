@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\concours\Serie;
-use App\Models\Diplome;
-use App\Models\Filiere;
+use App\Models\Serie;
 use Illuminate\Http\Request;
 
 class SerieController extends Controller

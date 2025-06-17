@@ -3,8 +3,6 @@
 
 namespace App\Models;
 
-use App\Models\concours\FiliereDiplome;
-use App\Models\concours\Serie;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,12 +13,13 @@ class Diplome extends Model
 	protected $primaryKey = 'code_dip';
 
 	protected $fillable = [
-		'label_dip'
+		'label_dip',
+        'specialite_dip',
 	];
 
 	public function filieres()
 	{
-		return $this->belongsToMany(Filiere::class, 'filiere_diplome', 'code_dip', 'filiere_code')
+		return $this->belongsToMany(Filiere::class, 'filiere_diplome', 'code_dip', 'code_filiere')
             ->using(FiliereDiplome::class)
             ->withPivot('code_serie')
             ->withTimestamps();
@@ -30,7 +29,7 @@ class Diplome extends Model
     {
         return $this->belongsToMany(Serie::class, 'filiere_diplome', 'code_dip', 'code_serie')
             ->using(FiliereDiplome::class)
-            ->withPivot('filiere_code')
+            ->withPivot('code_filiere')
             ->withTimestamps();
     }
 }

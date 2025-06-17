@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\concours;
 
-use Tests\TestCase;
+use App\Models\concours\{App\Models\Ecole, App\Models\SiteEtude, Candidat, Compte, Filiere, Personnel, SessionConcours};
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Compte, Candidat, Personnel, Filiere, SiteEtude, SessionConcours, Ecole};
-use Laravel\Sanctum\Sanctum;
 use Illuminate\Http\UploadedFile;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class IntegrationTest extends TestCase
 {
@@ -17,12 +17,12 @@ class IntegrationTest extends TestCase
     {
         // 1. Create required data
         $filiere = Filiere::factory()->create();
-        $site = SiteEtude::factory()->create();
+        $site = \App\Models\SiteEtude::factory()->create();
         $session = SessionConcours::factory()->create([
             'debut' => now()->subDays(5),
             'cloture' => now()->addDays(30)
         ]);
-        $ecole = Ecole::factory()->create();
+        $ecole = \App\Models\Ecole::factory()->create();
 
         // 2. Create compte
         $response = $this->postJson('/api/concours/comptes', [

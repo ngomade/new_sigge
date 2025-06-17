@@ -3,26 +3,23 @@
 
 namespace App\Models\notes;
 
-use App\Models\User;
+use App\Models\concours\User;
 use Illuminate\Database\Eloquent\Model;
+use Thiagoprz\CompositeKey\HasCompositeKey;
 
-/**
- * Class EtudiantEc
- *
- * @property string $code_user
- * @property string $code_ec
- *
- * @property Ec $ec
- * @property User $user
- *
- * @package App\Models\notes
- */
+
 class EtudiantEc extends Model
 {
+    use HasCompositeKey;
 	protected $table = 'etudiant_ec';
 	public $incrementing = false;
 	public $timestamps = false;
+    protected $primaryKey = ['code_ec', 'code_user'];
 
+    protected $fillable = [
+        "code_user",
+        'code_ec'
+    ];
 	public function ec()
 	{
 		return $this->belongsTo(Ec::class, 'code_ec');

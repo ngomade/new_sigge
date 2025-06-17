@@ -29,12 +29,12 @@ return new class extends Migration
             // Clés étrangères
             $table->foreign('code_bureau')
                 ->references('code_bureau')
-                ->on('bureaux')
+                ->on('bureau')
                 ->onDelete('cascade');
 
             $table->foreign('code_pers')
                 ->references('code_pers')
-                ->on('personnels')
+                ->on('personnel')
                 ->onDelete('cascade');
 
             $table->foreign('code_role')

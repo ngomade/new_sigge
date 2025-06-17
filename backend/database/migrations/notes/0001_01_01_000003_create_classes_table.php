@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('code_class', 32)->primary();
             $table->string('label_class', 100);
             $table->char('code_user',32);
-             $table->foreign('code_user')->references('code_user')->on('user')->onDelete('cascade');
+             $table->foreign('code_user')->references('code_user')->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });
