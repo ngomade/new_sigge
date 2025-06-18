@@ -11,6 +11,7 @@ use App\Models\Users;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 
 class Requete extends Model
@@ -38,6 +39,18 @@ class Requete extends Model
 		'code_bureau'
 	];
 
+	 protected static function boot(): void
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            do {
+                $id = Str::upper(Str::substr($model->code_user, 0, 2));
+                $id .= rand(1000, 10000);
+			} while (Requete::where('code_requete', $id)->exists());
+            $model->code_requete = $id;
+        });
+    }
+
 	public function bureau()
 	{
 		return $this->belongsTo(Bureau::class, 'code_bureau');
@@ -53,7 +66,7 @@ class Requete extends Model
 		return $this->belongsTo(Users::class, 'code_user');
 	}
 
-	public function fichier_requtes()
+	public function fichiers()
 	{
 		return $this->hasMany(FichierRequete::class, 'code_requete');
 	}

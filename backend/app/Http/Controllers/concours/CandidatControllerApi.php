@@ -7,7 +7,7 @@ use App\Http\Requests\concours\CandidatRequest;
 use App\Http\Requests\concours\UpdateCandidatRequest;
 use App\Models\CentreDepot;
 use App\Models\concours\Candidat;
-use App\Models\concours\CentreExaman;
+use App\Models\concours\CentreExamen;
 use App\Models\concours\Compte;
 use App\Models\Diplome;
 use App\Models\Serie;
@@ -312,7 +312,7 @@ class CandidatControllerApi extends Controller
 //                'repartition_par_centre_examen' => $candidatsParCentreExamen,
 //                'repartition_par_centre_depot' => $candidatsParCentreDepot,
 //                'age_moyen' => $ageMoyen?->age_moyen,
-                'centre_examen' => CentreExaman::all(),
+                'centre_examen' => CentreExamen::all(),
                 'centre_depot' => CentreDepot::all(),
                 'candidats' => $candidats,
                 'diplomes' => Diplome::all(),

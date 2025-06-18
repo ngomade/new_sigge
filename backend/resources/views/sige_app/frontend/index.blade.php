@@ -432,7 +432,7 @@ La troisième phase de recrutement de 150 enseignants est lancée pour l'exercic
                     <p>Découvrez la vie de l'école à travers nos articles d'actualités </p>
                 </div>
                 <div class="row">
-                    @foreach (\App\Models\Actualite::orderBy("created_at", "desc")->take(9)->get() as $actu)
+@foreach (\App\Models\Actualite::orderBy("created_at", "desc")->take(9)->get() as $actu)
                     <?php
                         $res = \App\Models\RessourceActu::where("actu_code", $actu->actu_code)->first();
                         $src = "";
@@ -443,7 +443,9 @@ La troisième phase de recrutement de 150 enseignants est lancée pour l'exercic
                     ?>
                     <div class="col-md-4 d-flex align-items-stretch mt-3">
                         <div class="card"
+                    
                     style="background-image: url('{{asset("storage".DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."actualites".DIRECTORY_SEPARATOR.$actu->actu_code.DIRECTORY_SEPARATOR.$res->r_name)}}');"
+                    
                             data-aos="fade-up" data-aos-delay="100" title="">
                             <div class="card-body">
                                 <div class="card-title" style="text-align: justify; font-weight: lighter;">{{$actu->actu_title}}</div>

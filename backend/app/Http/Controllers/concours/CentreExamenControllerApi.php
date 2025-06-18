@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use App\Models\concours\CentreExaman;
+use App\Models\concours\CentreExamen;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class CentreExamenControllerApi extends Controller
      */
     public function index()
     {
-        $centres = CentreExaman::with("ecole")->get();
+        $centres = CentreExamen::with("ecole")->get();
         return response()->json($centres);
     }
 
@@ -31,7 +31,7 @@ class CentreExamenControllerApi extends Controller
         ]);
 
         try {
-            $centre = CentreExaman::create($validatedData);
+            $centre = CentreExamen::create($validatedData);
             return response()->json($centre);
         } catch (Exception $e) {
             Log::error('Error creating centre examen: ' . $e->getMessage());
@@ -44,7 +44,7 @@ class CentreExamenControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $centre = CentreExaman::findorfail($id);
+        $centre = CentreExamen::findorfail($id);
         return response()->json($centre->load("ecole"));
     }
 
@@ -58,7 +58,7 @@ class CentreExamenControllerApi extends Controller
             'centre_exam_label' => 'required|string|max:255',
         ]);
 
-        $centre = CentreExaman::findOrFail($id);
+        $centre = CentreExamen::findOrFail($id);
         try {
             $centre->update($validatedData);
             return response()->json($centre);
@@ -73,7 +73,7 @@ class CentreExamenControllerApi extends Controller
      */
     public function destroy(string $id)
     {
-        $centre = CentreExaman::findOrFail($id);
+        $centre = CentreExamen::findOrFail($id);
         try {
             $centre->delete();
             return response()->json(['message' => 'CentreExamen supprimé avec succès'], 200);

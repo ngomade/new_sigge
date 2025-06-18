@@ -76,26 +76,40 @@ class RequetteController extends Controller
         $request->validate([
             'titre_requete' => 'required|string|max:180',
             'desc_requete' => 'required|string|max:180',
+            'date_asignation' => 'nullable|date',
+            'date_traitement' => 'nullable|date',
+            'note_interne' => 'nullable|string|max:255',
             'code_cat' => 'required|exists:categories,code_cat',
-            'code_bureau' => 'required|exists:bureau,code_bureau',
+            // 'code_bureau' => 'required|exists:bureau,code_bureau',
             'fichiers.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120', // 5MB max
             'priorite' => 'in:urgent,standard'
         ]);
 
         try {
             // Générer un code unique pour la requête
-             $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
+            //  $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
               $user = session('user'); 
+              // Bureau par défaut : Scolarité
+             $bureauScolarite = Bureau::where('label_bureau', 'Scholarite')
+            ->orWhere('code_bureau', 'SCOL')
+            ->first();
+
+            if (!$bureauScolarite) {
+            return back()->withErrors(['error' => 'Service Scolarité non trouvé. Contactez l\'administrateur.']);
+           }
             // Créer la requête
             $requete = Requete::create([
-                 'code_requete' => $codeRequete,
+                //  'code_requete' => $codeRequete,
                 'titre_requete' => $request->titre_requete,
                 'desc_requete' => $request->desc_requete,
+                'date_asignation' => null,
+                'date_traitement' => null,
+                'note_interne' => null,
                 'status' => 'en attente',
                 'date_sousmis' => now(),
                 'code_cat' => $request->code_cat,
                 'code_user' => $user->code_user,
-                'code_bureau' => $request->code_bureau,
+                 'code_bureau' => $bureauScolarite->code_bureau,
                 'priorite' => $request->priorite ?? 'standard'
             ]);
 
@@ -108,7 +122,7 @@ class RequetteController extends Controller
                     FichierRequete::create([
                         'id_fichier' => 'FILE-' . strtoupper(Str::random(10)),
                         'chemin' => $path,
-                        'code_requete' => $codeRequete,
+                        'code_requete' => $requete->code_requete,
                         'nom_original' => $file->getClientOriginalName(),
                         'taille' => $file->getSize()
                     ]);
@@ -125,7 +139,7 @@ class RequetteController extends Controller
 
 
             return redirect()->route('requetes.index', $requete->code_requete)
-                ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $codeRequete);
+                ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $requete->code_requete);
 
         } catch (\Exception $e) {
             // Log::error('Erreur lors de la soumission de la requête: ' . $e->getMessage());
@@ -139,9 +153,10 @@ class RequetteController extends Controller
      */
     public function show(string $code_requete)
     {
+        $user = session('user');
         $requete = Requete::with(['category', 'user', 'bureau', 'fichiers', 'reponses'])
             ->where('code_requete', $code_requete)
-            ->where('code_user', Auth::user()->code_user)
+            ->where('code_user', $user->code_user)
             ->firstOrFail();
         // $personnel = session('user');
         return view('sige_app.backend.requetes.show', compact('requete'));
@@ -151,9 +166,9 @@ class RequetteController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $code_requete)
-    {
+    {   $user = session('user');
         $requete = Requete::where('code_requete', $code_requete)
-            ->where('code_user', Auth::user()->code_user)
+            ->where('code_user', $user->code_user)
             ->where('status', 'en attente')
             ->firstOrFail();
 
@@ -167,9 +182,9 @@ class RequetteController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $code_requete)
-    {
+    {   $user = session('user');
         $requete = Requete::where('code_requete', $code_requete)
-            ->where('code_user', Auth::user()->code_user)
+            ->where('code_user', $user->code_user)
             ->where('status', 'en attente')
             ->firstOrFail();
 
@@ -177,7 +192,7 @@ class RequetteController extends Controller
             'titre_requete' => 'required|string|max:180',
             'desc_requete' => 'required|string|max:180',
             'code_cat' => 'required|exists:categories,code_cat',
-            'code_bureau' => 'required|exists:bureau,code_bureau',
+            // 'code_bureau' => 'required|exists:bureau,code_bureau',
             'fichiers.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
             'priorite' => 'in:urgent,standard'
         ]);
@@ -187,7 +202,7 @@ class RequetteController extends Controller
                 'titre_requete' => $request->titre_requete,
                 'desc_requete' => $request->desc_requete,
                 'code_cat' => $request->code_cat,
-                'code_bureau' => $request->code_bureau,
+                // 'code_bureau' => $request->code_bureau,
                 'priorite' => $request->priorite ?? 'standard'
             ]);
 
@@ -221,8 +236,9 @@ class RequetteController extends Controller
      */
     public function destroy(string $code_requete)
     {
-        $requete = Requete::where('code_requete', $code_requete)
-            ->where('code_user', Auth::user()->code_user)
+        $user = session('user');
+       $requete = Requete::where('code_requete', $code_requete)
+            ->where('code_user', $user->code_user)
             ->where('status', 'en attente')
             ->firstOrFail();
 

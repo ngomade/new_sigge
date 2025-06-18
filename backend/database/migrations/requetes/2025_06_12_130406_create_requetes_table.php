@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('desc_requete',180);
             $table->string('status')->default('en cours');
             $table->dateTime('date_sousmis');
-            $table->dateTime('date_asignation');
-            $table->dateTime('date_traitement');
-            $table->string('note_interne',191);
+            $table->dateTime('date_asignation')->nullable();
+            $table->dateTime('date_traitement')->nullable();
+            $table->string('note_interne',191)->nullable();
             $table->string('code_cat');
             $table->foreign('code_cat')->references('code_cat')->on('categories')->onDelete('cascade');
             $table->string('code_user');
