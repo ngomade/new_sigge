@@ -3,7 +3,7 @@
 namespace Database\Factories\concours;
 
 use App\Models\concours\CentreExaman;
-use App\Models\concours\Ecole;
+use App\Models\Ecole;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CentreExamenFactory extends Factory

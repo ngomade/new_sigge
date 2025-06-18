@@ -1,28 +1,11 @@
 <?php
 
 
-namespace App\Models;
+namespace App\Models\notes;
 
-use App\Models\notes\Classe;
-use App\Models\notes\Semestre;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Niveau
- *
- * @property string $code_niveau
- * @property string|null $label_niveau
- * @property string $code_class
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Collection|FiliereNiveau[] $filiere_niveaus
- * @property Collection|Semestre[] $semestres
- *
- * @package App\Models\notes
- */
+
 class Niveau extends Model
 {
 	protected $table = 'niveau';
@@ -30,6 +13,7 @@ class Niveau extends Model
 	public $incrementing = false;
 
 	protected $fillable = [
+        'code_niveau',
 		'label_niveau',
 		'code_class'
 	];

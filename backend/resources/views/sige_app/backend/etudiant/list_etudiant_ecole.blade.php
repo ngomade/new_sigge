@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-2">
                                 <select name="code_niveau" id="code_niveau" class="form-select">
-                                    @foreach (\App\Models\Niveau::all() as $niveau)
+                                    @foreach (\App\Models\notes\Niveau::all() as $niveau)
                                         <option value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
                                     @endforeach
                                 </select>
@@ -129,8 +129,8 @@
                             </div>
                         @endif
                     @endisset
-        </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 @endsection

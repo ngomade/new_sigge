@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->increments('code_doc');
-            $table->char('code_session', 32);
+            $table->char('code_session', 32)->nullable();
             $table->foreign('code_session')->references('code_session')->on('session_examen')->onDelete('cascade');
-            $table->string('code_bureau', 128);
+            $table->string('code_bureau', 128)->nullable();
             $table->foreign('code_bureau')->references('code_bureau')->on('bureau')->onDelete('cascade');
             $table->string('label_doc', 128);
             $table->text('description_doc')->nullable();

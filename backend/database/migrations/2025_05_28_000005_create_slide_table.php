@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('slide', function (Blueprint $table) {
-            $table->id('id');
+            $table->id();
             $table->string('first_title', 128);
             $table->string('second_title', 150);
             $table->string('photo', 180);

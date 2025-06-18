@@ -28,14 +28,9 @@ class RequetteController extends Controller
     public function index(Request $request)
 
     {
-        $user = session('user');
-        if (!$user) {
-            abort(401, 'Utilisateur non authentifié');
-        }
-        $userCode = $user->code_user;
-
+        $id = $request->session()->get('user')->code_user;
         $query = Requete::with(['category', 'user', 'bureau'])
-            ->where('code_user', $userCode);
+            ->where('code_user', $id);
 
         // Filtres
         if ($request->filled('status')) {
@@ -56,7 +51,6 @@ class RequetteController extends Controller
 
         $requetes = $query->orderBy('date_sousmis', 'desc')->paginate(10);
         $categories = Category::all();
-        // $personnel = session('user');
         return view('sige_app.backend.requetes.index', compact('requetes', 'categories'));
     }
 
@@ -67,7 +61,6 @@ class RequetteController extends Controller
     {
         $categories = Category::all();
         $bureaux = Bureau::all();
-        // $personnel = session('user');
         return view('sige_app.backend.requetes.create', compact('categories', 'bureaux'));
     }
 
@@ -91,11 +84,11 @@ class RequetteController extends Controller
 
         try {
             // Générer un code unique pour la requête
-            // $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
+             $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
               $user = session('user'); 
             // Créer la requête
             $requete = Requete::create([
-                // 'code_requete' => $codeRequete,
+                 'code_requete' => $codeRequete,
                 'titre_requete' => $request->titre_requete,
                 'desc_requete' => $request->desc_requete,
                 'status' => 'en attente',
@@ -129,7 +122,7 @@ class RequetteController extends Controller
             // }
             Mail::to($user->email_user)->send(new RequeteSubmittedMail($requete));
 
-            
+
 
             return redirect()->route('requetes.index', $requete->code_requete)
                 ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $codeRequete);
@@ -294,6 +287,6 @@ class RequetteController extends Controller
     /**
      * Tableau de bord des statistiques
      */
-    
+
 
 }

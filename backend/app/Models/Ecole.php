@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Models\concours;
+namespace App\Models;
 
 
+use App\Models\concours\Candidat;
+use App\Models\concours\CandidatEcole;
+use App\Models\concours\CentreExaman;
+use App\Models\concours\Composition;
+use App\Models\concours\Dossier;
+use App\Models\concours\EcoleElement;
+use App\Models\concours\SiteComposition;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\concours\CentreDepot;
-use App\Models\concours\Candidat;
-use App\Models\concours\CentreExaman;
-use App\Models\concours\SiteComposition;
-use App\Models\concours\Composition;
-use App\Models\concours\EcoleElement;
-use App\Models\concours\CandidatEcole;
 
 class Ecole extends Model
 {

@@ -3,22 +3,18 @@
 namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-
-use App\Models\requetes\Requete;
-use App\Models\requetes\Category;
+use App\Mail\requetes\RequeteAssignedMail;
+use App\Mail\requetes\RequeteResponseMail;
+use App\Mail\requetes\RequeteStatusChangeMail;
 use App\Models\Bureau;
+use App\Models\requetes\Category;
 use App\Models\requetes\Reponse;
-use App\Models\Personnel;
-use App\Models\User;
-
+use App\Models\requetes\Requete;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Mail\requetes\RequeteStatusChangeMail;
-use App\Mail\requetes\RequeteAssignedMail;
-use App\Mail\requetes\RequeteResponseMail;
+
 
 class AdminRequeteController extends Controller
 {
@@ -69,7 +65,7 @@ class AdminRequeteController extends Controller
         $requetes = $query->paginate(15);
         $categories = Category::all();
         $bureaux = Bureau::all();
-        
+
         return view('sige_app.backend.administration.liste_requete', compact('requetes', 'categories', 'bureaux'));
     }
 
@@ -103,7 +99,7 @@ class AdminRequeteController extends Controller
         ]);
 
         $query = Requete::query();
-        
+
         // Restriction pour les agents
         $personnel = session('pers');
         if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
@@ -128,7 +124,7 @@ class AdminRequeteController extends Controller
                         $updateData['date_asignation'] = now();
                     }
                     break;
-                
+
                 case 'traitée':
                 case 'rejetée':
                     $updateData['date_traitement'] = now();
@@ -140,7 +136,7 @@ class AdminRequeteController extends Controller
                 $updateData['code_bureau'] = $request->nouveau_bureau;
                 $updateData['status'] = 'en attente'; // Reset status for new bureau
                 $updateData['date_asignation'] = null;
-                
+
                 // Notification de transfert
                 $user = session('user');
                 // if (!$user) {
@@ -206,7 +202,7 @@ class AdminRequeteController extends Controller
         ]);
 
         $query = Requete::query();
-        
+
         if (Auth::Personnel()->hasRole('agent')) {
             $query->where('code_bureau', Auth::user()->code_bureau);
         }
@@ -251,7 +247,7 @@ class AdminRequeteController extends Controller
     //     ]);
 
     //     $query = Requete::whereIn('code_requete', $request->requetes);
-        
+
     //     if (Auth::user()->hasRole('agent')) {
     //         $query->where('code_bureau', Auth::user()->code_bureau);
     //     }
@@ -271,7 +267,7 @@ class AdminRequeteController extends Controller
     //                         'status' => 'en attente',
     //                         'date_asignation' => now()
     //                     ]);
-                        
+
     //                     Mail::to($requete->user->email)->send(new RequeteAssignedMail($requete, $request->bulk_bureau));
     //                 }
     //                 $message = 'Requêtes assignées avec succès.';
@@ -281,7 +277,7 @@ class AdminRequeteController extends Controller
     //                 foreach ($requetes as $requete) {
     //                     $oldStatus = $requete->status;
     //                     $requete->update(['status' => $request->bulk_status]);
-                        
+
     //                     Mail::to($requete->user->email)->send(new RequeteStatusChangedMail($requete, $oldStatus, $request->bulk_status));
     //                 }
     //                 $message = 'Statuts mis à jour avec succès.';
@@ -309,5 +305,5 @@ class AdminRequeteController extends Controller
     /**
      * Dashboard with statistics
      */
-   
+
 }

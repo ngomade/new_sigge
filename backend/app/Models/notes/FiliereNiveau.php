@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\notes;
 
+use App\Models\Filiere;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Thiagoprz\CompositeKey\HasCompositeKey;
@@ -31,6 +32,6 @@ class FiliereNiveau extends Model
 	}
 	public function filiere(): BelongsTo
     {
-		return $this->belongsTo(Filiere::class, 'filiere_code');
+		return $this->belongsTo(Filiere::class, 'code_filiere', 'code_filiere');
 	}
 }

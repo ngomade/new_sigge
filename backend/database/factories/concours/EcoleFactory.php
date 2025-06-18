@@ -3,8 +3,8 @@
 // EcoleFactory.php
 namespace Database\Factories\concours;
 
-use App\Models\concours\Ecole;
-use App\Models\concours\CentreDepot;
+use App\Models\CentreDepot;
+use App\Models\Ecole;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EcoleFactory extends Factory
@@ -14,7 +14,7 @@ class EcoleFactory extends Factory
     public function definition(): array
     {
         static $index = 1;
-        
+
         return [
             'code_ecole' => 'ECO' . str_pad($index++, 4, '0', STR_PAD_LEFT),
             'label_ecole' => $this->faker->company . ' - École Supérieure',

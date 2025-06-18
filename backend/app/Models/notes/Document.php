@@ -1,8 +1,10 @@
 <?php
 
 
-namespace App\Models;
+namespace App\Models\notes;
 
+use App\Models\Bureau;
+use App\Models\SessionExaman;
 use Illuminate\Database\Eloquent\Model;
 
 class Document extends Model

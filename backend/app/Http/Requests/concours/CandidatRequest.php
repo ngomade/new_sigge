@@ -23,8 +23,8 @@ class CandidatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer|exists:sessionconcour,id',
-            'filiere_code' => 'required|string|exists:filiere,filiere_code',
+            'id' => 'required|integer|exists:session_concours,id',
+            'filiere_code' => 'required|string|exists:filiere,code_filiere',
             'code_site' => 'required|integer|exists:site_etude,code_site',
             'ca_nom' => 'required|string|max:255',
             'ca_prenom' => 'required|string|max:255',

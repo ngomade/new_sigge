@@ -1,26 +1,12 @@
 <?php
 
-namespace App\Models\concours;
+namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\concours\Candidat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * Class SiteEtude
- *
- * @property int $code_site
- * @property string $label_site
- * @property string $description_site
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Collection|Candidat[] $candidats
- *
- * @package App\Models
- */
 class SiteEtude extends Model
 {
     use HasFactory;

@@ -3,26 +3,9 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use Carbon\Carbon;
+use App\Models\Users;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Role;
 
-/**
- * Class UsersRole
- *
- * @property string $code_user
- * @property Carbon $annee_dip
- * @property Carbon $date_debut_role
- * @property Carbon|null $date_fin_role
- * @property int $etat_role
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property User $user
- *
- * @package App\Models\notes
- */
 class UsersRole extends Model
 {
 	protected $table = 'users_role';
@@ -45,7 +28,7 @@ class UsersRole extends Model
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'code_user');
+		return $this->belongsTo(Users::class, 'code_user');
 	}
 	public function role()
 	{

@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('centre_depot', function (Blueprint $table) {
             $table->id('centre_depot_code')->primary();
-            // $table->string('code_ecole',180);
             $table->string('centre_depot_label');
-            // $table->foreign('code_ecole')->references('code_ecole')->on('ecole')->onDelete('cascade');
             $table->timestamps();
         });
     }

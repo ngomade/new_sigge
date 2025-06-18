@@ -35,7 +35,7 @@ class FiliereFactory extends Factory
         ];
 
         return [
-            'filiere_code' => $this->faker->numerify("FIL#####"),
+            'code_filiere' => $this->faker->numerify("FIL#####"),
             'filiere_label' =>  $this->faker->randomElement($filieres),
             'filiere_description' => $this->faker->paragraph()
         ];

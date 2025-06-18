@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
-use App\Models\Niveau;
+use App\Models\notes\Niveau;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

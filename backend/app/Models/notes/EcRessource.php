@@ -6,22 +6,10 @@
 
 namespace App\Models\notes;
 
+use App\Models\Ressource;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class EcRessource
- * 
- * @property string $code_ec
- * @property int $code_res
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * 
- * @property Ec $ec
- * @property Ressource $ressource
- *
- * @package App\Models\notes
- */
 class EcRessource extends Model
 {
 	protected $table = 'ec_ressource';
@@ -30,6 +18,11 @@ class EcRessource extends Model
 	protected $casts = [
 		'code_res' => 'int'
 	];
+    protected $fillable = [
+        'code_res',
+        'code_ec',
+        'code_pers'
+    ];
 
 	public function ec()
 	{

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
+use App\Models\SiteEtude;
 use Illuminate\Http\Request;
-use App\Models\concours\SiteEtude;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 

@@ -4,14 +4,9 @@
 namespace App\Models\concours;
 
 
-use App\Models\concours\CandidatEcole;
-use App\Models\concours\Compte;
-use App\Models\concours\Ecole;
-use App\Models\concours\Mail;
-use App\Models\concours\SessionConcours;
-use App\Models\concours\SiteEtude;
-
+use App\Models\Ecole;
 use App\Models\Filiere;
+use App\Models\SiteEtude;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -92,7 +87,7 @@ class Candidat extends Model
 
     public function filiere(): BelongsTo
     {
-        return $this->belongsTo(Filiere::class, 'filiere_code');
+        return $this->belongsTo(Filiere::class, 'filiere_code', 'code_filiere');
     }
 
     public function sessionconcour(): BelongsTo

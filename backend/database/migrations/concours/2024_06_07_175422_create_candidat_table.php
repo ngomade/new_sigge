@@ -49,9 +49,9 @@ return new class extends Migration
             $table->string('ca_recu');
             $table->timestamps();
 
-            $table->foreign('filiere_code')->references('filiere_code')->on('filiere')->onDelete('cascade');
+            $table->foreign('filiere_code')->references('code_filiere')->on('filiere')->onDelete('cascade');
             $table->foreign('code_site')->references('code_site')->on('site_etude')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreign('id')->references('id')->on('sessionconcour')->onDelete('restrict')->onUpdate("cascade");
+            $table->foreign('id')->references('id')->on('session_concours')->onDelete('restrict')->onUpdate("cascade");
         });
     }
 

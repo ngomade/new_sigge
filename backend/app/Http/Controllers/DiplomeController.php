@@ -18,11 +18,13 @@ class DiplomeController extends Controller
     {
         $validated = $request->validate([
             'label_dip' => 'required|string|max:255',
+            'specialite_dip' => "required|string|max:255",
             'filiere_codes' => 'array',
-            'filiere_codes.*' => 'exists:filiere,filiere_code',
+            'filiere_codes.*' => 'exists:filiere,code_filiere',
         ]);
         $diplome = Diplome::create([
             'label_dip' => $validated['label_dip'],
+            'specialite_dip' => $validated['specialite_dip'],
         ]);
         if (isset($validated['filiere_codes'])) {
             $diplome->filieres()->sync($validated['filiere_codes']);
@@ -48,12 +50,13 @@ class DiplomeController extends Controller
     {
         $validated = $request->validate([
             'label_dip' => 'sometimes|required|string|max:255',
+            'specialite_dip' => 'sometimes|required|string|max:255',
             'filiere_codes' => 'array',
-            'filiere_codes.*' => 'exists:filiere,filiere_code',
+            'filiere_codes.*' => 'exists:filiere,code_filiere',
         ]);
         $diplome = Diplome::findOrFail($id);
         if (isset($validated['label_dip'])) {
-            $diplome->update(['label_dip' => $validated['label_dip']]);
+            $diplome->update(['label_dip' => $validated['label_dip'], 'specialide_dip' => $validated['specialite_dip']]);
         }
         if (isset($validated['filiere_codes'])) {
             $diplome->filieres()->sync($validated['filiere_codes']);

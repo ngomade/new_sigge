@@ -66,7 +66,7 @@
                                 <li><a href="/academique_index">Inscription Académique</a></li>
                             <li><a href="/telecharger_cours_index">Télécharger Mes Cours</a></li>
                                 <li><a href="/maintenance">Mes Notes</a></li>
-                                <li><a href="{{ route('requetes.create') }}">Rédiger une requête</a></li>
+                                <li><a href="{{ route('requetes.index') }}">Rédiger une requête</a></li>
                              {{-- @else
                                 <li><a href="/inscription_administrative">Inscription Administrative</a></li> --}}
                             @endif

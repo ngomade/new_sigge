@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FiliereNiveau;
-use App\Models\Inscription;
 use App\Models\notes\Ec;
 use App\Models\notes\EcRessource;
-use App\Models\notes\Ressource;
+use App\Models\notes\FiliereNiveau;
+use App\Models\notes\Inscription;
 use App\Models\notes\Semestre;
 use App\Models\notes\Ue;
+use App\Models\Ressource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;

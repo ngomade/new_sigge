@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('requetes', function (Blueprint $table) {
-           
-           
+
+
              $table->string('code_requete',32)->primary();
             $table->string('titre_requete',180);
             $table->string('desc_requete',180);

@@ -3,7 +3,7 @@
 namespace Tests\Feature\concours;
 
 use App\Models\concours\Filiere;
-use App\Models\User;
+use App\Models\concours\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;

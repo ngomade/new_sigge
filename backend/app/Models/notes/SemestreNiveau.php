@@ -3,27 +3,18 @@
 
 namespace App\Models\notes;
 
-use App\Models\Niveau;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class SemestreNiveau
- *
- * @property string $code_niveau
- * @property string $code_sem
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- *
- * @property Niveau $niveau
- * @property Semestre $semestre
- *
- * @package App\Models\notes
- */
 class SemestreNiveau extends Model
 {
 	protected $table = 'semestre_niveau';
 	public $incrementing = false;
+
+    protected $fillable = [
+        'code_niveau',
+        'code_sem'
+    ];
 
 	public function niveau()
 	{

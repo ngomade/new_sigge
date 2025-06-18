@@ -3,6 +3,8 @@
 
 namespace App\Models;
 
+use App\Models\notes\Inscription;
+use App\Models\notes\SessionExamen;
 use Illuminate\Database\Eloquent\Model;
 
 class Anneescolaire extends Model

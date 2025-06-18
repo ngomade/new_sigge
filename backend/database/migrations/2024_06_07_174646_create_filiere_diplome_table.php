@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('code_serie');
             $table->timestamps();
 
-            $table->foreign('filiere_code')->references('filiere_code')->on('filiere')->onDelete('cascade');
+            $table->foreign('filiere_code')->references('code_filiere')->on('filiere')->onDelete('cascade');
             $table->foreign('code_dip')->references('code_dip')->on('diplome')->onDelete('cascade');
             $table->foreign('code_serie')->references('code_serie')->on('serie')->onDelete('cascade');
         });

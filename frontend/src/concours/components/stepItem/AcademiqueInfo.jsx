@@ -133,7 +133,7 @@ function AcademiqueInfo({setLoadingState}) {
                                 className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1'>
                             <option value="">Selectionner</option>
                             {filieres.map((f, k) => (
-                                <option value={f.filiere_code} key={k}>{f.filiere_label}</option>
+                                <option value={f.code_filiere} key={k}>{f.label_filiere}</option>
                             ))}
                         </select>
                     </div>

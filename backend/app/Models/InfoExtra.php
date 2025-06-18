@@ -3,7 +3,7 @@
 
 namespace App\Models;
 
-
+use App\Models\concours\User;
 use Illuminate\Database\Eloquent\Model;
 
 class InfoExtra extends Model

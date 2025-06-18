@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Anneescolaire;
-use App\Models\FiliereNiveau;
-use App\Models\Inscription;
+use App\Models\concours\User;
+use App\Models\notes\FiliereNiveau;
+use App\Models\notes\Inscription;
 use App\Models\Quitus;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Throwable;

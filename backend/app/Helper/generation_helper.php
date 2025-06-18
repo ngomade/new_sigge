@@ -2,12 +2,12 @@
 
 namespace App\Helper;
 
-use App\Models\FiliereNiveau;
-use App\Models\Inscription;
+use App\Models\concours\User;
 use App\Models\notes\Ec;
+use App\Models\notes\FiliereNiveau;
+use App\Models\notes\Inscription;
 use App\Models\Personnel;
 use App\Models\Quitus;
-use App\Models\User;
 use App\Models\UsersDiplome;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

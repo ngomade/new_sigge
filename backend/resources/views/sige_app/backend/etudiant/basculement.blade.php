@@ -36,22 +36,22 @@
                                         <select name="code_annee" id="code_annee" class="form-select">
                                             @foreach (\App\Models\Anneescolaire::orderBy("debut_annee", "desc")->get() as $anneescolaire)
                                                 <option
-                                                    value="{{$anneescolaire->code_annee}}"> {{Carbon::parse($anneescolaire->debut_annee)->format('Y')}}
+                                                        value="{{$anneescolaire->code_annee}}"> {{Carbon::parse($anneescolaire->debut_annee)->format('Y')}}
                                                     - {{Carbon::parse($anneescolaire->fin_annee)->format('Y')}}  </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="col-2">
                                         <select name="niveau" id="niveau" class="form-select">
-                                            @foreach (\App\Models\Niveau::all() as $niveau)
+                                            @foreach (\App\Models\notes\Niveau::all() as $niveau)
                                                 <option
-                                                    value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
+                                                        value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="col-2">
                                         <button type="submit" class="btn btn-outline-primary"><i
-                                                class="ri-search-line"></i></button>
+                                                    class="ri-search-line"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -105,12 +105,12 @@
                                         <div class="col-4">
                                             <div class="row">
                                                 <label for="niveau_c" class="col-sm-4 col-form-label">Niveau Cible<span
-                                                        class="text-danger">*</span></label>
+                                                            class="text-danger">*</span></label>
                                                 <div class="col-5">
                                                     <select name="niveau_c" id="niveau_c" class="form-select">
-                                                        @foreach (\App\Models\Niveau::orderBy("code_niveau", "desc")->get() as $niveau)
+                                                        @foreach (\App\Models\notes\Niveau::orderBy("code_niveau", "desc")->get() as $niveau)
                                                             <option
-                                                                value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
+                                                                    value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
