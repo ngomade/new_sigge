@@ -26,90 +26,99 @@
         </div>
     @endif
 
-    <!-- Filtres -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <form method="GET" action="{{ route('admin.requetes.index') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Filtre Statut -->
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
-                    <select name="status" id="status" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Tous les statuts</option>
-                        <option value="en attente" {{ request('status') === 'en attente' ? 'selected' : '' }}>En attente</option>
-                        <option value="en cours" {{ request('status') === 'en cours' ? 'selected' : '' }}>En cours</option>
-                        <option value="traitée" {{ request('status') === 'traitée' ? 'selected' : '' }}>Traitée</option>
-                        <option value="rejetée" {{ request('status') === 'rejetée' ? 'selected' : '' }}>Rejetée</option>
-                        <option value="escaladée" {{ request('status') === 'escaladée' ? 'selected' : '' }}>Escaladée</option>
-                    </select>
-                </div>
+    <!-- Bouton pour ouvrir le modal de filtre -->
+    <div class="mb-6">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+            Filtrer les requêtes
+        </button>
+    </div>
 
-                <!-- Filtre Catégorie -->
-                <div>
-                    <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
-                    <select name="category" id="category" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Toutes les catégories</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->code_cat }}" {{ request('category') === $category->code_cat ? 'selected' : '' }}>
-                                {{ $category->nom_cat }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+    <!-- Modal de filtre -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <form method="GET" action="{{ route('admin.requetes.index') }}">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="filterModalLabel">Filtres des Requêtes</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row g-3">
+                                <!-- Filtre Statut -->
+                                <div class="col-md-3">
+                                    <label for="status" class="form-label">Statut</label>
+                                    <select name="status" id="status" class="form-select">
+                                        <option value="">Tous les statuts</option>
+                                        <option value="en attente" {{ request('status') === 'en attente' ? 'selected' : '' }}>En attente</option>
+                                        <option value="en cours" {{ request('status') === 'en cours' ? 'selected' : '' }}>En cours</option>
+                                        <option value="traitée" {{ request('status') === 'traitée' ? 'selected' : '' }}>Traitée</option>
+                                        <option value="rejetée" {{ request('status') === 'rejetée' ? 'selected' : '' }}>Rejetée</option>
+                                        <option value="escaladée" {{ request('status') === 'escaladée' ? 'selected' : '' }}>Escaladée</option>
+                                    </select>
+                                </div>
 
-                <!-- Filtre Bureau -->
-                @if(!Auth::Personnel()->hasRole('agent'))
-                <div>
-                    <label for="bureau" class="block text-sm font-medium text-gray-700 mb-2">Bureau</label>
-                    <select name="bureau" id="bureau" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Tous les bureaux</option>
-                        @foreach($bureaux as $bureau)
-                            <option value="{{ $bureau->code_bureau }}" {{ request('bureau') === $bureau->code_bureau ? 'selected' : '' }}>
-                                {{ $bureau->nom_bureau }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                @endif
+                                <!-- Filtre Catégorie -->
+                                <div class="col-md-3">
+                                    <label for="category" class="form-label">Catégorie</label>
+                                    <select name="category" id="category" class="form-select">
+                                        <option value="">Toutes les catégories</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->code_cat }}" {{ request('category') === $category->code_cat ? 'selected' : '' }}>
+                                                {{ $category->nom_cat }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                <!-- Filtre Priorité -->
-                <div>
-                    <label for="priorite" class="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
-                    <select name="priorite" id="priorite" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Toutes les priorités</option>
-                        <option value="basse" {{ request('priorite') === 'basse' ? 'selected' : '' }}>Basse</option>
-                        <option value="normale" {{ request('priorite') === 'normale' ? 'selected' : '' }}>Normale</option>
-                        <option value="haute" {{ request('priorite') === 'haute' ? 'selected' : '' }}>Haute</option>
-                        <option value="urgente" {{ request('priorite') === 'urgente' ? 'selected' : '' }}>Urgente</option>
-                    </select>
-                </div>
+                                <!-- Filtre Bureau -->
+                                <div class="col-md-3">
+                                    <label for="bureau" class="form-label">Bureau</label>
+                                    <select name="bureau" id="bureau" class="form-select">
+                                        <option value="">Tous les bureaux</option>
+                                        @foreach($bureaux as $bureau)
+                                            <option value="{{ $bureau->code_bureau }}" {{ request('bureau') === $bureau->code_bureau ? 'selected' : '' }}>
+                                                {{ $bureau->nom_bureau }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Filtre Priorité -->
+                                <div class="col-md-3">
+                                    <label for="priorite" class="form-label">Priorité</label>
+                                    <select name="priorite" id="priorite" class="form-select">
+                                        <option value="">Toutes les priorités</option>
+                                        <option value="basse" {{ request('priorite') === 'basse' ? 'selected' : '' }}>Basse</option>
+                                        <option value="normale" {{ request('priorite') === 'normale' ? 'selected' : '' }}>Normale</option>
+                                        <option value="haute" {{ request('priorite') === 'haute' ? 'selected' : '' }}>Haute</option>
+                                        <option value="urgente" {{ request('priorite') === 'urgente' ? 'selected' : '' }}>Urgente</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-3">
+                                <!-- Date de début -->
+                                <div class="col-md-6">
+                                    <label for="date_from" class="form-label">Date de début</label>
+                                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="form-control">
+                                </div>
+
+                                <!-- Date de fin -->
+                                <div class="col-md-6">
+                                    <label for="date_to" class="form-label">Date de fin</label>
+                                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ route('admin.requetes.index') }}" class="btn btn-secondary">Réinitialiser</a>
+                        <button type="submit" class="btn btn-primary">Filtrer</button>
+                    </div>
+                </form>
             </div>
-
-            <!-- Filtres de date -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="date_from" class="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
-                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label for="date_to" class="block text-sm font-medium text-gray-700 mb-2">Date de fin</label>
-                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}"
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-            </div>
-
-            <!-- Boutons d'action -->
-            <div class="flex justify-end space-x-3">
-                <a href="{{ route('admin.requetes.index') }}" 
-                   class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Réinitialiser
-                </a>
-                <button type="submit" 
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Filtrer
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <!-- Tableau des requêtes -->
@@ -179,10 +188,10 @@
                                     {{ $requete->user->nom_user ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $requete->category->nom_cat ?? 'N/A' }}
+                                    {{ $requete->category->label_cat ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $requete->bureau->nom_bureau ?? 'N/A' }}
+                                    {{ $requete->bureau->label_bureau ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
@@ -214,11 +223,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $requete->date_sousmis ? $requete->date_sousmis->format('d/m/Y H:i') : 'N/A' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <a href="{{ route('admin.requetes.show', $requete->code_requete) }}" 
-                                       class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        Voir détails
-                                    </a>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" style="position: relative; z-index: 10;">
+                                <a href="{{ route('admin.requetes.show', $requete->code_requete) }}" 
+                              class="btn btn-primary" style="position: relative; z-index: 10; display: inline-block; visibility: visible; opacity: 1;">
+                               Voir détails
+                                </a>
                                 </td>
                             </tr>
                         @endforeach

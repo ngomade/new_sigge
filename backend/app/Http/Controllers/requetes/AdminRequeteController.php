@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
@@ -11,10 +10,9 @@ use App\Models\requetes\Category;
 use App\Models\requetes\Reponse;
 use App\Models\requetes\Requete;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-
 
 class AdminRequeteController extends Controller
 {
@@ -26,11 +24,11 @@ class AdminRequeteController extends Controller
         $query = Requete::with(['category', 'user', 'bureau']);
 
         // Filtres pour les agents (selon leur bureau)
-        $personnel = session('pers');
-        $user = session('user');
-        if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
-            $query->where('code_bureau', $personnel->code_bureau);
-        }
+        // $personnel = session('pers');
+        // $user = session('user');
+        // if ($personnel && in_array('ADMIN', $personnel->getRoleNames()->toArray())) {
+        //     $query->where('code_bureau', $personnel->code_bureau);
+        // }
 
         // Filtres
         if ($request->filled('status')) {
@@ -58,13 +56,13 @@ class AdminRequeteController extends Controller
         }
 
         // Tri
-        $sortBy = $request->get('sort', 'date_sousmis');
+        $sortBy        = $request->get('sort', 'date_sousmis');
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortBy, $sortDirection);
 
-        $requetes = $query->paginate(15);
+        $requetes   = $query->paginate(15);
         $categories = Category::all();
-        $bureaux = Bureau::all();
+        $bureaux    = Bureau::all();
 
         return view('sige_app.backend.administration.liste_requete', compact('requetes', 'categories', 'bureaux'));
     }
@@ -77,10 +75,11 @@ class AdminRequeteController extends Controller
         $query = Requete::with(['category', 'user', 'bureau', 'fichiers', 'reponses']);
 
         // Restriction pour les agents
-        $personnel = session('pers');
-        if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
-            $query->where('code_bureau', $personnel->code_bureau);
-        }
+        // Temporarily disabled to debug "not found" issue
+        // $personnel = session('pers');
+        // if ($personnel && in_array('ADMIN', $personnel->getRoleNames()->toArray())) {
+        //     $query->where('code_bureau', $personnel->code_bureau);
+        // }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -93,18 +92,18 @@ class AdminRequeteController extends Controller
     public function updateStatus(Request $request, string $code_requete)
     {
         $request->validate([
-            'status' => 'required|in:en attente,en cours,traitée,rejetée,escaladée',
-            'note_interne' => 'nullable|string|max:191',
-            'nouveau_bureau' => 'nullable|exists:bureau,code_bureau'
+            'status'         => 'required|in:en attente,en cours,traitée,rejetée,escaladée',
+            'note_interne'   => 'nullable|string|max:191',
+            'nouveau_bureau' => 'nullable|exists:bureau,code_bureau',
         ]);
 
         $query = Requete::query();
 
         // Restriction pour les agents
-        $personnel = session('pers');
-        if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
-            $query->where('code_bureau', $personnel->code_bureau);
-        }
+        // $personnel = session('pers');
+        // if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
+        //     $query->where('code_bureau', $personnel->code_bureau);
+        // }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -113,8 +112,8 @@ class AdminRequeteController extends Controller
 
         try {
             $updateData = [
-                'status' => $newStatus,
-                'note_interne' => $request->note_interne
+                'status'       => $newStatus,
+                'note_interne' => $request->note_interne,
             ];
 
             // Gestion des dates selon le statut
@@ -133,64 +132,67 @@ class AdminRequeteController extends Controller
 
             // Transfert vers un autre bureau
             if ($request->filled('nouveau_bureau') && $request->nouveau_bureau !== $requete->code_bureau) {
-                $updateData['code_bureau'] = $request->nouveau_bureau;
-                $updateData['status'] = 'en attente'; // Reset status for new bureau
-                $updateData['date_asignation'] = null;
-
-                // Notification de transfert
-                $user = session('user');
-                // if (!$user) {
-                    // abort(401, 'Utilisateur non authentifié');
-                // }
-                Mail::to($user->email_user)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
+                $updateData['code_bureau']     = $request->nouveau_bureau;
+                $updateData['status']          = 'en attente'; // Reset status for new bureau
+                $updateData['date_asignation'] = now();
             }
 
             $requete->update($updateData);
 
-            // Notification de changement de statut
+            // Notification de transfert et changement de statut
+            $userEmail = $requete->user->email_user ?? null;
+            $userEmail = $requete->user->email_user ?? null;
+            if ($request->filled('nouveau_bureau') && $request->nouveau_bureau !== $requete->code_bureau) {
+                if ($userEmail) {
+                    Mail::to($userEmail)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
+                }
+            }
             if ($oldStatus !== $newStatus) {
-                Mail::to($user->email_user)->send(new RequeteStatusChangeMail($requete, $oldStatus, $newStatus));
+                if ($userEmail) {
+                    Mail::to($userEmail)->send(new RequeteStatusChangeMail($requete, $oldStatus, $newStatus));
+                }
             }
 
             return back()->with('success', 'Statut de la requête mis à jour avec succès.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de la mise à jour du statut.');
+            Log::error('Erreur mise à jour statut requête: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Erreur lors de la mise à jour du statut. Détails: ' . $e->getMessage());
         }
     }
 
     /**
      * Assign request to bureau
      */
-    public function assign(Request $request, string $code_requete)
-    {
-        $request->validate([
-            'code_bureau' => 'required|exists:bureau,code_bureau'
-        ]);
+    // public function assign(Request $request, string $code_requete)
+    // {
+    //     $request->validate([
+    //         'code_bureau' => 'required|exists:bureau,code_bureau',
+    //     ]);
 
-        $requete = Requete::where('code_requete', $code_requete)->firstOrFail();
+    //     $requete = Requete::where('code_requete', $code_requete)->firstOrFail();
 
-        if ($requete->code_bureau === $request->code_bureau) {
-            return back()->with('error', 'La requête est déjà assignée à ce bureau.');
-        }
+    //     if ($requete->code_bureau === $request->code_bureau) {
+    //         return back()->with('error', 'La requête est déjà assignée à ce bureau.');
+    //     }
 
-        try {
-            $requete->update([
-                'code_bureau' => $request->code_bureau,
-                'status' => 'en attente',
-                'date_asignation' => now()
-            ]);
+    //     try {
+    //         $requete->update([
+    //             'code_bureau'     => $request->code_bureau,
+    //             'status'          => 'en attente',
+    //             'date_asignation' => now(),
+    //         ]);
 
-            // Notification d'assignation
-            $user = session('user');
-            Mail::to($user->email_user)->send(new RequeteAssignedMail($requete, $request->code_bureau));
+    //         // Notification d'assignation
+    //         $user = session('user');
+    //         Mail::to($user->email_user)->send(new RequeteAssignedMail($requete, $request->code_bureau));
 
-            return back()->with('success', 'Requête assignée avec succès.');
+    //         return back()->with('success', 'Requête assignée avec succès.');
 
-        } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'assignation de la requête.');
-        }
-    }
+    //     } catch (\Exception $e) {
+    //         return back()->with('error', 'Erreur lors de l\'assignation de la requête.');
+    //     }
+    // }
 
     /**
      * Add response to request
@@ -198,23 +200,24 @@ class AdminRequeteController extends Controller
     public function addResponse(Request $request, string $code_requete)
     {
         $request->validate([
-            'text_repone' => 'required|string|max:180'
+            'text_reponse' => 'required|string|max:180',
         ]);
+        // $personnel = session('pers');
 
         $query = Requete::query();
 
-        if (Auth::Personnel()->hasRole('agent')) {
-            $query->where('code_bureau', Auth::user()->code_bureau);
-        }
+        // if ($personnel->hasRole('ADMIN')) {
+        //     $query->where('code_bureau', Auth::user()->code_bureau);
+        // }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
         try {
             $reponse = Reponse::create([
-                'code_res' => 'RES-' . strtoupper(Str::random(10)),
-                'text_repone' => $request->text_repone,
+                'code_res'     => 'RES-' . strtoupper(Str::random(10)),
+                'text_reponse' => $request->text_reponse,
                 'code_requete' => $code_requete,
-                'created_by' => Auth::Personnel()->code_pers
+                // 'created_by' => Auth::Personnel()->code_pers
             ]);
 
             // Mise à jour du statut si nécessaire
@@ -223,13 +226,20 @@ class AdminRequeteController extends Controller
             }
 
             // Notification de réponse
-            $user = session('user');
-            Mail::to($user->email_user)->send(new RequeteResponseMail($requete, $reponse));
+            // $userEmail = $requete->user->email_user ?? null;
+            // $user = session('user');
+            // Mail::to($userEmail->email_user)->send(new RequeteResponseMail($requete, $reponse));
+            $userEmail = $requete->user->email_user ?? null;
+            if ($userEmail && $request->filled('text_reponse')) {
+                Mail::to($userEmail)->send(new RequeteResponseMail($requete, $request->text_reponse));
+            }
+            
 
             return back()->with('success', 'Réponse ajoutée avec succès.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'ajout de la réponse.');
+            Log::error('Erreur d\'ajout de la requete: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            return back()->with('error', 'Erreur lors de l\'ajout de la reponse. Détails: ' . $e->getMessage());
         }
     }
 

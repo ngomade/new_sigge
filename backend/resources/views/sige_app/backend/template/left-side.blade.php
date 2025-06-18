@@ -325,6 +325,9 @@
           <li class="menu-item">
             <a href="/bureau/Service" class="menu-link"><div data-i18n="Service">Service</div></a>
           </li>
+          <li class="menu-item">
+            <a href="{{ route('admin.requetes.index') }}" class="menu-link"><div data-i18n="Requete">Requete</div></a>
+          </li>
         </ul>
       </li>
       <li class="menu-item">
