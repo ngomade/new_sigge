@@ -39,14 +39,13 @@ class Requete extends Model
 		'code_bureau'
 	];
 
-	 protected static function boot(): void
+     protected static function boot(): void
     {
         parent::boot();
         self::creating(function ($model) {
             do {
-                $id = Str::upper(Str::substr($model->code_user, 0, 2));
-                $id .= rand(1000, 10000);
-			} while (Requete::where('code_requete', $id)->exists());
+                $id = 'REQ-' . strtoupper(Str::random(10));
+            } while (Requete::where('code_requete', $id)->exists());
             $model->code_requete = $id;
         });
     }

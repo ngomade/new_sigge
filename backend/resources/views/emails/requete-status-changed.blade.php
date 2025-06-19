@@ -7,8 +7,17 @@
 <body>
     <p>Bonjour,</p>
     <p>Le statut de votre requête <strong>{{ $requete->code_requete }}</strong> a été mis à jour.</p>
-    <p>Ancien statut : <strong>{{ ucfirst($oldStatus) }}</strong></p>
-    <p>Nouveau statut : <strong>{{ ucfirst($newStatus) }}</strong></p>
+    {{-- <p>Ancien statut : <strong>{{ ucfirst($oldStatus) }}</strong></p>
+    <p>Nouveau statut : <strong>{{ ucfirst($newStatus) }}</strong></p> --}}
+    @if($oldStatus === 'en attente' && $newStatus === 'en cours')
+        <p>Votre requête a été transférée à un nouveau bureau et est maintenant en cours de traitement.</p>
+    @elseif(($oldStatus === 'en cours' || $oldStatus === 'en attente') && $newStatus === 'traitée')
+        <p>Votre requête a été traitée avec succès et est maintenant terminée.</p>
+    @elseif($newStatus === 'rejetée')
+        <p>Votre requête a été rejetée. Veuillez consulter les détails pour plus d'informations.</p>
+    @else
+        <p>Le statut de votre requête a été mis à jour.</p>
+    @endif
     <p>Vous pouvez consulter les détails de votre requête en vous connectant à votre compte.</p>
     <p>Merci,</p>
     <p>L'équipe de gestion des requêtes</p>

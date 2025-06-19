@@ -54,7 +54,7 @@
                                         <option value="en cours" {{ request('status') === 'en cours' ? 'selected' : '' }}>En cours</option>
                                         <option value="traitée" {{ request('status') === 'traitée' ? 'selected' : '' }}>Traitée</option>
                                         <option value="rejetée" {{ request('status') === 'rejetée' ? 'selected' : '' }}>Rejetée</option>
-                                        <option value="escaladée" {{ request('status') === 'escaladée' ? 'selected' : '' }}>Escaladée</option>
+                                        
                                     </select>
                                 </div>
 
@@ -196,11 +196,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
                                         $statusColors = [
-                                            'en attente' => 'bg-yellow-100 text-yellow-800',
+                                            'en attente' => 'bg-yellow-100 text-yellow-800', 
                                             'en cours' => 'bg-blue-100 text-blue-800',
                                             'traitée' => 'bg-green-100 text-green-800',
                                             'rejetée' => 'bg-red-100 text-red-800',
-                                            'escaladée' => 'bg-purple-100 text-purple-800'
+                                           
                                         ];
                                     @endphp
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusColors[$requete->status] ?? 'bg-gray-100 text-gray-800' }}">

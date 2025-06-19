@@ -13,6 +13,44 @@ document.addEventListener('DOMContentLoaded', function() {
             charCount.className = remaining < 20 ? 'text-danger' : remaining < 50 ? 'text-warning' : 'text-muted';
         });
     }
+
+    // Email notification toggle buttons
+    const activateBtn = document.getElementById('activateEmail');
+    const deactivateBtn = document.getElementById('deactivateEmail');
+    const emailInput = document.getElementById('email_notifications');
+
+    if (activateBtn && deactivateBtn && emailInput) {
+        activateBtn.addEventListener('click', function() {
+            emailInput.value = '1';
+            activateBtn.classList.add('btn-success');
+            activateBtn.classList.remove('btn-outline-success');
+            deactivateBtn.classList.add('btn-outline-danger');
+            deactivateBtn.classList.remove('btn-danger');
+            alert('Mail envoyé');
+        });
+
+        deactivateBtn.addEventListener('click', function() {
+            emailInput.value = '0';
+            deactivateBtn.classList.add('btn-danger');
+            deactivateBtn.classList.remove('btn-outline-danger');
+            activateBtn.classList.add('btn-outline-success');
+            activateBtn.classList.remove('btn-success');
+            alert('Le mail a été désactivé');
+        });
+
+        // Initialize buttons based on current value
+        if (emailInput.value === '1') {
+            activateBtn.classList.add('btn-success');
+            activateBtn.classList.remove('btn-outline-success');
+            deactivateBtn.classList.add('btn-outline-danger');
+            deactivateBtn.classList.remove('btn-danger');
+        } else {
+            deactivateBtn.classList.add('btn-danger');
+            deactivateBtn.classList.remove('btn-outline-danger');
+            activateBtn.classList.add('btn-outline-success');
+            activateBtn.classList.remove('btn-success');
+        }
+    }
 });
 </script>
 @endsection
@@ -63,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     'en cours' => 'bg-primary text-white',
                                     'traitée' => 'bg-success text-white',
                                     'rejetée' => 'bg-danger text-white',
-                                    'escaladée' => 'bg-secondary text-white'
+                                   
                                 ];
                             @endphp
                             <span class="badge {{ $statusColors[$requete->status] ?? 'bg-light text-dark' }}">
@@ -178,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     @else
                     <p class="text-muted">Aucune réponse pour le moment.</p>
                     @endif
-                    <form action="{{ route('admin.requetes.addResponse', $requete->code_requete) }}" method="POST" class="border-top pt-3">
+                    <form action="{{ route('admin.requetes.addResponse', $requete->code_requete) }}" method="POST" class="border-top pt-3" id="addResponseForm">
                         @csrf
                         <div class="mb-3">
                             <label for="text_reponse" class="form-label">Ajouter une réponse</label>
@@ -188,6 +226,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             @enderror
                             <div class="form-text">Caractères restants: <span id="char-count">180</span></div>
                         </div>
+                        <div class="mb-3 d-flex gap-2">
+                            <button type="button" id="activateEmailResponse" class="btn btn-outline-success flex-grow-1">Activer l'envoi des mails</button>
+                            <button type="button" id="deactivateEmailResponse" class="btn btn-outline-danger flex-grow-1">Désactiver l'envoi des mails</button>
+                        </div>
+                        <input type="hidden" name="email_notifications" id="email_notifications_response" value="0" />
                         <button type="submit" class="btn btn-primary">Ajouter la réponse</button>
                     </form>
                 </div>
@@ -205,11 +248,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="mb-3">
                             <label for="status" class="form-label">Changer le statut</label>
                             <select name="status" id="status" class="form-select">
-                                <option value="en attente" {{ $requete->status === 'en attente' ? 'selected' : '' }}>En attente</option>
-                                <option value="en cours" {{ $requete->status === 'en cours' ? 'selected' : '' }}>En cours</option>
+                                {{-- @if($requete->status !== 'en cours')
+                                    <option value="en attente" {{ $requete->status === 'en attente' ? 'selected' : '' }}>En attente</option>
+                                    <option value="en cours" {{ $requete->status === 'en cours' ? 'selected' : '' }}>En cours</option>
+                                @endif --}}
+                                 {{-- <option value="" disabled>Selectionez</option> --}}
                                 <option value="traitée" {{ $requete->status === 'traitée' ? 'selected' : '' }}>Traitée</option>
                                 <option value="rejetée" {{ $requete->status === 'rejetée' ? 'selected' : '' }}>Rejetée</option>
-                                <option value="escaladée" {{ $requete->status === 'escaladée' ? 'selected' : '' }}>Escaladée</option>
+                                
                             </select>
                         </div>
                         <div class="mb-3">
@@ -225,6 +271,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3 d-flex gap-2">
+                            <button type="button" id="activateEmail" class="btn btn-outline-success flex-grow-1">Activer l'envoi des mails</button>
+                            <button type="button" id="deactivateEmail" class="btn btn-outline-danger flex-grow-1">Désactiver l'envoi des mails</button>
+                        </div>
+                        <input type="hidden" name="email_notifications" id="email_notifications" value="0" />
                         <button type="submit" class="btn btn-success w-100">Mettre à jour</button>
                     </form>
                 </div>

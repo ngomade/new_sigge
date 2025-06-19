@@ -92,19 +92,19 @@ class AdminRequeteController extends Controller
     public function updateStatus(Request $request, string $code_requete)
     {
         $request->validate([
-            'status'         => 'required|in:en attente,en cours,traitée,rejetée,escaladée',
+            'status'         => 'required|in:en cours,en attente,traitée,rejetée',
             'note_interne'   => 'nullable|string|max:191',
             'nouveau_bureau' => 'nullable|exists:bureau,code_bureau',
+            'email_notifications' => 'nullable|boolean',
         ]);
 
         $query = Requete::query();
-
         // Restriction pour les agents
         // $personnel = session('pers');
         // if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
         //     $query->where('code_bureau', $personnel->code_bureau);
         // }
-
+        
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
         $oldStatus = $requete->status;
@@ -112,44 +112,63 @@ class AdminRequeteController extends Controller
 
         try {
             $updateData = [
-                'status'       => $newStatus,
                 'note_interne' => $request->note_interne,
             ];
 
-            // Gestion des dates selon le statut
-            switch ($newStatus) {
-                case 'en cours':
-                    if ($oldStatus === 'en attente') {
-                        $updateData['date_asignation'] = now();
-                    }
-                    break;
+            // Only update status if it is different and is one of the allowed statuses
+            if ($newStatus !== $oldStatus && in_array($newStatus, ['en cours', 'en attente', 'traitée', 'rejetée'])) {
+                $updateData['status'] = $newStatus;
 
-                case 'traitée':
-                case 'rejetée':
-                    $updateData['date_traitement'] = now();
-                    break;
+                // Gestion des dates selon le statut
+                switch ($newStatus) {
+                    case 'en cours':
+                        $updateData['date_asignation'] = now();
+                        break;
+
+                    case 'traitée':
+                    case 'rejetée':
+                        $updateData['date_traitement'] = now();
+                        break;
+                }
             }
 
             // Transfert vers un autre bureau
+            $statusChangedByTransfer = false;
             if ($request->filled('nouveau_bureau') && $request->nouveau_bureau !== $requete->code_bureau) {
                 $updateData['code_bureau']     = $request->nouveau_bureau;
-                $updateData['status']          = 'en attente'; // Reset status for new bureau
+                $updateData['status']          = 'en cours'; // Automatically set to 'en cours' on transfer
                 $updateData['date_asignation'] = now();
+                $statusChangedByTransfer = true;
             }
 
             $requete->update($updateData);
 
             // Notification de transfert et changement de statut
             $userEmail = $requete->user->email_user ?? null;
-            $userEmail = $requete->user->email_user ?? null;
+            $sendEmail = $request->input('email_notifications', false);
+
             if ($request->filled('nouveau_bureau') && $request->nouveau_bureau !== $requete->code_bureau) {
-                if ($userEmail) {
-                    Mail::to($userEmail)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
+                if ($userEmail && $sendEmail) {
+                    try {
+                        Mail::to($userEmail)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
+                    } catch (\Exception $e) {
+                        Log::error('Erreur envoi mail assignation: ' . $e->getMessage());
+                    }
                 }
             }
-            if ($oldStatus !== $newStatus) {
-                if ($userEmail) {
-                    Mail::to($userEmail)->send(new RequeteStatusChangeMail($requete, $oldStatus, $newStatus));
+            if ($oldStatus !== $newStatus || $statusChangedByTransfer) {
+                if ($userEmail && $sendEmail) {
+                    try {
+                        $emailOldStatus = $oldStatus;
+                        $emailNewStatus = $newStatus;
+                        if ($statusChangedByTransfer) {
+                            $emailOldStatus = $oldStatus;
+                            $emailNewStatus = 'en cours';
+                        }
+                        Mail::to($userEmail)->send(new RequeteStatusChangeMail($requete, $emailOldStatus, $emailNewStatus));
+                    } catch (\Exception $e) {
+                        Log::error('Erreur envoi mail changement statut: ' . $e->getMessage());
+                    }
                 }
             }
 
@@ -201,14 +220,11 @@ class AdminRequeteController extends Controller
     {
         $request->validate([
             'text_reponse' => 'required|string|max:180',
+            'email_notifications' => 'nullable|boolean',
         ]);
         // $personnel = session('pers');
 
         $query = Requete::query();
-
-        // if ($personnel->hasRole('ADMIN')) {
-        //     $query->where('code_bureau', Auth::user()->code_bureau);
-        // }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -217,7 +233,6 @@ class AdminRequeteController extends Controller
                 'code_res'     => 'RES-' . strtoupper(Str::random(10)),
                 'text_reponse' => $request->text_reponse,
                 'code_requete' => $code_requete,
-                // 'created_by' => Auth::Personnel()->code_pers
             ]);
 
             // Mise à jour du statut si nécessaire
@@ -226,14 +241,11 @@ class AdminRequeteController extends Controller
             }
 
             // Notification de réponse
-            // $userEmail = $requete->user->email_user ?? null;
-            // $user = session('user');
-            // Mail::to($userEmail->email_user)->send(new RequeteResponseMail($requete, $reponse));
             $userEmail = $requete->user->email_user ?? null;
-            if ($userEmail && $request->filled('text_reponse')) {
+            $sendEmail = $request->input('email_notifications', false);
+            if ($userEmail && $request->filled('text_reponse') && $sendEmail) {
                 Mail::to($userEmail)->send(new RequeteResponseMail($requete, $request->text_reponse));
             }
-            
 
             return back()->with('success', 'Réponse ajoutée avec succès.');
 
