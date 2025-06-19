@@ -14,17 +14,18 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\requetes\RequeteSubmittedMail;
 use App\Mail\requetes\RequetteStatusChangeMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RequetteController extends Controller
 {
     //
-     /**
+    /**
      * Display a listing of the resource.
-     * 
-     * 
+     *
+     *
      */
 
-    
+
     public function index(Request $request)
 
     {
@@ -66,11 +67,11 @@ class RequetteController extends Controller
 
     /**
      * Store a newly created resource in storage.
-    
-    
-    */
 
-     
+
+     */
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -88,15 +89,15 @@ class RequetteController extends Controller
         try {
             // Générer un code unique pour la requête
             //  $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
-              $user = session('user'); 
-              // Bureau par défaut : Scolarité
-             $bureauScolarite = Bureau::where('label_bureau', 'Scholarite')
-            ->orWhere('code_bureau', 'SCOL')
-            ->first();
+            $user = session('user');
+            // Bureau par défaut : Scolarité
+            $bureauScolarite = Bureau::where('label_bureau', 'Scholarite')
+                ->orWhere('code_bureau', 'SCOL')
+                ->first();
 
             if (!$bureauScolarite) {
-            return back()->withErrors(['error' => 'Service Scolarité non trouvé. Contactez l\'administrateur.']);
-           }
+                return back()->withErrors(['error' => 'Service Scolarité non trouvé. Contactez l\'administrateur.']);
+            }
             // Créer la requête
             $requete = Requete::create([
                 //  'code_requete' => $codeRequete,
@@ -109,7 +110,7 @@ class RequetteController extends Controller
                 'date_sousmis' => now(),
                 'code_cat' => $request->code_cat,
                 'code_user' => $user->code_user,
-                 'code_bureau' => $bureauScolarite->code_bureau,
+                'code_bureau' => $bureauScolarite->code_bureau,
                 'priorite' => $request->priorite ?? 'standard'
             ]);
 
@@ -130,7 +131,7 @@ class RequetteController extends Controller
             }
 
             // Envoyer email de confirmation à l'étudiant
-             $user = session('user');
+            $user = session('user');
             // if (!$user) {
             //     abort(401, 'Utilisateur non authentifié');
             // }
@@ -140,7 +141,6 @@ class RequetteController extends Controller
 
             return redirect()->route('requetes.index', $requete->code_requete)
                 ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $requete->code_requete);
-
         } catch (\Exception $e) {
             // Log::error('Erreur lors de la soumission de la requête: ' . $e->getMessage());
             return back()->withInput()
@@ -166,7 +166,8 @@ class RequetteController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $code_requete)
-    {   $user = session('user');
+    {
+        $user = session('user');
         $requete = Requete::where('code_requete', $code_requete)
             ->where('code_user', $user->code_user)
             ->where('status', 'en attente')
@@ -182,7 +183,8 @@ class RequetteController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $code_requete)
-    {   $user = session('user');
+    {
+        $user = session('user');
         $requete = Requete::where('code_requete', $code_requete)
             ->where('code_user', $user->code_user)
             ->where('status', 'en attente')
@@ -224,7 +226,6 @@ class RequetteController extends Controller
 
             return redirect()->route('requetes.show', $code_requete)
                 ->with('success', 'Votre requête a été mise à jour avec succès.');
-
         } catch (\Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour de la requête.');
@@ -237,7 +238,7 @@ class RequetteController extends Controller
     public function destroy(string $code_requete)
     {
         $user = session('user');
-       $requete = Requete::where('code_requete', $code_requete)
+        $requete = Requete::where('code_requete', $code_requete)
             ->where('code_user', $user->code_user)
             ->where('status', 'en attente')
             ->firstOrFail();
@@ -253,7 +254,6 @@ class RequetteController extends Controller
 
             return redirect()->route('requetes.index')
                 ->with('success', 'Requête supprimée avec succès.');
-
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression de la requête.');
         }
@@ -265,9 +265,9 @@ class RequetteController extends Controller
     public function deleteFichier(string $id_fichier)
     {
         $fichier = FichierRequete::where('id_fichier', $id_fichier)
-            ->whereHas('requete', function($query) {
+            ->whereHas('requete', function ($query) {
                 $query->where('code_user', Auth::user()->code_user)
-                      ->where('status', 'en attente');
+                    ->where('status', 'en attente');
             })
             ->firstOrFail();
 
@@ -287,7 +287,7 @@ class RequetteController extends Controller
     public function downloadFichier(string $id_fichier)
     {
         $fichier = FichierRequete::where('id_fichier', $id_fichier)
-            ->whereHas('requete', function($query) {
+            ->whereHas('requete', function ($query) {
                 $query->where('code_user', Auth::user()->code_user);
             })
             ->firstOrFail();
@@ -305,4 +305,7 @@ class RequetteController extends Controller
      */
 
 
+    /**
+     * Afficher les statistiques des requêtes
+     */
 }

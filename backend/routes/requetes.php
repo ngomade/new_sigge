@@ -20,8 +20,6 @@ Route::prefix('requete')->group(function () {
     Route::apiResource('bureaux', BureauControllerApi::class)->parameters([
         'bureaux' => 'code_bureau'
     ]);
-    
-    
 });
 
 // Routes personnalisées AVANT les routes de ressource
@@ -47,22 +45,22 @@ Route::prefix('affectations')->group(function () {
     Route::put('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'update']); // Modifier affectation
     Route::delete('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'destroy']); // Supprimer affectation
 
-    
+
 });
 
 // routes pour web
 
 
- Route::middleware('web')->group(function () {
+Route::middleware('web')->group(function () {
     Route::resource('requetes', RequetteController::class, ['parameters' => ['requetes' => 'code_requete']]);
 
 
- Route::resource('affectation', AffectationPersonnelController::class);
+    Route::resource('affectation', AffectationPersonnelController::class);
 
-// Routes de ressource APRÈS les routes personnalisées
-Route::resource('bureaux', BureauController::class)->parameters([
-    'bureaux' => 'code_bureau'
-]);
+    // Routes de ressource APRÈS les routes personnalisées
+    Route::resource('bureaux', BureauController::class)->parameters([
+        'bureaux' => 'code_bureau'
+    ]);
 });
 
 Route::delete('requetes/fichiers/{id_fichier}', [RequetteController::class, 'deleteFichier'])->name('requetes.deleteFichier');
@@ -85,12 +83,13 @@ Route::prefix('api/admin/requete')->group(function () {
 });
 
 Route::prefix('admin/requetes')->group(function () {
+
     Route::get('/', [AdminRequeteController::class, 'index'])->name('admin.requetes.index');
     Route::get('/{code_requete}', [AdminRequeteController::class, 'show'])->name('admin.requetes.show');
     Route::put('/{code_requete}/status', [AdminRequeteController::class, 'updateStatus'])->name('admin.requetes.updateStatus');
     Route::post('/{code_requete}/assign', [AdminRequeteController::class, 'assign'])->name('admin.requetes.assign');
     Route::post('/{code_requete}/response', [AdminRequeteController::class, 'addResponse'])->name('admin.requetes.addResponse');
+  // Route pour les statistiques des requêtes
+// Routes pour les statistiques côté admin
+Route::get('admin/requetes/statistiques', [AdminRequeteController::class, 'statistiques'])->name('admin.requetes.statistiques');
 });
-
-
-

@@ -1,7 +1,5 @@
 @extends("sige_app.backend.template.backend")
 @section("js")
-    
-@endsection
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
@@ -135,10 +133,10 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'code_requete', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'code_requete', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                    class="hover:text-gray-700">
                                     Code Requête
-                                    @if(request('sort') === 'code_requete')
+                                     @if(request('sort') === 'code_requete')
                                         <span class="ml-1">{{ request('direction') === 'asc' ? '↑' : '↓' }}</span>
                                     @endif
                                 </a>
@@ -153,10 +151,10 @@
                                 Bureau
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                    class="hover:text-gray-700">
                                     Statut
-                                    @if(request('sort') === 'status')
+                                    @if(request ('sort') === 'status')
                                         <span class="ml-1">{{ request('direction') === 'asc' ? '↑' : '↓' }}</span>
                                     @endif
                                 </a>
@@ -165,10 +163,10 @@
                                 Priorité
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'date_sousmis', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}" 
+                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'date_sousmis', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}"
                                    class="hover:text-gray-700">
                                     Date soumise
-                                    @if(request('sort') === 'date_sousmis')
+                                    @if(request('sort ') === 'date_sousmis')
                                         <span class="ml-1">{{ request('direction') === 'asc' ? '↑' : '↓' }}</span>
                                     @endif
                                 </a>
@@ -224,10 +222,10 @@
                                     {{ $requete->date_sousmis ? $requete->date_sousmis->format('d/m/Y H:i') : 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" style="position: relative; z-index: 10;">
-                                <a href="{{ route('admin.requetes.show', $requete->code_requete) }}" 
+                                <a href="{{ route('admin.requetes.show', $requete->code_requete) }}"
                               class="btn btn-primary" style="position: relative; z-index: 10; display: inline-block; visibility: visible; opacity: 1;">
                                Voir détails
-                                </a>
+                                 </a>
                                 </td>
                             </tr>
                         @endforeach
