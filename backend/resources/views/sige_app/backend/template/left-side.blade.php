@@ -253,6 +253,31 @@
         </ul>
       </li>
       @endif
+      {{-- @if ($personnel->hasRole("CHEF_SERV") || $personnel->hasRole("ADMIN")) --}}
+      <!-- Components -->
+      <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Requetes</span></li>
+      <!-- Cards -->
+      <li class="menu-item">
+        <a href="javascript:void(0)" class="menu-link menu-toggle">
+          <i class="menu-icon tf-icons bx bx-news"></i>
+          <div data-i18n="User interface">Requetes</div>
+        </a>
+        <ul class="menu-sub">
+          <li class="menu-item">
+            <a href="{{ route('admin.requetes.index') }}" class="menu-link">
+              <div data-i18n="PubActu">Gerer les requetes</div>
+            </a>
+          </li>
+          
+          <li class="menu-item">
+            <a href="#" class="menu-link">
+              <div data-i18n="StatActu">Statisques</div>
+            </a>
+          </li>
+        </ul>
+      </li>
+      
+      {{-- @endif --}}
       @if($personnel->hasRole("ADMIN"))
       <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Notes</span></li>
 
@@ -325,9 +350,9 @@
           <li class="menu-item">
             <a href="/bureau/Service" class="menu-link"><div data-i18n="Service">Service</div></a>
           </li>
-          <li class="menu-item">
+          {{-- <li class="menu-item">
             <a href="{{ route('admin.requetes.index') }}" class="menu-link"><div data-i18n="Requete">Requete</div></a>
-          </li>
+          </li> --}}
         </ul>
       </li>
       <li class="menu-item">
@@ -345,5 +370,6 @@
         </ul>
       </li>
       @endif
+      
     </ul>
   </aside>
