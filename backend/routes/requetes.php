@@ -10,6 +10,7 @@ use App\Http\Controllers\requetes\AffectationPersonnelController;
 use App\Http\Controllers\requetes\AffectationPersonnelControllerApi;
 use App\Http\Controllers\requetes\AdminRequetteControllerApi;
 use App\Http\Controllers\requetes\RequetteControllerApi;
+use App\Http\Controllers\requetes\CategoryController;
 
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
@@ -89,7 +90,11 @@ Route::prefix('admin/requetes')->group(function () {
     Route::put('/{code_requete}/status', [AdminRequeteController::class, 'updateStatus'])->name('admin.requetes.updateStatus');
     Route::post('/{code_requete}/assign', [AdminRequeteController::class, 'assign'])->name('admin.requetes.assign');
     Route::post('/{code_requete}/response', [AdminRequeteController::class, 'addResponse'])->name('admin.requetes.addResponse');
-  // Route pour les statistiques des requêtes
-// Routes pour les statistiques côté admin
-Route::get('admin/requetes/statistiques', [AdminRequeteController::class, 'statistiques'])->name('admin.requetes.statistiques');
+    // Route pour les statistiques des requêtes
+    // Routes pour les statistiques côté admin
+    Route::get('admin/requetes/statistiques', [AdminRequeteController::class, 'statistiques'])->name('admin.requetes.statistiques');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{code_cat}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{code_cat}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });

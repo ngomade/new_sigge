@@ -275,6 +275,11 @@
                         <div data-i18n="StatActu">Statistiques</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('categories.index') }}" class="menu-link">
+                        <div data-i18n="StatActu">categories</div>
+                    </a>
+                </li>
             </ul>
         </li>
 
