@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+
 
 class AdminRequeteController extends Controller
 {
@@ -326,6 +328,69 @@ class AdminRequeteController extends Controller
 
     /**
      * Dashboard with statistics
-     */
+     */// AdminRequeteController.php
+public function statistiques()
+{
+    // Statistiques globales
+    $totalRequetes = Requete::count();
+    $requetesEnAttente = Requete::where('status', 'en attente')->count();
+    $requetesEnCours = Requete::where('status', 'en cours')->count();
+    $requetesTraitees = Requete::where('status', 'traitée')->count();
 
+    // Répartition par bureau
+    $statistiquesParBureau = Requete::with('bureau')
+        ->select('code_bureau', DB::raw('count(*) as total'))
+        ->groupBy('code_bureau')
+        ->get();
+
+    // Répartition par catégorie
+    $statistiquesParCategorie = Requete::with('category')
+        ->select('code_cat', DB::raw('count(*) as total'))
+        ->groupBy('code_cat')
+        ->get();
+
+    // Évolution mensuelle
+    $evolutionMensuelle = Requete::select(
+            DB::raw('YEAR(date_sousmis) as annee'),
+            DB::raw('MONTH(date_sousmis) as mois'),
+            DB::raw('count(*) as total')
+        )
+        ->where('date_sousmis', '>=', now()->subYear())
+        ->groupBy('annee', 'mois')
+        ->orderBy('annee', 'desc')
+        ->orderBy('mois', 'desc')
+        ->get();
+
+    // Top 10 utilisateurs les plus actifs
+    $utilisateursActifs = Requete::with('user')
+        ->select('code_user', DB::raw('count(*) as total_requetes'))
+        ->groupBy('code_user')
+        ->orderBy('total_requetes', 'desc')
+        ->limit(10)
+        ->get();
+
+    // Temps moyen de traitement par bureau
+    $tempsTraitementParBureau = Requete::with('bureau')
+        ->whereNotNull('date_traitement')
+        ->select(
+            'code_bureau',
+            DB::raw('AVG(DATEDIFF(date_traitement, date_sousmis)) as moyenne_jours')
+        )
+        ->groupBy('code_bureau')
+        ->get();
+
+    return view('sige_app.backend.administration.statistiques', compact(
+        'totalRequetes',
+        'requetesEnAttente',
+        'requetesEnCours',
+        'requetesTraitees',
+        'statistiquesParBureau',
+        'statistiquesParCategorie',
+        'evolutionMensuelle',
+        'utilisateursActifs',
+        'tempsTraitementParBureau'
+    ));
 }
+
+
+    }
