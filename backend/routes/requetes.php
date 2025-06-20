@@ -12,6 +12,7 @@ use App\Http\Controllers\requetes\AdminRequetteControllerApi;
 use App\Http\Controllers\requetes\RequetteControllerApi;
 use App\Http\Controllers\requetes\CategoryController;
 
+
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
     Route::get('bureaux/search', [BureauControllerApi::class, 'search'])->name('api.bureaux.search');
