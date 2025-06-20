@@ -43,10 +43,24 @@ class Requete extends Model
     {
         parent::boot();
         self::creating(function ($model) {
-            do {
-                $id = 'REQ-' . strtoupper(Str::random(10));
-            } while (Requete::where('code_requete', $id)->exists());
-            $model->code_requete = $id;
+            $year = date('y'); // last two digits of current year
+            $prefix = 'REQ' . $year;
+
+            // Get max sequence number for current year prefix
+            $maxCode = Requete::where('code_requete', 'like', $prefix . '%')
+                ->max('code_requete');
+
+            if ($maxCode) {
+                $lastSequence = (int)substr($maxCode, strlen($prefix));
+                $nextSequence = $lastSequence + 1;
+            } else {
+                $nextSequence = 1;
+            }
+
+            // Format sequence with leading zeros to 6 digits
+            $sequenceStr = str_pad($nextSequence, 6, '0', STR_PAD_LEFT);
+
+            $model->code_requete = $prefix . $sequenceStr;
         });
     }
 

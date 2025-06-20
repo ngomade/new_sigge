@@ -1,6 +1,27 @@
 @extends("sige_app.backend.template.backend")
+@section("js")
+ <script>
+function confirmDelete(code_cat, label_cat) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer la catégorie "' + label_cat + '" ?\n\nCette action est irréversible.')) {
+        document.getElementById('delete-form-' + code_cat).submit();
+    }
+}
+
+// Auto-hide alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>
+
+@endsection
 @section("content")
-<?php $user = \Session::get("user");?>
+{{-- <?php $user = \Session::get("user");?> --}}
 
 <!-- Modal d'ajout -->
 <div class="modal fade" id="addModal" tabindex="-1">
@@ -10,7 +31,7 @@
                 <h5 class="modal-title" style="color: white">Ajout d'une catégorie</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('categories.store') }}" method="post">
+            <form action="{{ route('admin.requetes.categories.store') }}" method="post">
                 @csrf
                 <div class="modal-body">
                     <div class="row mt-3">
@@ -42,7 +63,7 @@
                 <h5 class="modal-title text-dark">Modification de la catégorie</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('categories.update', $category->code_cat) }}" method="post">
+            <form action="{{ route('admin.requetes.categories.update', $category->code_cat) }}" method="post">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -138,7 +159,7 @@
                             </button>
                             
                             <!-- Formulaire de suppression caché -->
-                            <form id="delete-form-{{$category->code_cat}}" action="{{ route('categories.destroy', $category->code_cat) }}" method="POST" style="display: none;">
+                            <form id="delete-form-{{$category->code_cat}}" action="{{ route('admin.requetes.categories.destroy', $category->code_cat) }}" method="POST" style="display: none;">
                                 @csrf
                                 @method('DELETE')
                             </form>
@@ -160,23 +181,5 @@
     </div>
 </div>
 
-<script>
-function confirmDelete(code_cat, label_cat) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer la catégorie "' + label_cat + '" ?\n\nCette action est irréversible.')) {
-        document.getElementById('delete-form-' + code_cat).submit();
-    }
-}
-
-// Auto-hide alerts after 5 seconds
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        var alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            var bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-});
-</script>
 
 @endsection

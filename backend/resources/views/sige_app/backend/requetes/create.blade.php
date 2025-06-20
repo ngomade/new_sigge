@@ -1,4 +1,23 @@
 @extends("sige_app.frontend.template.frontend")
+@section('js')
+ <script>
+    // Auto-hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+    document.getElementById('closeCreateModalBtn').addEventListener('click', function() {
+        const modal = this.closest('.modal');
+        modal.classList.remove('show', 'd-block');
+    });
+</script>
+@endsection
 @section('title', 'Nouvelle Requête')
 
 @section("content")
@@ -7,7 +26,7 @@
 <div class="modal-content border-danger shadow">
     <div class="modal-header bg-danger p-2 d-flex justify-content-between align-items-center" style="color: white">
         <h5 class="modal-title mb-0" style="color: white">Ajout d'une requête</h5>
-        <button type="button" class="btn-close" aria-label="Close" style="filter: invert(1);" data-bs-dismiss="modal"></button> {{-- Changed to button to close modal without navigation --}}
+        <button type="button" class="btn-close" aria-label="Close" style="filter: invert(1);" id="closeCreateModalBtn"></button> {{-- Changed to button to close modal without navigation --}}
     </div>
             <form action="{{ route('requetes.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -86,4 +105,6 @@
         </div>
     </div>
 </div>
+
+
 @endsection

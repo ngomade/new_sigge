@@ -121,17 +121,19 @@ class AdminRequeteController extends Controller
             if ($newStatus !== $oldStatus && in_array($newStatus, ['en cours', 'en attente', 'traitée', 'rejetée'])) {
                 $updateData['status'] = $newStatus;
 
-                // Gestion des dates selon le statut
-                switch ($newStatus) {
-                    case 'en cours':
-                        $updateData['date_asignation'] = now();
-                        break;
+            // Gestion des dates selon le statut
+            switch ($newStatus) {
+                case 'en cours':
+                    $updateData['date_asignation'] = now();
+                    // Clear date_traitement if status is set back to 'en cours'
+                    $updateData['date_traitement'] = null;
+                    break;
 
-                    case 'traitée':
-                    case 'rejetée':
-                        $updateData['date_traitement'] = now();
-                        break;
-                }
+                case 'traitée':
+                case 'rejetée':
+                    $updateData['date_traitement'] = now();
+                    break;
+            }
             }
 
             // Transfert vers un autre bureau
@@ -155,6 +157,7 @@ class AdminRequeteController extends Controller
                         Mail::to($userEmail)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
                     } catch (\Exception $e) {
                         Log::error('Erreur envoi mail assignation: ' . $e->getMessage());
+                        return back()->with('success', 'Statut de la requête mis à jour avec succès.')->with('error', 'Le mail d\'assignation n\'a pas pu être envoyé.');
                     }
                 }
             }
@@ -170,6 +173,7 @@ class AdminRequeteController extends Controller
                         Mail::to($userEmail)->send(new RequeteStatusChangeMail($requete, $emailOldStatus, $emailNewStatus));
                     } catch (\Exception $e) {
                         Log::error('Erreur envoi mail changement statut: ' . $e->getMessage());
+                        return back()->with('success', 'Statut de la requête mis à jour avec succès.')->with('error', 'Le mail de changement de statut n\'a pas pu être envoyé.');
                     }
                 }
             }
@@ -232,7 +236,7 @@ class AdminRequeteController extends Controller
 
         try {
             $reponse = Reponse::create([
-                'code_res'     => 'RES-' . strtoupper(Str::random(10)),
+                // 'code_res'     => 'RES-' . strtoupper(Str::random(10)),
                 'text_reponse' => $request->text_reponse,
                 'code_requete' => $code_requete,
             ]);
@@ -245,9 +249,9 @@ class AdminRequeteController extends Controller
             // Notification de réponse
             $userEmail = $requete->user->email_user ?? null;
             $sendEmail = $request->input('email_notifications', false);
-            if ($userEmail && $request->filled('text_reponse') && $sendEmail) {
-                Mail::to($userEmail)->send(new RequeteResponseMail($requete, $request->text_reponse));
-            }
+if ($userEmail && $request->filled('text_reponse') && $sendEmail) {
+    Mail::to($userEmail)->send(new RequeteResponseMail($requete, $reponse));
+}
 
             return back()->with('success', 'Réponse ajoutée avec succès.');
 

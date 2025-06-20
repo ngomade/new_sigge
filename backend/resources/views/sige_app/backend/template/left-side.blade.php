@@ -94,7 +94,7 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{{ route('admin.requetes.statistiques') }}" class="menu-link">
+                        <a href="" class="menu-link">
                             <div data-i18n="Blank">Statistiques</div>
                         </a>
                     </li>
@@ -276,9 +276,9 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="{{ route('categories.index') }}" class="menu-link">
-                        <div data-i18n="StatActu">categories</div>
-                    </a>
+<a href="{{ route('admin.requetes.categories.index') }}" class="menu-link">
+    <div data-i18n="StatActu">categories</div>
+</a>
                 </li>
             </ul>
         </li>

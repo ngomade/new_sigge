@@ -1,6 +1,19 @@
 @extends("sige_app.frontend.template.frontend")
-@section("js")
 
+@section('css')
+@endsection
+
+@section("js")
+<script>
+    function printProgressTable() {
+        var printContents = document.getElementById('progressTable').innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+</script>
 @endsection
 
 @section('content')
@@ -13,24 +26,29 @@
             </div>
             <div class="modal-body">
                 <!-- Messages -->
+                {{-- Remove bootstrap alerts for flash messages since toastr will handle them --}}
+                
                 @if(session('success'))
-                    <div class="alert alert-success">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-danger">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+                
 
                 <!-- Détails de la requête -->
                 <div class="mb-3">
                     <h6 class="text-muted">Code: {{ $requete->code_requete }}</h6>
                 </div>
 
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <label class="form-label fw-bold">Description</label>
                     <p class="border rounded p-3 bg-light">{{ $requete->desc_requete }}</p>
                 </div>
@@ -71,25 +89,87 @@
                             {{ ucfirst($requete->priorite) }}
                         </span>
                     </div>
+                </div> --}}
+
+                {{-- <!-- Fichiers joints --> --}}
+                {{-- @if($requete->fichiers->count() > 0) --}}
+                    {{-- <div class="mb-3"> --}}
+                        {{-- <h6>Fichiers joints</h6> --}}
+                        {{-- <ul class="list-group"> --}}
+                            {{-- @foreach($requete->fichiers as $fichier) --}}
+                                {{-- <li class="list-group-item d-flex justify-content-between align-items-center"> --}}
+                                    {{-- <div> --}}
+                                        {{-- <i class="bi bi-file-earmark-text me-2"></i> --}}
+                                        {{-- {{ $fichier->nom_original }} ({{ number_format($fichier->taille / 1024, 2) }} KB) --}}
+                                    {{-- </div> --}}
+                                    {{-- <div> --}}
+                                        {{-- <a href="{{ Storage::url($fichier->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">Examiner</a> --}}
+                                        {{-- @if($requete->status === 'en attente') --}}
+                                            {{-- <form action="{{ route('requetes.deleteFichier', $fichier->id_fichier) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')"> --}}
+                                                {{-- @csrf --}}
+                                                {{-- @method('DELETE') --}}
+                                                {{-- <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button> --}}
+                                            {{-- </form> --}}
+                                        {{-- @endif --}}
+                                    {{-- </div> --}}
+                                {{-- </li> --}}
+                            {{-- @endforeach --}}
+                        {{-- </ul> --}}
+                    {{-- </div> --}}
+                {{-- @endif --}}
+
+                <!-- Progress Tracking Table -->
+                <div class="mb-4" id="progressTable">
+                    <h6>Suivi du parcours de la requête</h6>
+                    <button class="btn btn-sm btn-outline-primary mb-2" onclick="printProgressTable()">Imprimer</button>
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Étape</th>
+                                <th>Date</th>
+                                <th>Bureau</th>
+                                <th>Personne en charge</th>
+                                <th>But</th>
+                                <th>Expéditeur</th>
+                                <th>Destinataire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($progressSteps as $step)
+                            <tr>
+                                <td>{{ $step['step'] }}</td>
+                                <td>{{ $step['date'] ? $step['date']->format('d/m/Y à H:i') : 'Non effectué' }}</td>
+                                <td>{{ $step['bureau']->label_bureau ?? 'N/A' }}</td>
+                                <td>{{ $step['manager'] ? $step['manager']->nom_pers . ' ' . $step['manager']->prenom_pers : 'N/A' }}</td>
+                                <td>{{ $step['purpose'] ?? 'N/A' }}</td>
+                                <td>{{ $step['sender'] ? $step['sender']->nom ?? $step['sender']->nom_pers ?? 'N/A' : 'N/A' }}</td>
+                                <td>{{ $step['recipient'] ? $step['recipient']->nom ?? $step['recipient']->nom_pers ?? 'N/A' : 'N/A' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end">
+                        {{ $progressSteps->appends(request()->except('page'))->links('pagination::bootstrap-5', ['prevText' => 'Précédent', 'nextText' => 'Suivant']) }}
+                    </div>
                 </div>
 
-                <!-- Fichiers joints -->
+                 <!-- Fichiers joints --> 
                 @if($requete->fichiers->count() > 0)
-                    <div class="mb-3">
-                        <h6>Fichiers joints</h6>
-                        <ul class="list-group">
-                            @foreach($requete->fichiers as $fichier)
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="bi bi-file-earmark-text me-2"></i>
+                    <div class="mb-3"> 
+                         <h6>Fichiers joints</h6>
+                         <ul class="list-group"> 
+                             @foreach($requete->fichiers as $fichier) 
+                                 <li class="list-group-item d-flex justify-content-between align-items-center"> 
+                                    <div> 
+                                         <i class="bi bi-file-earmark-text me-2"></i> 
                                         {{ $fichier->nom_original }} ({{ number_format($fichier->taille / 1024, 2) }} KB)
-                                    </div>
-                                    <div>
-                                        <a href="{{ Storage::url($fichier->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">Télécharger</a>
+                                    </div> 
+                                     <div>
+                                        <a href="{{ Storage::url($fichier->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">Examiner</a>
                                         @if($requete->status === 'en attente')
-                                            <form action="{{ route('requetes.deleteFichier', $fichier->id_fichier) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')">
-                                                @csrf
-                                                @method('DELETE')
+                                            <form action="{{ route('requetes.deleteFichier', $fichier->id_fichier) }}" method="POST" class="d-inline delete-fichier-form"> 
+                                                 @csrf
+                                                @method('DELETE') 
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                                             </form>
                                         @endif
@@ -98,7 +178,7 @@
                             @endforeach
                         </ul>
                     </div>
-                @endif
+                 @endif
 
                 <!-- Réponses -->
                 @if($requete->reponses && $requete->reponses->count() > 0)
