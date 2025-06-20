@@ -5,7 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Thiagoprz\CompositeKey\HasCompositeKey;
-
+use Spatie\Permission\Models\Role;
 class PersRole extends Model
 {
     use HasCompositeKey;
@@ -15,14 +15,14 @@ class PersRole extends Model
     public $timestamps = true;
 
     protected $casts = [
-        'code_role' => 'int',
+        'id' => 'int',
         'date_debut_role' => 'datetime',
         'date_fin_role' => 'date',
         'statut_role' => 'int'
     ];
 
     protected $fillable = [
-        'code_role',
+        'id',
         'code_bureau',
         'code_pers',
         'date_debut_role',

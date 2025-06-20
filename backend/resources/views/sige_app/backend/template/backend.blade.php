@@ -45,6 +45,16 @@
       <link href="{{ asset('vendor/toastr/build/toastr.css') }}" rel="stylesheet"/>
       <link href="{{ asset('vendor/sweetalert2/dist/sweetalert2.css')  }}" />
 
+    <style>
+        /* Forcer SweetAlert2 à être toujours au-dessus des modals Bootstrap */
+        .swal2-container, .swal2-container-custom {
+            z-index: 20000 !important;
+        }
+        .swal2-popup {
+            z-index: 21000 !important;
+        }
+    </style>
+
   </head>
 
   <body>

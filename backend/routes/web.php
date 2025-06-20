@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BasculementController;
 use App\Http\Controllers\BureauController;
+use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\concours\AdminConcoursController;
 use App\Http\Controllers\EcController;
 use App\Http\Controllers\EtudiantController;
@@ -18,6 +19,7 @@ Route::get("maintenance", [EcController::class ,'maintenance'])->name("maintenan
 
 // Routes pour la gestion de bureaux
 Route::get("bureau/{type}", [BureauController::class ,'index'])->name("index_bureau");
+Route::get("bureau/{type}/affectation", [AffectationController::class ,'index'])->name("affectation_personnel");
 Route::post("ajouter_bureau", [BureauController::class ,'store'])->name("ajouter_bureau");
 Route::get("delete_bureau/{type_bureau}/{code_bureau}", [BureauController::class ,'destroy'])->name("delete_bureau");
 Route::post("presentation_bureau", [BureauController::class ,'store_present'])->name("ajouter_presentation");

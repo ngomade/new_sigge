@@ -25,6 +25,18 @@ class BureauController extends Controller
         return view("sige_app.backend.administration.bureau", compact("type_bureau"));
     }
 
+    /**
+     * Afficher la page d'affectation de personnel
+     */
+    public function affectationPersonnel(string $type_bureau)
+    {
+        $bureau = Bureau::where('type_bureau', $type_bureau)->first();
+        if (!$bureau) {
+            return redirect()->back()->withErrors("Aucun bureau trouvé pour le type: " . $type_bureau);
+        }
+
+        return view("sige_app.backend.administration.affectation_personnel", compact("type_bureau", "bureau"));
+    }
 
     public function store(Request $request)
     {
@@ -208,7 +220,7 @@ class BureauController extends Controller
                     $existingRole->update([
                         'date_debut_role' => now(),
                         'date_fin_role' => $personnel['date_fin_role'] ?? null,
-                        'satut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF
+                        'statut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF
                     ]);
                 } else {
                     // Créer un nouveau rôle
@@ -218,7 +230,7 @@ class BureauController extends Controller
                         'code_role' => $personnel['role_id'],
                         'date_debut_role' => now(),
                         'date_fin_role' => $personnel['date_fin_role'] ?? null,
-                        'satut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF
+                        'statut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF
                     ]);
                 }
             }
@@ -258,7 +270,7 @@ class BureauController extends Controller
                 }
             ])
             ->where('code_bureau', $code)
-            ->get(['code_bureau', 'code_pers', 'code_role', 'date_debut_role', 'date_fin_role', 'satut_role']);
+            ->get(['code_bureau', 'code_pers', 'code_role', 'date_debut_role', 'date_fin_role', 'statut_role']);
 
         // Formater la réponse
         $formattedPersonnel = $personnel->map(function($item) {
@@ -278,7 +290,7 @@ class BureauController extends Controller
                 'second_phone' => $item->personnel->second_phone_pers ?? '',
                 'role_id' => $item->code_role,
                 'role_libelle' => $item->role->name ?? 'Inconnu',
-                'date_debut' => $item->date_debut_role,
+                'date_debut' => $item->date_debut_role ? Carbon::parse($item->date_debut_role)->format('d/m/Y') : null,
                 'date_fin' => $item->date_fin_role ? Carbon::parse($item->date_fin_role)->format('d/m/Y') : null,
                 'statut' => $statut
             ];
@@ -288,7 +300,7 @@ class BureauController extends Controller
     }
 
     /**
-     * Désactiver un rôle d'un personnel dans un bureau
+     * Désactiver un rôle d'un personnel dans un bureau (pour compatibilité)
      */
     public function desactiverRole(Request $request)
     {
@@ -324,6 +336,83 @@ class BureauController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la désactivation du rôle: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Affecter plusieurs rôles à plusieurs personnels
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function affecterPersonnelMultiple(Request $request)
+    {
+        $request->validate([
+            'bureau_code' => 'required|exists:bureau,code_bureau',
+            'affectations' => 'required|array',
+            'affectations.*.id' => 'required|exists:personnel,code_pers',
+            'affectations.*.roles' => 'required|array',
+            'affectations.*.roles.*.role_id' => 'required|integer|exists:roles,id',
+            'affectations.*.roles.*.date_debut_role' => 'required|date',
+            'affectations.*.roles.*.date_fin_role' => 'nullable|date|after:affectations.*.roles.*.date_debut_role',
+            'affectations.*.roles.*.statut_role' => 'required|integer|in:0,1'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $bureauCode = $request->bureau_code;
+            $affectations = $request->affectations;
+            $totalAffectations = 0;
+
+            foreach ($affectations as $affectation) {
+                $personnelId = $affectation['id'];
+
+                foreach ($affectation['roles'] as $roleData) {
+                    // Vérifier si le personnel a déjà ce rôle dans ce bureau
+                    $existingRole = PersRole::where([
+                        'code_bureau' => $bureauCode,
+                        'code_pers' => $personnelId,
+                        'code_role' => $roleData['role_id']
+                    ])->first();
+
+                    if ($existingRole) {
+                        // Mettre à jour le rôle existant
+                        $existingRole->update([
+                            'date_debut_role' => $roleData['date_debut_role'],
+                            'date_fin_role' => $roleData['date_fin_role'] ?? null,
+                            'statut_role' => $roleData['statut_role']
+                        ]);
+                    } else {
+                        // Créer un nouveau rôle
+                        PersRole::create([
+                            'code_bureau' => $bureauCode,
+                            'code_pers' => $personnelId,
+                            'code_role' => $roleData['role_id'],
+                            'date_debut_role' => $roleData['date_debut_role'],
+                            'date_fin_role' => $roleData['date_fin_role'] ?? null,
+                            'statut_role' => $roleData['statut_role']
+                        ]);
+                    }
+                    $totalAffectations++;
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$totalAffectations} affectation(s) enregistrée(s) avec succès"
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erreur lors de l\'affectation multiple du personnel: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de l\'affectation: ' . $e->getMessage()
             ], 500);
         }
     }

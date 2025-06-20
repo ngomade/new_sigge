@@ -344,10 +344,9 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Liste des {{$type_bureau}}s</h5>
             <div>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#affecterPersonnelModal" data-bureau-code="{{$bureau->code_bureau}}">
-                    <i class="fas fa-user-plus me-1"></i> Affecter du personnel
-                </button>
+                <a href="/bureau/{{$type_bureau}}/affectation/?bureau_code={{ \App\Models\Bureau::where('type_bureau', $type_bureau)->first('code_bureau')->code_bureau }}" class="btn btn-primary me-2">
+                    <i class="fas fa-user-plus me-1"></i> Gérer les affectations
+                </a>
                 <button class="btn btn-primary" style="font-size: 1.08em;" data-bs-toggle="modal"
                         data-bs-target="#addModal">Ajouter &nbsp; <i class="ri-add-circle-fill"></i></button>
                 <button class="btn btn-success" style="font-size: 1.08em;" data-bs-toggle="modal"
@@ -377,6 +376,9 @@
                                 style="width: 30%; overflow: hidden;">{!!$bureau->desc_bureau!!}  </td>
                             <td> {{$bureau->created_at !=null? $bureau->created_at->format("d/m/Y H:i"): "" }}  </td>
                             <td style="text-align: center;">
+                                <a href="{{ route('affectation_personnel', ['type' => $type_bureau, 'bureau_code' => $bureau->code_bureau]) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user-plus"></i> Affecter du personnel
+                                </a>
                                 <a href="/delete_bureau/{{$type_bureau}}/{{$bureau->code_bureau}}"
                                    class="btn-outline-danger rounded p-1"><i class='bx bx-x-circle'></i> </a>
                                 <a href="/update_bureau/{{$bureau->code_bureau}}"
