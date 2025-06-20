@@ -83,18 +83,18 @@ Route::prefix('api/admin/requete')->group(function () {
     Route::post('/{code_requete}/response', [AdminRequetteControllerApi::class, 'addResponse']);
 });
 
-Route::prefix('admin/requetes')->group(function () {
+Route::prefix('admin/requetes')->name('admin.requetes.')->group(function () {
 
-    Route::get('/', [AdminRequeteController::class, 'index'])->name('admin.requetes.index');
-    Route::get('/{code_requete}', [AdminRequeteController::class, 'show'])->name('admin.requetes.show');
-    Route::put('/{code_requete}/status', [AdminRequeteController::class, 'updateStatus'])->name('admin.requetes.updateStatus');
-    Route::post('/{code_requete}/assign', [AdminRequeteController::class, 'assign'])->name('admin.requetes.assign');
-    Route::post('/{code_requete}/response', [AdminRequeteController::class, 'addResponse'])->name('admin.requetes.addResponse');
+    Route::get('/', [AdminRequeteController::class, 'index'])->name('index');
+    Route::get('/{code_requete}', [AdminRequeteController::class, 'show'])->name('show');
+    Route::put('/{code_requete}/status', [AdminRequeteController::class, 'updateStatus'])->name('updateStatus');
+    Route::post('/{code_requete}/assign', [AdminRequeteController::class, 'assign'])->name('assign');
+    Route::post('/{code_requete}/response', [AdminRequeteController::class, 'addResponse'])->name('addResponse');
     // Route pour les statistiques des requêtes
     // Routes pour les statistiques côté admin
-    Route::get('admin/requetes/statistiques', [AdminRequeteController::class, 'statistiques'])->name('admin.requetes.statistiques');
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::put('/categories/{code_cat}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{code_cat}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('admin/requetes/statistiques', [AdminRequeteController::class, 'statistiques'])->name('statistiques');
+    Route::get('/categorie', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categorie', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categorie/{code_cat}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categorie/{code_cat}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });

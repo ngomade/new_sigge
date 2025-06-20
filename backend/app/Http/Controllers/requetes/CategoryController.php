@@ -15,7 +15,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::orderBy('created_at', 'desc')->get();
-        return view('sige_app.backend.administration.categories.index', compact('categories'));
+        return view('sige_app.backend.requetes.categorie_index', compact('categories'));
     }
 
     /**

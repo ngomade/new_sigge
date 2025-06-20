@@ -1,5 +1,22 @@
 @extends("sige_app.frontend.template.frontend")
 @section("js")
+<script>
+    document.getElementById('closeModalBtn').addEventListener('click', function() {
+        const modal = this.closest('.modal');
+        modal.classList.remove('show', 'd-block');
+    });
+</script>
+
+    // Auto-hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
 
 @endsection
 @section('content')
@@ -53,14 +70,16 @@
 
                 <!-- Messages -->
                 @if(session('success'))
-                    <div class="alert alert-success">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-danger">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
@@ -106,16 +125,18 @@
                                             </span>
                                         </td>
                                         <td>{{ $requete->date_sousmis->format('d/m/Y H:i') }}</td>
-                                        <td>
-                                            <a href="{{ route('requetes.show', $requete->code_requete) }}" class="btn btn-sm btn-info me-1">Voir</a>
-                                            @if($requete->status === 'en attente')
-                                                <a href="{{ route('requetes.edit', $requete->code_requete) }}" class="btn btn-sm btn-primary me-1">Modifier</a>
-                                                <form action="{{ route('requetes.destroy', $requete->code_requete) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette requête ?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
-                                                </form>
-                                            @endif
+                                        <td style="min-width: 180px; white-space: nowrap;">
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <a href="{{ route('requetes.show', $requete->code_requete) }}" class="btn btn-sm btn-info">Parcourir</a>
+                                                @if($requete->status === 'en attente')
+                                                    <a href="{{ route('requetes.edit', $requete->code_requete) }}" class="btn btn-sm btn-primary">Modifier</a>
+                                                    <form action="{{ route('requetes.destroy', $requete->code_requete) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette requête ?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                                    </form>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -125,7 +146,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-3">
-                        {{ $requetes->links() }}
+                        {{ $requetes->links('pagination::bootstrap-5') }}
                     </div>
                 @else
                     <div class="text-center py-5">
@@ -139,9 +160,11 @@
                 @endif
             </div>
             <div class="modal-footer justify-content-center">
-                <a href="{{ url()->previous() }}" class="btn btn-secondary">Fermer</a>
+                <button type="button" class="btn btn-secondary" id="closeModalBtn">Fermer</button>
             </div>
         </div>
     </div>
 </div>
+
+
 @endsection

@@ -158,8 +158,83 @@ class RequetteController extends Controller
             ->where('code_requete', $code_requete)
             ->where('code_user', $user->code_user)
             ->firstOrFail();
-        // $personnel = session('user');
-        return view('sige_app.backend.requetes.show', compact('requete'));
+
+        // Fetch personnel managing the bureau at each step date
+        $progressSteps = [];
+
+        // Helper function to get personnel managing bureau at a given date
+        $getManagerAtDate = function ($bureauCode, $date) {
+            if (!$date) {
+                return null;
+            }
+            $persRole = \App\Models\PersRole::where('code_bureau', $bureauCode)
+                ->where('statut_role', \App\Models\PersRole::STATUT_ACTIF)
+                ->where(function ($query) use ($date) {
+                    $query->whereNull('date_fin_role')
+                          ->orWhere('date_fin_role', '>', $date);
+                })
+                ->where('date_debut_role', '<=', $date)
+                ->with('personnel')
+                ->first();
+            return $persRole ? $persRole->personnel : null;
+        };
+
+        // Step: Soumission
+        $submissionDate = $requete->date_sousmis;
+        $submissionBureau = $requete->bureau;
+        $submissionManager = $getManagerAtDate($submissionBureau->code_bureau ?? null, $submissionDate);
+        $progressSteps[] = [
+            'step' => 'Soumission',
+            'date' => $submissionDate,
+            'bureau' => $submissionBureau,
+            'manager' => $submissionManager,
+            'purpose' => $requete->desc_requete,
+            'sender' => $requete->user,
+            'recipient' => $submissionManager ?? $submissionBureau,
+        ];
+
+        // Step: Assignation
+        $assignDate = $requete->date_asignation;
+        $assignBureau = $requete->bureau; // Assuming same bureau, adjust if different
+        $assignManager = $getManagerAtDate($assignBureau->code_bureau ?? null, $assignDate);
+        $progressSteps[] = [
+            'step' => 'Assignation',
+            'date' => $assignDate,
+            'bureau' => $assignBureau,
+            'manager' => $assignManager,
+            'purpose' => $requete->note_interne,
+            'sender' => $submissionManager,
+            'recipient' => $assignManager ?? $assignBureau,
+        ];
+
+        // Step: Traitement
+        $treatmentDate = $requete->date_traitement;
+        $treatmentBureau = $requete->bureau; // Assuming same bureau, adjust if different
+        $treatmentManager = $getManagerAtDate($treatmentBureau->code_bureau ?? null, $treatmentDate);
+        $progressSteps[] = [
+            'step' => 'Traitement',
+            'date' => $treatmentDate,
+            'bureau' => $treatmentBureau,
+            'manager' => $treatmentManager,
+            'purpose' => $requete->note_interne,
+            'sender' => $assignManager,
+            'recipient' => $treatmentManager ?? $treatmentBureau,
+        ];
+        
+        // Paginate progressSteps array manually
+        $currentPage = request()->get('page', 1);
+        $perPage = 2;
+        $offset = ($currentPage - 1) * $perPage;
+        $itemsForCurrentPage = array_slice($progressSteps, $offset, $perPage);
+        $progressSteps = new \Illuminate\Pagination\LengthAwarePaginator(
+            $itemsForCurrentPage,
+            count($progressSteps),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('sige_app.backend.requetes.show', compact('requete', 'progressSteps'));
     }
 
     /**

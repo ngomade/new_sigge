@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Email notification toggle buttons
+    // Email notification toggle buttons for status update
     const activateBtn = document.getElementById('activateEmail');
     const deactivateBtn = document.getElementById('deactivateEmail');
     const emailInput = document.getElementById('email_notifications');
@@ -51,6 +51,44 @@ document.addEventListener('DOMContentLoaded', function() {
             activateBtn.classList.remove('btn-success');
         }
     }
+
+    // Email notification toggle buttons for response
+    const activateBtnResponse = document.getElementById('activateEmailResponse');
+    const deactivateBtnResponse = document.getElementById('deactivateEmailResponse');
+    const emailInputResponse = document.getElementById('email_notifications_response');
+
+    if (activateBtnResponse && deactivateBtnResponse && emailInputResponse) {
+        activateBtnResponse.addEventListener('click', function() {
+            emailInputResponse.value = '1';
+            activateBtnResponse.classList.add('btn-success');
+            activateBtnResponse.classList.remove('btn-outline-success');
+            deactivateBtnResponse.classList.add('btn-outline-danger');
+            deactivateBtnResponse.classList.remove('btn-danger');
+            alert('Mail de réponse activé');
+        });
+
+        deactivateBtnResponse.addEventListener('click', function() {
+            emailInputResponse.value = '0';
+            deactivateBtnResponse.classList.add('btn-danger');
+            deactivateBtnResponse.classList.remove('btn-outline-danger');
+            activateBtnResponse.classList.add('btn-outline-success');
+            activateBtnResponse.classList.remove('btn-success');
+            alert('Mail de réponse désactivé');
+        });
+
+        // Initialize buttons based on current value
+        if (emailInputResponse.value === '1') {
+            activateBtnResponse.classList.add('btn-success');
+            activateBtnResponse.classList.remove('btn-outline-success');
+            deactivateBtnResponse.classList.add('btn-outline-danger');
+            deactivateBtnResponse.classList.remove('btn-danger');
+        } else {
+            deactivateBtnResponse.classList.add('btn-danger');
+            deactivateBtnResponse.classList.remove('btn-outline-danger');
+            activateBtnResponse.classList.add('btn-outline-success');
+            activateBtnResponse.classList.remove('btn-success');
+        }
+    }
 });
 </script>
 @endsection
@@ -70,13 +108,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Notifications -->
     @if(session('success'))
-        <div class="alert alert-success" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
@@ -108,11 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 {{ ucfirst($requete->status) }}
                             </span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Utilisateur</label>
-                            <p class="form-control-plaintext">{{ $requete->user->nom_user ?? 'N/A' }}</p>
-                            <p class="form-text text-muted">{{ $requete->user->email_user ?? 'N/A' }}</p>
-                        </div>
+                       
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Catégorie</label>
                             <p class="form-control-plaintext">{{ $requete->category->label_cat ?? 'N/A' }}</p>
@@ -187,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </svg>
                                 {{ $fichier->nom_fichier }}
                             </div>
-                            <a href="{{ asset('storage/' . $fichier->chemin) }}" target="_blank" class="btn btn-link btn-sm">Télécharger</a>
+                            <a href="{{ asset('storage/' . $fichier->chemin) }}" target="_blank" class="btn btn-link btn-sm">Examiner</a>
                         </li>
                         @endforeach
                     </ul>
@@ -317,13 +353,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                         Imprimer
                     </button>
-                    <a href="mailto:{{ $requete->user->email_user ?? '' }}?subject=Concernant votre requête {{ $requete->code_requete }}" class="btn btn-outline-primary w-100">
-                        <svg class="bi bi-envelope me-2" width="16" height="16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4z"/>
-                            <path fill-rule="evenodd" d="M.05 4.555L8 9.414l7.95-4.859A1 1 0 0 0 15 4H1a1 1 0 0 0-.95.555z"/>
-                        </svg>
-                        Contacter l'utilisateur
-                    </a>
+                     <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Informations personnelles de l'utilisateur</label>
+                            <p class="form-control-plaintext">{{ $requete->user->nom_user ?? 'N/A' }} {{ $requete->user->prenom_user ?? '' }}</p>
+                            <p class="form-text text-muted">
+                                Email: 
+                                @if($requete->user->email_user)
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ $requete->user->email_user }}" target="_blank" class="text-decoration-none">{{ $requete->user->email_user }}</a>
+                                @else
+                                    N/A
+                                @endif
+                            </p>
+                            <p class="form-text text-muted">
+                                Téléphone: 
+                                @if($requete->user->first_phone_user)
+                                    <a href="tel:{{ $requete->user->first_phone_user }}" class="text-decoration-none">{{ $requete->user->first_phone_user }}</a>
+                                @else
+                                    N/A
+                                @endif
+                            </p>
+                            <p class="form-text text-muted">Adresse: {{ $requete->user->lieu_resi_user ?? 'N/A' }}</p>
+                        </div>
                 </div>
             </div>
         </div>
