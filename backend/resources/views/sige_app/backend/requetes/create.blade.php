@@ -50,7 +50,7 @@
                     <div class="row mt-3 justify-content-center">
                         <div class="col-12 col-md-10 col-lg-8">
                             <input type="text" class="form-control form-control-lg border-primary" placeholder="Titre de la requête *"
-                                   name="titre_requete" id="titre_requete" maxlength="180"
+                                   name="titre_requete" id="titre_requete_create" maxlength="180"
                                    value="{{ old('titre_requete') }}" required>
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row mt-3 justify-content-center">
+                    {{-- <div class="row mt-3 justify-content-center">
                         <div class="col-12 col-md-10 col-lg-8">
                             <label class="form-label mb-1">Niveau de priorité</label>
                             <div>
@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="row mt-3 justify-content-center">
                         <div class="col-12 col-md-10 col-lg-8">
                             <label for="fichiers" class="form-label">Documents joints (optionnel)</label>

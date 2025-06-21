@@ -200,9 +200,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <a href="{{ route('requetes.index') }}" class="btn btn-secondary">Retour à la liste</a>
-                @if($requete->status === 'en attente')
+                {{-- @if($requete->status === 'en attente')
                     <a href="{{ route('requetes.edit', $requete->code_requete) }}" class="btn btn-primary">Modifier</a>
-                @endif
+                @endif --}}
             </div>
         </div>
     </div>

@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Compteur de caractères pour les champs texte
-    const titreInput = document.getElementById('titre_requete');
+    const titreInput = document.getElementById('titre_requete_edit');
     if (titreInput) {
         titreInput.addEventListener('input', function(e) {
             const maxLength = 180;
@@ -80,64 +80,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 <h5 class="modal-title mb-0" style="color: white">Modifier la requête</h5>
                 <a href="{{ route('requetes.show', $requete->code_requete) }}" class="btn btn-secondary btn-sm">Retour</a>
             </div>
-            <form action="{{ route('requetes.update', $requete->code_requete) }}" method="POST" enctype="multipart/form-data" class="modal-body">
-                @csrf
-                @method('PUT')
+<form action="{{ route('requetes.update', $requete->code_requete) }}" method="POST" enctype="multipart/form-data" class="modal-body" id="editRequeteForm">
+    @csrf
+    @method('PUT')
 
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
                 <div class="mb-3">
+                    <label for="titre_requete_edit" class="form-label">Titre de la requête <span class="text-danger">*</span></label>
+                    <input type="text" name="titre_requete" id="titre_requete_edit" maxlength="180" class="form-control @error('titre_requete') is-invalid @enderror" value="{{ old('titre_requete', $requete->titre_requete) }}" placeholder="Entrez le titre de votre requête" required>
+                    @error('titre_requete')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- <div class="mb-3">
                     <label for="titre_requete" class="form-label">Titre de la requête <span class="text-danger">*</span></label>
                     <input type="text" name="titre_requete" id="titre_requete" maxlength="180" class="form-control @error('titre_requete') is-invalid @enderror" value="{{ old('titre_requete', $requete->titre_requete) }}" placeholder="Entrez le titre de votre requête" required>
                     @error('titre_requete')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
-                <div class="mb-3">
-                    <label for="desc_requete" class="<thinking>
-I have saved the first part of the edit view with modal and header and form start. I will now continue with the rest of the form content and modal footer to complete the edit view update.
-
-I will append the remaining form fields, file upload, buttons, and close the modal and section.
-
-Proceeding with the next part of the edit view update.
-</thinking>
-
-<edit_file>
-<path>resources/views/sige_app/backend/requetes/edit.blade.php</path>
-<content>
-<<<<<<< SEARCH
-                @if(session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
-=======
-                @if(session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
-                <div class="mb-3">
-                    <label for="titre_requete" class="form-label">Titre de la requête <span class="text-danger">*</span></label>
-                    <input type="text" name="titre_requete" id="titre_requete" maxlength="180" class="form-control @error('titre_requete') is-invalid @enderror" value="{{ old('titre_requete', $requete->titre_requete) }}" placeholder="Entrez le titre de votre requête" required>
-                    @error('titre_requete')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                --}}
 
                 <div class="mb-3">
                     <label for="desc_requete" class="form-label">Description détaillée <span class="text-danger">*</span></label>
@@ -179,7 +166,7 @@ Proceeding with the next part of the edit view update.
                     </div> --}}
                 </div>
 
-                <div class="mb-3">
+                {{-- <div class="mb-3">
                     <label class="form-label">Priorité</label>
                     <div>
                         <div class="form-check form-check-inline">
@@ -191,7 +178,7 @@ Proceeding with the next part of the edit view update.
                             <label class="form-check-label" for="priorite_urgent">Urgent</label>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 @if($requete->fichiers->count() > 0)
                     <div class="mb-3">
@@ -234,3 +221,4 @@ Proceeding with the next part of the edit view update.
     </div>
 </div>
 @endsection
+</create_file>
