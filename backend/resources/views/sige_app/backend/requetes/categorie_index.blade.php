@@ -1,6 +1,6 @@
 @extends("sige_app.backend.template.backend")
 @section("js")
- <script>
+<script>
 function confirmDelete(code_cat, label_cat) {
     if (confirm('Êtes-vous sûr de vouloir supprimer la catégorie "' + label_cat + '" ?\n\nCette action est irréversible.')) {
         document.getElementById('delete-form-' + code_cat).submit();
@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
 });
 </script>
-
 @endsection
+
 @section("content")
 {{-- <?php $user = \Session::get("user");?> --}}
 
@@ -146,7 +146,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             {{ $category->desc_cat ? Str::limit($category->desc_cat, 100) : 'Aucune description' }}
                         </td>
                         <td>
-                            <span class="badge bg-secondary">{{ $category->requests()->count() }}</span>
+                            {{-- Vérification de l'existence de la relation avant de l'utiliser --}}
+                            @php
+                                try {
+                                    $requestCount = $category->requests()->count();
+                                } catch (\Exception $e) {
+                                    $requestCount = 0;
+                                }
+                            @endphp
+                            <span class="badge bg-secondary">{{ $requestCount }}</span>
                         </td>
                         <td>{{ $category->created_at->format("d/m/Y H:i") }}</td>
                         <td style="text-align: center;">
@@ -180,6 +188,5 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
-
 
 @endsection
