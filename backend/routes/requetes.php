@@ -32,31 +32,11 @@ Route::get('bureaux/{code_bureau}/presentations', [BureauController::class, 'pre
 
 
 
-// use App\Http\Controllers\requetes\AffectationController;
-
-// Route::resource('affectations', AffectationController::class);
-
-
-Route::prefix('affectations')->group(function () {
-    // CRUD de base
-    Route::get('/', [AffectationPersonnelControllerApi::class, 'index']); // Liste toutes les affectations
-    Route::post('/', [AffectationPersonnelControllerApi::class, 'store']); // Créer une affectation
-    Route::get('/personnel/{code_pers}', [AffectationPersonnelControllerApi::class, 'show']); // Affectations d'un personnel
-    Route::get('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'showAffectation']); // Affectation spécifique
-    Route::put('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'update']); // Modifier affectation
-    Route::delete('/personnel/{code_pers}/role/{id_role}', [AffectationPersonnelControllerApi::class, 'destroy']); // Supprimer affectation
-
-
-});
-
 // routes pour web
 
 
 Route::middleware('web')->group(function () {
     Route::resource('requetes', RequetteController::class, ['parameters' => ['requetes' => 'code_requete']]);
-
-
-    Route::resource('affectation', AffectationPersonnelController::class);
 
     // Routes de ressource APRÈS les routes personnalisées
     Route::resource('bureaux', BureauController::class)->parameters([

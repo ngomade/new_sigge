@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActualiteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BasculementController;
 use App\Http\Controllers\BureauController;
@@ -7,15 +8,18 @@ use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\concours\AdminConcoursController;
 use App\Http\Controllers\EcController;
 use App\Http\Controllers\EtudiantController;
+use App\Http\Controllers\InscriptionAcademiqueController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\SemestreController;
+use App\Http\Controllers\share\DownloadController;
+use App\Http\Controllers\UeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {return view("sige_app.frontend.index");})->name("home");
 Route::post("login", [AuthController::class ,'store'])->name("login");
 Route::get("logout", [AuthController::class ,'index'])->name("logout");
 
-Route::get("maintenance", [EcController::class ,'maintenance'])->name("maintenance");
 
 // Routes pour la gestion de bureaux
 Route::get("bureau/{type}", [BureauController::class ,'index'])->name("index_bureau");
@@ -82,5 +86,51 @@ Route::post("/add_session", [AdminConcoursController::class ,'add_session'])->na
 Route::post("/delete_session", [AdminConcoursController::class ,'delete_session'])->name("delete_session");
 Route::post("/update_session", [AdminConcoursController::class ,'update_session'])->name("update_session");
 Route::post("/delete_cand", [AdminConcoursController::class ,'destroy'])->name("delete_cand");
+
+Route::get("/download/{chemin}", [DownloadController::class ,'show'])->name("download");
+//Route::post("/save_message", [MessageController::class ,'store'])->name("save_message");
+
+//Route::get("/form_send_mail", [MailController::class ,'index'])->name("form_send_mail");
+//Route::post("/send_mail_candidats", [MailController::class ,'store'])->name("send_mail_candidats");
+//Route::post("/delete_mail", [MailController::class ,'supprimer'])->name("delete_mail");
+
+Route::get("/inscription_administrative", [InscriptionAcademiqueController::class ,'index'])->name("inscription_academique");
+Route::post("/recherche_candidat", [InscriptionAcademiqueController::class ,'recherche'])->name("recherche_candidat");
+Route::post("/inscription_administrative", [InscriptionAcademiqueController::class ,'store'])->name("inscription_administrative");
+Route::get("/telecharger_fiche/{code_ins}", [InscriptionAcademiqueController::class ,'production_fiche'])->name("telecharger_fiche");
+Route::get("/telecharger_quitus/{code_quitus}", [InscriptionAcademiqueController::class ,'production_quitus'])->name("telecharger_quitus");
+Route::get("/retelecharger_fiche/{code_user}", [InscriptionAcademiqueController::class ,'reproduction_document'])->name("retelecharger_fiche");
+Route::get("/academique_index", [InscriptionAcademiqueController::class ,'inscription_academique_index'])->name("inscription_academique_index");
+Route::get("/academique_download/{code_ins}", [InscriptionAcademiqueController::class ,'academie_download'])->name("academie_download");
+Route::post("/academique_inscription", [InscriptionAcademiqueController::class ,'inscription_academique'])->name("inscription_academique");
+Route::post("/recuperation_pwd", [InscriptionAcademiqueController::class ,'recuperation_pwd'])->name("recuperation_pwd");
+
+Route::get("/gestion_semestre", [SemestreController::class ,'index'])->name("gestion_semestre");
+Route::post("/ajouter_semestre", [SemestreController::class ,'store'])->name("ajouter_semestre");
+Route::get("/delete_sem/{code_sem}", [SemestreController::class ,'destroy'])->name("delete_sem");
+
+//Route::get("/gestion_grille", [GrilleController::class ,'index'])->name("gestion_grille");
+//Route::post("/ajouter_grille", [GrilleController::class ,'store'])->name("ajouter_grille");
+//Route::get("/delete_grille/{code_grille}", [GrilleController::class ,'destroy'])->name("delete_grille");
+
+
+Route::get("/gestion_ue", [UeController::class ,'index'])->name("gestion_ue");
+Route::post("/ajouter_ue", [UeController::class ,'store'])->name("ajouter_ue");
+Route::get("/delete_ue/{code_ue}", [UeController::class ,'destroy'])->name("delete_ue");
+
+Route::get("maintenance", [EcController::class ,'maintenance'])->name("maintenance");
+Route::get("/gestion_ec", [EcController::class ,'index'])->name("gestion_ec");
+Route::post("/ajouter_ec", [EcController::class ,'store'])->name("ajouter_ec");
+Route::get("/delete_ec/{code_ec}", [EcController::class ,'destroy'])->name("delete_ec");
+Route::get("/telecharger_cours_index", [EcController::class ,'show_download_ec'])->name("telecharger_cours_index");
+Route::get("/download_ec/{code_ec}", [EcController::class ,'download_ec'])->name("download_ec");
+
+
+Route::get("/index_actualite", [ActualiteController::class ,'index'])->name("index_actualite");
+Route::post("/publier_actualite", [ActualiteController::class ,'store'])->name("publier_actualite");
+Route::get("/details_actu/{code_actu}", [ActualiteController::class ,'show'])->name("details_actu");
+Route::get("/all_actu", [ActualiteController::class ,'create'])->name("all_actu");
+Route::get("/list_actu", [ActualiteController::class ,'list_actu'])->name("list_actu");
+Route::get("/delete_actu/{id}", [ActualiteController::class ,'destroy'])->name("delete_actu");
 
 require __DIR__."/requetes.php";
