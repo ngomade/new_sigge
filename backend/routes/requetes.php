@@ -12,6 +12,7 @@ use App\Http\Controllers\requetes\AdminRequetteControllerApi;
 use App\Http\Controllers\requetes\RequetteControllerApi;
 use App\Http\Controllers\requetes\CategoryController;
 
+
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
     Route::get('bureaux/search', [BureauControllerApi::class, 'search'])->name('api.bureaux.search');
@@ -73,8 +74,8 @@ Route::prefix('admin/requetes')->name('admin.requetes.')->group(function () {
     // Route pour les statistiques des requêtes
     // Routes pour les statistiques côté admin
     Route::get('admin/requetes/statistiques', [AdminRequeteController::class, 'statistiques'])->name('statistiques');
-    Route::get('/categorie', [CategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categorie', [CategoryController::class, 'store'])->name('categories.store');
-    Route::put('/categorie/{code_cat}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categorie/{code_cat}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('admin/requetes/categorie', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('admin/requetes/categorie', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('admin/requetes/categorie/{code_cat}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('admin/requetes/categorie/{code_cat}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });

@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activateBtn.classList.remove('btn-outline-success');
             deactivateBtn.classList.add('btn-outline-danger');
             deactivateBtn.classList.remove('btn-danger');
-            alert('Mail envoyé');
+            alert('Mail deactive');
         });
 
         deactivateBtn.addEventListener('click', function() {
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             deactivateBtn.classList.remove('btn-outline-danger');
             activateBtn.classList.add('btn-outline-success');
             activateBtn.classList.remove('btn-success');
-            alert('Le mail a été désactivé');
+            alert('Le mail désactivé');
         });
 
         // Initialize buttons based on current value
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <label class="form-label text-muted">Bureau assigné</label>
                             <p class="form-control-plaintext">{{ $requete->bureau->label_bureau ?? 'N/A' }}</p>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        {{-- <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Priorité</label>
                             @php
                                 $priorityColors = [
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="badge {{ $priorityColors[$requete->priorite] ?? 'bg-light text-dark' }}">
                                 {{ ucfirst($requete->priorite) }}
                             </span>
-                        </div>
+                        </div> --}}
                         <div class="col-md-6 mb-3">
                             <label class="form-label text-muted">Date de soumission</label>
                             <p class="form-control-plaintext">{{ $requete->date_sousmis ? $requete->date_sousmis->format('d/m/Y à H:i') : 'N/A' }}</p>
@@ -284,10 +284,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="mb-3">
                             <label for="status" class="form-label">Changer le statut</label>
                             <select name="status" id="status" class="form-select">
-                                {{-- @if($requete->status !== 'en cours')
+                                 @if($requete->status !== 'en cours')
                                     <option value="en attente" {{ $requete->status === 'en attente' ? 'selected' : '' }}>En attente</option>
                                     <option value="en cours" {{ $requete->status === 'en cours' ? 'selected' : '' }}>En cours</option>
-                                @endif --}}
+                                @endif 
                                  {{-- <option value="" disabled>Selectionez</option> --}}
                                 <option value="traitée" {{ $requete->status === 'traitée' ? 'selected' : '' }}>Traitée</option>
                                 <option value="rejetée" {{ $requete->status === 'rejetée' ? 'selected' : '' }}>Rejetée</option>

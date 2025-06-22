@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\requetes\RequeteSubmittedMail;
 use App\Mail\requetes\RequetteStatusChangeMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class RequetteController extends Controller
@@ -83,7 +84,7 @@ class RequetteController extends Controller
             'code_cat' => 'required|exists:categories,code_cat',
             // 'code_bureau' => 'required|exists:bureau,code_bureau',
             'fichiers.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120', // 5MB max
-            'priorite' => 'in:urgent,standard'
+            // 'priorite' => 'in:urgent,standard'
         ]);
 
         try {
@@ -111,7 +112,7 @@ class RequetteController extends Controller
                 'code_cat' => $request->code_cat,
                 'code_user' => $user->code_user,
                 'code_bureau' => $bureauScolarite->code_bureau,
-                'priorite' => $request->priorite ?? 'standard'
+                // 'priorite' => $request->priorite ?? 'standard'
             ]);
 
             // Gérer les fichiers joints
@@ -135,12 +136,21 @@ class RequetteController extends Controller
             // if (!$user) {
             //     abort(401, 'Utilisateur non authentifié');
             // }
-            Mail::to($user->email_user)->send(new RequeteSubmittedMail($requete));
+            $mailSent = true;
+            try {
+                Mail::to($user->email_user)->send(new RequeteSubmittedMail($requete));
+            } catch (\Exception $mailException) {
+                $mailSent = false;
+                // Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $mailException->getMessage());
+            }
 
-
+            $successMessage = 'Votre requête a été soumise avec succès. Numéro de référence: ' . $requete->code_requete;
+            if (!$mailSent) {
+                $successMessage .= ' Cependant, l\'email de confirmation n\'a pas pu être envoyé.';
+            }
 
             return redirect()->route('requetes.index', $requete->code_requete)
-                ->with('success', 'Votre requête a été soumise avec succès. Numéro de référence: ' . $requete->code_requete);
+                ->with('success', $successMessage);
         } catch (\Exception $e) {
             // Log::error('Erreur lors de la soumission de la requête: ' . $e->getMessage());
             return back()->withInput()
@@ -271,7 +281,7 @@ class RequetteController extends Controller
             'code_cat' => 'required|exists:categories,code_cat',
             // 'code_bureau' => 'required|exists:bureau,code_bureau',
             'fichiers.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
-            'priorite' => 'in:urgent,standard'
+            // 'priorite' => 'in:urgent,standard'
         ]);
 
         try {
@@ -280,7 +290,7 @@ class RequetteController extends Controller
                 'desc_requete' => $request->desc_requete,
                 'code_cat' => $request->code_cat,
                 // 'code_bureau' => $request->code_bureau,
-                'priorite' => $request->priorite ?? 'standard'
+                // 'priorite' => $request->priorite ?? 'standard'
             ]);
 
             // Gérer les nouveaux fichiers
@@ -299,9 +309,12 @@ class RequetteController extends Controller
                 }
             }
 
+            Log::info('Requete updated successfully: ' . $code_requete);
+
             return redirect()->route('requetes.show', $code_requete)
                 ->with('success', 'Votre requête a été mise à jour avec succès.');
         } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour de la requête: ' . $e->getMessage());
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour de la requête.');
         }

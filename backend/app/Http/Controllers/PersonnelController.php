@@ -10,7 +10,6 @@ use App\Models\Personnel;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
-use function App\Helper\generate_matricule_pers;
 
 class PersonnelController extends Controller
 {
@@ -25,7 +24,7 @@ class PersonnelController extends Controller
      */
     public function store(Request $request)
     {
-        $code_pers = generate_matricule_pers();
+        $code_pers = \App\Helper\generate_matricule_pers();
         $pictfile = $request->file('photo_pers');
         try {
             $exist = Personnel::where('first_phone_pers', $request->first_phone_pers)

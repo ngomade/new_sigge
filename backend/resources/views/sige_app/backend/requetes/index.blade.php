@@ -94,7 +94,7 @@
                                     <th>Catégorie</th>
                                     <th>Bureau</th>
                                     <th>Statut</th>
-                                    <th>Priorité</th>
+                                    {{-- <th>Priorité</th> --}}
                                     <th>Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -119,11 +119,11 @@
                                                 {{ ucfirst($requete->status) }}
                                             </span>
                                         </td>
-                                        <td>
+                                        {{-- <td>
                                             <span class="badge {{ $requete->priorite === 'urgent' ? 'bg-danger' : 'bg-secondary' }}">
                                                 {{ ucfirst($requete->priorite) }}
                                             </span>
-                                        </td>
+                                        </td> --}}
                                         <td>{{ $requete->date_sousmis->format('d/m/Y H:i') }}</td>
                                         <td style="min-width: 180px; white-space: nowrap;">
                                             <div class="d-flex flex-wrap gap-1">
