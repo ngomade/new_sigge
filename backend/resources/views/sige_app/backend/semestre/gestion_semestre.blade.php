@@ -42,7 +42,7 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach (\App\Models\Semestre::all() as $semestre)
+                @foreach (\App\Models\notes\Semestre::all() as $semestre)
                 <tr>
                     <td> {{$semestre->code_sem}}  </td>
                     <td><span class="badge bg-label-primary me-1"> {{$semestre->label_sem}}</span></td>

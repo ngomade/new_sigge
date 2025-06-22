@@ -13,7 +13,7 @@
                     <div class="row mt-2">
                         <div class="col-sm-11 m-auto">
                             <select name="code_ue" id="code_ue" class="form-select">
-                               @foreach (\App\Models\Ue::all() as $ue)
+                               @foreach (\App\Models\notes\Ue::all() as $ue)
                                    <option value="{{$ue->code_ue}}"> {{$ue->code_ue}}: {{$ue->intitule_ue}} </option>
                                @endforeach
                             </select>

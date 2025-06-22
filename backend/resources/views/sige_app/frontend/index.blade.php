@@ -443,9 +443,9 @@ La troisième phase de recrutement de 150 enseignants est lancée pour l'exercic
                     ?>
                     <div class="col-md-4 d-flex align-items-stretch mt-3">
                         <div class="card"
-                    
+
                     style="background-image: url('{{asset("storage".DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."actualites".DIRECTORY_SEPARATOR.$actu->actu_code.DIRECTORY_SEPARATOR.$res->r_name)}}');"
-                    
+
                             data-aos="fade-up" data-aos-delay="100" title="">
                             <div class="card-body">
                                 <div class="card-title" style="text-align: justify; font-weight: lighter;">{{$actu->actu_title}}</div>
@@ -533,7 +533,7 @@ La troisième phase de recrutement de 150 enseignants est lancée pour l'exercic
                     <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
                         <div class="member" data-aos="fade-up" data-aos-delay="100">
                             <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/dang.png') }}" class="img-fluid" alt="" title="Nomme en septembre 2023 comme Chef de service au Service des diplômes et de la certification de l’Ecole Supérieure de Transport de Logistique et de Commerce (ESTLC).  M.DANG KOKO Adamou est titulaire d’un PhD en Biophyque  optenu à l’UNIVERSITE DE YAOUNDE I où il est également membre du laboratoire de physique nucléaire, moléculaire et biophysique. Son domaine de recherche concerne la physique des rayonnements, la physique de la matière condensée et la biophysique. Ses principales publications portent sur le transport d’énergie dans l’ADN, les microtubules, la propagation de l’influ nerveux. Il travail également dans la modélisation de système biologiques. M. DANG KOKO est également membre du comité directeur de l’African Centre for Advanced Studies (ACAS)">
+                                <img src="{{ asset('sige_app/frontend/img/team/dang.png') }}" class="img-fluid" alt="" title="Nomme en septembre 2023 comme Chef de service au Service des diplômes et de la certification de l’Ecole Supérieure de Transport de Logistique et de Commerce (ESTLC).  M.DANG KOKO Adamou est titulaire d’un PhD en Biophyque  optenu à l’UNIVERSITE DE YAOUNDE I où il est également membre du laboratoire.php de physique nucléaire, moléculaire et biophysique. Son domaine de recherche concerne la physique des rayonnements, la physique de la matière condensée et la biophysique. Ses principales publications portent sur le transport d’énergie dans l’ADN, les microtubules, la propagation de l’influ nerveux. Il travail également dans la modélisation de système biologiques. M. DANG KOKO est également membre du comité directeur de l’African Centre for Advanced Studies (ACAS)">
                                 <div class="social">
                                     <a href="#"><i class="bi bi-twitter"></i></a>
                                     <a href="#"><i class="bi bi-facebook"></i></a>

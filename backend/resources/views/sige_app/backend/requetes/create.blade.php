@@ -11,7 +11,6 @@
             });
         }, 5000);
     });
-</script>
     document.getElementById('closeCreateModalBtn').addEventListener('click', function() {
         const modal = this.closest('.modal');
         modal.classList.remove('show', 'd-block');

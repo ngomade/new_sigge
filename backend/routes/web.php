@@ -9,6 +9,9 @@ use App\Http\Controllers\concours\AdminConcoursController;
 use App\Http\Controllers\EcController;
 use App\Http\Controllers\EtudiantController;
 use App\Http\Controllers\InscriptionAcademiqueController;
+use App\Http\Controllers\labo\LaboratoireController;
+use App\Http\Controllers\MairieController;
+use App\Http\Controllers\OrganigrammeController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\SemestreController;
@@ -133,4 +136,12 @@ Route::get("/all_actu", [ActualiteController::class ,'create'])->name("all_actu"
 Route::get("/list_actu", [ActualiteController::class ,'list_actu'])->name("list_actu");
 Route::get("/delete_actu/{id}", [ActualiteController::class ,'destroy'])->name("delete_actu");
 
+Route::get("/organigramme", [OrganigrammeController::class ,'index'])->name("organigramme");
+Route::get("/staff_admin", [OrganigrammeController::class ,'create'])->name("staff_admin");
+
+Route::get("/pres_marie", [MairieController::class ,'index'])->name("pres_marie");
+Route::get("/organigramme_mairie", [MairieController::class ,'create'])->name("organigramme_mairie");
+Route::get("/projet_mairie", [MairieController::class ,'projet_mairie'])->name("projet_mairie");
+
 require __DIR__."/requetes.php";
+require __DIR__."/laboratoire.php";

@@ -14,7 +14,7 @@
                     <div class="row mt-3">
                         <div class="col-sm-11 m-auto">
                             <select name="code_sem" id="code_sem" class="form-select">
-                               @foreach (\App\Models\Semestre::all() as $semestre)
+                               @foreach (\App\Models\notes\Semestre::all() as $semestre)
                                    <option value="{{$semestre->code_sem}}"> {{$semestre->code_sem}} -- {{$semestre->label_sem}}</option>
                                @endforeach
                             </select>
@@ -72,7 +72,7 @@
                 <tr>
                     <td> {{$ue->code_ue}}  </td>
                     <td><span class="badge bg-label-primary me-1"> {{$ue->intitule_ue}}</span></td>
-                    <td> {{\App\Models\Ec::where("code_ue", $ue->code_ue)->count()}}</td>
+                    <td> {{\App\Models\notes\Ec::where("code_ue", $ue->code_ue)->count()}}</td>
                     <td>
                       <div class="dropdown">
                         <button

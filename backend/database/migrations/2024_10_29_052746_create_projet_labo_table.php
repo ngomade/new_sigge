@@ -18,7 +18,7 @@ class CreateProjetLaboTable extends Migration
             $table->string("theme_projet");
             $table->text("description_projet");
             $table->string("code_lab", 10);
-            $table->foreign("code_lab")->references("code_lab")->on("laboratoire");
+            $table->foreign("code_lab")->references("code_lab")->on("laboratoire.php");
             $table->timestamps();
         });
     }

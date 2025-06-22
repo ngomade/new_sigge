@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+@php use App\Models\Bureau; @endphp
+    <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -73,7 +74,7 @@
                         <div class="row mt-2">
                             <div class="col-sm-8 m-auto">
                                 <select name="code_bureau" id="code_bureau" class="form-select">
-                                    @foreach (\App\Models\Bureau::all() as $bureau)
+                                    @foreach (Bureau::all() as $bureau)
                                         <option value="{{$bureau->code_bureau}}"> {{$bureau->label_bureau}} </option>
                                     @endforeach
                                 </select>
@@ -344,9 +345,12 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Liste des {{$type_bureau}}s</h5>
             <div>
-                <a href="/bureau/{{$type_bureau}}/affectation/?bureau_code={{ \App\Models\Bureau::where('type_bureau', $type_bureau)->first('code_bureau')->code_bureau }}" class="btn btn-primary me-2">
-                    <i class="fas fa-user-plus me-1"></i> Gérer les affectations
-                </a>
+                @if(Bureau::where('type_bureau', $type_bureau)->first("code_bureau"))
+                    <a href="/bureau/{{$type_bureau}}/affectation/?bureau_code={{ Bureau::where('type_bureau', $type_bureau)->first('code_bureau')->code_bureau }}"
+                       class="btn btn-primary me-2">
+                        <i class="fas fa-user-plus me-1"></i> Gérer les affectations
+                    </a>
+                @endif
                 <button class="btn btn-primary" style="font-size: 1.08em;" data-bs-toggle="modal"
                         data-bs-target="#addModal">Ajouter &nbsp; <i class="ri-add-circle-fill"></i></button>
                 <button class="btn btn-success" style="font-size: 1.08em;" data-bs-toggle="modal"
@@ -367,7 +371,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (\App\Models\Bureau::where("type_bureau", $type_bureau)->get() as $bureau)
+                    @foreach (Bureau::where("type_bureau", $type_bureau)->get() as $bureau)
                         <tr>
                             <td> {{$loop->index +1}}  </td>
                             <td> {{$bureau->code_bureau}}  </td>
@@ -376,7 +380,8 @@
                                 style="width: 30%; overflow: hidden;">{!!$bureau->desc_bureau!!}  </td>
                             <td> {{$bureau->created_at !=null? $bureau->created_at->format("d/m/Y H:i"): "" }}  </td>
                             <td style="text-align: center;">
-                                <a href="{{ route('affectation_personnel', ['type' => $type_bureau, 'bureau_code' => $bureau->code_bureau]) }}" class="btn btn-outline-primary btn-sm">
+                                <a href="{{ route('affectation_personnel', ['type' => $type_bureau, 'bureau_code' => $bureau->code_bureau]) }}"
+                                   class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-user-plus"></i> Affecter du personnel
                                 </a>
                                 <a href="/delete_bureau/{{$type_bureau}}/{{$bureau->code_bureau}}"
@@ -535,19 +540,19 @@
                                         ${!isSelected ? 'disabled' : ''}>
                                     <option value="">Sélectionner un rôle</option>
                                     @foreach(\App\Models\Role::all() as $role)
-                                        <option value="{{ $role->id }}"
+                    <option value="{{ $role->id }}"
                                             ${selectedRole && selectedRole.role_id == '{{ $role->id }}' ? 'selected' : ''}>
                                             {{ $role->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <input type="date" class="form-control form-control-sm date-fin-select"
-                                       data-id="${personnel.id}"
+                    </option>
+@endforeach
+                    </select>
+                </td>
+                <td>
+                    <input type="date" class="form-control form-control-sm date-fin-select"
+                           data-id="${personnel.id}"
                                        value="${selectedRole ? selectedRole.date_fin_role : ''}"
                                        ${!isSelected ? 'disabled' : ''}>
-                                    ${ selectedRole && selectedRole.date_fin_role ? selectedRole.date_fin_role  : '<span><span/>' }
+                                    ${selectedRole && selectedRole.date_fin_role ? selectedRole.date_fin_role : '<span><span/>'}
                             </td>
                             <td>
                                 <select class="form-select form-select-sm statut-select"

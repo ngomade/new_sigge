@@ -21,6 +21,6 @@ class Category extends Model
 
     public function requests()
     {
-        return $this->hasMany(StudentRequest::class);
+        return $this->hasMany(Requete::class, 'code_cat');
     }
 }

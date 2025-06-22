@@ -92,7 +92,7 @@ class RequetteController extends Controller
             //  $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
             $user = session('user');
             // Bureau par défaut : Scolarité
-            $bureauScolarite = Bureau::where('label_bureau', 'Scholarite')
+            $bureauScolarite = Bureau::where('label_bureau', 'Scolarite')
                 ->orWhere('code_bureau', 'SCOL')
                 ->first();
 
@@ -230,7 +230,7 @@ class RequetteController extends Controller
             'sender' => $assignManager,
             'recipient' => $treatmentManager ?? $treatmentBureau,
         ];
-        
+
         // Paginate progressSteps array manually
         $currentPage = request()->get('page', 1);
         $perPage = 2;

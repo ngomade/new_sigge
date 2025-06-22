@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->string('code_cat')->primary();
             $table->string('label_cat',100);
-            $table->string('desc_cat',100);
+            $table->string('desc_cat',100)->nullable();
             $table->timestamps();
         });
     }
