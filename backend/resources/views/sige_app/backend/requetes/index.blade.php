@@ -119,11 +119,7 @@
                                                 {{ ucfirst($requete->status) }}
                                             </span>
                                         </td>
-                                        {{-- <td>
-                                            <span class="badge {{ $requete->priorite === 'urgent' ? 'bg-danger' : 'bg-secondary' }}">
-                                                {{ ucfirst($requete->priorite) }}
-                                            </span>
-                                        </td> --}}
+                                       
                                         <td>{{ $requete->date_sousmis->format('d/m/Y H:i') }}</td>
                                         <td style="min-width: 180px; white-space: nowrap;">
                                             <div class="d-flex flex-wrap gap-1">

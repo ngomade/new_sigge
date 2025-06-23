@@ -28,11 +28,11 @@ class AdminRequeteController extends Controller
         $query = Requete::with(['category', 'user', 'bureau']);
 
         // Filtres pour les agents (selon leur bureau)
-        // $personnel = session('pers');
-        // $user = session('user');
-        // if ($personnel && in_array('ADMIN', $personnel->getRoleNames()->toArray())) {
-        //     $query->where('code_bureau', $personnel->code_bureau);
-        // }
+         $personnel = session('pers');
+        //  $user = session('user');
+         if ($personnel && in_array('ADMIN,CHEF_SERV', $personnel->getRoleNames()->toArray())) {
+            $query->where('code_bureau', $personnel->code_bureau);
+         }
 
         // Filtres
         if ($request->filled('status')) {
@@ -80,10 +80,10 @@ class AdminRequeteController extends Controller
 
         // Restriction pour les agents
         // Temporarily disabled to debug "not found" issue
-        // $personnel = session('pers');
-        // if ($personnel && in_array('ADMIN', $personnel->getRoleNames()->toArray())) {
-        //     $query->where('code_bureau', $personnel->code_bureau);
-        // }
+         $personnel = session('pers');
+        if ($personnel && in_array('ADMIN,CHEF_SERV', $personnel->getRoleNames()->toArray())) {
+            $query->where('code_bureau', $personnel->code_bureau);
+        }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -104,10 +104,10 @@ class AdminRequeteController extends Controller
 
         $query = Requete::query();
         // Restriction pour les agents
-        // $personnel = session('pers');
-        // if ($personnel && in_array('agent', $personnel->getRoleNames()->toArray())) {
-        //     $query->where('code_bureau', $personnel->code_bureau);
-        // }
+         $personnel = session('pers');
+        if ($personnel && in_array('ADMIN,CHEF_SERV', $personnel->getRoleNames()->toArray())) {
+            $query->where('code_bureau', $personnel->code_bureau);
+        }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -229,7 +229,7 @@ class AdminRequeteController extends Controller
             'text_reponse' => 'required|string|max:180',
             'email_notifications' => 'nullable|boolean',
         ]);
-        // $personnel = session('pers');
+         $personnel = session('pers');
 
         $query = Requete::query();
 

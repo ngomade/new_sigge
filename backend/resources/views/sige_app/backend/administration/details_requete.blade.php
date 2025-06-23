@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activateBtn.classList.remove('btn-outline-success');
             deactivateBtn.classList.add('btn-outline-danger');
             deactivateBtn.classList.remove('btn-danger');
-            alert('Mail deactive');
+            alert('Mail active');
         });
 
         deactivateBtn.addEventListener('click', function() {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <h1 class="h3 mb-0">{{ $requete->code_requete }}</h1>
     </div>
 
-    <!-- Notifications -->
+    {{-- <!-- Notifications -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+    @endif --}}
 
     <div class="row">
         <!-- Main content -->
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <li class="list-group-item">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    {{-- <strong>{{ $reponse->createdBy->nom_pers ?? 'Admin' }}</strong> --}}
+                                     <strong>{{ $reponse->createdBy->nom_pers ?? 'Admin' }}</strong> 
                                     <p class="mb-0">{{ $reponse->text_reponse }}</p>
                                 </div>
                                 <small class="text-muted">{{ $reponse->created_at->format('d/m/Y à H:i') }}</small>

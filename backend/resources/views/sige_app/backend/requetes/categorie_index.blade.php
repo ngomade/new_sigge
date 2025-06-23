@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 @endsection
 
 @section("content")
-{{-- <?php $user = \Session::get("user");?> --}}
+ <?php $user = \Session::get("user");?> 
 
 <!-- Modal d'ajout -->
 <div class="modal fade" id="addModal" tabindex="-1">
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     
     <div class="card-body">
-        <!-- Messages de succès/erreur -->
+        {{-- <!-- Messages de succès/erreur -->
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </ul>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        @endif --}}
 
         <div class="table-responsive text-nowrap">
             <table class="table table-bordered">
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <th>Nom de la catégorie</th>
                         <th>Description</th>
                         <th>Nombre de requêtes</th>
-                        <th>Date de création</th>
+                        {{-- <th>Date de création</th> --}}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             @endphp
                             <span class="badge bg-secondary">{{ $requestCount }}</span>
                         </td>
-                        <td>{{ $category->created_at->format("d/m/Y H:i") }}</td>
+                        {{-- <td>{{ $category->created_at->format("d/m/Y H:i") }}</td> --}}
                         <td style="text-align: center;">
                             <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editModal{{$category->code_cat}}" title="Modifier">
                                 <i class='bx bx-pencil'></i>

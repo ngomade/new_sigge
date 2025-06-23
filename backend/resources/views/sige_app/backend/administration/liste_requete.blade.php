@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <!-- Messages de notification -->
+    {{-- <!-- Messages de notification -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -37,7 +37,7 @@
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+    @endif --}}
 
     <!-- Inline filter form above the table -->
     <form method="GET" action="{{ route('admin.requetes.index') }}" class="row g-3 mb-3">

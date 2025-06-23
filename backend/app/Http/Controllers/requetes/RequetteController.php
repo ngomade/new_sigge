@@ -92,8 +92,8 @@ class RequetteController extends Controller
             //  $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
             $user = session('user');
             // Bureau par défaut : Scolarité
-            $bureauScolarite = Bureau::where('label_bureau', 'Scolarite')
-                ->orWhere('code_bureau', 'SCOL')
+            $bureauScolarite = Bureau::where('label_bureau', 'Scolarité')
+                ->orWhere('code_bureau')
                 ->first();
 
             if (!$bureauScolarite) {
@@ -183,6 +183,8 @@ class RequetteController extends Controller
                     $query->whereNull('date_fin_role')
                           ->orWhere('date_fin_role', '>', $date);
                 })
+                ->where('date_debut_role', '<=', $date)
+                ->with('personnel')
                 ->where('date_debut_role', '<=', $date)
                 ->with('personnel')
                 ->first();
@@ -397,3 +399,4 @@ class RequetteController extends Controller
      * Afficher les statistiques des requêtes
      */
 }
+

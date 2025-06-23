@@ -29,8 +29,8 @@
     </div>
             <form action="{{ route('requetes.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-body">
-                    @if(session('error'))
+                 <div class="modal-body">
+                    {{-- @if(session('error'))
                         <div class="mb-3 alert alert-danger p-2">
                             {{ session('error') }}
                         </div>
@@ -44,7 +44,7 @@
                                 @endforeach
                             </ul>
                         </div>
-                    @endif
+                    @endif  --}}
 
                     <div class="row mt-3 justify-content-center">
                         <div class="col-12 col-md-10 col-lg-8">

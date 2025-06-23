@@ -28,7 +28,7 @@
                 <!-- Messages -->
                 {{-- Remove bootstrap alerts for flash messages since toastr will handle them --}}
                 
-                @if(session('success'))
+                {{-- @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -40,7 +40,7 @@
                         {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif
+                @endif --}}
                 
 
                 <!-- Détails de la requête -->

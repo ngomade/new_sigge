@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @csrf
     @method('PUT')
 
-    @if($errors->any())
+    {{-- @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <ul class="mb-0">
                 @foreach($errors->all() as $error)
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+    @endif --}}
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
