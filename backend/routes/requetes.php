@@ -17,7 +17,9 @@ Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
     Route::get('bureaux/search', [BureauControllerApi::class, 'search'])->name('api.bureaux.search');
     Route::get('bureaux/{code_bureau}/sous-bureaux', [BureauControllerApi::class, 'getSousBureaux'])->name('api.bureaux.sous-bureaux');
+
     Route::get('bureaux/{code_bureau}/bureau-parents', [BureauControllerApi::class, 'getBureauParents'])->name('api.bureaux.bureau-parents');
+
     // Routes de ressource APRÈS les routes personnalisées
     Route::apiResource('bureaux', BureauControllerApi::class)->parameters([
         'bureaux' => 'code_bureau'
@@ -30,7 +32,18 @@ Route::get('bureaux/{code_bureau}/sous-bureaux', [BureauController::class, 'sous
 Route::get('bureaux/{code_bureau}/bureau-parents', [BureauController::class, 'bureauParents'])->name('bureaux.bureau-parents');
 Route::get('bureaux/{code_bureau}/documents', [BureauController::class, 'documents'])->name('bureaux.documents');
 Route::get('bureaux/{code_bureau}/presentations', [BureauController::class, 'presentations'])->name('bureaux.presentations');
+Route::get('/update_bureau/{code_bureau}', [BureauController::class, 'edit'])->name('bureau.edit');
+Route::post('/update_bureau/{code_bureau}', [BureauController::class, 'update'])->name('bureau.update');
+Route::post('/presentation_bureau', [BureauController::class, 'presentation'])->name('bureau.presentation');
+Route::get('/bureau/{code_bureau}/documents', [BureauController::class, 'documents'])->name('bureau.documents');
+Route::post('/bureau/affecter-personnel', [BureauController::class, 'affecterPersonnel'])->name('bureau.affecter_personnel');
 
+Route::post('/api/bureau/generate-code', [BureauController::class, 'generateCode'])->name('bureau.generate_code');
+Route::get('/api/bureau/{code_bureau}/sous-bureaux', [BureauController::class, 'getSousBureaux'])->name('bureau.sous_bureaux');
+Route::get('/api/bureau/arborescence', [BureauController::class, 'getArborescence'])->name('bureau.arborescence');
+Route::get('/api/bureau/by-type/{type}', [BureauController::class, 'getBureauxByType'])->name('bureau.by_type');
+Route::get('/api/bureau/{type}/code', [BureauController::class, 'getBureauCodeByType'])->name('bureau.code_by_type');
+Route::get('/api/bureau/{code}/personnel', [BureauController::class, 'getPersonnelBureau'])->name('bureau.personnel');
 
 
 // routes pour web
