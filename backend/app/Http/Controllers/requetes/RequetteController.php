@@ -141,7 +141,7 @@ class RequetteController extends Controller
                 Mail::to($user->email_user)->send(new RequeteSubmittedMail($requete));
             } catch (\Exception $mailException) {
                 $mailSent = false;
-                // Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $mailException->getMessage());
+                Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $mailException->getMessage());
             }
 
             $successMessage = 'Votre requête a été soumise avec succès. Numéro de référence: ' . $requete->code_requete;
