@@ -28,7 +28,13 @@ class RolePermissionController extends Controller
         try {
             $exist = Role::where("name", $request->name)->count() > 0;
             if (!$exist) {
-                $res = Role::create($request->all());
+                // Explicitly set guard_name to 'personnel' for roles
+                $data = $request->all();
+                if (!isset($data['guard_name'])) {
+                    $data['guard_name'] = 'personnel';
+                }
+                $res = Role::create($data);
+                    
                 if($res){
                     $success = "Rôle ajouté avec succès";
                     return redirect("/gestion_role_perm")->with(compact("success"));
@@ -153,18 +159,24 @@ class RolePermissionController extends Controller
         if ($user == null) {
             $user = User::find($request->id_user_p);
         }
+        $role = Role::find($request->role_name);
+        // Check guard_name match
+        if ($role && $role->guard_name !== 'personnel') {
+            $errors = "Le rôle doit utiliser le guard 'personnel' et non '{$role->guard_name}'";
+            return redirect("/assignation_index")->with(compact("errors"));
+        }
         if ($request->type_op == "add") {
-            if ($user->hasRole(Role::find($request->role_name))) {
+            if ($user->hasRole($role)) {
                 $errors= "L'utilisateur possède déjà ce rôle";
                 return redirect("/assignation_index")->with(compact("errors"));
             }else{
-                $user->assignRole(Role::find($request->role_name));
+                $user->assignRole($role);
                 $success = "Rôle ajouté avec succès";
                 return redirect("/assignation_index")->with(compact("success"));
             }
         } else {
-            if ($user->hasRole(Role::find($request->role_name))) {
-                $user->removeRole(Role::find($request->role_name));
+            if ($user->hasRole($role)) {
+                $user->removeRole($role);
                 $success= "Rôle retiré avec succès";
                 return redirect("/assignation_index")->with(compact("success"));
             }else{
