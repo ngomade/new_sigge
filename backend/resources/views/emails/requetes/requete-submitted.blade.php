@@ -6,7 +6,11 @@
 </head>
 <body>
     <h1>Confirmation de soumission de votre requête</h1>
-    <p>Bonjour,</p>
+    @php
+        $hour = \Carbon\Carbon::now()->hour;
+        $greeting = ($hour >= 18 || $hour < 6) ? 'Bonsoir' : 'Bonjour';
+    @endphp
+    <p>{{ $greeting }},</p>
     <p>Votre requête a été soumise avec succès. Voici les détails :</p>
     <ul>
         <li><strong>Numéro de référence :</strong> {{ $requete->code_requete }}</li>

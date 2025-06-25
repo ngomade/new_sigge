@@ -30,7 +30,7 @@ class RequeteSubmittedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.requete-submitted',
+            view: 'emails.requetes.requete-submitted',
             with: [
                 'requete' => $this->requete,
             ],

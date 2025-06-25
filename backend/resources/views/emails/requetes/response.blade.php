@@ -5,7 +5,11 @@
     <title>Nouvelle réponse à votre requête</title>
 </head>
 <body>
-    <p>Bonjour,</p>
+    @php
+        $hour = \Carbon\Carbon::now()->hour;
+        $greeting = ($hour >= 18 || $hour < 6) ? 'Bonsoir' : 'Bonjour';
+    @endphp
+    <p>{{ $greeting }},</p>
     <p>Une nouvelle réponse a été ajoutée à votre requête <strong>{{ $requete->code_requete }}</strong> :</p>
     <blockquote>
         {{ $reponse->text_reponse ?? $reponse }}

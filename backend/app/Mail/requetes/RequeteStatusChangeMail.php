@@ -34,7 +34,7 @@ class RequeteStatusChangeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.requete-status-changed',
+            view: 'emails.requetes.requete-status-changed',
             with: [
                 'requete' => $this->requete,
                 'oldStatus' => $this->oldStatus,

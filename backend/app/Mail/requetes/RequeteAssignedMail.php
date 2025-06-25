@@ -36,7 +36,7 @@ class RequeteAssignedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.requete-assigned',
+            view: 'emails.requetes.requete-assigned',
             with: [
                 'requete' => $this->requete,
                 'bureau' => $this->bureau,
