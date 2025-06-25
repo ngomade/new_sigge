@@ -43,7 +43,11 @@ Route::get("delete_perm/{id}", [RolePermissionController::class ,'delete_perm'])
 Route::get("assignation_index", [RolePermissionController::class ,'create'])->name("assignation_role_perm");
 Route::post("add_role_pers", [RolePermissionController::class ,'add_role_pers'])->name("add_role_pers");
 Route::post("add_perm_pers", [RolePermissionController::class ,'add_perm_pers'])->name("add_perm_pers");
-
+// NOUVELLES ROUTES À AJOUTER
+Route::get('/edit_role/{id}', [RolePermissionController::class, 'edit_role']);
+Route::put('/update_role/{id}', [RolePermissionController::class, 'update_role']);
+Route::get('/edit_perm/{id}', [RolePermissionController::class, 'edit_perm']);
+Route::put('/update_perm/{id}', [RolePermissionController::class, 'update_perm']);
 // Routes pour la gestion du personnel
 Route::get("insription_personnel", [PersonnelController::class ,'index'])->name("insription_personnel");
 Route::post("ajouter_personnel", [PersonnelController::class ,'store'])->name("ajouter_personnel");
