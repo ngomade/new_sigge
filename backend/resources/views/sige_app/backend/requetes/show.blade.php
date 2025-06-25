@@ -91,32 +91,32 @@
                     </div>
                 </div> --}}
 
-                {{-- <!-- Fichiers joints --> --}}
-                {{-- @if($requete->fichiers->count() > 0) --}}
-                    {{-- <div class="mb-3"> --}}
-                        {{-- <h6>Fichiers joints</h6> --}}
-                        {{-- <ul class="list-group"> --}}
-                            {{-- @foreach($requete->fichiers as $fichier) --}}
-                                {{-- <li class="list-group-item d-flex justify-content-between align-items-center"> --}}
-                                    {{-- <div> --}}
-                                        {{-- <i class="bi bi-file-earmark-text me-2"></i> --}}
-                                        {{-- {{ $fichier->nom_original }} ({{ number_format($fichier->taille / 1024, 2) }} KB) --}}
-                                    {{-- </div> --}}
-                                    {{-- <div> --}}
-                                        {{-- <a href="{{ Storage::url($fichier->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">Examiner</a> --}}
-                                        {{-- @if($requete->status === 'en attente') --}}
-                                            {{-- <form action="{{ route('requetes.deleteFichier', $fichier->id_fichier) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')"> --}}
-                                                {{-- @csrf --}}
-                                                {{-- @method('DELETE') --}}
-                                                {{-- <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button> --}}
-                                            {{-- </form> --}}
-                                        {{-- @endif --}}
-                                    {{-- </div> --}}
-                                {{-- </li> --}}
-                            {{-- @endforeach --}}
-                        {{-- </ul> --}}
-                    {{-- </div> --}}
-                {{-- @endif --}}
+                {{-- <!-- Fichiers joints --> 
+                @if($requete->fichiers->count() > 0)
+                    <div class="mb-3">
+                        <h6>Fichiers joints</h6>
+                        <ul class="list-group">
+                            @foreach($requete->fichiers as $fichier)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-file-earmark-text me-2"></i>
+                                        {{ $fichier->nom_original }} ({{ number_format($fichier->taille / 1024, 2) }} KB)
+                                    </div>
+                                    <div>
+                                        <a href="{{ Storage::url($fichier->chemin) }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">Examiner</a>
+                                        @if($requete->status === 'en attente')
+                                            <form action="{{ route('requetes.deleteFichier', $fichier->id_fichier) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                 @endif --}}
 
                 <!-- Progress Tracking Table -->
                 <div class="mb-4" id="progressTable">
@@ -129,7 +129,6 @@
                                 <th>Date</th>
                                 <th>Bureau</th>
                                 <th>Personne en charge</th>
-                                <th>But</th>
                                 <th>Expéditeur</th>
                                 <th>Destinataire</th>
                             </tr>
@@ -141,8 +140,11 @@
                                 <td>{{ $step['date'] ? $step['date']->format('d/m/Y à H:i') : 'Non effectué' }}</td>
                                 <td>{{ $step['bureau']->label_bureau ?? 'N/A' }}</td>
                                 <td>{{ $step['manager'] ? $step['manager']->nom_pers . ' ' . $step['manager']->prenom_pers : 'N/A' }}</td>
-                                <td>{{ $step['purpose'] ?? 'N/A' }}</td>
-                                <td>{{ $step['sender'] ? $step['sender']->nom ?? $step['sender']->nom_pers ?? 'N/A' : 'N/A' }}</td>
+                                @if($step['step'] === 'Soumission')
+                                    <td>{{ $requete->user->nom_user ?? $requete->user->nom_pers ?? 'N/A' }}</td>
+                                @else
+                                    <td>{{ $step['sender'] ? $step['sender']->nom ?? $step['sender']->nom_pers ?? 'N/A' : 'N/A' }}</td>
+                                @endif
                                 <td>{{ $step['recipient'] ? $step['recipient']->nom ?? $step['recipient']->nom_pers ?? 'N/A' : 'N/A' }}</td>
                             </tr>
                             @endforeach
