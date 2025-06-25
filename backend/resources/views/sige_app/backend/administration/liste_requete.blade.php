@@ -5,7 +5,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
             var alerts = document.querySelectorAll('.alert');
-             alerts.forEach(function(alert) {
+            alerts.forEach(function(alert) {
                 var bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });
@@ -15,16 +15,16 @@
 @endsection
 
 @section('content')
-<div class="w-full py-6">
+<div class="container-fluid py-4">
     <!-- En-tête -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Gestion des Requêtes</h1>
-            <p class="text-gray-600 mt-1">Administration et suivi des demandes</p>
+            <h1 class="h2 text-dark mb-1">Gestion des Requêtes</h1>
+            <p class="text-muted mb-0">Administration et suivi des demandes</p>
         </div>
     </div>
 
-    {{-- <!-- Messages de notification -->
+    <!-- Messages de notification -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -37,198 +37,168 @@
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif --}}
+    @endif
 
-    <!-- Inline filter form above the table -->
-    <form method="GET" action="{{ route('admin.requetes.index') }}" class="row g-3 mb-3">
-        <div class="col-md-3">
-            <label for="status" class="form-label">Statut</label>
-            <select name="status" id="status" class="form-select">
-                <option value="">Tous les statuts</option>
-                <option value="en attente" {{ request('status') == 'en attente' ? 'selected' : '' }}>En attente</option>
-                <option value="en cours" {{ request('status') == 'en cours' ? 'selected' : '' }}>En cours</option>
-                <option value="traitée" {{ request('status') == 'traitée' ? 'selected' : '' }}>Traitée</option>
-                <option value="rejetée" {{ request('status') == 'rejetée' ? 'selected' : '' }}>Rejetée</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="category" class="form-label">Catégorie</label>
-            <select name="category" id="category" class="form-select">
-                <option value="">Toutes les catégories</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->code_cat }}" {{ request('category') == $category->code_cat ? 'selected' : '' }}>
-                        {{ $category->label_cat }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="bureau" class="form-label">Bureau</label>
-            <select name="bureau" id="bureau" class="form-select">
-                <option value="">Tous les bureaux</option>
-                @foreach($bureaux as $bureau)
-                    <option value="{{ $bureau->code_bureau }}" {{ request('bureau') == $bureau->code_bureau ? 'selected' : '' }}>
-                        {{ $bureau->label_bureau }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        {{-- <div class="col-md-3">
-            <label for="priorite" class="form-label">Priorité</label>
-            <select name="priorite" id="priorite" class="form-select">
-                <option value="">Toutes les priorités</option>
-                <option value="basse" {{ request('priorite') == 'basse' ? 'selected' : '' }}>Basse</option>
-                <option value="normale" {{ request('priorite') == 'normale' ? 'selected' : '' }}>Normale</option>
-                <option value="haute" {{ request('priorite') == 'haute' ? 'selected' : '' }}>Haute</option>
-                <option value="urgente" {{ request('priorite') == 'urgente' ? 'selected' : '' }}>Urgente</option>
-            </select>
-        </div> --}}
-        <div class="col-md-3">
-            <label for="date_from" class="form-label">Date de début</label>
-            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="form-control">
-        </div>
-        <div class="col-md-3">
-            <label for="date_to" class="form-label">Date de fin</label>
-            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="form-control">
-        </div>
-        <div class="col-12 d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-secondary">Filtrer</button>
-            <a href="{{ route('admin.requetes.index') }}" class="btn btn-light">Réinitialiser</a>
-        </div>
-    </form>
-
-    <!-- Tableau des requêtes -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 text-center">
-            <h3 class="text-lg font-medium text-gray-900">
-                Liste des Requêtes ({{ $requetes->total() }} résultats)
-            </h3>
+    <!-- Card container for filters and table -->
+    <div class="card shadow-sm">
+        <!-- Filter form -->
+        <div class="card-header bg-light">
+            <form method="GET" action="{{ route('admin.requetes.index') }}" class="row g-3">
+                <div class="col-md-3 col-sm-6">
+                    <label for="status" class="form-label small text-muted">STATUT</label>
+                    <select name="status" id="status" class="form-select form-select-sm">
+                        <option value="">Tous les statuts</option>
+                        <option value="en attente" {{ request('status') == 'en attente' ? 'selected' : '' }}>En attente</option>
+                        <option value="en cours" {{ request('status') == 'en cours' ? 'selected' : '' }}>En cours</option>
+                        <option value="traitée" {{ request('status') == 'traitée' ? 'selected' : '' }}>Traitée</option>
+                        <option value="rejetée" {{ request('status') == 'rejetée' ? 'selected' : '' }}>Rejetée</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="category" class="form-label small text-muted">CATÉGORIE</label>
+                    <select name="category" id="category" class="form-select form-select-sm">
+                        <option value="">Toutes les catégories</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->code_cat }}" {{ request('category') == $category->code_cat ? 'selected' : '' }}>
+                                {{ $category->label_cat }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="bureau" class="form-label small text-muted">BUREAU</label>
+                    <select name="bureau" id="bureau" class="form-select form-select-sm">
+                        <option value="">Tous les bureaux</option>
+                        @foreach($bureaux as $bureau)
+                            <option value="{{ $bureau->code_bureau }}" {{ request('bureau') == $bureau->code_bureau ? 'selected' : '' }}>
+                                {{ $bureau->label_bureau }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="date_from" class="form-label small text-muted">DATE DE DÉBUT</label>
+                    <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <label for="date_to" class="form-label small text-muted">DATE DE FIN</label>
+                    <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-6 col-sm-6 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-secondary btn-sm px-4">Filtrer</button>
+                    <a href="{{ route('admin.requetes.index') }}" class="btn btn-outline-secondary btn-sm px-4">Réinitialiser</a>
+                </div>
+            </form>
         </div>
 
-        @if($requetes->count() > 0)
-            <div class="grid grid-cols-1 gap-4">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+        <!-- Table header -->
+        <div class="card-body p-0">
+            <div class="bg-primary text-white text-center py-3">
+                <h5 class="mb-0">Liste des Requêtes ({{ $requetes->total() }} résultats)</h5>
+            </div>
+
+            @if($requetes->count() > 0)
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th class="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="text-primary fw-bold">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'code_requete', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}"
-                                       class="hover:text-gray-700">
+                                       class="text-decoration-none text-primary">
                                         Code Requête
-                                         @if(request('sort') === 'code_requete')
-                                            <span class="ml-1">{{ request('direction') === 'asc' ? '↑' : '↓' }}</span>
+                                        @if(request('sort') === 'code_requete')
+                                            <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }}"></i>
                                         @endif
                                     </a>
                                 </th>
-                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Utilisateur
-                                </th>
-                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Catégorie
-                                </th>
-                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Bureau
-                                </th>
-                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="text-muted">Utilisateur</th>
+                                <th class="text-muted">Catégorie</th>
+                                <th class="text-muted">Bureau</th>
+                                <th class="text-primary fw-bold">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}"
-                                       class="hover:text-gray-700">
+                                       class="text-decoration-none text-primary">
                                         Statut
-                                        @if(request ('sort') === 'status')
-                                            <span class="ml-1">{{ request('direction') === 'asc' ? '↑' : '↓' }}</span>
+                                        @if(request('sort') === 'status')
+                                            <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }}"></i>
                                         @endif
                                     </a>
                                 </th>
-                                {{-- <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Priorité
-                                </th> --}}
-                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="text-primary fw-bold">
                                     <a href="{{ request()->fullUrlWithQuery(['sort' => 'date_sousmis', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc']) }}"
-                                       class="hover:text-gray-700">
+                                       class="text-decoration-none text-primary">
                                         Date soumise
-                                        @if(request('sort ') === 'date_sousmis')
-                                            <span class="ml-1">{{ request('direction') === 'asc' ? '↑' : '↓' }}</span>
+                                        @if(request('sort') === 'date_sousmis')
+                                            <i class="fas fa-sort-{{ request('direction') === 'asc' ? 'up' : 'down' }}"></i>
                                         @endif
                                     </a>
                                 </th>
-                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
+                                <th class="text-muted">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody>
                             @foreach($requetes as $requete)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $requete->code_requete }}
-                                    </td>
-                                    <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $requete->user->nom_user ?? 'N/A' }}
-                                    </td>
-                                    <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $requete->category->label_cat ?? 'N/A' }}
-                                    </td>
-                                    <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $requete->bureau->label_bureau ?? 'N/A' }}
-                                    </td>
-                                    <td class="px-2 py-4 whitespace-nowrap">
+                                <tr>
+                                    <td class="fw-bold text-primary">{{ $requete->code_requete }}</td>
+                                    <td class="text-muted">{{ $requete->user->nom_user ?? 'N/A' }}</td>
+                                    <td class="text-muted">{{ $requete->category->label_cat ?? 'N/A' }}</td>
+                                    <td class="text-muted">{{ $requete->bureau->label_bureau ?? 'N/A' }}</td>
+                                    <td>
                                         @php
-                                            $statusColors = [
-                                                'en attente' => 'bg-yellow-100 text-yellow-800',
-                                                'en cours' => 'bg-blue-100 text-blue-800',
-                                                'traitée' => 'bg-green-100 text-green-800',
-                                                'rejetée' => 'bg-red-100 text-red-800',
-
+                                            $statusConfig = [
+                                                'en attente' => ['class' => 'badge bg-warning text-dark', 'text' => 'En attente'],
+                                                'en cours' => ['class' => 'badge bg-info text-white', 'text' => 'En cours'],
+                                                'traitée' => ['class' => 'badge bg-success text-white', 'text' => 'Traitée'],
+                                                'rejetée' => ['class' => 'badge bg-danger text-white', 'text' => 'Rejetée'],
                                             ];
+                                            $config = $statusConfig[$requete->status] ?? ['class' => 'badge bg-secondary', 'text' => ucfirst($requete->status)];
                                         @endphp
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusColors[$requete->status] ?? 'bg-gray-100 text-gray-800' }}">
-                                            {{ ucfirst($requete->status) }}
-                                        </span>
+                                        <span class="{{ $config['class'] }}">{{ $config['text'] }}</span>
                                     </td>
-                                    {{-- <td class="px-2 py-4 whitespace-nowrap">
-                                        @php
-                                            $priorityColors = [
-                                                'basse' => 'bg-gray-100 text-gray-800',
-                                                'normale' => 'bg-blue-100 text-blue-800',
-                                                'haute' => 'bg-orange-100 text-orange-800',
-                                                'urgente' => 'bg-red-100 text-red-800'
-                                            ];
-                                        @endphp
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $priorityColors[$requete->priorite] ?? 'bg-gray-100 text-gray-800' }}">
-                                            {{ ucfirst($requete->priorite) }}
-                                        </span>
-                                    </td> --}}
-                                    <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="text-muted">
                                         {{ $requete->date_sousmis ? $requete->date_sousmis->format('d/m/Y H:i') : 'N/A' }}
                                     </td>
-                                    <td class="px-2 py-4 whitespace-nowrap text-sm text-gray-900" style="position: relative; z-index: 10;">
-                                    <a href="{{ route('admin.requetes.show', $requete->code_requete) }}"
-                                  class="btn btn-primary" style="position: relative; z-index: 10; display: inline-block; visibility: visible; opacity: 1;">
-                                   Voir détails
-                                     </a>
+                                    <td>
+                                        <a href="{{ route('admin.requetes.show', $requete->code_requete) }}"
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Voir détails
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                <div class="py-4 border-t border-gray-200">
-                    {{ $requetes->withQueryString()->links('pagination::bootstrap-5') }}
-                </div>
-            </div>
 
-            {{-- <!-- Pagination -->
-            <div class="py-4 border-t border-gray-200">
-                {{ $requetes->withQueryString()->links('pagination::bootstrap-5') }}
-            </div> --}}
-        @else
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune requête trouvée</h3>
-                <p class="mt-1 text-sm text-gray-500">Aucune requête ne correspond aux critères de recherche.</p>
-            </div>
-        @endif
+                <!-- Pagination -->
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            Affichage de {{ $requetes->firstItem() }} à {{ $requetes->lastItem() }} sur {{ $requetes->total() }} résultats
+                        </div>
+                        <div>
+                            {{ $requetes->withQueryString()->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+            @else
+                <!-- Empty state -->
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">Aucune requête trouvée</h5>
+                    <p class="text-muted">Aucune requête ne correspond aux critères de recherche.</p>
+                    <a href="{{ route('admin.requetes.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-refresh me-1"></i>Voir toutes les requêtes
+                    </a>
+                </div>
+            @endif
+        </div>
     </div>
+
+   
 </div>
+
+
 @endsection

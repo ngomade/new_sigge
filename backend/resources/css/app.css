@@ -115,3 +115,55 @@
     background-color: #ffc107;
     color: #212529;
 }
+
+/* style pour liste requete */
+
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .table th {
+        border-top: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+    }
+    
+    .table td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        font-size: 0.875rem;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+    }
+    
+    .form-select-sm, .form-control-sm {
+        border-radius: 0.25rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-select-sm:focus, .form-control-sm:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+    }
+    
+    .text-primary a:hover {
+        text-decoration: underline !important;
+    }
+

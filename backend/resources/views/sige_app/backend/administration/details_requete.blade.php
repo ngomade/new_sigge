@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     @if($requete->note_interne)
                     <div class="mt-4">
                         <h5>Note interne</h5>
-                        <div class="border-start border-4 border-warning bg-warning bg-opacity-10 p-3 rounded">
-                            <p class="mb-0 text-warning">{{ $requete->note_interne }}</p>
+                        <div class="border-start border-4 border-warning bg-warning p-3 rounded">
+                            <p class="mb-0 text-dark">{{ $requete->note_interne }}</p>
                         </div>
                     </div>
                     @endif
@@ -266,6 +266,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button type="button" id="activateEmailResponse" class="btn btn-outline-success flex-grow-1">Activer l'envoi des mails</button>
                             <button type="button" id="deactivateEmailResponse" class="btn btn-outline-danger flex-grow-1">Désactiver l'envoi des mails</button>
                         </div>
+                        <div class="mb-3">
+                            <small class="text-muted fst-italic">Veuillez activer l'envoi des mails avant de mettre à jour le statut ou d'envoyer une réponse si vous souhaitez que le mail soit envoyé.</small>
+                        </div>
                         <input type="hidden" name="email_notifications" id="email_notifications_response" value="0" />
                         <button type="submit" class="btn btn-primary">Ajouter la réponse</button>
                     </form>
@@ -310,6 +313,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="mb-3 d-flex gap-2">
                             <button type="button" id="activateEmail" class="btn btn-outline-success flex-grow-1">Activer l'envoi des mails</button>
                             <button type="button" id="deactivateEmail" class="btn btn-outline-danger flex-grow-1">Désactiver l'envoi des mails</button>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted fst-italic">Veuillez activer l'envoi des mails avant de mettre à jour le statut ou d'envoyer une réponse si vous souhaitez que le mail soit envoyé.</small>
                         </div>
                         <input type="hidden" name="email_notifications" id="email_notifications" value="0" />
                         <button type="submit" class="btn btn-success w-100">Mettre à jour</button>

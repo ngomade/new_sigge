@@ -254,7 +254,7 @@
                 </ul>
             </li>
         @endif
-        {{-- @if ($personnel->hasRole('CHEF_SERV') || $personnel->hasRole('ADMIN')) --}}
+        @if ($personnel && !$personnel->hasRole('etudiant') && !$personnel->hasRole('candidat'))
         <!-- Components -->
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Requetes</span></li>
         <!-- Cards -->
@@ -275,15 +275,17 @@
                         <div data-i18n="StatActu">Statistiques</div>
                     </a>
                 </li>
+                @if ($personnel->hasRole('ADMIN'))
                 <li class="menu-item">
-<a href="{{ route('admin.requetes.categories.index') }}" class="menu-link">
-    <div data-i18n="StatActu">categories</div>
-</a>
+                    <a href="{{ route('admin.requetes.categories.index') }}" class="menu-link">
+                        <div data-i18n="StatActu">categories</div>
+                    </a>
                 </li>
+                @endif
             </ul>
         </li>
 
-        {{-- @endif --}}
+          @endif 
         @if ($personnel->hasRole('ADMIN'))
             <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Notes</span></li>
 
