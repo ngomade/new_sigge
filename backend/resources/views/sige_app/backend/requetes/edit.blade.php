@@ -1,8 +1,16 @@
 @extends('sige_app.frontend.template.frontend')
 @section('js')
     <script>
-        // Gestion de l'upload de fichiers
+        // Variables globales pour les modals
+        let confirmUpdateModal, confirmDeleteModal;
+        let currentDeleteForm = null;
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation des modals
+            confirmUpdateModal = new bootstrap.Modal(document.getElementById('confirmUpdateModal'));
+            confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+
+            // Gestion de l'upload de fichiers
             const fichiersInput = document.getElementById('fichiers');
             if (fichiersInput) {
                 fichiersInput.addEventListener('change', function(e) {
@@ -34,7 +42,7 @@
                 });
             }
 
-            // Compteur de caractères pour les champs texte
+            // Compteur de caractères pour le titre
             const titreInput = document.getElementById('titre_requete_edit');
             if (titreInput) {
                 titreInput.addEventListener('input', function(e) {
@@ -55,6 +63,7 @@
                 });
             }
 
+            // Compteur de caractères pour la description
             const descInput = document.getElementById('desc_requete');
             if (descInput) {
                 descInput.addEventListener('input', function(e) {
@@ -75,26 +84,91 @@
                 });
             }
 
-            // Gestion du formulaire avec confirmation
+            // Gestion du formulaire de modification avec modal
             const form = document.getElementById('editRequeteForm');
             if (form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-
-                    if (confirm('Êtes-vous sûr de vouloir modifier cette requête ?')) {
-                        // Désactiver le bouton pour éviter les double-clics
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        if (submitBtn) {
-                            submitBtn.disabled = true;
-                            submitBtn.innerHTML =
-                                '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Mise à jour...';
-                        }
-
-                        // Soumettre le formulaire
-                        form.submit();
-                    }
+                    confirmUpdateModal.show();
                 });
             }
+
+            // Confirmation de la mise à jour
+            document.getElementById('confirmUpdateBtn').addEventListener('click', function() {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Mise à jour...';
+                }
+                confirmUpdateModal.hide();
+                form.submit();
+            });
+
+            // Gestion des boutons de suppression de fichiers
+            document.querySelectorAll('.delete-file-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const fileName = this.getAttribute('data-file-name');
+                    const deleteForm = this.closest('form');
+                    
+                    // Stocker la référence du formulaire
+                    currentDeleteForm = deleteForm;
+                    
+                    // Mettre à jour le contenu du modal
+                    document.getElementById('fileNameToDelete').textContent = fileName;
+                    
+                    // Afficher le modal
+                    confirmDeleteModal.show();
+                });
+            });
+
+            // Empêcher la soumission des formulaires de suppression
+            document.querySelectorAll('.delete-file-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+
+            // Confirmation de la suppression
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                if (currentDeleteForm) {
+                    // Désactiver le bouton pour éviter les doubles clics
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Suppression...';
+                    
+                    confirmDeleteModal.hide();
+                    
+                    // Créer un nouveau formulaire temporaire pour éviter les event listeners
+                    const tempForm = document.createElement('form');
+                    tempForm.method = 'POST';
+                    tempForm.action = currentDeleteForm.action;
+                    tempForm.style.display = 'none';
+                    
+                    // Copier les inputs CSRF et METHOD
+                    const csrfToken = currentDeleteForm.querySelector('input[name="_token"]').value;
+                    const methodInput = currentDeleteForm.querySelector('input[name="_method"]').value;
+                    
+                    tempForm.innerHTML = `
+                        <input type="hidden" name="_token" value="${csrfToken}">
+                        <input type="hidden" name="_method" value="${methodInput}">
+                    `;
+                    
+                    document.body.appendChild(tempForm);
+                    tempForm.submit();
+                }
+            });
+
+            // Réinitialiser le bouton quand le modal se ferme
+            document.getElementById('confirmDeleteModal').addEventListener('hidden.bs.modal', function() {
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-trash me-1"></i>Supprimer le fichier';
+                currentDeleteForm = null;
+            });
         });
     </script>
 @endsection
@@ -193,18 +267,25 @@
                                 <ul class="list-group">
                                     @foreach ($requete->fichiers as $fichier)
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            {{ $fichier->nom_original }} ({{ number_format($fichier->taille / 1024, 1) }}
-                                            KB)
+                                            <span>
+                                                <i class="fas fa-file me-2 text-muted"></i>
+                                                {{ $fichier->nom_original }} 
+                                                <small class="text-muted">({{ number_format($fichier->taille / 1024, 1) }} KB)</small>
+                                            </span>
                                             <div>
                                                 <a href="{{ route('requetes.downloadFichier', $fichier->id_fichier) }}"
-                                                    class="btn btn-sm btn-outline-primary me-1">Télécharger</a>
+                                                    class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="fas fa-download me-1"></i>Télécharger
+                                                </a>
                                                 <form action="{{ route('requetes.deleteFichier', $fichier->id_fichier) }}"
-                                                    method="POST" class="d-inline"
-                                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')">
+                                                    method="POST" class="d-inline delete-file-form">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit"
-                                                        class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                                    <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger delete-file-btn"
+                                                        data-file-name="{{ $fichier->nom_original }}">
+                                                        <i class="fas fa-trash me-1"></i>Supprimer
+                                                    </button>
                                                 </form>
                                             </div>
                                         </li>
@@ -217,8 +298,10 @@
                             <label for="fichiers" class="form-label">Ajouter de nouveaux fichiers</label>
                             <input id="fichiers" name="fichiers[]" type="file" class="form-control" multiple
                                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                            <small class="form-text text-muted">Formats acceptés : PDF, JPG, PNG, DOC, DOCX (max 5MB par
-                                fichier)</small>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Formats acceptés : PDF, JPG, PNG, DOC, DOCX (max 5MB par fichier)
+                            </small>
                             @error('fichiers.*')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -228,8 +311,12 @@
                             <small class="text-muted"><span class="text-danger">*</span> Champs obligatoires</small>
                             <div>
                                 <a href="{{ route('requetes.show', $requete->code_requete) }}"
-                                    class="btn btn-secondary me-2">Annuler</a>
-                                <button type="submit" class="btn btn-primary">Mettre à jour la requête</button>
+                                    class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-1"></i>Annuler
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Mettre à jour la requête
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -237,4 +324,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de confirmation de mise à jour -->
+    <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="confirmUpdateModalLabel">
+                        <i class="fas fa-edit me-2"></i>Confirmer la modification
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <h6 class="mb-3">Êtes-vous sûr de vouloir modifier cette requête ?</h6>
+                    <p class="text-muted mb-0">
+                        Cette action mettra à jour les informations de la requête avec les nouvelles données saisies.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmUpdateBtn">
+                        <i class="fas fa-check me-1"></i>Confirmer la modification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation de suppression de fichier -->
+
 @endsection
