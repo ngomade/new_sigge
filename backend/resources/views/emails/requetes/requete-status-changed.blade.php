@@ -16,9 +16,9 @@
     @if($oldStatus === 'en attente' && $newStatus === 'en cours')
         <p>Votre requête a été transférée au bureau <strong>{{ $requete->bureau->label_bureau ?? 'inconnu' }}</strong> et est maintenant en cours de traitement.</p>
     @elseif(($oldStatus === 'en cours' || $oldStatus === 'en attente') && $newStatus === 'traitée')
-        <p>Votre requête a été traitée avec succès et est maintenant terminée.</p>
+        <p>Votre requête a été traitée avec succès au bureau <strong>{{ $requete->bureau->label_bureau ?? 'inconnu' }}</strong> et est maintenant terminée.</p>
     @elseif($newStatus === 'rejetée')
-        <p>Votre requête a été rejetée. Veuillez consulter les détails pour plus d'informations.</p>
+        <p>Votre requête a été rejetée au bureau <strong>{{ $requete->bureau->label_bureau ?? 'inconnu' }}</strong>. Veuillez consulter les détails pour plus d'informations.</p>
     @else
         <p>Le statut de votre requête a été mis à jour.</p>
     @endif
