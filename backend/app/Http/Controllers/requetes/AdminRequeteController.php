@@ -231,7 +231,7 @@ class AdminRequeteController extends Controller
                         Mail::to($userEmail)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
                     } catch (\Exception $e) {
                         Log::error('Erreur envoi mail assignation: ' . $e->getMessage());
-                        return back()->with('success', 'Statut de la requête mis à jour avec succès.')->with('error', 'Le mail d\'assignation n\'a pas pu être envoyé.');
+                        return back()->with('success', 'Statut de la requête mis à jour avec succès, mais le mail d\'assignation n\'a pas pu être envoyé.');
                     }
                 }
             }
@@ -247,12 +247,16 @@ class AdminRequeteController extends Controller
                         Mail::to($userEmail)->send(new RequeteStatusChangeMail($requete, $emailOldStatus, $emailNewStatus));
                     } catch (\Exception $e) {
                         Log::error('Erreur envoi mail changement statut: ' . $e->getMessage());
-                        return back()->with('success', 'Statut de la requête mis à jour avec succès.')->with('error', 'Le mail de changement de statut n\'a pas pu être envoyé.');
+                        return back()->with('success', 'Statut de la requête mis à jour avec succès, mais le mail de changement de statut n\'a pas pu être envoyé.');
                     }
                 }
             }
 
-            return back()->with('success', 'Statut de la requête mis à jour avec succès.');
+            if ($sendEmail) {
+                return back()->with('success', 'Statut de la requête mis à jour avec succès et mail envoyé.');
+            } else {
+                return back()->with('success', 'Statut de la requête mis à jour avec succès, mail non envoyé.');
+            }
         } catch (\Exception $e) {
             Log::error('Erreur mise à jour statut requête: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Erreur lors de la mise à jour du statut. Détails: ' . $e->getMessage());
@@ -350,11 +354,15 @@ class AdminRequeteController extends Controller
                     Mail::to($userEmail)->send(new RequeteResponseMail($requete, $reponse));
                 } catch (\Exception $e) {
                     Log::error('Erreur envoi mail réponse: ' . $e->getMessage());
-                    return back()->with('success', 'Réponse ajoutée avec succès.')->with('error', 'Le mail de réponse n\'a pas pu être envoyé.');
+                    return back()->with('success', 'Réponse ajoutée avec succès, mais le mail de réponse n\'a pas pu être envoyé.');
                 }
             }
 
-            return back()->with('success', 'Réponse ajoutée avec succès.');
+            if ($sendEmail) {
+                return back()->with('success', 'Réponse ajoutée avec succès et mail envoyé.');
+            } else {
+                return back()->with('success', 'Réponse ajoutée avec succès, mail non envoyé.');
+            }
         } catch (\Exception $e) {
             Log::error('Erreur d\'ajout de la requete: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Erreur lors de l\'ajout de la reponse. Détails: ' . $e->getMessage());
