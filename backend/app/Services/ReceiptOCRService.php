@@ -6,6 +6,7 @@ use thiagoalessio\TesseractOCR\TesseractOCR;
 use Illuminate\Http\UploadedFile;
 use Imagick;
 use Exception;
+
 use Illuminate\Support\Facades\Log;
 
 class ReceiptOCRService
@@ -29,7 +30,7 @@ class ReceiptOCRService
             // Pattern avec tolérance aux erreurs OCR
             '/(?:BORDEREAU|B0RDEREAU).*?(?:TIERS|T1ERS)\s*(?:N[°°]|NO|N0)\s*(\d{6})/is',
         ],
-      
+
         'ca_nom' => [
             // Pattern pour "Nom: MAHOP MAHOP" - prendre tout après "Nom:"
             '/(?:nom|name|surname)\s*:?\s*([A-ZÀ-Ÿ][A-ZÀ-Ÿ\s\-\']+?)(?=\s*(?:pr[eé]nom|firstname|email|$))/i',
@@ -124,9 +125,9 @@ class ReceiptOCRService
     {
         // Nettoyer le texte spécifiquement pour la recherche du numéro
         $cleanedText = $this->cleanTextForReceiptNumber($text);
-        
+
         Log::info('Recherche du numéro de reçu', ['cleaned_text' => $cleanedText]);
-        
+
         // Essayer chaque pattern dans l'ordre
         foreach ($this->patterns['ca_num_recu'] as $index => $pattern) {
             if (preg_match_all($pattern, $cleanedText, $matches, PREG_SET_ORDER)) {
@@ -144,7 +145,7 @@ class ReceiptOCRService
                 }
             }
         }
-        
+
         // Si aucun pattern n'a fonctionné, chercher le premier nombre à 6 chiffres après "BORDEREAU"
         if (preg_match('/BORDEREAU.*?(\d{6})/is', $cleanedText, $match)) {
             $number = $match[1];
@@ -153,7 +154,7 @@ class ReceiptOCRService
                 return $number;
             }
         }
-        
+
         // Dernière tentative : chercher tous les nombres à 6 chiffres et prendre le premier
         if (preg_match_all('/(?<!\d)(\d{6})(?!\d)/', $cleanedText, $matches)) {
             foreach ($matches[1] as $number) {
@@ -164,7 +165,7 @@ class ReceiptOCRService
                 }
             }
         }
-        
+
         Log::warning('Aucun numéro de reçu trouvé');
         return null;
     }
@@ -183,14 +184,14 @@ class ReceiptOCRService
             '°' => '°',  // Uniformiser le symbole degré
             '  ' => ' ', // Espaces multiples en espace simple
         ];
-        
+
         $text = str_replace(array_keys($replacements), array_values($replacements), $text);
-        
+
         // Corriger les erreurs OCR courantes dans "BORDEREAU"
         $text = preg_replace('/B[0O]RDEREAU/i', 'BORDEREAU', $text);
         $text = preg_replace('/T[1I]ERS/i', 'TIERS', $text);
         $text = preg_replace('/N[0O]/i', 'N°', $text);
-        
+
         return $text;
     }
 
@@ -395,8 +396,9 @@ class ReceiptOCRService
         return $data;
     }
 
-    // ... Méthodes existantes (prepareImageForOCR, performOCR, etc.) restent identiques ...
-
+    /**
+     * Préparer l'image pour l'OCR avec gestion améliorée des PDF
+     */
     private function prepareImageForOCR(UploadedFile $file): string
     {
         $mimeType = $file->getMimeType();
@@ -406,10 +408,160 @@ class ReceiptOCRService
         }
 
         if ($mimeType === 'application/pdf') {
-            return $this->convertPdfToImage($file);
+            return $this->convertPdfToImageAlternative($file);
         }
 
         throw new Exception('Format de fichier non supporté. Utilisez PDF, JPG, JPEG ou PNG.');
+    }
+
+    /**
+     * Convertir PDF en image avec plusieurs méthodes alternatives
+     */
+    private function convertPdfToImageAlternative(UploadedFile $file): string
+    {
+        // Méthode 1: Essayer avec ImageMagick configuré
+        try {
+            return $this->convertPdfWithImageMagick($file);
+        } catch (Exception $e) {
+            Log::warning('ImageMagick PDF failed: ' . $e->getMessage());
+        }
+
+        // Méthode 2: Utiliser ghostscript directement
+        try {
+            return $this->convertPdfWithGhostscript($file);
+        } catch (Exception $e) {
+            Log::warning('Ghostscript PDF failed: ' . $e->getMessage());
+        }
+
+        // Méthode 3: Utiliser poppler-utils
+        try {
+            return $this->convertPdfWithPoppler($file);
+        } catch (Exception $e) {
+            Log::warning('Poppler PDF failed: ' . $e->getMessage());
+        }
+
+        // Si toutes les méthodes échouent, retourner le PDF original
+        // Tesseract peut parfois traiter directement les PDF
+        Log::info('Attempting direct PDF OCR with Tesseract');
+        return $file->getPathname();
+    }
+
+    /**
+     * Méthode 1: ImageMagick avec configuration PDF
+     */
+    private function convertPdfWithImageMagick(UploadedFile $file): string
+    {
+        if (!extension_loaded('imagick')) {
+            throw new Exception('Extension Imagick non disponible');
+        }
+
+        // Vérifier si ImageMagick supporte les PDF
+        $formats = Imagick::queryFormats();
+        if (!in_array('PDF', $formats)) {
+            throw new Exception('ImageMagick ne supporte pas les PDF');
+        }
+
+        try {
+            $imagick = new Imagick();
+
+            // Configuration pour PDF
+            $imagick->setResolution(300, 300);
+            $imagick->setOption('pdf:use-cropbox', 'true');
+
+            // Lire seulement la première page
+            $imagick->readImage($file->getPathname() . '[0]');
+
+            // Convertir et optimiser
+            $imagick->setImageFormat('png');
+            $imagick->setImageType(Imagick::IMGTYPE_GRAYSCALE);
+            $imagick->contrastImage(1);
+            $imagick->normalizeImage();
+
+            $tempPath = sys_get_temp_dir() . '/pdf_image_' . uniqid() . '.png';
+            $imagick->writeImage($tempPath);
+            $imagick->destroy();
+
+            return $tempPath;
+        } catch (Exception $e) {
+            throw new Exception('Erreur ImageMagick PDF: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Méthode 2: Ghostscript direct
+     */
+    private function convertPdfWithGhostscript(UploadedFile $file): string
+    {
+        // Vérifier si ghostscript est disponible
+        $gsCommand = $this->findGhostscriptCommand();
+        if (!$gsCommand) {
+            throw new Exception('Ghostscript non trouvé');
+        }
+
+        $tempPath = sys_get_temp_dir() . '/pdf_gs_' . uniqid() . '.png';
+
+        $command = sprintf(
+            '%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=png16m -r300 -dFirstPage=1 -dLastPage=1 -sOutputFile=%s %s 2>&1',
+            $gsCommand,
+            escapeshellarg($tempPath),
+            escapeshellarg($file->getPathname())
+        );
+
+        exec($command, $output, $returnCode);
+
+        if ($returnCode !== 0 || !file_exists($tempPath)) {
+            throw new Exception('Erreur Ghostscript: ' . implode("\n", $output));
+        }
+
+        return $tempPath;
+    }
+
+    /**
+     * Méthode 3: Poppler-utils (pdftoppm)
+     */
+    private function convertPdfWithPoppler(UploadedFile $file): string
+    {
+        // Vérifier si pdftoppm est disponible
+        exec('which pdftoppm', $output, $returnCode);
+        if ($returnCode !== 0) {
+            throw new Exception('pdftoppm non trouvé');
+        }
+
+        $tempPath = sys_get_temp_dir() . '/pdf_poppler_' . uniqid();
+
+        $command = sprintf(
+            'pdftoppm -png -r 300 -f 1 -l 1 %s %s 2>&1',
+            escapeshellarg($file->getPathname()),
+            escapeshellarg($tempPath)
+        );
+
+        exec($command, $output, $returnCode);
+
+        // pdftoppm ajoute -1 au nom de fichier
+        $generatedFile = $tempPath . '-1.png';
+
+        if ($returnCode !== 0 || !file_exists($generatedFile)) {
+            throw new Exception('Erreur pdftoppm: ' . implode("\n", $output));
+        }
+
+        return $generatedFile;
+    }
+
+    /**
+     * Trouver la commande Ghostscript
+     */
+    private function findGhostscriptCommand(): ?string
+    {
+        $commands = ['gs', 'ghostscript', '/usr/bin/gs', '/usr/local/bin/gs'];
+
+        foreach ($commands as $cmd) {
+            exec("which $cmd", $output, $returnCode);
+            if ($returnCode === 0) {
+                return $cmd;
+            }
+        }
+
+        return null;
     }
 
     private function enhanceImage(string $imagePath): string
@@ -443,43 +595,28 @@ class ReceiptOCRService
         }
     }
 
-    private function convertPdfToImage(UploadedFile $file): string
-    {
-        try {
-            if (!extension_loaded('imagick')) {
-                throw new Exception('Extension Imagick requise pour traiter les fichiers PDF');
-            }
-
-            $imagick = new Imagick();
-            $imagick->setResolution(300, 300);
-            $imagick->readImage($file->getPathname() . '[0]');
-            $imagick->setImageFormat('png');
-            $imagick->setImageType(Imagick::IMGTYPE_GRAYSCALE);
-            $imagick->contrastImage(1);
-            $imagick->normalizeImage();
-
-            $tempPath = sys_get_temp_dir() . '/pdf_image_' . uniqid() . '.png';
-            $imagick->writeImage($tempPath);
-            $imagick->destroy();
-
-            return $tempPath;
-        } catch (Exception $e) {
-            throw new Exception('Erreur lors de la conversion PDF: ' . $e->getMessage());
-        }
-    }
-
+    /**
+     * Améliorer l'OCR avec gestion des PDF
+     */
     private function performOCR(string $imagePath): string
     {
         try {
             $ocr = new TesseractOCR($imagePath);
             $ocr->lang('fra', 'eng');
-            $ocr->psm(3);
+
+            // Configuration spéciale pour PDF si nécessaire
+            if (pathinfo($imagePath, PATHINFO_EXTENSION) === 'pdf') {
+                $ocr->psm(1); // Automatic page segmentation with OSD
+            } else {
+                $ocr->psm(3); // Fully automatic page segmentation
+            }
+
             $ocr->oem(3);
 
             $text = $ocr->run();
 
             if (empty(trim($text))) {
-                throw new Exception('Aucun texte détecté dans l\'image');
+                throw new Exception('Aucun texte détecté dans le document');
             }
 
             return $text;
@@ -488,29 +625,91 @@ class ReceiptOCRService
         }
     }
 
+    /**
+     * Convertir image en PDF - Version améliorée
+     */
     public function convertImageToPdf(string $imagePath): string
     {
         try {
-            if (!extension_loaded('imagick')) {
-                throw new Exception('Extension Imagick requise pour la conversion PDF');
+            // Méthode 1: Essayer avec ImageMagick
+            if (extension_loaded('imagick')) {
+                try {
+                    $imagick = new Imagick($imagePath);
+                    $imagick->setImageFormat('pdf');
+                    $imagick->setImageCompressionQuality(85);
+
+                    $pdfPath = $this->generatePdfPath($imagePath);
+                    $imagick->writeImage($pdfPath);
+                    $imagick->destroy();
+
+                    return $pdfPath;
+                } catch (Exception $e) {
+                    Log::warning('ImageMagick conversion failed: ' . $e->getMessage());
+                }
             }
 
-            $imagick = new Imagick($imagePath);
-            $imagick->setImageFormat('pdf');
-            $imagick->setImageCompressionQuality(85);
-
-            $pdfPath = str_replace(['.jpg', '.jpeg', '.png'], '.pdf', $imagePath);
-
-            if ($pdfPath === $imagePath) {
-                $pdfPath = dirname($imagePath) . '/' . pathinfo($imagePath, PATHINFO_FILENAME) . '.pdf';
-            }
-
-            $imagick->writeImage($pdfPath);
-            $imagick->destroy();
-
-            return $pdfPath;
+            // Méthode 2: Utiliser fpdf pour créer un PDF simple
+            return $this->createPdfWithFpdf($imagePath);
         } catch (Exception $e) {
             throw new Exception('Erreur lors de la conversion en PDF: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Créer un PDF simple avec FPDF
+     */
+    private function createPdfWithFpdf(string $imagePath): string
+    {
+        // Vérifier si FPDF est disponible
+        if (!class_exists('FPDF')) {
+            throw new Exception('FPDF non disponible pour la conversion PDF');
+        }
+
+        $pdf = new \FPDF();
+        $pdf->AddPage();
+
+        // Obtenir les dimensions de l'image
+        $imageInfo = getimagesize($imagePath);
+        if (!$imageInfo) {
+            throw new Exception('Impossible de lire les dimensions de l\'image');
+        }
+
+        $width = $imageInfo[0];
+        $height = $imageInfo[1];
+
+        // Calculer les dimensions pour le PDF (A4 = 210x297mm)
+        $maxWidth = 190; // Laisser des marges
+        $maxHeight = 277;
+
+        $ratio = min($maxWidth / $width, $maxHeight / $height);
+        $finalWidth = $width * $ratio;
+        $finalHeight = $height * $ratio;
+
+        // Centrer l'image
+        $x = (210 - $finalWidth) / 2;
+        $y = (297 - $finalHeight) / 2;
+
+        $pdf->Image($imagePath, $x, $y, $finalWidth, $finalHeight);
+
+        $pdfPath = $this->generatePdfPath($imagePath);
+        $pdf->Output('F', $pdfPath);
+
+        return $pdfPath;
+    }
+
+    /**
+     * Générer un chemin pour le fichier PDF
+     */
+    private function generatePdfPath(string $imagePath): string
+    {
+        $pathInfo = pathinfo($imagePath);
+        $pdfPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.pdf';
+
+        // Si le fichier existe déjà, ajouter un timestamp
+        if (file_exists($pdfPath)) {
+            $pdfPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_' . time() . '.pdf';
+        }
+
+        return $pdfPath;
     }
 }
