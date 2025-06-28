@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('diplome', function (Blueprint $table) {
             $table->id('code_dip');
             $table->string('label_dip');
-            $table->string('specialtite_dip', 128);
             $table->timestamps();
         });
     }

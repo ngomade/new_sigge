@@ -14,7 +14,6 @@ class Diplome extends Model
 
 	protected $fillable = [
 		'label_dip',
-        'specialite_dip',
 	];
 
 	public function filieres()
