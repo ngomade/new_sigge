@@ -127,6 +127,13 @@
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/storage/app" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/storage/framework" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/bacon/bacon-qr-code" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/dasprid/enum" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/simplesoftwareio/simple-qrcode" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/spatie/laravel-permission" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/thiagoprz/eloquent-composite-key" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

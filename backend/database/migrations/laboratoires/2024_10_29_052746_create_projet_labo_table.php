@@ -14,11 +14,12 @@ class CreateProjetLaboTable extends Migration
     public function up(): void
     {
         Schema::create('projet_labo', function (Blueprint $table) {
-            $table->increments("code_projet");
+            $table->id("code_projet");
             $table->string("theme_projet");
             $table->text("description_projet");
-            $table->string("code_lab", 10);
-            $table->foreign("code_lab")->references("code_lab")->on("laboratoire.php");
+            $table->string("code_lab");
+
+            $table->foreign("code_lab")->references("code_lab")->on("laboratoire");
             $table->timestamps();
         });
     }

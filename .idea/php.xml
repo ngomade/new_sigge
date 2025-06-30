@@ -136,6 +136,11 @@
       <path value="$PROJECT_DIR$/backend/vendor/webmozart/assert" />
       <path value="$PROJECT_DIR$/backend/vendor/doctrine/inflector" />
       <path value="$PROJECT_DIR$/backend/vendor/doctrine/dbal" />
+      <path value="$PROJECT_DIR$/backend/vendor/bacon/bacon-qr-code" />
+      <path value="$PROJECT_DIR$/backend/vendor/spatie/laravel-permission" />
+      <path value="$PROJECT_DIR$/backend/vendor/dasprid/enum" />
+      <path value="$PROJECT_DIR$/backend/vendor/thiagoprz/eloquent-composite-key" />
+      <path value="$PROJECT_DIR$/backend/vendor/simplesoftwareio/simple-qrcode" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

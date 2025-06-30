@@ -13,10 +13,11 @@ class CreateLaboratoireTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('laboratoire.php', function (Blueprint $table) {
+        Schema::create('laboratoire', function (Blueprint $table) {
             $table->string("code_lab", 10)->primary();
             $table->string("label_labo", 255);
             $table->text("desc_labo")->nullable();
+
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreateLaboratoireTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('laboratoire.php');
+        Schema::dropIfExists('laboratoire');
     }
 }
