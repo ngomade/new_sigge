@@ -12,13 +12,10 @@ return new class extends Migration
         Schema::table('laboratoire', function (Blueprint $table) {
             $table->string('logo_labo')->nullable();
             $table->string('sigle', 20)->nullable();
-            $table->string('historiq_labo')->nullable();
             $table->string('axes_recherche');
-            $table->string('site_web')->nullable();
             $table->string('email_labo')->nullable();
             $table->string('tel_labo')->nullable();
             $table->string('adresse_labo')->nullable();
-            $table->string('missions')->nullable();
         });
 
         // Exemple d'ajout de champ à projet_labo (à adapter selon tes besoins)
@@ -33,9 +30,9 @@ return new class extends Migration
     {
         Schema::table('laboratoire', function (Blueprint $table) {
             $table->dropColumn([
-                'sigle', 'logo_labo', 'historiq_labo',
-                'email_labo', 'tel_labo', 'site_web', 'adresse_labo',
-                'axes_recherche', 'missions'
+                'sigle', 'logo_labo',
+                'email_labo', 'tel_labo','adresse_labo',
+                'axes_recherche'
             ]);
         });
         Schema::table('projet_labo', function (Blueprint $table) {

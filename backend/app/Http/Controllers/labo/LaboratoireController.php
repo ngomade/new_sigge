@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
-use App\Models\Laboratoire;
+use App\Models\laboratoires\Laboratoire;
 use Illuminate\Http\Request;
 
 class LaboratoireController extends Controller
