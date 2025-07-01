@@ -80,7 +80,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Personnel::class,
         ],
-        'apit-admins' => [
+        'api-admins' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_ADMIN_MODEL', App\Models\Personnel::class),
         ],

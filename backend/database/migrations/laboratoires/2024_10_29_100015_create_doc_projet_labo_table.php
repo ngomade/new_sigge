@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('doc_projet_labo', function (Blueprint $table) {
             $table->id('id_doc');
-            $table->unsignedInteger('code_projet');
+            $table->unsignedBigInteger('code_projet');
             $table->string('titre_doc', 255);
             $table->string('path', 255);
             $table->timestamps();

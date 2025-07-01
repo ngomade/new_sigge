@@ -29,7 +29,8 @@ class AuthController extends Controller
         $user = Users::where("login_user",$request->login_user)
             ->where("pwd_user", md5($request->pwd_user))->first();
         if($user != null){
-            Auth::login($user);
+            try {
+                Auth::login($user);
             $new_password = $request->login_user == $request->pwd_user;
             $success = "Vous êtes désormais connecté.";
             $request->session()->flash('success', $success);
@@ -45,6 +46,9 @@ class AuthController extends Controller
                 return redirect("/")->with(compact(["success", "new_password"]));
             }
             return redirect("/")->with(compact(["success"]));
+            } catch (\Throwable $th) {
+                dd($th);
+            }
         }else{
             $personnel = Personnel::where("login_pers",$request->login_user)
                 ->where("pwd_pers", md5($request->pwd_user))->first();

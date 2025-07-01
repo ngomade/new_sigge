@@ -20,7 +20,7 @@ use App\Http\Controllers\UeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {return view("sige_app.frontend.index");})->name("home");
-Route::post("login", [AuthController::class ,'store'])->name("login");
+Route::post("login", [AuthController::class ,'store'])->name("login")->middleware('web');
 Route::get("logout", [AuthController::class ,'index'])->name("logout");
 
 
