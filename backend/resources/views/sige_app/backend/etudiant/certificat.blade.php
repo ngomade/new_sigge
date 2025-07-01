@@ -1,3 +1,4 @@
+@php use App\Models\Anneescolaire;use Carbon\Carbon; @endphp
 @extends("sige_app.backend.template.backend")
 @section('js')
     <script>
@@ -33,24 +34,26 @@
                                     <div class="col-2">
                                         <select name="code_annee" id="code_annee" class="form-select">
                                             @foreach (\App\Models\Anneescolaire::orderBy("debut_annee", "desc")->get() as $anneescolaire)
-                                                {{
-                \Carbon\Carbon::parse($anneescolaire->debut_annee)->format('Y')
-            }}-{{
+                                                <option value="{{$anneescolaire->code_annee}}">
+                                                    {{
+                                                                \Carbon\Carbon::parse($anneescolaire->debut_annee)->format('Y')
+                                                            }}-{{
             \Carbon\Carbon::parse($anneescolaire->fin_annee)->format('Y')
-        }}
+        }}                                </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="col-2">
                                         <select name="niveau" id="niveau" class="form-select">
                                             @foreach (\App\Models\notes\Niveau::all() as $niveau)
-                                                <option value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
+                                                <option
+                                                    value="{{$niveau->code_niveau}}"> {{$niveau->label_niveau}} </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="col-2">
                                         <button type="submit" class="btn btn-outline-primary"><i
-                                                    class="ri-search-line"></i></button>
+                                                class="ri-search-line"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -104,7 +107,7 @@
                                     </table>
                                     <div class="mt-4 text-center">
                                         <button type="submit" class="btn btn-outline-danger">Imprimer &nbsp;<i
-                                                    class='bx bxs-file-pdf'></i></button>
+                                                class='bx bxs-file-pdf'></i></button>
                                     </div>
                                 @else
                                     <div class="alert alert-primary w-50 h4 m-auto"> Aucun étudiant ne correspond à vos

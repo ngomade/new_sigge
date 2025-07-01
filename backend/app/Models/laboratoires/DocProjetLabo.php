@@ -15,6 +15,6 @@ class DocProjetLabo extends Model
 
     public function projet()
     {
-        return $this->belongsTo(ProjetLabo::class, 'code_projet', 'code_projet');
+        return $this->belongsTo(Projet+Labo::class, 'code_projet', 'code_projet');
     }
 }

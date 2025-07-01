@@ -60,7 +60,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <input type="file" accept="image/png, image/jpeg, image/gif, image/bmp" required
-                                           class="form-control" required name="photo_user" placeholder="Votre photo"
+                                           class="form-control" name="photo_user" placeholder="Votre photo"
                                            onchange="previewPicture(this)">
                                 </div>
                             </div>

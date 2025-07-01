@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\concours\Candidat;
-use App\Models\concours\User;
 use App\Models\InfoExtra;
 use App\Models\notes\FiliereNiveau;
 use App\Models\notes\Inscription;
 use App\Models\Quitus;
+use App\Models\Users;
 use App\Models\UsersDiplome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Image;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Throwable;
 use function App\Helper\get_filiere;
 use function App\Helper\update_matricule_pers;
@@ -34,13 +34,13 @@ class EtudiantController extends Controller
         return view("sige_app.backend.etudiant.carte", compact("fil"));
     }
     function show_candidat_list(){
-        $candidats = Candidat::join("serie", "serie.code_serie"."", "candidat.ca_serie_diplome")
+        $candidats = Candidat::join("serie", "serie.code_serie", "candidat.ca_serie_diplome")
             ->where("candidat.filiere_code", "GLTCO")->orderBy("candidat.ca_nom")->get();
         return view("sige_app.backend.etudiant.candidat_list", compact(["candidats"]));
     }
 
     function search_candidats(Request  $request){
-        $candidats = Candidat::join("serie", "serie.code_serie"."", "candidat.ca_serie_diplome")
+        $candidats = Candidat::join("serie", "serie.code_serie", "candidat.ca_serie_diplome")
             ->where("candidat.filiere_code", $request->filiere_code)
             ->where("candidat.code_site", $request->code_site)
             ->orderBy("candidat.ca_nom")->get();
@@ -62,7 +62,7 @@ class EtudiantController extends Controller
         }
     }
     function find_candidats(Request  $request){
-        $candidats = Candidat::join("serie", "serie.code_serie"."", "candidat.ca_serie_diplome")
+        $candidats = Candidat::join("serie", "serie.code_serie", "candidat.ca_serie_diplome")
             ->where("candidat.ca_nom", "LIKE", "%$request->keyword%")
             ->orWhere("candidat.ca_prenom", "LIKE", "%$request->keyword%")
             ->orWhere("candidat.ca_telephone",  "LIKE","%$request->keyword%")
@@ -75,7 +75,7 @@ class EtudiantController extends Controller
         $ecole = $request->ecole;
         $annee = $request->annee;
         $level = $request->niveau;
-        $users = User::join("inscription", "users.code_user", "inscription.code_user")
+        $users = Users::class::join("inscription", "users.code_user", "inscription.code_user")
                 ->join("filiere_niveau", "filiere_niveau.code_ins", "inscription.code_ins")
                 ->where("users.code_user", "LIKE", "%$request->keyword%")
                 ->orWhere("users.nom_user", "LIKE", "%$request->keyword%")
@@ -94,7 +94,7 @@ class EtudiantController extends Controller
         $niveau = $request->niveau;
         $etudiants = collect();
         foreach($selectedUsers as $code){
-            $e = User::find($code);
+            $e = Users::find($code);
             $etudiants->push($e);
         }
         $pdf = PDF::loadView("sige_app.backend.pdf.certificat_scolarite", compact(["etudiants", "code_filiere", "niveau"]))->setPaper('a4');
@@ -110,7 +110,7 @@ class EtudiantController extends Controller
         $niveau = $request->input("niveau");
         $etudiants = collect();
         foreach($selectedUsers as $code){
-            $e = User::find($code);
+            $e = Users::find($code);
             $etudiants->push($e);
         }
         $customPaper = array(10,10,595.00,842);
@@ -130,7 +130,7 @@ class EtudiantController extends Controller
         $filiere = explode("-", $request->code_user)[1];
         try {
             DB::beginTransaction();
-            $user = User::where("code_user", $id);
+            $user = Users::where("code_user", $id);
              $inscription = Inscription::where("code_user", $id);
              FiliereNiveau::where("code_ins",  $inscription->first()->code_ins)->delete();
              //UsersRole::where("code_user",  $id)->delete();
@@ -161,7 +161,7 @@ class EtudiantController extends Controller
         $annee = $request->code_annee;
         $level = $request->level;
         //$inscrit = $request->inscrit;
-        $etudiants = User::join("inscription", "users.code_user", "inscription.code_user")
+        $etudiants = Users::join("inscription", "users.code_user", "inscription.code_user")
                 ->join("filiere_niveau", "filiere_niveau.code_ins", "inscription.code_ins")
                 ->where("users.ecole_user", $ecole)
                 ->where("inscription.code_annee", (int)$annee)
@@ -179,7 +179,7 @@ class EtudiantController extends Controller
         $ecole = $request->code_ecole;
         $annee = $request->code_annee;
         $level = $request->code_niveau;
-        $users = User::join("inscription", "users.code_user", "inscription.code_user")
+        $users = Users::join("inscription", "users.code_user", "inscription.code_user")
                 ->join("filiere_niveau", "filiere_niveau.code_ins", "inscription.code_ins")
                 ->where("users.ecole_user", $ecole)
                 ->where("inscription.code_annee", (int)$annee)
@@ -198,7 +198,7 @@ class EtudiantController extends Controller
        try {
         $fil = $request->new_filiere;
         DB::beginTransaction();
-        $u = User::Where("code_user", $request->code_user)->first();
+        $u = Users::Where("code_user", $request->code_user)->first();
         //à verifer plutard que l'on est bien inscris à cette année
         $inscription = Inscription::where("code_user", $u->code_user)->first();
         $filiere_niveau = FiliereNiveau::where("code_ins", $inscription->code_ins)->update(["code_filiere"=>$fil]);
@@ -216,8 +216,8 @@ class EtudiantController extends Controller
     {
        try {
         $fil = get_filiere($request->code_user);
-        $u = User::firstWhere("code_user", $request->code_user);
-        $res = User::firstWhere("code_user", $request->code_user)->update($request->all());
+        $u = Users::firstWhere("code_user", $request->code_user);
+        $res = Users::firstWhere("code_user", $request->code_user)->update($request->all());
         if($res){
             $success = "Informations Modifiées avec success";
             return redirect("/update_info/".$u->code_user."-".$fil)->with(compact(["u", "fil", "success"]));
@@ -234,7 +234,7 @@ class EtudiantController extends Controller
     {
        try {
         $fil = get_filiere($request->code_user);
-        $u = User::firstWhere("code_user", $request->code_user);
+        $u = Users::firstWhere("code_user", $request->code_user);
         $image_extension = ["png", "jpg", "gif", "bmp"];
         $path = public_path("cartes/");
         $pictfile = $request->file('photo_user');
@@ -250,7 +250,7 @@ class EtudiantController extends Controller
             });
             $img->save($file);
         }
-        $res = User::firstWhere("code_user", $request->code_user)->update(["photo_user" => $nom]);
+        $res = Users::firstWhere("code_user", $request->code_user)->update(["photo_user" => $nom]);
         if($res){
             $success = "Photo Modifiée avec success";
             return redirect()->route("liste_etudiant",['id'=>0]);
@@ -266,7 +266,7 @@ class EtudiantController extends Controller
     public function change_info_sup(Request $request)
     {
        try {
-        $u = User::where("code_info_extra", $request->code_info_extra)->first();
+        $u = Users::where("code_info_extra", $request->code_info_extra)->first();
         $fil = get_filiere($u->code_user);
         $res = InfoExtra::where("code_info_extra", $request->code_info_extra)->update($request->except('_token'));
         if($res){
@@ -286,8 +286,8 @@ class EtudiantController extends Controller
     {
         try {
             $fil = get_filiere($request->code_user);
-            $u = User::firstWhere("code_user", $request->code_user);
-            $res = User::where("code_user", $request->code_user)->update([
+            $u = Users::firstWhere("code_user", $request->code_user);
+            $res = Users::where("code_user", $request->code_user)->update([
                 "pwd_user"  => md5($request->pwd_user)
             ]);
             if($res){
@@ -305,12 +305,12 @@ class EtudiantController extends Controller
     public function change_pwd_first(Request $request)
     {
         try {
-            $u = User::firstWhere("code_user", $request->code_user);
+            $u = Users::firstWhere("code_user", $request->code_user);
             if ($request->code_user == $request->npwd) {
                 $errors= "Echec de mise à jour. Le nouveau mot de passe doit être différent de l'ancien";
                 return redirect("/")->with(compact(["errors"]));
             } else {
-                $res = User::where("code_user", $request->code_user)->update([
+                $res = Users::where("code_user", $request->code_user)->update([
                     "pwd_user"  => md5($request->npwd)
                 ]);
                 if($res){
@@ -331,7 +331,7 @@ class EtudiantController extends Controller
     {
         $code = explode("-", $id)[0];
         $fil = explode("-", $id)[1];
-        $u = User::where("code_user", $code)->first();
+        $u = Users::where("code_user", $code)->first();
         return view("sige_app.backend.etudiant.update_etudiant", compact(["u", "fil"]));
     }
 
@@ -340,7 +340,7 @@ class EtudiantController extends Controller
     public function show($id)
     {
         $fil =  $id;
-        $etudiants = User::join("inscription", "users.code_user", "inscription.code_user")
+        $etudiants = Users::join("inscription", "users.code_user", "inscription.code_user")
                 ->join("filiere_niveau", "inscription.code_ins", "=", 'filiere_niveau.code_ins')
                 ->where("filiere_niveau.code_filiere", $fil)->orderBy("nom_user")->paginate(100);
         return view("sige_app.backend.etudiant.liste_etudiant", compact(["etudiants", "fil"]));

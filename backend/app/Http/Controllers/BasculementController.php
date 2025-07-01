@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Anneescolaire;
-use App\Models\concours\User;
 use App\Models\notes\FiliereNiveau;
 use App\Models\notes\Inscription;
 use App\Models\Quitus;
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Throwable;
@@ -29,7 +29,7 @@ class BasculementController extends Controller
         $inscrit = $request->inscrit;
         $user = [];
         if($inscrit != null){
-            $users = User::join("inscription", "users.code_user", "inscription.code_user")
+            $users = Users::join("inscription", "users.code_user", "inscription.code_user")
                 ->join("filiere_niveau", "filiere_niveau.code_ins", "inscription.code_ins")
                 ->where("users.ecole_user", $ecole)
                 ->where("inscription.code_annee", (int)$annee)
@@ -39,7 +39,7 @@ class BasculementController extends Controller
                 ->orderBy("users.nom_user")
                 ->get();
         }else{
-            $users = User::join("inscription", "users.code_user", "inscription.code_user")
+            $users = Users::join("inscription", "users.code_user", "inscription.code_user")
                 ->join("filiere_niveau", "filiere_niveau.code_ins", "inscription.code_ins")
                 ->where("users.ecole_user", $ecole)
                 ->where("inscription.code_annee", (int)$annee)
