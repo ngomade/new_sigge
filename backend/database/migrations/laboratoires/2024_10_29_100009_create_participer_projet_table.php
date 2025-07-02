@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('participer_projet', function (Blueprint $table) {
             $table->unsignedBigInteger('code_projet');
             $table->string('id_pers_lab');
+            $table->integer('id_user_ext');
             $table->string('role', 100)->nullable();
             $table->date('debut_participation');
             $table->date('fin_participation');
@@ -18,8 +19,9 @@ return new class extends Migration
 
             $table->foreign('code_projet')->references('code_projet')->on('projet_labo');
             $table->foreign('id_pers_lab')->references('id_pers_lab')->on('pers_lab');
+            $table->foreign('id_user_ext')->references('id_user_ext')->on('user_externe');
 
-            $table->primary(['code_projet', 'id_pers_lab']);
+            $table->primary(['code_projet', 'id_pers_lab', 'id_user_ext']);
         });
     }
 

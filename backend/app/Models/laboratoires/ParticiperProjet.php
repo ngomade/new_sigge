@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ParticiperProjet extends Model
 {
     protected $table = 'participer_projet';
-    protected $primaryKey = 'id_participation';
-    public $incrementing = true;
+    public $incrementing = false;
+    public $timestamps = true;
+    protected $primaryKey = null;
     protected $fillable = [
-        'id_participation', 'code_projet', 'id_pers_lab', 'role', 'debut_participation', 'fin_participation'
+        'code_projet', 'id_pers_lab', 'id_user_ext', 'role', 'debut_participation', 'fin_participation'
     ];
 
     public function projet()
@@ -20,5 +21,9 @@ class ParticiperProjet extends Model
     public function membre()
     {
         return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
+    }
+    public function userExterne()
+    {
+        return $this->belongsTo(UserExterne::class, 'id_user_ext', 'id_user_ext');
     }
 }
