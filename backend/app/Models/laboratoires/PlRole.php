@@ -23,3 +23,4 @@ class PlRole extends Model
         return $this->belongsTo(RoleLabo::class, 'id_rl', 'id_rl');
     }
 }
+ 
