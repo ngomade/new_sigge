@@ -211,7 +211,7 @@ class InscriptionAcademiqueController extends Controller
                 "code_user" =>$user->code_user,
                 "code_dip"  =>$diplome->code_dip
             ]));
-            $code_ins = generate_inscription($annee->debut_annee->year);
+            $code_ins = generate_inscription(Carbon::parse($annee->debut_annee)->format('Y'));
             $inscription = Inscription::create([
                 'code_ins'      =>$code_ins ,
                 'code_user'     =>$user->code_user,
@@ -259,12 +259,13 @@ class InscriptionAcademiqueController extends Controller
                 $code_cand = $request->code_cand;
                 $res = Candidat::where("ca_code", $code_cand)->update(["ca_email_pere"=>"inscrit@estlc"]);
                 DB::commit();
-                return redirect()->route("show_candidat_list")->with("user",$user);
+                return redirect()->route('show_candidat_list')->with("user",$user);
             }
             DB::commit();
             return view("sige_app.frontend.inscriptions.fiche_administrative_quitus", compact(["user", "code_filiere", "nb_q1", "nb_q2", "nb_q3", "code_ins"]));
         } catch (Throwable $th) {
             DB::rollback();
+            dd($th);
         }
     }
 

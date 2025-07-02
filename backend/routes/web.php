@@ -72,7 +72,6 @@ Route::post("/certificat", [EtudiantController::class ,'certificat'])->name("cer
 Route::get("/carte_index", [EtudiantController::class ,'carte_index'])->name("carte_index");
 Route::post("/carte", [EtudiantController::class ,'carte'])->name("carte");
 Route::get("/show_candidat_list", [EtudiantController::class ,'show_candidat_list'])->name("show_candidat_list");
-Route::get("/show_candidat_list", [EtudiantController::class ,'show_candidat_list'])->name("show_candidat_list");
 Route::post("/search_candidats", [EtudiantController::class ,'search_candidats'])->name("search_candidats");
 Route::post("/find_candidats", [EtudiantController::class ,'find_candidats'])->name("find_candidats");
 Route::get("/liste_site_formation", [EtudiantController::class ,'liste_site_formation'])->name("liste_site_formation");

@@ -8,6 +8,7 @@ use App\Models\notes\FiliereNiveau;
 use App\Models\notes\Inscription;
 use App\Models\Personnel;
 use App\Models\Quitus;
+use App\Models\Users;
 use App\Models\UsersDiplome;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,7 @@ class Helper
         }
 
         // Vérifier l'unicité
-        if (User::where("code_user", $id)->exists()) {
+        if (Users::where("code_user", $id)->exists()) {
             return self::generate_matricule($annee, $ecole);
         }
 
@@ -146,7 +147,7 @@ class Helper
 
         $filiere_niveau = FiliereNiveau::where("code_ins", $inscription->code_ins)->first();
 
-        return $filiere_niveau ? $filiere_niveau->code_filiere : null;
+        return $filiere_niveau?->code_filiere;
     }
 
     /**
@@ -171,7 +172,7 @@ class Helper
 
             foreach ($matricules as $matricule) {
                 $new_matricule = self::generate_matricule(Carbon::now(), $ecole);
-                $user = User::find($matricule);
+                $user = Users::find($matricule);
 
                 if (!$user) {
                     continue; // Passer au suivant si l'utilisateur n'existe pas
@@ -263,6 +264,9 @@ if (!function_exists('get_nb_credit')) {
 }
 
 if (!function_exists('update_matricule_pers')) {
+    /**
+     * @throws Throwable
+     */
     function update_matricule_pers($matricules, $ecole): string
     {
         return \App\Helper\Helper::update_matricule_pers($matricules, $ecole);

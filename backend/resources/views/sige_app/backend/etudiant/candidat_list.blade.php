@@ -335,7 +335,7 @@
                                             <div class="row">
                                                 <label for="mention_dip" class="col-sm-4 col-form-label">Mention<span class="text-danger">*</span></label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" class="form-control" placeholder="Exp: Bien" name="mention_dip" id="mention_dip" minlength="5" >
+                                                    <input type="text" class="form-control" placeholder="Exp: Bien" name="mention_dip" id="mention_dip" minlength="4" >
                                                 </div>
                                             </div>
                                         </div>
@@ -456,7 +456,7 @@
                                 </fieldset>
                             </div>
                             <div class="modal-footer text-center">
-                                <button type="reset" class="btn btn-danger m-3" >Annuler</button>
+                                <button type="reset" class="btn btn-danger m-3"  >Annuler</button>
                                 <button type="submit" class="btn btn-primary">S'Inscrire</button>
                             </div>
                         </form>
