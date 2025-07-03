@@ -49,3 +49,4 @@ Route::prefix('notes')->group(function () {
 Route::prefix('requetes')->group(function () {
     require __DIR__.'/requetes.php';
 });
+// Routes du module Laboratoire

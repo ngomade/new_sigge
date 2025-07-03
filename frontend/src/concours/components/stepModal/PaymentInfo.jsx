@@ -5,10 +5,10 @@ import {toast} from 'react-toastify';
 import {createCompte} from '../../api/routes/compte';
 import {useDispatch} from 'react-redux';
 import {push_candidate_info} from '../../app/modules/candidate';
-import {useNavigate} from 'react-router-dom';
+// import {useNavigate} from 'react-router-dom';
 
 function PaymentInfo({onClose, isLoad, setLoadingState}) {
-    const [imageObject, setImageObject] = useState("");
+    const [ setImageObject] = useState("");
     const [formData, setFormData] = useState({});
     const [showPassword, setPasswordShow] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,7 +17,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
     const [ocrData, setOcrData] = useState(null);
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
         fieldSet('#form_pay', setFormData, {});
@@ -78,6 +78,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
         } catch (error) {
             console.error('Erreur OCR:', error);
             toast.error("Erreur lors de l'extraction des données");
+            
         } finally {
             setIsExtracting(false);
         }
