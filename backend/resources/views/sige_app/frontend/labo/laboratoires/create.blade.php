@@ -1,4 +1,4 @@
-@extends('sige_app.frontend.template.frontend')
+@extends('sige_app.backend.template.backend')
 
 @section('js')
     <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>

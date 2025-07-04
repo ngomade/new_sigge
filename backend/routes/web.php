@@ -5,11 +5,17 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BasculementController;
 use App\Http\Controllers\BureauController;
 use App\Http\Controllers\AffectationController;
+use App\Http\Controllers\CarousselController;
 use App\Http\Controllers\concours\AdminConcoursController;
+use App\Http\Controllers\concours\HomeController;
+use App\Http\Controllers\concours\ImpressionController;
+use App\Http\Controllers\concours\InscriptionController;
+use App\Http\Controllers\concours\MailController;
+use App\Http\Controllers\concours\MessageController;
 use App\Http\Controllers\EcController;
 use App\Http\Controllers\EtudiantController;
+use App\Http\Controllers\FormationController;
 use App\Http\Controllers\InscriptionAcademiqueController;
-use App\Http\Controllers\labo\LaboratoireController;
 use App\Http\Controllers\MairieController;
 use App\Http\Controllers\OrganigrammeController;
 use App\Http\Controllers\PersonnelController;
@@ -22,6 +28,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {return view("sige_app.frontend.index");})->name("home");
 Route::post("login", [AuthController::class ,'store'])->name("login")->middleware('web');
 Route::get("logout", [AuthController::class ,'index'])->name("logout");
+
+Route::get("/concours-estlc", [HomeController::class ,'index'])->name(".councours");
+Route::get("/planche", [FormationController::class ,'index'])->name("planche");
+Route::get("/programme_EBTTL", [FormationController::class ,'create'])->name("programme_EBTTL");
+Route::get("/programme_GLTCO", [FormationController::class ,'show_GLTCO'])->name("programme_GLTCO");
+Route::get("/site_compo", [FormationController::class ,'show_site'])->name("site_compo");
+
+Route::post("/inscription", [InscriptionController::class ,'store'])->name("inscription");
+Route::post("/update_validate", [InscriptionController::class ,'update'])->name("update_validate");
+Route::get("/update", [InscriptionController::class ,'index'])->name("update");
+Route::post("/request_information", [InscriptionController::class ,'create'])->name("request_information");
+Route::get("/show_candidat/{code}", [InscriptionController::class ,'show'])->name("show_candidat");
+
+Route::get("/impression/{code}", [ImpressionController::class ,'show'])->name("impression");
+Route::get("/impression_liste/{type}", [ImpressionController::class ,'print'])->name("impression_candidats");
+Route::post("/imprimer", [ImpressionController::class ,'imprimer'])->name("update_info");
 
 
 // Routes pour la gestion de bureaux
@@ -138,6 +160,11 @@ Route::get("/details_actu/{code_actu}", [ActualiteController::class ,'show'])->n
 Route::get("/all_actu", [ActualiteController::class ,'create'])->name("all_actu");
 Route::get("/list_actu", [ActualiteController::class ,'list_actu'])->name("list_actu");
 Route::get("/delete_actu/{id}", [ActualiteController::class ,'destroy'])->name("delete_actu");
+
+Route::get("/index_caroussel", [CarousselController::class ,'index'])->name("index_caroussel");
+Route::post("/publier_slide", [CarousselController::class ,'store'])->name("publier_slide");
+Route::get("/list_slide", [CarousselController::class ,'list_slide'])->name("list_slide");
+Route::get("/delete_slide/{id}", [CarousselController::class ,'destroy'])->name("delete_slide");
 
 Route::get("/organigramme", [OrganigrammeController::class ,'index'])->name("organigramme");
 Route::get("/staff_admin", [OrganigrammeController::class ,'create'])->name("staff_admin");

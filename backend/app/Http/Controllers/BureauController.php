@@ -715,4 +715,76 @@ class BureauController extends Controller
             ], 500);
         }
     }
+
+    public function presentation_departement(string $id)
+    {
+        $presentation = Presentation::where("code_bureau",$id)->first();
+        $bureau = Bureau::where("code_bureau", $presentation->code_bureau)->first();
+        return view("sige_app.frontend.departement.presentation_departement",compact(["presentation", "bureau"]));
+    }
+    public function download_grille($dept, $nom)
+    {
+        return Response::download(storage_path("app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."departements".DIRECTORY_SEPARATOR.$dept.DIRECTORY_SEPARATOR.$nom.".pdf"));
+    }
+    public function store_present(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+            $exist = Presentation::where("code_bureau", $request->code_bureau)->count();
+            if($exist == 0){
+                $photo_chef = $request->file('photo_chef');
+                $depliant_ingenieur = $request->file('depliant_ingenieur');
+                $depliant_science = $request->file('depliant_science');
+                $nom_photo = "photo_".$request->code_bureau.".".$photo_chef->extension();
+                $res = Presentation::create(array_merge($request->all(),[
+                    "photo_chef"     =>$nom_photo
+                ]));
+                if ($res) {
+                    $image_extension = ["png", "jpg", "gif", "bmp"];
+                    $path = "/public/departements/".$request->code_bureau."/";
+                    if (!Storage::exists($path)) {
+
+                        Storage::makeDirectory($path,  0775, true);
+                    }
+                    if (($photo_chef != null) && (in_array($photo_chef->extension(), $image_extension))) {
+                        $photo_chef->storeAs($path, $nom_photo);
+                        $file = storage_path().DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR ."departements".DIRECTORY_SEPARATOR.$request->code_bureau.DIRECTORY_SEPARATOR.$nom_photo;
+                        $img = Image::make($file)->resize(300, 300, function($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                        $img->save($file);
+                    }
+                    DB::commit();
+                    $depliant_ingenieur->storeAs($path, "depliant_ingenieur". ".".$depliant_science->extension());
+                    $depliant_science->storeAs($path, "depliant_science". ".".$depliant_science->extension());
+                    for ($i=1; $i <= 10; $i++) {
+                        $nom_fichier="flyer_science_".$i."";
+                        if ($request->file("document_".$i) != null) {
+                            $nom_fichier = "flyer_ingenieur".$i;
+                            if ($i<=5) {
+                                $request->file("document_".$i)->storeAs($path, $nom_fichier.".{$request->file("document_".$i)->extension()}");
+                            } else {
+                                $request->file("document_".$i)->storeAs($path, $nom_fichier.".{$request->file("document_".$i)->extension()}");
+                            }
+                            Document::create([
+                                'code_bureau'   =>$request->code_bureau  ,
+                                'label_doc'     =>"Flyer ".$i ." Pour le département".$request->code_bureau,
+                                'type_doc'      =>"Image",
+                                'nom_fichier'   =>$nom_fichier.".".$request->file("document_".$i)->extension()
+                            ]);
+                        }
+                    }
+                    $success = $request->type_bureau."Présentation mis créée avec success";
+                    return redirect("/bureau/Departement")->with(compact("success"));
+                }
+                return redirect()->back()->withErrors("Echec de création de la présentation ")->withInput();
+            }else {
+                return redirect()->back()->withErrors("Cette présentation existe déja veuiller plutot la modifier")->withInput();
+            }
+        } catch (\Throwable $th) {
+            dd($th);
+            return redirect()->back()->withErrors("Echec de création  de la présentation".$th)->withInput();
+        }
+    }
 }
