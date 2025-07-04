@@ -86,16 +86,16 @@ function HomeHeader() {
                             Bienvenue sur notre plateforme d'inscription de <span className="text-teal-500 text-5xl underline">ESTLC</span> !
                         </h1>
                         <p className="text-center md:text-left">
-                            {/* Nous vous recommandons de télécharge l'arrêté de lancement du concours qui pourra vous être utile plus tard. Faites-le en cliquant sur le bouton suivant en fonction de votre préférence. */}
-                            LES ÉPREUVES ÉCRITES DU CONCOURS D'ENTREE À L'ESTLC INITIALEMENT PREVUES LE 26 SEPTEMBRE 2024 SONT REPORTÉES AU JEUDI, 17 OCTOBRE 2024. 
-                            LA DATE LIMITE DE DOSSIER QUANT À ELLE EST PROROGÉE AU MERCREDI 16 OCTOBRE À 15H30.
+                            Nous vous recommandons de télécharger l'arrêté de lancement du concours qui pourra vous être utile plus tard. Faites-le en cliquant sur le bouton suivant en fonction de votre niveau.
+                            {/* LES ÉPREUVES ÉCRITES DU CONCOURS D'ENTREE À L'ESTLC INITIALEMENT PREVUES LE 26 SEPTEMBRE 2024 SONT REPORTÉES AU JEUDI, 17 OCTOBRE 2024. 
+                            LA DATE LIMITE DE DOSSIER QUANT À ELLE EST PROROGÉE AU MERCREDI 16 OCTOBRE À 15H30. */}
                         </p>
                         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_ESTLC_EN_2024.pdf' target='_blank'
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_estlc_premiere_annee_2025.pdf' target='_blank'
                             rel="noopener noreferrer">
                                 Version Anglaise <IoDownload size={25} />
                             </a>
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_ESTLC_FR_2024.pdf' target='_blank'
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_estlc_troisieme_annee_2025.pdf' target='_blank'
                             rel="noopener noreferrer">
                                 Version Française <IoDownload size={25} />
                             </a>
