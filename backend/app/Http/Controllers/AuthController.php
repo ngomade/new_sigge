@@ -31,6 +31,7 @@ class AuthController extends Controller
         if($user != null){
             try {
                 Auth::login($user);
+                dd(Auth::user());
             $new_password = $request->login_user == $request->pwd_user;
             $success = "Vous êtes désormais connecté.";
             $request->session()->flash('success', $success);
