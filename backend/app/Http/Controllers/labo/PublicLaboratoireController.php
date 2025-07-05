@@ -56,23 +56,19 @@ class PublicLaboratoireController extends Controller
             $personnel = \App\Models\Personnel::where('login_pers', $request->login)->first();
 
             if ($personnel) {
-                // Vérifier le mot de passe - essayer d'abord Hash::check, puis MD5
                 $passwordValid = false;
                 if (Hash::check($request->password, $personnel->pwd_pers)) {
                     $passwordValid = true;
                 } elseif ($personnel->pwd_pers === md5($request->password)) {
                     $passwordValid = true;
                 }
-
                 if ($passwordValid) {
-                    // Vérifier si le personnel est membre du laboratoire via PersLab
                     $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $personnel->code_pers)->first();
                     if ($persLab) {
                         $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
                             ->where('id_pers_lab', $persLab->id_pers_lab)
                             ->where('statut', 'actif')
                             ->first();
-
                         if ($affectation) {
                             session([
                                 'user_id' => $personnel->code_pers,
@@ -80,9 +76,14 @@ class PublicLaboratoireController extends Controller
                                 'laboratoire_code' => $code_lab,
                                 'user_name' => $personnel->nom_pers . ' ' . $personnel->prenom_pers
                             ]);
-
-                            return redirect()->route('laboratoires.show', $code_lab)
-                                ->with('success', 'Connexion réussie !');
+                            // Redirection selon le rôle
+                            if ($affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                                return redirect()->route('laboratoires.admin.dashboard', $code_lab)
+                                    ->with('success', 'Connexion réussie !');
+                            } else {
+                                return redirect()->route('laboratoires.espace.membre', $code_lab)
+                                    ->with('success', 'Connexion réussie !');
+                            }
                         }
                     }
                 }
@@ -92,23 +93,19 @@ class PublicLaboratoireController extends Controller
             $user = \App\Models\Users::where('login_user', $request->login)->first();
 
             if ($user) {
-                // Vérifier le mot de passe - essayer d'abord Hash::check, puis MD5
                 $passwordValid = false;
                 if (Hash::check($request->password, $user->pwd_user)) {
                     $passwordValid = true;
                 } elseif ($user->pwd_user === md5($request->password)) {
                     $passwordValid = true;
                 }
-
                 if ($passwordValid) {
-                    // Vérifier si l'étudiant est membre du laboratoire via PersLab
                     $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $user->code_user)->first();
                     if ($persLab) {
                         $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
                             ->where('id_pers_lab', $persLab->id_pers_lab)
                             ->where('statut', 'actif')
                             ->first();
-
                         if ($affectation) {
                             session([
                                 'user_id' => $user->code_user,
@@ -116,8 +113,8 @@ class PublicLaboratoireController extends Controller
                                 'laboratoire_code' => $code_lab,
                                 'user_name' => $user->nom_user . ' ' . $user->prenom_user
                             ]);
-
-                            return redirect()->route('laboratoires.show', $code_lab)
+                            // Redirection membre classique
+                            return redirect()->route('laboratoires.espace.membre', $code_lab)
                                 ->with('success', 'Connexion réussie !');
                         }
                     }
@@ -137,8 +134,8 @@ class PublicLaboratoireController extends Controller
                     'laboratoire_code' => $code_lab,
                     'user_name' => $userExterne->nom_user_ext . ' ' . $userExterne->prenom_user_ext
                 ]);
-
-                return redirect()->route('laboratoires.show', $code_lab)
+                // Redirection membre classique
+                return redirect()->route('laboratoires.espace.membre', $code_lab)
                     ->with('success', 'Connexion réussie !');
             }
 

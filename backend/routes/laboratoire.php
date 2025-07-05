@@ -10,6 +10,7 @@ use App\Http\Controllers\Labo\UserExterneController;
 use App\Http\Controllers\Labo\RoleLaboController;
 use App\Http\Controllers\Labo\PublicLaboratoireController;
 use App\Http\Controllers\Labo\CandidatureController;
+use App\Http\Controllers\Labo\AdminLaboratoireController;
 
 // Routes publiques pour les laboratoires
 Route::prefix('laboratoires')->name('laboratoires.')->group(function () {
@@ -107,3 +108,45 @@ Route::prefix('labo')->name('labo.')->group(function () {
 
 Route::get('/presentation_ufd_tsi',  [LaboratoireController::class, 'index']);
 //Route::get('/presentation_labo/{id}',  [LaboratoireController::class, 'show']);
+
+// Dashboard admin du laboratoire
+Route::get('/laboratoires/{code_lab}/admin', [AdminLaboratoireController::class, 'dashboard'])->name('laboratoires.admin.dashboard');
+
+// Gestion des membres du laboratoire (admin)
+Route::get('/laboratoires/{code_lab}/admin/membres', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'membres'])->name('laboratoires.admin.membres');
+
+// Ajout d'un membre (admin labo)
+Route::get('/laboratoires/{code_lab}/admin/membres/ajouter', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'ajouterMembreForm'])->name('laboratoires.admin.membres.create');
+Route::post('/laboratoires/{code_lab}/admin/membres/ajouter', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'ajouterMembre'])->name('laboratoires.admin.membres.store');
+
+// Voir la fiche d'un membre
+Route::get('/laboratoires/{code_lab}/admin/membres/{membre}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'ficheMembre'])->name('laboratoires.admin.membres.show');
+// Modifier un membre
+Route::get('/laboratoires/{code_lab}/admin/membres/{membre}/modifier', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'modifierMembreForm'])->name('laboratoires.admin.membres.edit');
+Route::post('/laboratoires/{code_lab}/admin/membres/{membre}/modifier', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'modifierMembre'])->name('laboratoires.admin.membres.update');
+// Supprimer un membre
+Route::post('/laboratoires/{code_lab}/admin/membres/{membre}/supprimer', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'supprimerMembre'])->name('laboratoires.admin.membres.destroy');
+
+// Actions groupées sur les membres (admin labo)
+Route::post('/laboratoires/{code_lab}/admin/membres/actions-groupees', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'actionsGroupeesMembres'])->name('laboratoires.admin.membres.bulk');
+
+// Gestion des candidatures du laboratoire (admin)
+Route::get('/laboratoires/{code_lab}/admin/candidatures', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'candidatures'])->name('laboratoires.admin.candidatures');
+Route::get('/laboratoires/{code_lab}/admin/candidatures/{candidature}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'candidatureShow'])->name('laboratoires.admin.candidatures.show');
+Route::post('/laboratoires/{code_lab}/admin/candidatures/{candidature}/approve', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'candidatureApprove'])->name('laboratoires.admin.candidatures.approve');
+Route::post('/laboratoires/{code_lab}/admin/candidatures/{candidature}/reject', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'candidatureReject'])->name('laboratoires.admin.candidatures.reject');
+
+// Gestion des utilisateurs externes du laboratoire (admin)
+Route::get('/laboratoires/{code_lab}/admin/externes', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externes'])->name('laboratoires.admin.externes');
+Route::get('/laboratoires/{code_lab}/admin/externes/create', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeCreate'])->name('laboratoires.admin.externes.create');
+Route::post('/laboratoires/{code_lab}/admin/externes', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeStore'])->name('laboratoires.admin.externes.store');
+Route::get('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeShow'])->name('laboratoires.admin.externes.show');
+Route::get('/laboratoires/{code_lab}/admin/externes/{externe}/edit', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeEdit'])->name('laboratoires.admin.externes.edit');
+Route::post('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeUpdate'])->name('laboratoires.admin.externes.update');
+Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeDestroy'])->name('laboratoires.admin.externes.destroy');
+
+// Gestion des projets du laboratoire (admin)
+Route::get('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projets'])->name('laboratoires.admin.projets');
+
+// Gestion des équipements du laboratoire (admin)
+Route::get('/laboratoires/{code_lab}/admin/equipements', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipements'])->name('laboratoires.admin.equipements');
