@@ -77,7 +77,13 @@
                                     <span class="badge bg-primary">{{ $projet->statut_projet }}</span>
                                     <small class="text-muted">
                                         <i class='bx bx-calendar'></i>
-                                        {{ $projet->debut_projet ? $projet->debut_projet->format('M Y') : 'N/A' }}
+                                        @php
+                                            $debutDate = $projet->debut_projet;
+                                            if (is_string($debutDate) && !empty($debutDate)) {
+                                                $debutDate = \Carbon\Carbon::parse($debutDate);
+                                            }
+                                        @endphp
+                                        {{ $debutDate && $debutDate instanceof \Carbon\Carbon ? $debutDate->format('M Y') : 'N/A' }}
                                     </small>
                                 </div>
                             </div>
@@ -129,34 +135,44 @@
                 @php
                     $hasActiveMembers = false;
                 @endphp
-                            @forelse($laboratoire->membres as $membre)
-                                @foreach($membre->affectations as $affectation)
-                                    @if($affectation->code_lab === $laboratoire->code_lab && $affectation->statut === 'actif')
-                                        <div class="col-lg-3 col-md-6 mb-4">
-                                            <div class="card member-card">
-                                                <div class="member-avatar">
-                                                    <i class='bx bx-user'></i>
-                                                </div>
-                                                <h6 class="card-title">
-                                                    @if($membre->type_pers_lab === 'personnel')
-                                                        {{ \App\Models\Personnel::where('code_pers', $membre->id_pers_lab)->first()->nom_pers ?? 'Membre' }}
-                                                    @elseif($membre->type_pers_lab === 'user')
-                                                        {{ \App\Models\Users::where('code_user', $membre->id_pers_lab)->first()->nom_user ?? 'Membre' }}
-                                                    @else
-                                                        Membre
-                                                    @endif
-                                                </h6>
-                                                @if($affectation->roleLabo)
-                                                    <p class="text-muted small">{{ $affectation->roleLabo->lib_rl }}</p>
-                                                @endif
-                                                <small class="text-muted">
-                                                    <i class='bx bx-calendar'></i>
-                                                    {{ $affectation->date_affectation ? $affectation->date_affectation->format('M Y') : 'N/A' }}
-                                                </small>
-                                            </div>
-                                        </div>
+                @foreach($laboratoire->membres as $membre)
+                    @foreach($membre->affectations as $affectation)
+                        @if($affectation->code_lab === $laboratoire->code_lab && $affectation->statut === 'actif')
+                            @php
+                                $hasActiveMembers = true;
+                            @endphp
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card member-card">
+                                    <div class="member-avatar">
+                                        <i class='bx bx-user'></i>
+                                    </div>
+                                    <h6 class="card-title">
+                                        @if($membre->type_pers_lab === 'personnel')
+                                            {{ \App\Models\Personnel::where('code_pers', $membre->id_pers_lab)->first()->nom_pers ?? 'Membre' }}
+                                        @elseif($membre->type_pers_lab === 'user')
+                                            {{ \App\Models\Users::where('code_user', $membre->id_pers_lab)->first()->nom_user ?? 'Membre' }}
+                                        @else
+                                            Membre
+                                        @endif
+                                    </h6>
+                                    @if($affectation->roleLabo)
+                                        <p class="text-muted small">{{ $affectation->roleLabo->lib_rl }}</p>
                                     @endif
-                                @endforeach
+                                    <small class="text-muted">
+                                        <i class='bx bx-calendar'></i>
+                                        @php
+                                            $affectationDate = $affectation->date_affectation;
+                                            if (is_string($affectationDate) && !empty($affectationDate)) {
+                                                $affectationDate = \Carbon\Carbon::parse($affectationDate);
+                                            }
+                                        @endphp
+                                        {{ $affectationDate && $affectationDate instanceof \Carbon\Carbon ? $affectationDate->format('M Y') : 'N/A' }}
+                                    </small>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                @endforeach
                 @if(!$hasActiveMembers)
                     <div class="col-12 text-center">
                         <p class="text-muted">Aucun membre répertorié pour le moment.</p>

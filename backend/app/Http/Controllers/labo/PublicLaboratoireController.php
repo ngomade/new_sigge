@@ -44,90 +44,115 @@ class PublicLaboratoireController extends Controller
      */
     public function login(Request $request, $code_lab)
     {
-        $request->validate([
-            'login' => 'required',
-            'password' => 'required'
-        ]);
-
-        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-
-        // 1. Vérifier si c'est un Personnel
-        $personnel = \App\Models\Personnel::where('login_pers', $request->login)
-            ->where('pwd_pers', $request->password) // Personnel utilise un mot de passe en clair
-            ->first();
-
-        if ($personnel) {
-            // Vérifier si le personnel est membre du laboratoire via PersLab
-            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $personnel->code_pers)->first();
-            if ($persLab) {
-                $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
-                    ->where('id_pers_lab', $persLab->id_pers_lab)
-                    ->where('statut', 'actif')
-                    ->first();
-
-                if ($affectation) {
-                    session([
-                        'user_id' => $personnel->code_pers,
-                        'user_type' => 'personnel',
-                        'laboratoire_code' => $code_lab,
-                        'user_name' => $personnel->nom_pers . ' ' . $personnel->prenom_pers
-                    ]);
-
-                    return redirect()->route('laboratoires.show', $code_lab)
-                        ->with('success', 'Connexion réussie !');
-                }
-            }
-        }
-
-        // 2. Vérifier si c'est un User (étudiant)
-        $user = \App\Models\Users::where('login_user', $request->login)
-            ->where('pwd_user', $request->password) // Users utilise un mot de passe en clair
-            ->first();
-
-        if ($user) {
-            // Vérifier si l'étudiant est membre du laboratoire via PersLab
-            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $user->code_user)->first();
-            if ($persLab) {
-                $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
-                    ->where('id_pers_lab', $persLab->id_pers_lab)
-                    ->where('statut', 'actif')
-                    ->first();
-
-                if ($affectation) {
-                    session([
-                        'user_id' => $user->code_user,
-                        'user_type' => 'user',
-                        'laboratoire_code' => $code_lab,
-                        'user_name' => $user->nom_user . ' ' . $user->prenom_user
-                    ]);
-
-                    return redirect()->route('laboratoires.show', $code_lab)
-                        ->with('success', 'Connexion réussie !');
-                }
-            }
-        }
-
-        // 3. Vérifier si c'est un utilisateur externe
-        $userExterne = UserExterne::where('email_user_ext', $request->login)
-            ->where('code_lab', $code_lab)
-            ->where('statut', 'actif')
-            ->first();
-
-        if ($userExterne && Hash::check($request->password, $userExterne->pwd)) {
-            session([
-                'user_id' => $userExterne->id_user_ext,
-                'user_type' => 'externe',
-                'laboratoire_code' => $code_lab,
-                'user_name' => $userExterne->nom_user_ext . ' ' . $userExterne->prenom_user_ext
+        try {
+            $request->validate([
+                'login' => 'required',
+                'password' => 'required'
             ]);
 
-            return redirect()->route('laboratoires.show', $code_lab)
-                ->with('success', 'Connexion réussie !');
-        }
+            $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
-        return back()->withErrors([
-            'email' => 'Identifiants incorrects ou vous n\'êtes pas autorisé à accéder à ce laboratoire.'
-        ]);
+            // 1. Vérifier si c'est un Personnel
+            $personnel = \App\Models\Personnel::where('login_pers', $request->login)->first();
+
+            if ($personnel) {
+                // Vérifier le mot de passe - essayer d'abord Hash::check, puis MD5
+                $passwordValid = false;
+                if (Hash::check($request->password, $personnel->pwd_pers)) {
+                    $passwordValid = true;
+                } elseif ($personnel->pwd_pers === md5($request->password)) {
+                    $passwordValid = true;
+                }
+
+                if ($passwordValid) {
+                    // Vérifier si le personnel est membre du laboratoire via PersLab
+                    $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $personnel->code_pers)->first();
+                    if ($persLab) {
+                        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                            ->where('id_pers_lab', $persLab->id_pers_lab)
+                            ->where('statut', 'actif')
+                            ->first();
+
+                        if ($affectation) {
+                            session([
+                                'user_id' => $personnel->code_pers,
+                                'user_type' => 'personnel',
+                                'laboratoire_code' => $code_lab,
+                                'user_name' => $personnel->nom_pers . ' ' . $personnel->prenom_pers
+                            ]);
+
+                            return redirect()->route('laboratoires.show', $code_lab)
+                                ->with('success', 'Connexion réussie !');
+                        }
+                    }
+                }
+            }
+
+            // 2. Vérifier si c'est un User (étudiant)
+            $user = \App\Models\Users::where('login_user', $request->login)->first();
+
+            if ($user) {
+                // Vérifier le mot de passe - essayer d'abord Hash::check, puis MD5
+                $passwordValid = false;
+                if (Hash::check($request->password, $user->pwd_user)) {
+                    $passwordValid = true;
+                } elseif ($user->pwd_user === md5($request->password)) {
+                    $passwordValid = true;
+                }
+
+                if ($passwordValid) {
+                    // Vérifier si l'étudiant est membre du laboratoire via PersLab
+                    $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $user->code_user)->first();
+                    if ($persLab) {
+                        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                            ->where('id_pers_lab', $persLab->id_pers_lab)
+                            ->where('statut', 'actif')
+                            ->first();
+
+                        if ($affectation) {
+                            session([
+                                'user_id' => $user->code_user,
+                                'user_type' => 'user',
+                                'laboratoire_code' => $code_lab,
+                                'user_name' => $user->nom_user . ' ' . $user->prenom_user
+                            ]);
+
+                            return redirect()->route('laboratoires.show', $code_lab)
+                                ->with('success', 'Connexion réussie !');
+                        }
+                    }
+                }
+            }
+
+            // 3. Vérifier si c'est un utilisateur externe
+            $userExterne = UserExterne::where('email_user_ext', $request->login)
+                ->where('code_lab', $code_lab)
+                ->where('statut', 'actif')
+                ->first();
+
+            if ($userExterne && Hash::check($request->password, $userExterne->pwd)) {
+                session([
+                    'user_id' => $userExterne->id_user_ext,
+                    'user_type' => 'externe',
+                    'laboratoire_code' => $code_lab,
+                    'user_name' => $userExterne->nom_user_ext . ' ' . $userExterne->prenom_user_ext
+                ]);
+
+                return redirect()->route('laboratoires.show', $code_lab)
+                    ->with('success', 'Connexion réussie !');
+            }
+
+            return back()->withErrors([
+                'login' => 'Identifiants incorrects ou vous n\'êtes pas autorisé à accéder à ce laboratoire.'
+            ])->withInput($request->only('login'));
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'login' => 'Une erreur est survenue lors de la connexion. Veuillez réessayer.'
+            ])->withInput($request->only('login'));
+        }
     }
 
     /**

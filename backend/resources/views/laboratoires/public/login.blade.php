@@ -30,18 +30,32 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('laboratoires.login', $laboratoire->code_lab) }}">
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('laboratoires.login', $laboratoire->code_lab) }}" id="loginForm">
                         @csrf
                         <div class="mb-3">
                             <label for="login" class="form-label">Login / Email</label>
-                            <input type="text" class="form-control" id="login" name="login" value="{{ old('login') }}" required>
+                            <input type="text" class="form-control @error('login') is-invalid @enderror"
+                                   id="login" name="login" value="{{ old('login') }}" required>
+                            @error('login')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Mot de passe</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                   id="password" name="password" required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
                                 <i class='bx bx-log-in'></i> Se connecter
                             </button>
                         </div>
@@ -60,4 +74,38 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Fonction pour rafraîchir le token CSRF
+    function refreshCsrfToken() {
+        fetch('/csrf-token')
+            .then(response => response.json())
+            .then(data => {
+                const tokenInput = form.querySelector('input[name="_token"]');
+                if (tokenInput) {
+                    tokenInput.value = data.token;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du rafraîchissement du token CSRF:', error);
+            });
+    }
+
+    // Rafraîchir le token au chargement de la page
+    refreshCsrfToken();
+
+    // Gestionnaire de soumission du formulaire
+    form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Connexion...';
+    });
+
+    // Rafraîchir le token toutes les 5 minutes
+    setInterval(refreshCsrfToken, 5 * 60 * 1000);
+});
+</script>
 @endsection

@@ -13,6 +13,11 @@ use App\Http\Controllers\Labo\CandidatureController;
 
 // Routes publiques pour les laboratoires
 Route::prefix('laboratoires')->name('laboratoires.')->group(function () {
+    // Route pour rafraîchir le token CSRF
+    Route::get('/csrf-token', function () {
+        return response()->json(['token' => csrf_token()]);
+    })->name('csrf-token');
+
     // Landing page publique d'un laboratoire
     Route::get('/{code_lab}', [PublicLaboratoireController::class, 'show'])->name('show');
 
