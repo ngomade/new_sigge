@@ -155,12 +155,12 @@ function AcademiqueInfo({setLoadingState}) {
                         </select>
                     </div>
                     <div className='flex flex-col gap-3 mb-3'>
-                        <label htmlFor="serie">Série <sup className='text-red-600'>*</sup></label>
+                        <label htmlFor="serie">Série /spécialité<sup className='text-red-600'>*</sup></label>
                         <select id='serie' name="ca_serie_diplome" value={formData.ca_serie_diplome || ""}
                                 placeholder='INFORMATIQUE'
                                 className='p-2 border border-teal-600 rounded-md outline-none focus:outline-teal-600/15 indent-1'
                                 onChange={onChange}>
-                            <option value="">Selectionner votre serie</option>
+                            <option value="">Selectionner votre serie / spécialité </option>
                             {Series.map((s) => (
                                 <option value={s.code_serie}>{s.label_serie}</option>
                             ))}
