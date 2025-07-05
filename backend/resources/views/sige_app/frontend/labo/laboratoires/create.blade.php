@@ -25,17 +25,17 @@
 
         // Initialiser les éditeurs CKEditor
         Promise.all([
-            ClassicEditor
-                .create(document.querySelector('#desc_labo'))
+        ClassicEditor
+            .create(document.querySelector('#desc_labo'))
                 .then(editor => {
                     descEditor = editor;
                     console.log('Éditeur desc_labo initialisé');
                 })
-                .catch(error => {
+            .catch(error => {
                     console.error('Erreur initialisation desc_labo:', error);
                 }),
-            ClassicEditor
-                .create(document.querySelector('#axes_recherche'))
+        ClassicEditor
+            .create(document.querySelector('#axes_recherche'))
                 .then(editor => {
                     axesEditor = editor;
                     console.log('Éditeur axes_recherche initialisé');
@@ -110,7 +110,7 @@
 
                     resultsDiv.style.display = 'block';
                 })
-                .catch(error => {
+            .catch(error => {
                     console.error('Erreur lors de la recherche:', error);
                     resultsDiv.innerHTML = '<div class="p-2 text-danger">Erreur de chargement</div>';
                     resultsDiv.style.display = 'block';
@@ -328,13 +328,13 @@
                             @csrf
 
                             <div class="mb-3">
-                                <label for="code_lab" class="form-label">Code du laboratoire <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('code_lab') is-invalid @enderror"
-                                    id="code_lab" name="code_lab" value="{{ old('code_lab') }}" required>
-                                @error('code_lab')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                    <label for="code_lab" class="form-label">Code du laboratoire <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('code_lab') is-invalid @enderror"
+                                        id="code_lab" name="code_lab" value="{{ old('code_lab') }}" required>
+                                    @error('code_lab')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                             </div>
 
                             <div class="mb-3">

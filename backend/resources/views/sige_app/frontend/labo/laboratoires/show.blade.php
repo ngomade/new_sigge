@@ -116,11 +116,14 @@
 
                 <!-- Membres du laboratoire -->
                 <div class="card mb-3">
-                    <div class="card-header bg-info text-white">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">
                             <i class="bx bx-group me-2"></i>
                             Membres du laboratoire ({{ $laboratoire->membres ? $laboratoire->membres->count() : 0 }})
                         </h4>
+                        <a href="{{ route('labo.laboratoires.membres.index', $laboratoire) }}" class="btn btn-light btn-sm">
+                            <i class="bx bx-cog"></i> Gérer les membres
+                        </a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

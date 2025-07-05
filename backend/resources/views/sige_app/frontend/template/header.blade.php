@@ -59,7 +59,7 @@
                             </ul>
                         </li>
                         @foreach (\App\Models\laboratoires\Laboratoire::all() as $laboratoire)
-                            <li><a href="/presentation_labo/{{$laboratoire->code_lab}}">{{$laboratoire->label_labo}}
+                            <li><a href="/laboratoires/{{$laboratoire->code_lab}}" target="_blank">{{$laboratoire->label_labo}}
                                     ({{$laboratoire->code_lab}})</a></li>
                         @endforeach
                     </ul>

@@ -4,6 +4,7 @@ namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Laboratoire extends Model
 {
@@ -58,5 +59,45 @@ class Laboratoire extends Model
     public function affectations()
     {
         return $this->hasMany(LaboratoirePersLab::class, 'code_lab', 'code_lab');
+    }
+
+    /**
+     * Nettoie le HTML pour l'affichage sécurisé
+     */
+    public function getCleanDescAttribute()
+    {
+        return strip_tags($this->desc_labo);
+    }
+
+    /**
+     * Nettoie les axes de recherche pour l'affichage sécurisé
+     */
+    public function getCleanAxesAttribute()
+    {
+        return strip_tags($this->axes_recherche);
+    }
+
+    /**
+     * Limite la description pour l'affichage court
+     */
+    public function getShortDescAttribute()
+    {
+        return Str::limit(strip_tags($this->desc_labo), 200);
+    }
+
+    /**
+     * Nettoie la description du projet pour l'affichage sécurisé
+     */
+    public function getCleanDescProjet()
+    {
+        return strip_tags($this->desc_labo);
+    }
+
+    /**
+     * Nettoie les axes de recherche pour l'affichage sécurisé
+     */
+    public function getCleanAxesRecherche()
+    {
+        return strip_tags($this->axes_recherche);
     }
 }

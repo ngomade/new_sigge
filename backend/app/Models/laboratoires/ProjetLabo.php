@@ -4,6 +4,7 @@ namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ProjetLabo extends Model
 {
@@ -37,5 +38,21 @@ class ProjetLabo extends Model
     public function docs()
     {
         return $this->hasMany(DocProjetLabo::class, 'code_projet', 'code_projet');
+    }
+
+    /**
+     * Nettoie la description du projet pour l'affichage sécurisé
+     */
+    public function getCleanDescAttribute()
+    {
+        return strip_tags($this->description_projet);
+    }
+
+    /**
+     * Limite la description du projet pour l'affichage court
+     */
+    public function getShortDescAttribute()
+    {
+        return Str::limit(strip_tags($this->description_projet), 150);
     }
 }
