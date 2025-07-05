@@ -22,7 +22,7 @@ function SiteExam() {
 
   return (
     <div className="flex items-center justify-center flex-col py-5">
-      <h1 className="text-2xl font-bold text-center mb-5">Liste des sites de composition</h1>
+      <h1 className="text-2xl font-bold text-center mb-5">Liste des sites provisoires de composition</h1>
       <table className="text-left rtl:text-right border-collapse border border-slate-400">
         <thead className="text-xl text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>

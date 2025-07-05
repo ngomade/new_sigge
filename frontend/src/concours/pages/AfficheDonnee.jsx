@@ -154,33 +154,22 @@ const AfficheDonnee = () => {
                 <div className="consigne">
                     <h3 style={{marginTop: '-18px'}}>Documents Nécessaires / Necessary Documents</h3>
                     <ol style={{marginTop: '5px', listStyleType: 'circle'}}>
-                        <li>Une photocopie certifiée d'acte de naissance datant de moins de trois (3) mois;
-                            <br/>
+                        <li>Une photocopie certifiée d'acte de naissance datant de moins de trois (3) mois;/ 
                             <span className="english">A certified true photocopy of the birth certificate issued within the last three (03) months;</span>
                         </li>
-                        <li>Une photocopie certifiée conforme du diplôme/attestation de réussite du Baccalauréat ou du
-                            GCE A/L ou du diplôme équivalent;
-                            <br/>
-                            <span className="english">A certified true copy of the required diploma;</span>
+                        <li>Une photocopie certifiée conforme du diplôme/attestation requis;/ <span className="english">A certified true copy of the required diploma;</span>
                         </li>
                         <li>Un certificat médical délivré par un médecin fonctionnaire, datant de moins de trois (03)
-                            mois et certifiant que le candidat est apte à poursuivre des études supérieures;
-                            <br/>
+                            mois et certifiant que le candidat est apte à poursuivre des études supérieures;/ 
                             <span className="english">A medical certificate issued within the last three (03) months by a state medical practitioner, and testifying that the candidate is fit for higher education;</span>
                         </li>
                         <li>Quatre (04) photos d'identité 4x4 du candidat;
-                            <br/>
                             <span className="english">Four (04) 4x4 identity photos of the candidate;</span>
                         </li>
-                        <li>Un reçu de versement bancaire d'un montant de vingt mille (20 000) francs CFA représentant
-                            les droits d'inscription au concours de l'ESTLC de l'Université d'Ebolowa, à verser au
-                            compte SCB Cameroun, N° 10002-00059-90001487491-26 dans toutes les agences du Cameroun
-                            (Aucun autre mode de paiement ne sera accepté);
-                            <br/>
-                            <span className="english">A twenty thousand (20,000) CFA francs banking receipt representing examination fees of the competitive entrance at HITLC of the University of Ebolowa to be paid at SCB Cameroon account, N° 10002-00059-90001487491-26 in all agencies in Cameroon (No other method of payment will be accepted);</span>
+                        <li>Un reçu de versement bancaire d'un montant de 20 000F pour les 1<sup>ière</sup> années  et de 25 000F pour les 3 <sup>ième années</sup>; /
+                            <span className="english">A bank deposit receipt of 20,000F for first-year students and 25,000F for third-year students.</span>
                         </li>
-                        <li>Une enveloppe A4 timbrée au tarif réglementaire et portant l'adresse exacte du candidat;
-                            <br/>
+                        <li>Une enveloppe A4 timbrée au tarif réglementaire et portant l'adresse exacte du candidat; / 
                             <span className="english">A 21 x 29.7 size self-addressed envelope bearing a 400 CFA francs postal stamp</span>
                         </li>
                     </ol>

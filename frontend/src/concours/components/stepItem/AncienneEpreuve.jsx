@@ -4,7 +4,7 @@ function AncienneEpreuvePage() {
             <div className='w-50 shadow shadow-green-800 rounded p-6 mb-5'>
                 <h1 className="text-2xl font-bold text-center mb-5">Nos Anciennes épreuves</h1>
                 <h3 className="text-2xl text-center mb-5">Veuillez télécharger nos anciennes épreuves afin de mieux vous
-                    préparer au concours qui aura lieu le 28 Septembre</h3>
+                    préparer au concours qui aura lieu le 27 Septembre pour les premières années et </h3>
 
                 <div id="accordion-open" data-accordion="collapse">
                     <h2 id="accordion-open-heading-1">
