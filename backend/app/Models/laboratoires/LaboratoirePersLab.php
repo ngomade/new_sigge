@@ -4,23 +4,37 @@ namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PlRole extends Model
+class LaboratoirePersLab extends Model
 {
-    protected $table = 'pers_lab_role';
+    protected $table = 'laboratoire_pers_lab';
     public $incrementing = false;
-    public $timestamps = true;
     protected $primaryKey = null; // Pas de clé primaire auto-incrément
     protected $fillable = [
-        'id_pers_lab', 'id_rl', 'date_debut', 'date_fin'
+        'code_lab',
+        'id_pers_lab',
+        'id_rl',
+        'date_affectation',
+        'date_fin_affectation',
+        'statut'
     ];
+
+    protected $casts = [
+        'date_affectation' => 'date',
+        'date_fin_affectation' => 'date'
+    ];
+
+    public function laboratoire()
+    {
+        return $this->belongsTo(Laboratoire::class, 'code_lab', 'code_lab');
+    }
 
     public function persLab()
     {
         return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
     }
+
     public function roleLabo()
     {
         return $this->belongsTo(RoleLabo::class, 'id_rl', 'id_rl');
     }
 }
- 

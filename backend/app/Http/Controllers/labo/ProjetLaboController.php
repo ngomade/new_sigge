@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Labo;
+namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
 use App\Models\laboratoires\ProjetLabo;

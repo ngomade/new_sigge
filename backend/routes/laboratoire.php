@@ -7,6 +7,7 @@ use App\Http\Controllers\Labo\PersLabController;
 use App\Http\Controllers\Labo\EquipementsController;
 use App\Http\Controllers\Labo\PublicationController;
 use App\Http\Controllers\Labo\UserExterneController;
+use App\Http\Controllers\Labo\RoleLaboController;
 
 // Routes pour le module Laboratoire
 Route::prefix('labo')->name('labo.')->group(function () {
@@ -32,6 +33,9 @@ Route::prefix('labo')->name('labo.')->group(function () {
 
     // Utilisateurs externes
     Route::resource('externes', UserExterneController::class);
+
+    // Rôles de laboratoire
+    Route::resource('roles', RoleLaboController::class);
 
     // Dashboard
     Route::get('dashboard', function () {
