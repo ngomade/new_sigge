@@ -1,29 +1,41 @@
-@extends('sige_app.frontend.template.frontend')
+@extends('sige_app.backend.template.backend')
 
 @section('js')
 @endsection
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
                 <div class="card mb-3">
-                    <div class="card-header text-center bg-primary text-white">
-                        <h4>{{ $laboratoire->label_labo }} ({{ $laboratoire->code_lab }})</h4>
-                        <p class="mb-0">{{ $laboratoire->sigle }}</p>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bx bx-building-house me-2"></i>
+                            {{ $laboratoire->label_labo }}
+                            <small class="text-muted">({{ $laboratoire->code_lab }})</small>
+                        </h4>
+                        <div>
+                            <a href="{{ route('labo.laboratoires.edit', $laboratoire->code_lab) }}"
+                                class="btn btn-warning btn-sm">
+                                <i class="bx bx-edit"></i> Modifier
+                            </a>
+                            <a href="{{ route('labo.laboratoires.index') }}" class="btn btn-secondary btn-sm">
+                                <i class="bx bx-arrow-back"></i> Retour
+                            </a>
+                        </div>
                     </div>
 
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <h5>Description</h5>
-                                <div style="text-align: justify; line-height: 30px;">
+                                <h5><i class="bx bx-file-text me-2"></i>Description</h5>
+                                <div class="text-justify" style="line-height: 1.6;">
                                     {!! $laboratoire->desc_labo !!}
                                 </div>
 
                                 @if ($laboratoire->axes_recherche)
-                                    <h5 class="mt-4">Axes de recherche</h5>
-                                    <div style="text-align: justify;">
+                                    <h5 class="mt-4"><i class="bx bx-target-lock me-2"></i>Axes de recherche</h5>
+                                    <div class="text-justify">
                                         {!! $laboratoire->axes_recherche !!}
                                     </div>
                                 @endif
@@ -33,28 +45,18 @@
                                 @if ($laboratoire->logo_labo)
                                     <div class="text-center mb-3">
                                         <img src="{{ Storage::url($laboratoire->logo_labo) }}" alt="Logo"
-                                            class="img-fluid" style="max-height: 200px;">
+                                            class="img-fluid rounded" style="max-height: 200px;">
                                     </div>
                                 @endif
 
                                 <div class="card bg-light">
                                     <div class="card-body">
-                                        <h6>Informations de contact</h6>
+                                        <h6><i class="bx bx-info-circle me-2"></i>Informations de contact</h6>
                                         <hr>
-                                        <p><i class="fas fa-envelope"></i> {{ $laboratoire->email_labo }}</p>
-                                        <p><i class="fas fa-phone"></i> {{ $laboratoire->tel_labo }}</p>
-                                        <p><i class="fas fa-map-marker-alt"></i> {{ $laboratoire->adresse_labo }}</p>
+                                        <p><i class="bx bx-envelope text-muted me-2"></i> {{ $laboratoire->email_labo }}</p>
+                                        <p><i class="bx bx-phone text-muted me-2"></i> {{ $laboratoire->tel_labo }}</p>
+                                        <p><i class="bx bx-map text-muted me-2"></i> {{ $laboratoire->adresse_labo }}</p>
                                     </div>
-                                </div>
-
-                                <div class="mt-3">
-                                    <a href="{{ route('labo.laboratoires.edit', $laboratoire->code_lab) }}"
-                                        class="btn btn-warning w-100 mb-2">
-                                        <i class="fas fa-edit"></i> Modifier
-                                    </a>
-                                    <a href="{{ route('labo.laboratoires.index') }}" class="btn btn-secondary w-100">
-                                        <i class="fas fa-arrow-left"></i> Retour à la liste
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -64,7 +66,10 @@
                 <!-- Projets de recherche -->
                 <div class="card mb-3">
                     <div class="card-header bg-success text-white">
-                        <h4 class="mb-0">Projets de recherche ({{ $laboratoire->projets->count() }})</h4>
+                        <h4 class="mb-0">
+                            <i class="bx bx-folder me-2"></i>
+                            Projets de recherche ({{ $laboratoire->projets ? $laboratoire->projets->count() : 0 }})
+                        </h4>
                     </div>
                     <div class="card-body">
                         <div id="accordionProjets">
@@ -85,12 +90,12 @@
                                     <div id="projet{{ $loop->index }}" class="collapse"
                                         data-bs-parent="#accordionProjets">
                                         <div class="card-body">
-                                            <div style="text-align: justify;">
+                                            <div class="text-justify">
                                                 {!! $projet->description_projet !!}
                                             </div>
                                             <hr>
                                             <small>
-                                                <i class="fas fa-calendar"></i>
+                                                <i class="bx bx-calendar text-muted me-1"></i>
                                                 Du {{ \Carbon\Carbon::parse($projet->debut_projet)->format('d/m/Y') }}
                                                 @if ($projet->fin_projet)
                                                     au {{ \Carbon\Carbon::parse($projet->fin_projet)->format('d/m/Y') }}
@@ -100,16 +105,25 @@
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-center">Aucun projet de recherche pour ce laboratoire.</p>
+                                <div class="text-center text-muted py-4">
+                                    <i class="bx bx-info-circle fs-1"></i>
+                                    <p class="mt-2">Aucun projet de recherche pour ce laboratoire.</p>
+                                </div>
                             @endforelse
                         </div>
                     </div>
                 </div>
 
-                <!-- Membres -->
+                <!-- Membres du laboratoire -->
                 <div class="card mb-3">
-                    <div class="card-header bg-info text-white">
-                        <h4 class="mb-0">Membres du laboratoire ({{ $laboratoire->membres->count() }})</h4>
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="bx bx-group me-2"></i>
+                            Membres du laboratoire ({{ $laboratoire->membres ? $laboratoire->membres->count() : 0 }})
+                        </h4>
+                        <a href="{{ route('labo.laboratoires.membres.index', $laboratoire) }}" class="btn btn-light btn-sm">
+                            <i class="bx bx-cog"></i> Gérer les membres
+                        </a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -118,26 +132,44 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Type</th>
-                                        <th>Date d'entrée</th>
+                                        <th>Rôle</th>
+                                        <th>Date d'affectation</th>
                                         <th>Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($laboratoire->membres as $membre)
                                         <tr>
-                                            <td>{{ $membre->id_pers_lab }}</td>
-                                            <td>{{ ucfirst($membre->type_pers_lab) }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($membre->date_entree)->format('d/m/Y') }}</td>
+                                            <td><strong>{{ $membre->id_pers_lab }}</strong></td>
+                                            <td>
+                                                <span class="badge bg-info">{{ ucfirst($membre->type_pers_lab) }}</span>
+                                            </td>
+                                            <td>
+                                                @if($membre->pivot->roleLabo)
+                                                    <span class="badge bg-{{ $membre->pivot->roleLabo->lib_rl == 'admin' ? 'danger' : 'primary' }}">
+                                                        {{ ucfirst($membre->pivot->roleLabo->lib_rl) }}
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-secondary">Aucun rôle</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <i class="bx bx-calendar text-muted me-1"></i>
+                                                {{ \Carbon\Carbon::parse($membre->pivot->date_affectation)->format('d/m/Y') }}
+                                            </td>
                                             <td>
                                                 <span
-                                                    class="badge bg-{{ $membre->statut == 'actif' ? 'success' : 'danger' }}">
-                                                    {{ ucfirst($membre->statut) }}
+                                                    class="badge bg-{{ $membre->pivot->statut == 'actif' ? 'success' : 'danger' }}">
+                                                    {{ ucfirst($membre->pivot->statut) }}
                                                 </span>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">Aucun membre dans ce laboratoire.</td>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                <i class="bx bx-info-circle fs-1"></i>
+                                                <p class="mt-2">Aucun membre dans ce laboratoire.</p>
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -149,16 +181,19 @@
                 <!-- Équipements -->
                 <div class="card">
                     <div class="card-header bg-warning">
-                        <h4 class="mb-0">Équipements ({{ $laboratoire->equipements->count() }})</h4>
+                        <h4 class="mb-0">
+                            <i class="bx bx-cog me-2"></i>
+                            Équipements ({{ $laboratoire->equipements ? $laboratoire->equipements->count() : 0 }})
+                        </h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             @forelse($laboratoire->equipements as $equipement)
                                 <div class="col-md-4 mb-3">
-                                    <div class="card">
+                                    <div class="card h-100">
                                         <div class="card-body">
-                                            <h6>{{ $equipement->nom_equip }}</h6>
-                                            <p class="mb-1"><small>Ref: {{ $equipement->ref_equip }}</small></p>
+                                            <h6><i class="bx bx-cog me-2"></i>{{ $equipement->nom_equip }}</h6>
+                                            <p class="mb-1"><small class="text-muted">Ref: {{ $equipement->ref_equip }}</small></p>
                                             <p class="mb-0">
                                                 <span
                                                     class="badge bg-{{ $equipement->etat == 'disponible' ? 'success' : ($equipement->etat == 'en_maintenance' ? 'warning' : 'danger') }}">
@@ -169,7 +204,12 @@
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-center">Aucun équipement enregistré pour ce laboratoire.</p>
+                                <div class="col-12">
+                                    <div class="text-center text-muted py-4">
+                                        <i class="bx bx-info-circle fs-1"></i>
+                                        <p class="mt-2">Aucun équipement enregistré pour ce laboratoire.</p>
+                                    </div>
+                                </div>
                             @endforelse
                         </div>
                     </div>

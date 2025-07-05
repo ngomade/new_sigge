@@ -11,7 +11,8 @@ class UserExterne extends Model
     public $incrementing = true;
     protected $fillable = [
         'id_user_ext', 'code_lab', 'nom_user_ext', 'prenom_user_ext', 'email_user_ext',
-        'tel_user_ext', 'statut', 'pwd', 'logo_url', 'date_debut', 'date_fin'
+        'tel_user_ext', 'statut', 'pwd', 'logo_url', 'date_debut', 'date_fin',
+        'motivation', 'cv_path'
     ];
 
     public function laboratoire()
@@ -21,5 +22,10 @@ class UserExterne extends Model
     public function participationsProjet()
     {
         return $this->hasMany(ParticiperProjet::class, 'id_user_ext', 'id_user_ext');
+    }
+
+    public function affectations()
+    {
+        return $this->hasMany(LaboratoirePersLab::class, 'id_user_externe', 'id_user_ext');
     }
 }

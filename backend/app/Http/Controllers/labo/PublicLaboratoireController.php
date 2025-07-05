@@ -1,0 +1,264 @@
+<?php
+
+namespace App\Http\Controllers\Labo;
+
+use App\Http\Controllers\Controller;
+use App\Models\laboratoires\Laboratoire;
+use App\Models\laboratoires\UserExterne;
+use App\Models\laboratoires\LaboratoirePersLab;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\laboratoires\ProjetLabo;
+use App\Models\laboratoires\Equipements;
+
+class PublicLaboratoireController extends Controller
+{
+    /**
+     * Affiche la landing page publique d'un laboratoire
+     */
+    public function show($code_lab)
+    {
+        $laboratoire = Laboratoire::with([
+            'projets' => function($query) {
+                $query->where('statut_projet', 'En cours');
+            },
+            'membres.affectations.roleLabo',
+            'equipements'
+        ])->where('code_lab', $code_lab)->firstOrFail();
+
+        return view('laboratoires.public.show', compact('laboratoire'));
+    }
+
+    /**
+     * Affiche le formulaire de connexion
+     */
+    public function loginForm($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        return view('laboratoires.public.login', compact('laboratoire'));
+    }
+
+    /**
+     * Traite la connexion
+     */
+    public function login(Request $request, $code_lab)
+    {
+        $request->validate([
+            'login' => 'required',
+            'password' => 'required'
+        ]);
+
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        // 1. Vérifier si c'est un Personnel
+        $personnel = \App\Models\Personnel::where('login_pers', $request->login)
+            ->where('pwd_pers', $request->password) // Personnel utilise un mot de passe en clair
+            ->first();
+
+        if ($personnel) {
+            // Vérifier si le personnel est membre du laboratoire via PersLab
+            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $personnel->code_pers)->first();
+            if ($persLab) {
+                $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                    ->where('id_pers_lab', $persLab->id_pers_lab)
+                    ->where('statut', 'actif')
+                    ->first();
+
+                if ($affectation) {
+                    session([
+                        'user_id' => $personnel->code_pers,
+                        'user_type' => 'personnel',
+                        'laboratoire_code' => $code_lab,
+                        'user_name' => $personnel->nom_pers . ' ' . $personnel->prenom_pers
+                    ]);
+
+                    return redirect()->route('laboratoires.show', $code_lab)
+                        ->with('success', 'Connexion réussie !');
+                }
+            }
+        }
+
+        // 2. Vérifier si c'est un User (étudiant)
+        $user = \App\Models\Users::where('login_user', $request->login)
+            ->where('pwd_user', $request->password) // Users utilise un mot de passe en clair
+            ->first();
+
+        if ($user) {
+            // Vérifier si l'étudiant est membre du laboratoire via PersLab
+            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $user->code_user)->first();
+            if ($persLab) {
+                $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                    ->where('id_pers_lab', $persLab->id_pers_lab)
+                    ->where('statut', 'actif')
+                    ->first();
+
+                if ($affectation) {
+                    session([
+                        'user_id' => $user->code_user,
+                        'user_type' => 'user',
+                        'laboratoire_code' => $code_lab,
+                        'user_name' => $user->nom_user . ' ' . $user->prenom_user
+                    ]);
+
+                    return redirect()->route('laboratoires.show', $code_lab)
+                        ->with('success', 'Connexion réussie !');
+                }
+            }
+        }
+
+        // 3. Vérifier si c'est un utilisateur externe
+        $userExterne = UserExterne::where('email_user_ext', $request->login)
+            ->where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->first();
+
+        if ($userExterne && Hash::check($request->password, $userExterne->pwd)) {
+            session([
+                'user_id' => $userExterne->id_user_ext,
+                'user_type' => 'externe',
+                'laboratoire_code' => $code_lab,
+                'user_name' => $userExterne->nom_user_ext . ' ' . $userExterne->prenom_user_ext
+            ]);
+
+            return redirect()->route('laboratoires.show', $code_lab)
+                ->with('success', 'Connexion réussie !');
+        }
+
+        return back()->withErrors([
+            'email' => 'Identifiants incorrects ou vous n\'êtes pas autorisé à accéder à ce laboratoire.'
+        ]);
+    }
+
+    /**
+     * Déconnexion
+     */
+    public function logout($code_lab)
+    {
+        session()->forget(['user_id', 'user_type', 'laboratoire_code', 'user_name']);
+
+        return redirect()->route('laboratoires.show', $code_lab)
+            ->with('success', 'Déconnexion réussie.');
+    }
+
+    /**
+     * Espace membre du laboratoire
+     */
+    public function espaceMembre($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $userType = session('user_type');
+        $userId = session('user_id');
+
+        // Récupérer les informations de l'utilisateur selon son type
+        $user = null;
+        switch ($userType) {
+            case 'personnel':
+                $user = \App\Models\Personnel::where('code_pers', $userId)->first();
+                break;
+            case 'user':
+                $user = \App\Models\Users::where('code_user', $userId)->first();
+                break;
+            case 'externe':
+                $user = UserExterne::where('id_user_ext', $userId)->first();
+                break;
+        }
+
+        // Récupérer les projets du laboratoire via la relation
+        $projets = $laboratoire->projets;
+
+        // Récupérer les équipements du laboratoire via la relation
+        $equipements = $laboratoire->equipements;
+
+        return view('laboratoires.public.espace-membre', compact('laboratoire', 'user', 'userType', 'projets', 'equipements'));
+    }
+
+    /**
+     * Profil utilisateur
+     */
+    public function profil($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $userType = session('user_type');
+        $userId = session('user_id');
+
+        // Récupérer les informations de l'utilisateur selon son type
+        $user = null;
+        switch ($userType) {
+            case 'personnel':
+                $user = \App\Models\Personnel::where('code_pers', $userId)->first();
+                break;
+            case 'user':
+                $user = \App\Models\Users::where('code_user', $userId)->first();
+                break;
+            case 'externe':
+                $user = UserExterne::where('id_user_ext', $userId)->first();
+                break;
+        }
+
+        return view('laboratoires.public.profil', compact('laboratoire', 'user', 'userType'));
+    }
+
+    /**
+     * Mise à jour du profil utilisateur
+     */
+    public function updateProfil(Request $request, $code_lab)
+    {
+        $userType = session('user_type');
+        $userId = session('user_id');
+
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email',
+            'telephone' => 'nullable|string|max:20',
+        ]);
+
+        try {
+            switch ($userType) {
+                case 'personnel':
+                    $user = \App\Models\Personnel::where('code_pers', $userId)->first();
+                    if ($user) {
+                        $user->update([
+                            'nom_pers' => $request->nom,
+                            'prenom_pers' => $request->prenom,
+                            'email_pers' => $request->email,
+                            'first_phone_pers' => $request->telephone,
+                        ]);
+                    }
+                    break;
+                case 'user':
+                    $user = \App\Models\Users::where('code_user', $userId)->first();
+                    if ($user) {
+                        $user->update([
+                            'nom_user' => $request->nom,
+                            'prenom_user' => $request->prenom,
+                            'email_user' => $request->email,
+                            'first_phone_user' => $request->telephone,
+                        ]);
+                    }
+                    break;
+                case 'externe':
+                    $user = UserExterne::where('id_user_ext', $userId)->first();
+                    if ($user) {
+                        $user->update([
+                            'nom_user_ext' => $request->nom,
+                            'prenom_user_ext' => $request->prenom,
+                            'email_user_ext' => $request->email,
+                            'tel_user_ext' => $request->telephone,
+                        ]);
+                    }
+                    break;
+            }
+
+            // Mettre à jour le nom dans la session
+            session(['user_name' => $request->nom . ' ' . $request->prenom]);
+
+            return redirect()->route('laboratoires.profil', $code_lab)
+                ->with('success', 'Profil mis à jour avec succès !');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erreur lors de la mise à jour du profil.']);
+        }
+    }
+}

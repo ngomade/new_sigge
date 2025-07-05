@@ -37,14 +37,17 @@ class DatabaseSeeder extends Seeder
 //            $candidat->id = $sessions->random()->id;
 //            $candidat->save();
 //        });
-        Compte::create([
-            'ca_num_recu' => "samendjiaha@gmail.com",
-            'ca_code' => Candidat::all()->random()->ca_code,
-            'ca_pwd' => Hash::make("password"),
-            'ca_recu' => "0000",
-            'ca_nom' => "steeven",
-            'ca_email' => "samendjiaha@gmail.com",
-            'ca_prenom' => "steeven",
-        ]);
+//        Compte::create([
+//            'ca_num_recu' => "samendjiaha@gmail.com",
+//            'ca_code' => Candidat::all()->random()->ca_code,
+//            'ca_pwd' => Hash::make("password"),
+//            'ca_recu' => "0000",
+//            'ca_nom' => "steeven",
+//            'ca_email' => "samendjiaha@gmail.com",
+//            'ca_prenom' => "steeven",
+//        ]);
+
+        // Ajouter les rôles de laboratoire
+        $this->call(RoleLaboSeeder::class);
     }
 }

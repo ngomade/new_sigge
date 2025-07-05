@@ -93,7 +93,7 @@
                                             <td>{{ $equipement->code_equip }}</td>
                                             <td>{{ $equipement->nom_equip }}</td>
                                             <td>{{ $equipement->ref_equip }}</td>
-                                            <td>{{ $equipement->laboratoire->sigle }}</td>
+                                            <td>{{ $equipement->laboratoire->code_lab }}</td>
                                             <td>
                                                 <span
                                                     class="badge bg-{{ $equipement->etat == 'disponible'

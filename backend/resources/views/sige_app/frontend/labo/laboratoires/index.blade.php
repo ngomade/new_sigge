@@ -11,17 +11,15 @@
 @endsection
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h4>Gestion des Laboratoires</h4>
-                            <a href="{{ route('labo.laboratoires.create') }}" class="btn btn-light btn-sm">
-                                <i class="fas fa-plus"></i> Nouveau Laboratoire
-                            </a>
-                        </div>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Gestion des Laboratoires</h4>
+                        <a href="{{ route('labo.laboratoires.create') }}" class="btn btn-primary">
+                            <i class="bx bx-plus"></i> Nouveau Laboratoire
+                        </a>
                     </div>
 
                     <div class="card-body">
@@ -32,13 +30,19 @@
                             </div>
                         @endif
 
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <th>Code</th>
                                         <th>Nom</th>
-                                        <th>Sigle</th>
                                         <th>Email</th>
                                         <th>Téléphone</th>
                                         <th>Projets</th>
@@ -49,23 +53,46 @@
                                 <tbody>
                                     @forelse($laboratoires as $laboratoire)
                                         <tr>
-                                            <td>{{ $laboratoire->code_lab }}</td>
-                                            <td>{{ $laboratoire->label_labo }}</td>
-                                            <td>{{ $laboratoire->sigle }}</td>
-                                            <td>{{ $laboratoire->email_labo }}</td>
-                                            <td>{{ $laboratoire->tel_labo }}</td>
-                                            <td><span class="badge bg-info">{{ $laboratoire->projets->count() }}</span></td>
-                                            <td><span class="badge bg-success">{{ $laboratoire->membres->count() }}</span>
+                                            <td>
+                                                <strong>{{ $laboratoire->code_lab }}</strong>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>{{ $laboratoire->label_labo }}</strong>
+                                                    @if($laboratoire->logo_labo)
+                                                        <br><small class="text-muted">Logo disponible</small>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <i class="bx bx-envelope text-muted me-1"></i>
+                                                {{ $laboratoire->email_labo }}
+                                            </td>
+                                            <td>
+                                                <i class="bx bx-phone text-muted me-1"></i>
+                                                {{ $laboratoire->tel_labo }}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    <i class="bx bx-folder me-1"></i>
+                                                    {{ $laboratoire->projets ? $laboratoire->projets->count() : 0 }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    <i class="bx bx-group me-1"></i>
+                                                    {{ $laboratoire->membres ? $laboratoire->membres->count() : 0 }}
+                                                </span>
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('labo.laboratoires.show', $laboratoire->code_lab) }}"
-                                                        class="btn btn-sm btn-info" title="Voir">
-                                                        <i class="fas fa-eye"></i>
+                                                        class="btn btn-sm btn-info" title="Voir les détails">
+                                                        <i class="bx bx-show"></i>
                                                     </a>
                                                     <a href="{{ route('labo.laboratoires.edit', $laboratoire->code_lab) }}"
                                                         class="btn btn-sm btn-warning" title="Modifier">
-                                                        <i class="fas fa-edit"></i>
+                                                        <i class="bx bx-edit"></i>
                                                     </a>
                                                     <form
                                                         action="{{ route('labo.laboratoires.destroy', $laboratoire->code_lab) }}"
@@ -74,7 +101,7 @@
                                                         @method('DELETE')
                                                         <button type="button" class="btn btn-sm btn-danger"
                                                             onclick="confirmDelete(this.form)" title="Supprimer">
-                                                            <i class="fas fa-trash"></i>
+                                                            <i class="bx bx-trash"></i>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -82,14 +109,24 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center">Aucun laboratoire trouvé</td>
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                <i class="bx bx-info-circle fs-1"></i>
+                                                <p class="mt-2">Aucun laboratoire trouvé</p>
+                                                <a href="{{ route('labo.laboratoires.create') }}" class="btn btn-primary btn-sm">
+                                                    <i class="bx bx-plus"></i> Créer le premier laboratoire
+                                                </a>
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
 
-                        {{ $laboratoires->links() }}
+                        @if($laboratoires->hasPages())
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ $laboratoires->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

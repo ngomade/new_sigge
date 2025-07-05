@@ -276,6 +276,16 @@
                             <div data-i18n="listActu">Listing et Modification</div>
                         </a>
                     </li>
+                    <li class="menu-item">
+                        <a href="/labo/roles" class="menu-link">
+                            <div data-i18n="roles">Gestion des rôles</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/labo/candidatures" class="menu-link">
+                            <div data-i18n="candidatures">Gestion des candidatures</div>
+                        </a>
+                    </li>
                 </ul>
             </li>
         @endif

@@ -3,6 +3,7 @@
 namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Equipements extends Model
 {
@@ -24,5 +25,21 @@ class Equipements extends Model
     public function reservations()
     {
         return $this->hasMany(ReservationAgent::class, 'code_equip', 'code_equip');
+    }
+
+    /**
+     * Nettoie la description de l'équipement pour l'affichage sécurisé
+     */
+    public function getCleanDescAttribute()
+    {
+        return strip_tags($this->desc_equip);
+    }
+
+    /**
+     * Limite la description de l'équipement pour l'affichage court
+     */
+    public function getShortDescAttribute()
+    {
+        return Str::limit(strip_tags($this->desc_equip), 100);
     }
 }

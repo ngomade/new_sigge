@@ -42,24 +42,11 @@
                             @csrf
                             @method('PUT')
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="code_lab" class="form-label">Code du laboratoire</label>
-                                    <input type="text" class="form-control" id="code_lab"
-                                        value="{{ $laboratoire->code_lab }}" disabled>
-                                    <small class="text-muted">Le code ne peut pas être modifié</small>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="sigle" class="form-label">Sigle <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('sigle') is-invalid @enderror"
-                                        id="sigle" name="sigle" value="{{ old('sigle', $laboratoire->sigle) }}"
-                                        required>
-                                    @error('sigle')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                            <div class="mb-3">
+                                <label for="code_lab" class="form-label">Code du laboratoire</label>
+                                <input type="text" class="form-control" id="code_lab"
+                                    value="{{ $laboratoire->code_lab }}" disabled>
+                                <small class="text-muted">Le code ne peut pas être modifié</small>
                             </div>
 
                             <div class="mb-3">
