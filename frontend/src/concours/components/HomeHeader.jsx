@@ -12,14 +12,14 @@ const divStyle = {
 }
 function HomeHeader() {
     const sliderImg = [
-        {
-            img: require("../img/sliders/report.png"),
-            caption: "Report du concours de l'ESTLC pour le 17 octobre 2024. Date limite de dépôt des dossiers le 16 Octobre 2024"
-        },
-        {
-            img: require("../img/sliders/report.png"),
-            caption: "Report du concours de l'ESTLC pour le 17 Octobre 2024. Date limite de dépôt des dossiers le 16 Octobre 2024"
-        },
+        // {
+        //     img: require("../img/sliders/report.png"),
+        //     caption: "Report du concours de l'ESTLC pour le 17 octobre 2024. Date limite de dépôt des dossiers le 16 Octobre 2024"
+        // },
+        // {
+        //     img: require("../img/sliders/report.png"),
+        //     caption: "Report du concours de l'ESTLC pour le 17 Octobre 2024. Date limite de dépôt des dossiers le 16 Octobre 2024"
+        // },
         {
             img: require("../img/sliders/img.jpeg"),
             caption: "L'ESTLC à la quête de l'excellence pour une formation intégrale de l'étudiant."
@@ -86,18 +86,18 @@ function HomeHeader() {
                             Bienvenue sur notre plateforme d'inscription de <span className="text-teal-500 text-5xl underline">ESTLC</span> !
                         </h1>
                         <p className="text-center md:text-left">
-                            {/* Nous vous recommandons de télécharge l'arrêté de lancement du concours qui pourra vous être utile plus tard. Faites-le en cliquant sur le bouton suivant en fonction de votre préférence. */}
-                            LES ÉPREUVES ÉCRITES DU CONCOURS D'ENTREE À L'ESTLC INITIALEMENT PREVUES LE 26 SEPTEMBRE 2024 SONT REPORTÉES AU JEUDI, 17 OCTOBRE 2024. 
-                            LA DATE LIMITE DE DOSSIER QUANT À ELLE EST PROROGÉE AU MERCREDI 16 OCTOBRE À 15H30.
+                            Nous vous recommandons de télécharger l'arrêté de lancement du concours qui pourra vous être utile plus tard. Faites-le en cliquant sur le bouton suivant en fonction de votre niveau.
+                            {/* LES ÉPREUVES ÉCRITES DU CONCOURS D'ENTREE À L'ESTLC INITIALEMENT PREVUES LE 26 SEPTEMBRE 2024 SONT REPORTÉES AU JEUDI, 17 OCTOBRE 2024. 
+                            LA DATE LIMITE DE DOSSIER QUANT À ELLE EST PROROGÉE AU MERCREDI 16 OCTOBRE À 15H30. */}
                         </p>
                         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_ESTLC_EN_2024.pdf' target='_blank'
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_estlc_premiere_annee_2025.pdf' target='_blank'
                             rel="noopener noreferrer">
-                                Version Anglaise <IoDownload size={25} />
+                                Première Année <IoDownload size={25} />
                             </a>
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_ESTLC_FR_2024.pdf' target='_blank'
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_estlc_troisieme_annee_2025.pdf' target='_blank'
                             rel="noopener noreferrer">
-                                Version Française <IoDownload size={25} />
+                                Troisième Année <IoDownload size={25} />
                             </a>
                         </div>
                         <p className="text-sm text-center md:text-left">
@@ -105,8 +105,7 @@ function HomeHeader() {
                         </p>
                         <p className="text-lg text-center md:text-justify shadow-lg rounded-xl py-6">
                             <div className='p-5 text-center'>
-                            Pour tout problème d'inscription, veuillez contacter par WhatsApp les numeros suivant: <span className='text-blue-500 underline'><a href="https://api.whatsapp.com/send?phone=694915442" target='_blank' rel="noreferrer">694915442</a></span>, <span  className='text-blue-500'><a href="https://api.whatsapp.com/send?phone=695021036" className='underline' target='_blank' rel="noreferrer">695021036</a></span> ou ecrire à l'adresse  <a href="mailto:
-                            estlc@estlc.unv-ebolowa.cm"  className='text-blue-500 underline'>estlc@estlc.unv-ebolowa.cm</a>
+                            Pour tout problème d'inscription bien vouloir ecrire à l'adresse  <a href="mailto:estlc@estlc.unv-ebolowa.cm"  className='text-blue-500 underline'>estlc@estlc.unv-ebolowa.cm</a>
                             </div>
                         </p>
                     </div>
