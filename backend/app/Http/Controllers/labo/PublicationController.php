@@ -25,10 +25,10 @@ class PublicationController extends Controller
         }
 
         if ($request->has('annee')) {
-            $query->whereYear('date_publi', $request->annee);
+            $query->whereYear('created_at', $request->annee);
         }
 
-        $publications = $query->orderBy('date_publi', 'desc')->paginate(10);
+        $publications = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('sige_app.frontend.labo.publications.index', compact('publications'));
     }
@@ -51,10 +51,13 @@ class PublicationController extends Controller
         $validated = $request->validate([
             'titre_publi' => 'required|max:255',
             'type_publi' => 'required|in:article,conference,livre,rapport,these',
-            'date_publi' => 'required|date',
-            'domaine' => 'required|max:100',
+            'domaine' => 'nullable|max:100',
             'resume' => 'nullable',
-            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab'
+            'tags' => 'nullable|string',
+            'reference' => 'nullable|string',
+            'rapport_path' => 'nullable|string',
+            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab',
+            'code_lab' => 'nullable|exists:laboratoire,code_lab'
         ]);
 
         Publication::create($validated);
@@ -66,10 +69,11 @@ class PublicationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $code_publi)
     {
         $publication = Publication::with(['createur.laboratoire'])
-            ->findOrFail($id);
+            ->where('code_publi', $code_publi)
+            ->firstOrFail();
 
         return view('sige_app.frontend.labo.publications.show', compact('publication'));
     }
@@ -77,9 +81,9 @@ class PublicationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $code_publi)
     {
-        $publication = Publication::findOrFail($id);
+        $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
         $membres = PersLab::with('laboratoire')->where('statut', 'actif')->get();
 
         return view('sige_app.frontend.labo.publications.edit', compact('publication', 'membres'));
@@ -88,17 +92,20 @@ class PublicationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $code_publi)
     {
-        $publication = Publication::findOrFail($id);
+        $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
 
         $validated = $request->validate([
             'titre_publi' => 'required|max:255',
             'type_publi' => 'required|in:article,conference,livre,rapport,these',
-            'date_publi' => 'required|date',
-            'domaine' => 'required|max:100',
+            'domaine' => 'nullable|max:100',
             'resume' => 'nullable',
-            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab'
+            'tags' => 'nullable|string',
+            'reference' => 'nullable|string',
+            'rapport_path' => 'nullable|string',
+            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab',
+            'code_lab' => 'nullable|exists:laboratoire,code_lab'
         ]);
 
         $publication->update($validated);
@@ -110,9 +117,9 @@ class PublicationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $code_publi)
     {
-        $publication = Publication::findOrFail($id);
+        $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
         $publication->delete();
 
         return redirect()->route('publications.index')

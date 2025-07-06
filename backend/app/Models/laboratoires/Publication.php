@@ -11,7 +11,7 @@ class Publication extends Model
     protected $primaryKey = 'code_publi';
     public $incrementing = true;
     protected $fillable = [
-        'code_publi', 'code_lab', 'titre_publi', 'type_publi', 'date_publi', 'domaine', 'resume', 'id_pers_lab'
+        'code_publi', 'code_lab', 'titre_publi', 'type_publi', 'tags', 'domaine', 'resume', 'reference','rapport_path', 'id_pers_lab'
     ];
 
     public function createur(): BelongsTo
