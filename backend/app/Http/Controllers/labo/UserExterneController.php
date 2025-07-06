@@ -29,7 +29,7 @@ class UserExterneController extends Controller
         $externes = $query->paginate(10);
         $laboratoires = Laboratoire::all();
 
-        return view('sige_app.frontend.labo.externes.index', compact('externes', 'laboratoires'));
+        return view('laboratoires.admin.externes.index', compact('externes', 'laboratoires'));
     }
 
     /**
@@ -38,7 +38,7 @@ class UserExterneController extends Controller
     public function create()
     {
         $laboratoires = Laboratoire::all();
-        return view('sige_app.frontend.labo.externes.create', compact('laboratoires'));
+        return view('laboratoires.admin.externes.create', compact('laboratoires'));
     }
 
     /**

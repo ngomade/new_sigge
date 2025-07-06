@@ -56,7 +56,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Publications</h5>
                     <p class="display-4">{{ $stats['publications'] }}</p>
-                    <a href="#" class="btn btn-outline-dark">Voir les publications</a>
+                    <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-dark">Voir les publications</a>
                 </div>
             </div>
         </div>

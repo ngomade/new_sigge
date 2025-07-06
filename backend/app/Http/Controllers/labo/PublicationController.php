@@ -14,18 +14,29 @@ class PublicationController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Publication::with('createur');
+        $query = Publication::with(['createur.personnel', 'createur.user', 'createur']);
 
-        if ($request->has('type')) {
+        // Filtres
+        if ($request->filled('type')) {
             $query->where('type_publi', $request->type);
         }
 
-        if ($request->has('domaine')) {
+        if ($request->filled('domaine')) {
             $query->where('domaine', 'like', '%' . $request->domaine . '%');
         }
 
-        if ($request->has('annee')) {
+        if ($request->filled('annee')) {
             $query->whereYear('created_at', $request->annee);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('titre_publi', 'like', "%$search%")
+                  ->orWhere('domaine', 'like', "%$search%")
+                  ->orWhere('tags', 'like', "%$search%")
+                  ->orWhere('reference', 'like', "%$search%");
+            });
         }
 
         $publications = $query->orderBy('created_at', 'desc')->paginate(10);
@@ -35,7 +46,25 @@ class PublicationController extends Controller
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
         }
 
-        return view('laboratoires.admin.publications.index', compact('publications', 'laboratoire'));
+        // Statistiques
+        $stats = [
+            'total' => Publication::count(),
+            'par_type' => Publication::selectRaw('type_publi, COUNT(*) as total')->groupBy('type_publi')->pluck('total', 'type_publi')->toArray(),
+            'par_annee' => Publication::selectRaw('YEAR(created_at) as annee, COUNT(*) as total')->groupBy('annee')->orderBy('annee', 'desc')->pluck('total', 'annee')->toArray(),
+        ];
+
+        // Données pour les filtres
+        $types = ['article', 'conference', 'livre', 'rapport', 'these'];
+        $annees = Publication::selectRaw('YEAR(created_at) as annee')->distinct()->orderBy('annee', 'desc')->pluck('annee');
+
+        return view('laboratoires.admin.publications.index', compact(
+            'publications',
+            'laboratoire',
+            'stats',
+            'types',
+            'annees',
+            'request'
+        ));
     }
 
     /**
@@ -43,14 +72,12 @@ class PublicationController extends Controller
      */
     public function create()
     {
-        $membres = PersLab::with('laboratoires')->where('statut', 'actif')->get();
-
         $laboratoire = null;
         if (session()->has('laboratoire_code')) {
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
         }
 
-        return view('laboratoires.admin.publications.create', compact('membres', 'laboratoire'));
+        return view('laboratoires.admin.publications.create', compact('laboratoire'));
     }
 
     /**
@@ -65,10 +92,27 @@ class PublicationController extends Controller
             'resume' => 'nullable',
             'tags' => 'nullable|string',
             'reference' => 'nullable|string',
-            'rapport_path' => 'nullable|string',
-            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab',
-            'code_lab' => 'nullable|exists:laboratoire,code_lab'
+            'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240', // 10MB max
         ]);
+
+        // Gérer l'upload du fichier rapport
+        if ($request->hasFile('rapport')) {
+            $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
+            $validated['rapport_path'] = $rapportPath;
+        }
+
+        // Récupérer l'utilisateur connecté depuis la session
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $codeLab = session('laboratoire_code');
+
+        if (!$userId || !$userType || !$codeLab) {
+            return back()->withInput()->with('error', 'Vous devez être connecté pour créer une publication.');
+        }
+
+        // L'id_pers_lab est le même que l'user_id pour tous les types
+        $validated['id_pers_lab'] = $userId;
+        $validated['code_lab'] = $codeLab;
 
         Publication::create($validated);
 
@@ -81,11 +125,13 @@ class PublicationController extends Controller
      */
     public function show(string $code_publi)
     {
-        $publication = Publication::with(['createur.laboratoire'])
+        $publication = Publication::with(['createur', 'laboratoire'])
             ->where('code_publi', $code_publi)
             ->firstOrFail();
 
-        return view('laboratoires.admin.publications.show', compact('publication'));
+        $laboratoire = $publication->laboratoire;
+
+        return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
     }
 
     /**
@@ -93,10 +139,13 @@ class PublicationController extends Controller
      */
     public function edit(string $code_publi)
     {
-        $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
-        $membres = PersLab::with('laboratoire')->where('statut', 'actif')->get();
+        $publication = Publication::with(['createur', 'laboratoire'])
+            ->where('code_publi', $code_publi)
+            ->firstOrFail();
 
-        return view('laboratoires.admin.publications.edit', compact('publication', 'membres'));
+        $laboratoire = $publication->laboratoire;
+
+        return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire'));
     }
 
     /**
@@ -113,10 +162,18 @@ class PublicationController extends Controller
             'resume' => 'nullable',
             'tags' => 'nullable|string',
             'reference' => 'nullable|string',
-            'rapport_path' => 'nullable|string',
-            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab',
-            'code_lab' => 'nullable|exists:laboratoire,code_lab'
+            'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240', // 10MB max
         ]);
+
+        // Gérer l'upload du fichier rapport
+        if ($request->hasFile('rapport')) {
+            // Supprimer l'ancien fichier s'il existe
+            if ($publication->rapport_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($publication->rapport_path);
+            }
+            $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
+            $validated['rapport_path'] = $rapportPath;
+        }
 
         $publication->update($validated);
 

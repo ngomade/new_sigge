@@ -1135,7 +1135,7 @@ class AdminLaboratoireController extends Controller
             \App\Models\laboratoires\LaboratoirePersLab::create([
                 'code_lab' => $code_lab,
                 'id_pers_lab' => $persLab->id_pers_lab,
-                'id_user_ext' => $userExterne->id_user_ext,
+                'id_user_externe' => $userExterne->id_user_ext,
                 'id_rl' => $request->id_rl,
                 'date_affectation' => $request->date_debut,
                 'date_fin_affectation' => $request->date_fin,
@@ -1160,7 +1160,7 @@ class AdminLaboratoireController extends Controller
 
         // Récupérer l'affectation
         $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-            ->where('id_user_ext', $externe->id_user_ext)
+            ->where('id_user_externe', $externe->id_user_ext)
             ->with('roleLabo')
             ->first();
 
@@ -1177,7 +1177,7 @@ class AdminLaboratoireController extends Controller
 
         // Récupérer l'affectation
         $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-            ->where('id_user_ext', $externe->id_user_ext)
+            ->where('id_user_externe', $externe->id_user_ext)
             ->first();
 
         return view('laboratoires.admin.externes.edit', compact('laboratoire', 'externe', 'affectation', 'roles'));

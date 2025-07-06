@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('rapport_path')->nullable();
             $table->foreign('code_lab')->references('code_lab')->on('laboratoire')->onDelete('set null');
         });
+        Schema::table('user_externe', function (Blueprint $table) {
+           $table->renameColumn('motivation', 'motivation_path');
+        });
     }
 
     /**
@@ -29,6 +32,9 @@ return new class extends Migration
             $table->dropColumn('reference');
             $table->dropColumn('rapport_path');
             $table->dropColumn('code_lab');
+        });
+        Schema::table('user_externe', function (Blueprint $table) {
+            $table->renameColumn('motivation_path', 'motivation');
         });
     }
 };
