@@ -84,9 +84,9 @@
                                     </td>
                                     <td>
                                         <small>
-                                            Du {{ $externe->date_debut ? $externe->date_debut->format('d/m/Y') : 'N/A' }}
+                                            Du {{ $externe->date_debut ? \Carbon\Carbon::parse($externe->date_debut)->format('d/m/Y') : 'N/A' }}
                                             @if($externe->date_fin)
-                                                <br>Au {{ $externe->date_fin->format('d/m/Y') }}
+                                                <br>Au {{ \Carbon\Carbon::parse($externe->date_fin)->format('d/m/Y') }}
                                             @endif
                                         </small>
                                     </td>

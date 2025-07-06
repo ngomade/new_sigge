@@ -36,9 +36,9 @@
         <div class="col-md-4">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Projets</h5>
+                    <h5 class="card-title">Projets de recherche</h5>
                     <p class="display-4">{{ $stats['projets'] }}</p>
-                    <a href="#" class="btn btn-outline-success">Voir les projets</a>
+                    <a href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}" class="btn btn-outline-success">Gérer les projets</a>
                 </div>
             </div>
         </div>
