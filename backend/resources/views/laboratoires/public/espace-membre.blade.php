@@ -25,8 +25,8 @@
                         </div>
                         <div class="col-md-6">
                             <h6><i class='bx bx-calendar'></i> Dates</h6>
-                            <p><strong>Création :</strong> {{ $laboratoire->date_creation_labo ? $laboratoire->date_creation_labo->format('d/m/Y') : 'Non définie' }}</p>
-                            <p><strong>Dernière modification :</strong> {{ $laboratoire->updated_at->format('d/m/Y H:i') }}</p>
+                            <p><strong>Création :</strong> {{ $laboratoire->date_creation_labo ? \Carbon\Carbon::parse($laboratoire->date_creation_labo)->format('d/m/Y') : 'Non définie' }}</p>
+                            <p><strong>Dernière modification :</strong> {{ \Carbon\Carbon::parse($laboratoire->updated_at)->format('d/m/Y H:i') }}</p>
                         </div>
                     </div>
 
@@ -71,7 +71,7 @@
                                                 {{ ucfirst(str_replace('_', ' ', $projet->statut_projet)) }}
                                             </span>
                                             <small class="text-muted">
-                                                {{ $projet->date_debut_projet ? $projet->date_debut_projet->format('d/m/Y') : 'Non définie' }}
+                                                {{ $projet->date_debut_projet ? \Carbon\Carbon::parse($projet->date_debut_projet)->format('d/m/Y') : 'Non définie' }}
                                             </small>
                                         </div>
                                     </div>

@@ -149,6 +149,38 @@ Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/delete', [\App\Ht
 
 // Gestion des projets du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projets'])->name('laboratoires.admin.projets');
+Route::get('/laboratoires/{code_lab}/admin/projets/create', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetCreate'])->name('laboratoires.admin.projets.create');
+Route::post('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetStore'])->name('laboratoires.admin.projets.store');
+Route::get('/laboratoires/{code_lab}/admin/projets/{projet}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetShow'])->name('laboratoires.admin.projets.show');
+Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/edit', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetEdit'])->name('laboratoires.admin.projets.edit');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetUpdate'])->name('laboratoires.admin.projets.update');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDestroy'])->name('laboratoires.admin.projets.destroy');
+
+// Gestion des participants aux projets
+Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/participants', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipants'])->name('laboratoires.admin.projets.participants');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsStore'])->name('laboratoires.admin.projets.participants.store');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants/{participant}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsDestroy'])->name('laboratoires.admin.projets.participants.destroy');
+
+// Gestion des documents des projets
+Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/documents', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocuments'])->name('laboratoires.admin.projets.documents');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/documents', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocumentsStore'])->name('laboratoires.admin.projets.documents.store');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/documents/{document}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocumentsDestroy'])->name('laboratoires.admin.projets.documents.destroy');
 
 // Gestion des équipements du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/equipements', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipements'])->name('laboratoires.admin.equipements');
+Route::get('/laboratoires/{code_lab}/admin/equipements/create', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementCreate'])->name('laboratoires.admin.equipements.create');
+Route::post('/laboratoires/{code_lab}/admin/equipements', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementStore'])->name('laboratoires.admin.equipements.store');
+Route::get('/laboratoires/{code_lab}/admin/equipements/{equipement}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementShow'])->name('laboratoires.admin.equipements.show');
+Route::get('/laboratoires/{code_lab}/admin/equipements/{equipement}/edit', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementEdit'])->name('laboratoires.admin.equipements.edit');
+Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementUpdate'])->name('laboratoires.admin.equipements.update');
+Route::delete('/laboratoires/{code_lab}/admin/equipements/{equipement}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementDestroy'])->name('laboratoires.admin.equipements.destroy');
+
+// Gestion des entretiens des équipements
+Route::get('/laboratoires/{code_lab}/admin/equipements/{equipement}/entretiens', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementEntretiens'])->name('laboratoires.admin.equipements.entretiens');
+Route::post('/laboratoires/{code_lab}/admin/equipements/{equipement}/entretiens', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementEntretienStore'])->name('laboratoires.admin.equipements.entretien.store');
+Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}/entretiens/{entretien}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementEntretienUpdate'])->name('laboratoires.admin.equipements.entretien.update');
+
+// Gestion des réservations des équipements
+Route::get('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservations'])->name('laboratoires.admin.equipements.reservations');
+Route::post('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservationStore'])->name('laboratoires.admin.equipements.reservation.store');
+Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations/{reservation}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservationUpdate'])->name('laboratoires.admin.equipements.reservation.update');

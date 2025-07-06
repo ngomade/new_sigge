@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 //        Personnel::factory(5)->create();
 //        // Création de 5 filières
 //        $filieres = Filiere::factory(5)->create();
-//        // Création de 5 sites d’étude
+//        // Création de 5 sites d'étude
 //        $sites = SiteEtude::factory(5)->create();
 //        // Crée des sessions de concours
 //        $sessions = SessionConcour::factory(3)->create();
@@ -49,5 +49,11 @@ class DatabaseSeeder extends Seeder
 
         // Ajouter les rôles de laboratoire
         $this->call(RoleLaboSeeder::class);
+
+        // Ajouter les équipements de test
+        $this->call(EquipementsSeeder::class);
+
+        // Ajouter les entretiens et réservations de test
+        $this->call(EntretiensReservationsSeeder::class);
     }
 }

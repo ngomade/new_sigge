@@ -111,11 +111,8 @@
                             <td>
                                 @php
                                     $date = $membre->date_affectation;
-                                    if (is_string($date) && !empty($date)) {
-                                        $date = \Carbon\Carbon::parse($date);
-                                    }
                                 @endphp
-                                {{ $date && $date instanceof \Carbon\Carbon ? $date->format('d/m/Y') : '-' }}
+                                {{ $date && $date instanceof \Carbon\Carbon ? $date->format('d/m/Y') : ($date ? \Carbon\Carbon::parse($date)->format('d/m/Y') : '-') }}
                             </td>
                             <td>
                                 <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membre->id_pers_lab]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
