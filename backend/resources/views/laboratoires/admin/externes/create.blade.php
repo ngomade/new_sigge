@@ -132,12 +132,12 @@
 
                 <div class="mb-3">
                     <label for="motivation" class="form-label">Motivation (optionnel)</label>
-                    <textarea class="form-control @error('motivation') is-invalid @enderror"
-                              id="motivation" name="motivation" rows="4"
-                              placeholder="Motivation de l'utilisateur externe...">{{ old('motivation') }}</textarea>
+                    <input type="file" class="form-control @error('motivation') is-invalid @enderror"
+                           id="motivation" name="motivation" accept=".pdf,.doc,.docx">
+                    <div class="form-text">Formats acceptés : PDF, DOC, DOCX (max 2MB)</div>
                     @error('motivation')
                         <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                            @enderror
                 </div>
 
                 <div class="alert alert-info">

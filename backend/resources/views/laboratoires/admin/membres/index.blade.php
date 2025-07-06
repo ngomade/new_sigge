@@ -47,7 +47,7 @@
         @csrf
         <div class="row mb-3">
             <div class="col-md-4 d-flex align-items-center gap-2">
-                <select name="action" id="bulk-action" class="form-select" required style="max-width: 180px;">
+                <select name="action" id="bulk-action" class="form-select"  style="max-width: 180px;">
                     <option value="">Action groupée</option>
                     <option value="delete">Supprimer</option>
                     <option value="role">Changer le rôle</option>

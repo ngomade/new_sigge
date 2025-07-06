@@ -212,11 +212,11 @@
                                         </a>
                                     </li>
                                 @endif
-                                <li>
+                                {{-- <li>
                                     <a href="{{ $isAdmin ? route('laboratoires.admin.dashboard', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab) }}" class="dropdown-item">
                                         <i class='bx bx-user-circle'></i> {{ $isAdmin ? 'Espace admin' : 'Espace membre' }}
                                     </a>
-                                </li>
+                                </li> --}}
                                 <li>
                                     <a href="{{ route('laboratoires.profil', $laboratoire->code_lab) }}" class="dropdown-item">
                                         <i class='bx bx-edit'></i> Mon profil
@@ -248,6 +248,7 @@
 
     <!-- Contenu principal -->
     <main>
+        @include('laboratoires.partials.alerts')
         @yield('content')
     </main>
 

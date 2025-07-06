@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_externe', function (Blueprint $table) {
-            $table->text('motivation')->nullable()->after('tel_user_ext');
-            $table->string('cv_path')->nullable()->after('motivation');
+            $table->string('motivation_path')->nullable()->after('tel_user_ext');
+            $table->string('cv_path')->nullable()->after('motivation_path');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_externe', function (Blueprint $table) {
-            $table->dropColumn(['motivation', 'cv_path']);
+            $table->dropColumn(['motivation_path', 'cv_path']);
         });
     }
 };

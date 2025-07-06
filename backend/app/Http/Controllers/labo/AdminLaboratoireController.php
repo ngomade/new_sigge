@@ -373,7 +373,7 @@ class AdminLaboratoireController extends Controller
             'statut' => 'required|in:actif,inactif',
             'date_debut' => 'required|date',
             'date_fin' => 'nullable|date|after:date_debut',
-            'motivation' => 'nullable|string',
+            'motivation' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
             'id_rl' => 'required|exists:role_labo,id_rl',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
         ]);
@@ -393,13 +393,19 @@ class AdminLaboratoireController extends Controller
                 'pwd' => \Illuminate\Support\Facades\Hash::make($tempPassword),
                 'date_debut' => $request->date_debut,
                 'date_fin' => $request->date_fin,
-                'motivation' => $request->motivation
+                // 'motivation' => $request->motivation
             ]);
 
             // Gérer le CV si fourni
             if ($request->hasFile('cv')) {
                 $cvPath = $request->file('cv')->store('cvs', 'public');
                 $userExterne->update(['cv_path' => $cvPath]);
+            }
+
+             // Gérer les motivations si fourni
+            if ($request->hasFile('motivation')) {
+                $motivationPath = $request->file('motivation')->store('motivations', 'public');
+                $userExterne->update(['motivation_path' => $motivationPath]);
             }
 
             // Créer l'entrée dans pers_lab
@@ -538,8 +544,9 @@ class AdminLaboratoireController extends Controller
                 ->delete();
 
             // Supprimer de pers_lab
-            \App\Models\laboratoires\PersLab::where('id_pers_lab', $externe->id_user_ext)
-                ->delete();
+            // Removed deletion from pers_lab as tables are independent to avoid SQL error
+            // \App\Models\laboratoires\PersLab::whereRaw('BINARY `id_pers_lab` = ?', [$externe->id_user_ext])
+            //     ->delete();
 
             // Supprimer l'utilisateur externe
             $externe->delete();

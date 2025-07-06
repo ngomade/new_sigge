@@ -84,9 +84,9 @@
                                     </td>
                                     <td>
                                         <small>
-                                            Du {{ $externe->date_debut ? $externe->date_debut->format('d/m/Y') : 'N/A' }}
+                                            Du {{ $externe->date_debut ? \Carbon\Carbon::parse($externe->date_debut)->format('d/m/Y') : 'N/A' }}
                                             @if($externe->date_fin)
-                                                <br>Au {{ $externe->date_fin->format('d/m/Y') }}
+                                                <br>Au {{ \Carbon\Carbon::parse($externe->date_fin)->format('d/m/Y') }}
                                             @endif
                                         </small>
                                     </td>
@@ -97,12 +97,12 @@
                                         <a href="{{ route('laboratoires.admin.externes.edit', [$laboratoire->code_lab, $externe->id_user_ext]) }}" class="btn btn-sm btn-primary">
                                             <i class='bx bx-edit'></i> Modifier
                                         </a>
-                                        <form method="POST" action="{{ route('laboratoires.admin.externes.destroy', [$laboratoire->code_lab, $externe->id_user_ext]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de cet utilisateur externe ?')">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class='bx bx-trash'></i> Supprimer
-                                            </button>
-                                        </form>
+<form method="POST" action="{{ route('laboratoires.admin.externes.destroy', [$laboratoire->code_lab, $externe->id_user_ext]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de cet utilisateur externe ?')">
+    @csrf
+    <button type="submit" class="btn btn-sm btn-danger" onclick="console.log('Deleting externe with id:', '{{ $externe->id_user_ext }}')">
+        <i class='bx bx-trash'></i> Supprimer
+    </button>
+</form>
                                     </td>
                                 </tr>
                             @endforeach

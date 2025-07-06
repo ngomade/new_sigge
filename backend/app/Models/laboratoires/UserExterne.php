@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class UserExterne extends Model
 {
@@ -12,7 +12,12 @@ class UserExterne extends Model
     protected $fillable = [
         'id_user_ext', 'code_lab', 'nom_user_ext', 'prenom_user_ext', 'email_user_ext',
         'tel_user_ext', 'statut', 'pwd', 'logo_url', 'date_debut', 'date_fin',
-        'motivation', 'cv_path'
+        'motivation_path', 'cv_path'
+    ];
+
+    protected $casts = [
+        'date_debut' => 'datetime',
+        'date_fin' => 'datetime',
     ];
 
     public function laboratoire()

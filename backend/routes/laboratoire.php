@@ -143,7 +143,9 @@ Route::post('/laboratoires/{code_lab}/admin/externes', [\App\Http\Controllers\La
 Route::get('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeShow'])->name('laboratoires.admin.externes.show');
 Route::get('/laboratoires/{code_lab}/admin/externes/{externe}/edit', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeEdit'])->name('laboratoires.admin.externes.edit');
 Route::post('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeUpdate'])->name('laboratoires.admin.externes.update');
-Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeDestroy'])->name('laboratoires.admin.externes.destroy');
+Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeDestroy'])
+    ->where('externe', '[A-Za-z0-9\-]+')
+    ->name('laboratoires.admin.externes.destroy');
 
 // Gestion des projets du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projets'])->name('laboratoires.admin.projets');
