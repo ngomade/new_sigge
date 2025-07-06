@@ -19,7 +19,7 @@
                         <h4 class="mb-0">Gestion des Laboratoires</h4>
                         <a href="{{ route('labo.laboratoires.create') }}" class="btn btn-primary">
                             <i class="bx bx-plus"></i> Nouveau Laboratoire
-                        </a>
+                            </a>
                     </div>
 
                     <div class="card-body">
@@ -124,7 +124,7 @@
 
                         @if($laboratoires->hasPages())
                             <div class="d-flex justify-content-center mt-3">
-                                {{ $laboratoires->links() }}
+                        {{ $laboratoires->links() }}
                             </div>
                         @endif
                     </div>

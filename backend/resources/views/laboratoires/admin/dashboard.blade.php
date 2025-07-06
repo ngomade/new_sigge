@@ -47,7 +47,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Équipements</h5>
                     <p class="display-4">{{ $stats['equipements'] }}</p>
-                    <a href="#" class="btn btn-outline-secondary">Gérer les équipements</a>
+                    <a href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">Gérer les équipements</a>
                 </div>
             </div>
         </div>
