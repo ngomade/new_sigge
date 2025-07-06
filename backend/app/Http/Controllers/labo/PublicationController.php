@@ -30,7 +30,12 @@ class PublicationController extends Controller
 
         $publications = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('sige_app.frontend.labo.publications.index', compact('publications'));
+        $laboratoire = null;
+        if (session()->has('laboratoire_code')) {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+        }
+
+        return view('laboratoires.admin.publications.index', compact('publications', 'laboratoire'));
     }
 
     /**
@@ -38,9 +43,14 @@ class PublicationController extends Controller
      */
     public function create()
     {
-        $membres = PersLab::with('laboratoire')->where('statut', 'actif')->get();
+        $membres = PersLab::with('laboratoires')->where('statut', 'actif')->get();
 
-        return view('sige_app.frontend.labo.publications.create', compact('membres'));
+        $laboratoire = null;
+        if (session()->has('laboratoire_code')) {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+        }
+
+        return view('laboratoires.admin.publications.create', compact('membres', 'laboratoire'));
     }
 
     /**
@@ -62,7 +72,7 @@ class PublicationController extends Controller
 
         Publication::create($validated);
 
-        return redirect()->route('publications.index')
+        return redirect()->route('labo.publications.index')
             ->with('success', 'Publication ajoutée avec succès.');
     }
 
@@ -75,7 +85,7 @@ class PublicationController extends Controller
             ->where('code_publi', $code_publi)
             ->firstOrFail();
 
-        return view('sige_app.frontend.labo.publications.show', compact('publication'));
+        return view('laboratoires.admin.publications.show', compact('publication'));
     }
 
     /**
@@ -86,7 +96,7 @@ class PublicationController extends Controller
         $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
         $membres = PersLab::with('laboratoire')->where('statut', 'actif')->get();
 
-        return view('sige_app.frontend.labo.publications.edit', compact('publication', 'membres'));
+        return view('laboratoires.admin.publications.edit', compact('publication', 'membres'));
     }
 
     /**
@@ -110,7 +120,7 @@ class PublicationController extends Controller
 
         $publication->update($validated);
 
-        return redirect()->route('publications.show', $publication->code_publi)
+        return redirect()->route('labo.publications.show', $publication->code_publi)
             ->with('success', 'Publication mise à jour avec succès.');
     }
 
@@ -122,7 +132,7 @@ class PublicationController extends Controller
         $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
         $publication->delete();
 
-        return redirect()->route('publications.index')
+        return redirect()->route('labo.publications.index')
             ->with('success', 'Publication supprimée avec succès.');
     }
 }

@@ -187,6 +187,19 @@
                             <a class="nav-link" href="#membres">Membres</a>
                         @endif
                     </li>
+                    <li class="nav-item dropdown">
+                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Publications & Rapports
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ route('labo.publications.index') }}">Publications</a></li>
+                                <li><a class="dropdown-item" href="{{ route('labo.rapports.index') }}">Rapports</a></li>
+                            </ul>
+                        @else
+                            <a class="nav-link" href="#projets">Publications</a>
+                        @endif
+                    </li>
                 </ul>
 
                 <div class="navbar-nav">

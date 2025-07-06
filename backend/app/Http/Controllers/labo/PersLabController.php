@@ -63,7 +63,7 @@ class PersLabController extends Controller
 
         // Attribuer les rôles
         foreach ($request->roles as $role_id) {
-            PlRole::create([
+            PersLab::create([
                 'id_pers_lab' => $membre->id_pers_lab,
                 'id_rl' => $role_id,
                 'date_debut' => $membre->date_entree
@@ -122,13 +122,13 @@ class PersLabController extends Controller
         // Gérer les rôles si modifiés
         if ($request->has('roles')) {
             // Terminer les rôles actuels
-            PlRole::where('id_pers_lab', $membre->id_pers_lab)
+            PersLab::where('id_pers_lab', $membre->id_pers_lab)
                 ->whereNull('date_fin')
                 ->update(['date_fin' => now()]);
 
             // Ajouter les nouveaux rôles
             foreach ($request->roles as $role_id) {
-                PlRole::create([
+                PersLab::create([
                     'id_pers_lab' => $membre->id_pers_lab,
                     'id_rl' => $role_id,
                     'date_debut' => now()

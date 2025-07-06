@@ -64,6 +64,9 @@ Route::prefix('labo')->name('labo.')->group(function () {
     // Publications
     Route::resource('publications', PublicationController::class);
 
+    // Rapports de laboratoire
+    Route::resource('rapports', \App\Http\Controllers\Labo\RapportLaboController::class);
+
     // Utilisateurs externes
     Route::resource('externes', UserExterneController::class);
 
