@@ -66,11 +66,88 @@
                 </div>
             </div>
         </div>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Rapports Personnalisés</h5>
+                        <p class="display-4">
+                            <i class="bi bi-file-earmark-text text-primary"></i>
+                        </p>
+                        <p class="text-muted">Créez et gérez vos rapports personnalisés</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ route('laboratoires.admin.rapports', $laboratoire->code_lab) }}" class="btn btn-outline-primary">
+                                <i class="bi bi-collection"></i> Gérer les rapports
+                            </a>
+                            <a href="{{ route('laboratoires.admin.rapports.create', $laboratoire->code_lab) }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Nouveau rapport
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Rapports Automatiques</h5>
+                        <p class="display-4">
+                            <i class="bi bi-graph-up text-success"></i>
+                        </p>
+                        <p class="text-muted">Générez des rapports automatiques</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ route('laboratoires.admin.reporting', $laboratoire->code_lab) }}" class="btn btn-outline-success">
+                                <i class="bi bi-file-earmark-text"></i> Rapports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Notifications & Alertes</h5>
+                        <p class="display-4">
+                            <i class="bi bi-bell text-warning"></i>
+                        </p>
+                        <p class="text-muted">Surveillez les échéances et maintenances</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ route('laboratoires.admin.notifications', $laboratoire->code_lab) }}" class="btn btn-outline-warning">
+                                <i class="bi bi-bell"></i> Notifications
+                            </a>
+                            <a href="{{ route('laboratoires.admin.alertes', $laboratoire->code_lab) }}" class="btn btn-warning">
+                                <i class="bi bi-exclamation-triangle"></i> Alertes actives
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Communication</h5>
+                        <p class="display-4">
+                            <i class="bi bi-chat-dots text-info"></i>
+                        </p>
+                        <p class="text-muted">Gérez les communications internes</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ route('laboratoires.admin.notifications', $laboratoire->code_lab) }}" class="btn btn-outline-info">
+                                <i class="bi bi-envelope"></i> Messages
+                            </a>
+                            <a href="{{ route('laboratoires.admin.alertes', $laboratoire->code_lab) }}" class="btn btn-info">
+                                <i class="bi bi-gear"></i> Paramètres
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row mt-5">
             <div class="col-12">
                 <div class="alert alert-info text-center">
                     <h4>Bienvenue dans l'espace d'administration du laboratoire !</h4>
-                    <p>Utilisez le menu ci-dessus pour gérer les membres, les candidatures, les projets, les équipements, les publications et plus encore.</p>
+                    <p>Utilisez le menu ci-dessus pour gérer les membres, les candidatures, les projets, les équipements, les publications, les rapports, les notifications et alertes, et plus encore.</p>
                 </div>
             </div>
         </div>

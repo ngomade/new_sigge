@@ -10,6 +10,11 @@ use App\Models\laboratoires\ProjetLabo;
 use App\Models\laboratoires\Equipements;
 use App\Models\laboratoires\Publication;
 use App\Models\laboratoires\UserExterne;
+use App\Models\laboratoires\RapportLabo;
+use App\Models\laboratoires\LabNotif;
+use App\Services\LaboratoireAlertService;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AdminLaboratoireController extends Controller
 {
@@ -1498,7 +1503,191 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
-        return view('laboratoires.admin.reporting', compact('laboratoire'));
+        // Récupérer les rapports existants
+        $rapports = RapportLabo::where('code_lab', $code_lab)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('laboratoires.admin.reporting', compact('laboratoire', 'rapports'));
+    }
+
+    /**
+     * Afficher la liste des rapports personnalisés
+     */
+    public function rapports($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        $rapports = RapportLabo::where('code_lab', $code_lab)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('laboratoires.admin.rapports.index', compact('laboratoire', 'rapports'));
+    }
+
+    /**
+     * Afficher le formulaire de création de rapport
+     */
+    public function rapportCreate($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        return view('laboratoires.admin.rapports.create', compact('laboratoire'));
+    }
+
+    /**
+     * Enregistrer un nouveau rapport
+     */
+    public function rapportStore(Request $request, $code_lab)
+    {
+        $request->validate([
+            'titre' => 'required|string|max:255',
+            'contenu' => 'required|string',
+            'type_rapport' => 'required|in:pdf,word',
+            'description' => 'nullable|string'
+        ]);
+
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        // Générer un code unique pour le rapport
+        $code_rl = 'RL' . strtoupper(Str::random(8));
+
+        // Créer le rapport
+        $rapport = RapportLabo::create([
+            'code_rl' => $code_rl,
+            'path_rl' => '', // Sera mis à jour après génération
+            'desc_rapport' => $request->description,
+            'code_lab' => $code_lab
+        ]);
+
+        // Générer le fichier selon le type
+        if ($request->type_rapport === 'pdf') {
+            $this->generateCustomPDF($rapport, $request->titre, $request->contenu, $laboratoire);
+        } else {
+            $this->generateCustomWord($rapport, $request->titre, $request->contenu, $laboratoire);
+        }
+
+        return redirect()->route('laboratoires.admin.rapports', $code_lab)
+            ->with('success', 'Rapport créé et généré avec succès.');
+    }
+
+    /**
+     * Afficher un rapport
+     */
+    public function rapportShow($code_lab, $rapport)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
+
+        return view('laboratoires.admin.rapports.show', compact('laboratoire', 'rapport'));
+    }
+
+    /**
+     * Télécharger un rapport
+     */
+    public function rapportDownload($code_lab, $rapport)
+    {
+        $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
+
+        if (!file_exists(storage_path('app/' . $rapport->path_rl))) {
+            return back()->with('error', 'Fichier non trouvé.');
+        }
+
+        return response()->download(storage_path('app/' . $rapport->path_rl));
+    }
+
+    /**
+     * Supprimer un rapport
+     */
+    public function rapportDestroy(Request $request, $code_lab, $rapport)
+    {
+        $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
+
+        // Supprimer le fichier physique
+        if (file_exists(storage_path('app/' . $rapport->path_rl))) {
+            unlink(storage_path('app/' . $rapport->path_rl));
+        }
+
+        $rapport->delete();
+
+        return redirect()->route('laboratoires.admin.rapports', $code_lab)
+            ->with('success', 'Rapport supprimé avec succès.');
+    }
+
+    /**
+     * Générer un rapport PDF personnalisé
+     */
+    private function generateCustomPDF($rapport, $titre, $contenu, $laboratoire)
+    {
+        $data = [
+            'titre' => $titre,
+            'contenu' => $contenu,
+            'laboratoire' => $laboratoire,
+            'date_generation' => Carbon::now()->format('d/m/Y H:i'),
+            'rapport' => $rapport
+        ];
+
+        $pdf = \PDF::loadView('laboratoires.admin.rapports.template-pdf', $data);
+
+        $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".pdf";
+        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+
+        // Créer le dossier s'il n'existe pas
+        \Storage::makeDirectory("rapports/{$laboratoire->code_lab}");
+
+        // Sauvegarder le PDF
+        \Storage::put($path, $pdf->output());
+
+        // Mettre à jour le chemin dans la base de données
+        $rapport->update(['path_rl' => $path]);
+    }
+
+    /**
+     * Générer un rapport Word personnalisé
+     */
+    private function generateCustomWord($rapport, $titre, $contenu, $laboratoire)
+    {
+        $data = [
+            'titre' => $titre,
+            'contenu' => $contenu,
+            'laboratoire' => $laboratoire,
+            'date_generation' => Carbon::now()->format('d/m/Y H:i'),
+            'rapport' => $rapport
+        ];
+
+        $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".docx";
+        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+
+        // Créer le dossier s'il n'existe pas
+        \Storage::makeDirectory("rapports/{$laboratoire->code_lab}");
+
+        // Utiliser PhpWord pour générer le document Word
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+
+        // Créer une section
+        $section = $phpWord->addSection();
+
+        // Titre
+        $section->addText($titre, ['bold' => true, 'size' => 16]);
+        $section->addTextBreak();
+
+        // Informations du laboratoire
+        $section->addText("Laboratoire : " . $laboratoire->label_labo, ['bold' => true]);
+        $section->addText("Code : " . $laboratoire->code_lab);
+        $section->addText("Date de génération : " . $data['date_generation']);
+        $section->addTextBreak();
+
+        // Contenu
+        $section->addText("Contenu du rapport :", ['bold' => true]);
+        $section->addTextBreak();
+        $section->addText($contenu);
+
+        // Sauvegarder le document
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save(storage_path('app/' . $path));
+
+        // Mettre à jour le chemin dans la base de données
+        $rapport->update(['path_rl' => $path]);
     }
 
     /**
@@ -1548,5 +1737,194 @@ class AdminLaboratoireController extends Controller
                 })->count(),
                 ];
         }
+    }
+
+    // ========================================
+    // GESTION DES NOTIFICATIONS ET ALERTES
+    // ========================================
+
+    /**
+     * Afficher les notifications du laboratoire
+     */
+    public function notifications($code_lab, Request $request)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        // Filtres
+        $type = $request->input('type');
+        $lu = $request->input('lu');
+        $search = $request->input('search');
+
+        $query = LabNotif::where('code_lab', $code_lab)
+            ->with(['expediteur', 'destinataire']);
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+        if ($lu !== null) {
+            $query->where('lu', $lu);
+        }
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('titre', 'like', "%$search%")
+                  ->orWhere('message', 'like', "%$search%");
+            });
+        }
+
+        $notifications = $query->orderByDesc('created_at')->paginate(20);
+
+        // Statistiques des notifications
+        $stats = [
+            'total' => LabNotif::where('code_lab', $code_lab)->count(),
+            'non_lues' => LabNotif::where('code_lab', $code_lab)->where('lu', false)->count(),
+            'urgentes' => LabNotif::where('code_lab', $code_lab)->where('type', 'projet_echeance')->count(),
+            'maintenance' => LabNotif::where('code_lab', $code_lab)->where('type', 'maintenance_equipement')->count(),
+        ];
+
+        return view('laboratoires.admin.notifications.index', compact(
+            'laboratoire',
+            'notifications',
+            'stats',
+            'type',
+            'lu',
+            'search'
+        ));
+    }
+
+    /**
+     * Marquer une notification comme lue
+     */
+    public function notificationMarkAsRead($code_lab, $notification_id)
+    {
+        $notification = LabNotif::where('code_lab', $code_lab)
+            ->where('id_notif', $notification_id)
+            ->firstOrFail();
+
+        $notification->update(['lu' => true]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Marquer toutes les notifications comme lues
+     */
+    public function notificationsMarkAllAsRead($code_lab)
+    {
+        LabNotif::where('code_lab', $code_lab)
+            ->where('lu', false)
+            ->update(['lu' => true]);
+
+        return redirect()->route('laboratoires.admin.notifications', $code_lab)
+            ->with('success', 'Toutes les notifications ont été marquées comme lues.');
+    }
+
+    /**
+     * Supprimer une notification
+     */
+    public function notificationDestroy($code_lab, $notification_id)
+    {
+        $notification = LabNotif::where('code_lab', $code_lab)
+            ->where('id_notif', $notification_id)
+            ->firstOrFail();
+
+        $notification->delete();
+
+        return redirect()->route('laboratoires.admin.notifications', $code_lab)
+            ->with('success', 'Notification supprimée avec succès.');
+    }
+
+    /**
+     * Afficher les alertes actives du laboratoire
+     */
+    public function alertes($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $alertService = new LaboratoireAlertService();
+
+        // Obtenir les statistiques des alertes
+        $alertStats = $alertService->getAlertStats($code_lab);
+
+        // Projets en échéance urgente (7 jours)
+        $projetsUrgents = ProjetLabo::where('code_lab', $code_lab)
+            ->where('fin_projet', '>=', now())
+            ->where('fin_projet', '<=', now()->addDays(7))
+            ->where('statut_projet', '!=', 'Terminé')
+            ->get();
+
+        // Projets en échéance importante (30 jours)
+        $projetsImportants = ProjetLabo::where('code_lab', $code_lab)
+            ->where('fin_projet', '>=', now())
+            ->where('fin_projet', '<=', now()->addDays(30))
+            ->where('fin_projet', '>', now()->addDays(7))
+            ->where('statut_projet', '!=', 'Terminé')
+            ->get();
+
+        // Maintenances d'équipements urgentes (3 jours)
+        $maintenancesUrgentes = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function($query) use ($code_lab) {
+                $query->where('code_lab', $code_lab);
+            })
+            ->where('debut_entretien', '>=', now())
+            ->where('debut_entretien', '<=', now()->addDays(3))
+            ->where('statut_entretien', '!=', 'Annulé')
+            ->with('equipement')
+            ->get();
+
+        // Maintenances d'équipements importantes (30 jours)
+        $maintenancesImportantes = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function($query) use ($code_lab) {
+                $query->where('code_lab', $code_lab);
+            })
+            ->where('debut_entretien', '>=', now())
+            ->where('debut_entretien', '<=', now()->addDays(30))
+            ->where('debut_entretien', '>', now()->addDays(3))
+            ->where('statut_entretien', '!=', 'Annulé')
+            ->with('equipement')
+            ->get();
+
+        return view('laboratoires.admin.alertes.index', compact(
+            'laboratoire',
+            'alertStats',
+            'projetsUrgents',
+            'projetsImportants',
+            'maintenancesUrgentes',
+            'maintenancesImportantes'
+        ));
+    }
+
+    /**
+     * Exécuter manuellement les vérifications d'alertes
+     */
+    public function runAlertChecks($code_lab)
+    {
+        $alertService = new LaboratoireAlertService();
+        $alertService->runAllChecks();
+
+        return redirect()->route('laboratoires.admin.alertes', $code_lab)
+            ->with('success', 'Vérifications d\'alertes exécutées avec succès.');
+    }
+
+    /**
+     * Obtenir les notifications non lues pour l'API (AJAX)
+     */
+    public function getUnreadNotifications($code_lab)
+    {
+        $notifications = LabNotif::where('code_lab', $code_lab)
+            ->where('lu', false)
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+
+        return response()->json($notifications);
+    }
+
+    /**
+     * Obtenir le nombre de notifications non lues pour l'API (AJAX)
+     */
+    public function getUnreadNotificationsCount($code_lab)
+    {
+        $count = LabNotif::where('code_lab', $code_lab)
+            ->where('lu', false)
+            ->count();
+
+        return response()->json(['count' => $count]);
     }
 }

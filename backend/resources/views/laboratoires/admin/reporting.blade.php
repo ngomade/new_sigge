@@ -17,6 +17,106 @@
         </div>
     </div>
 
+    <!-- Section Rapports Personnalisés -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-white shadow-sm">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold text-dark">
+                            <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                            Rapports Personnalisés
+                        </h5>
+                        <a href="{{ route('laboratoires.admin.rapports', $laboratoire->code_lab) }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Gérer les Rapports
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-pencil-square text-primary fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-medium">Créer un Rapport</h6>
+                                    <p class="text-muted mb-0 small">Rédigez et générez vos propres rapports</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-collection text-success fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-medium">{{ $rapports->count() }} Rapports Créés</h6>
+                                    <p class="text-muted mb-0 small">Accédez à vos rapports personnalisés</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($rapports->count() > 0)
+                        <div class="mt-4">
+                            <h6 class="fw-medium mb-3">Rapports Récents</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($rapports->take(3) as $rapport)
+                                        <tr>
+                                            <td class="fw-medium">{{ $rapport->code_rl }}</td>
+                                            <td>
+                                                @if(str_contains($rapport->path_rl, '.pdf'))
+                                                    <span class="badge bg-danger-subtle text-danger">PDF</span>
+                                                @elseif(str_contains($rapport->path_rl, '.docx'))
+                                                    <span class="badge bg-primary-subtle text-primary">Word</span>
+                                                @else
+                                                    <span class="badge bg-secondary-subtle text-secondary">Fichier</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-muted">{{ \Carbon\Carbon::parse($rapport->created_at)->format('d/m/Y') }}</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ route('laboratoires.admin.rapports.show', [$laboratoire->code_lab, $rapport->code_rl]) }}"
+                                                       class="btn btn-outline-secondary btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    @if(file_exists(storage_path('app/' . $rapport->path_rl)))
+                                                        <a href="{{ route('laboratoires.admin.rapports.download', [$laboratoire->code_lab, $rapport->code_rl]) }}"
+                                                           class="btn btn-outline-primary btn-sm">
+                                                            <i class="bi bi-download"></i>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i class="bi bi-file-earmark-text text-muted fs-1 mb-3"></i>
+                            <h6 class="text-muted mb-2">Aucun rapport personnalisé</h6>
+                            <p class="text-muted mb-0">Commencez par créer votre premier rapport</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Types de rapports -->
     <div class="row">
         <!-- Rapport général -->
@@ -166,8 +266,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Statistiques Équipements</div>
-                            <div class="h6 mb-0 font-weight-bold text-gray-800">Analyse d'utilisation</div>
-                            <small class="text-muted">Graphiques et analyses détaillées</small>
+                            <div class="h6 mb-0 font-weight-bold text-gray-800">Analyse détaillée</div>
+                            <small class="text-muted">Utilisation et performance des équipements</small>
                         </div>
                         <div class="col-auto">
                             <i class="bi bi-bar-chart fa-2x text-gray-300"></i>
@@ -175,8 +275,8 @@
                     </div>
                     <div class="mt-3">
                         <a href="{{ route('laboratoires.admin.equipements.stats', $laboratoire->code_lab) }}"
-                           class="btn btn-sm btn-outline-info">
-                            <i class="bi bi-graph-up"></i> Voir les statistiques
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-graph-up"></i> Voir les Stats
                         </a>
                     </div>
                 </div>
@@ -196,6 +296,7 @@
                         <div class="col-md-4">
                             <label for="type" class="form-label">Type de rapport</label>
                             <select class="form-select" id="type" name="type" required>
+                                <option value="">Choisir un type</option>
                                 <option value="general">Rapport général</option>
                                 <option value="membres">Rapport membres</option>
                                 <option value="projets">Rapport projets</option>

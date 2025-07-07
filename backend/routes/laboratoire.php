@@ -193,3 +193,25 @@ Route::get('/laboratoires/{code_lab}/admin/reporting', [\App\Http\Controllers\La
 Route::get('/laboratoires/{code_lab}/admin/reports/pdf', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'generateReportPDF'])->name('laboratoires.admin.reports.pdf');
 Route::get('/laboratoires/{code_lab}/admin/reports/excel', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'generateReportExcel'])->name('laboratoires.admin.reports.excel');
 Route::get('/laboratoires/{code_lab}/admin/equipements/stats', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementsStats'])->name('laboratoires.admin.equipements.stats');
+
+// Routes pour les rapports personnalisés
+Route::get('/laboratoires/{code_lab}/admin/rapports', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapports'])->name('laboratoires.admin.rapports');
+Route::get('/laboratoires/{code_lab}/admin/rapports/create', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportCreate'])->name('laboratoires.admin.rapports.create');
+Route::post('/laboratoires/{code_lab}/admin/rapports', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportStore'])->name('laboratoires.admin.rapports.store');
+Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportShow'])->name('laboratoires.admin.rapports.show');
+Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}/download', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportDownload'])->name('laboratoires.admin.rapports.download');
+Route::delete('/laboratoires/{code_lab}/admin/rapports/{rapport}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportDestroy'])->name('laboratoires.admin.rapports.destroy');
+
+// Routes pour les notifications et alertes
+Route::get('/laboratoires/{code_lab}/admin/notifications', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'notifications'])->name('laboratoires.admin.notifications');
+Route::post('/laboratoires/{code_lab}/admin/notifications/{notification_id}/mark-read', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'notificationMarkAsRead'])->name('laboratoires.admin.notifications.mark-read');
+Route::post('/laboratoires/{code_lab}/admin/notifications/mark-all-read', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'notificationsMarkAllAsRead'])->name('laboratoires.admin.notifications.mark-all-read');
+Route::delete('/laboratoires/{code_lab}/admin/notifications/{notification_id}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'notificationDestroy'])->name('laboratoires.admin.notifications.destroy');
+
+// Routes pour les alertes
+Route::get('/laboratoires/{code_lab}/admin/alertes', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'alertes'])->name('laboratoires.admin.alertes');
+Route::post('/laboratoires/{code_lab}/admin/alertes/check', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'runAlertChecks'])->name('laboratoires.admin.alertes.check');
+
+// Routes AJAX pour les notifications
+Route::get('/laboratoires/{code_lab}/admin/notifications/unread', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'getUnreadNotifications'])->name('laboratoires.admin.notifications.unread');
+Route::get('/laboratoires/{code_lab}/admin/notifications/unread-count', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'getUnreadNotificationsCount'])->name('laboratoires.admin.notifications.unread-count');
