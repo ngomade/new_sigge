@@ -1,4 +1,4 @@
-@extends('sige_app.backend.template.backend')
+@extends($layout ?? 'sige_app.backend.template.backend')
 
 @section('content')
 <div class="container-fluid">

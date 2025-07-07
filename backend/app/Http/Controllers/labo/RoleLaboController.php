@@ -15,7 +15,12 @@ class RoleLaboController extends Controller
     public function index()
     {
         $roles = RoleLabo::with('affectations')->paginate(10);
-        return view('sige_app.frontend.labo.roles.index', compact('roles'));
+        $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
+        $laboratoire = null;
+        if ($layout === 'laboratoires.public.layout') {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+        }
+        return view('sige_app.frontend.labo.roles.index', compact('roles', 'layout', 'laboratoire'));
     }
 
     /**
@@ -23,7 +28,12 @@ class RoleLaboController extends Controller
      */
     public function create()
     {
-        return view('sige_app.frontend.labo.roles.create');
+        $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
+        $laboratoire = null;
+        if ($layout === 'laboratoires.public.layout') {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+        }
+        return view('sige_app.frontend.labo.roles.create', compact('layout', 'laboratoire'));
     }
 
     /**
@@ -47,7 +57,12 @@ class RoleLaboController extends Controller
     public function show(string $id)
     {
         $role = RoleLabo::with('affectations.persLab', 'affectations.laboratoire')->findOrFail($id);
-        return view('sige_app.frontend.labo.roles.show', compact('role'));
+        $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
+        $laboratoire = null;
+        if ($layout === 'laboratoires.public.layout') {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+        }
+        return view('sige_app.frontend.labo.roles.show', compact('role', 'layout', 'laboratoire'));
     }
 
     /**
@@ -56,7 +71,12 @@ class RoleLaboController extends Controller
     public function edit(string $id)
     {
         $role = RoleLabo::findOrFail($id);
-        return view('sige_app.frontend.labo.roles.edit', compact('role'));
+        $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
+        $laboratoire = null;
+        if ($layout === 'laboratoires.public.layout') {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+        }
+        return view('sige_app.frontend.labo.roles.edit', compact('role', 'layout', 'laboratoire'));
     }
 
     /**
