@@ -189,7 +189,7 @@
                     </li>
                     <li class="nav-item">
                         @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                            <a class="nav-link" href="{{ route('labo.publications.index') }}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link" href="{{ $isAdmin ? route('labo.publications.index', $laboratoire->code_lab) : route('labo.publications.index') }}">
                                 Publications
                             </a>
                         @else
