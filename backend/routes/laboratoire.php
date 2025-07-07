@@ -112,6 +112,9 @@ Route::get('/presentation_ufd_tsi',  [LaboratoireController::class, 'index']);
 // Dashboard admin du laboratoire
 Route::get('/laboratoires/{code_lab}/admin', [AdminLaboratoireController::class, 'dashboard'])->name('laboratoires.admin.dashboard');
 
+// Nouveau Dashboard admin du laboratoire
+Route::get('/laboratoires/{code_lab}/admin/new', [AdminLaboratoireController::class, 'dashboardNew'])->name('laboratoires.admin.dashboard.new');
+
 // Gestion des membres du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/membres', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'membres'])->name('laboratoires.admin.membres');
 
@@ -184,3 +187,9 @@ Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}/entretiens/{
 Route::get('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservations'])->name('laboratoires.admin.equipements.reservations');
 Route::post('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservationStore'])->name('laboratoires.admin.equipements.reservation.store');
 Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations/{reservation}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservationUpdate'])->name('laboratoires.admin.equipements.reservation.update');
+
+// Routes pour le reporting et les statistiques
+Route::get('/laboratoires/{code_lab}/admin/reporting', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'reporting'])->name('laboratoires.admin.reporting');
+Route::get('/laboratoires/{code_lab}/admin/reports/pdf', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'generateReportPDF'])->name('laboratoires.admin.reports.pdf');
+Route::get('/laboratoires/{code_lab}/admin/reports/excel', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'generateReportExcel'])->name('laboratoires.admin.reports.excel');
+Route::get('/laboratoires/{code_lab}/admin/equipements/stats', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementsStats'])->name('laboratoires.admin.equipements.stats');

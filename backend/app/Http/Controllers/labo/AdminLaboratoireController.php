@@ -27,7 +27,126 @@ class AdminLaboratoireController extends Controller
             'externes' => UserExterne::where('code_lab', $code_lab)->where('statut', 'actif')->count(),
         ];
 
-        return view('laboratoires.admin.dashboard', compact('laboratoire', 'stats'));
+        // Statistiques détaillées des projets
+        $projetsStats = [
+            'en_cours' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'en_cours')->count(),
+            'termines' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'termine')->count(),
+            'en_attente' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'en_attente')->count(),
+            'suspendus' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'suspendu')->count(),
+        ];
+
+        // Statistiques des équipements
+        $equipementsStats = [
+            'disponibles' => Equipements::where('code_lab', $code_lab)->where('etat', 'disponible')->count(),
+            'en_utilisation' => Equipements::where('code_lab', $code_lab)->where('etat', 'en utilisation')->count(),
+            'en_maintenance' => Equipements::where('code_lab', $code_lab)->where('etat', 'en maintenance')->count(),
+            'hors_service' => Equipements::where('code_lab', $code_lab)->where('etat', 'hors service')->count(),
+        ];
+
+        // Projets récents
+        $projetsRecents = ProjetLabo::where('code_lab', $code_lab)
+            ->orderBy('debut_projet', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Équipements les plus utilisés
+        $equipementsPopulaires = Equipements::where('code_lab', $code_lab)
+            ->withCount('reservations')
+            ->orderBy('reservations_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Activité récente (dernières 30 jours)
+        $dateLimite = now()->subDays(30);
+        $activiteRecente = [
+            'nouvelles_candidatures' => UserExterne::where('code_lab', $code_lab)
+                ->where('created_at', '>=', $dateLimite)
+                ->count(),
+            'nouveaux_projets' => ProjetLabo::where('code_lab', $code_lab)
+                ->where('created_at', '>=', $dateLimite)
+                ->count(),
+            'nouvelles_reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+                $q->where('code_lab', $code_lab);
+            })->where('created_at', '>=', $dateLimite)->count(),
+        ];
+
+        return view('laboratoires.admin.dashboard', compact(
+            'laboratoire',
+            'stats',
+            'projetsStats',
+            'equipementsStats',
+            'projetsRecents',
+            'equipementsPopulaires',
+            'activiteRecente'
+        ));
+    }
+
+    public function dashboardNew($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        // Statistiques principales
+        $stats = [
+            'membres' => LaboratoirePersLab::where('code_lab', $code_lab)->where('statut', 'actif')->count(),
+            'projets' => ProjetLabo::where('code_lab', $code_lab)->count(),
+            'equipements' => Equipements::where('code_lab', $code_lab)->count(),
+            'publications' => Publication::where('code_lab', $code_lab)->count(),
+            'candidatures' => UserExterne::where('code_lab', $code_lab)->where('statut', 'en_attente')->count(),
+            'externes' => UserExterne::where('code_lab', $code_lab)->where('statut', 'actif')->count(),
+        ];
+
+        // Statistiques détaillées des projets
+        $projetsStats = [
+            'en_cours' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'en_cours')->count(),
+            'termines' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'termine')->count(),
+            'en_attente' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'en_attente')->count(),
+            'suspendus' => ProjetLabo::where('code_lab', $code_lab)->where('statut_projet', 'suspendu')->count(),
+        ];
+
+        // Statistiques des équipements
+        $equipementsStats = [
+            'disponibles' => Equipements::where('code_lab', $code_lab)->where('etat', 'disponible')->count(),
+            'en_utilisation' => Equipements::where('code_lab', $code_lab)->where('etat', 'en utilisation')->count(),
+            'en_maintenance' => Equipements::where('code_lab', $code_lab)->where('etat', 'en maintenance')->count(),
+            'hors_service' => Equipements::where('code_lab', $code_lab)->where('etat', 'hors service')->count(),
+        ];
+
+        // Projets récents
+        $projetsRecents = ProjetLabo::where('code_lab', $code_lab)
+            ->orderBy('debut_projet', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Équipements les plus utilisés
+        $equipementsPopulaires = Equipements::where('code_lab', $code_lab)
+            ->withCount('reservations')
+            ->orderBy('reservations_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Activité récente (dernières 30 jours)
+        $dateLimite = now()->subDays(30);
+        $activiteRecente = [
+            'nouvelles_candidatures' => UserExterne::where('code_lab', $code_lab)
+                ->where('created_at', '>=', $dateLimite)
+                ->count(),
+            'nouveaux_projets' => ProjetLabo::where('code_lab', $code_lab)
+                ->where('created_at', '>=', $dateLimite)
+                ->count(),
+            'nouvelles_reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+                $q->where('code_lab', $code_lab);
+            })->where('created_at', '>=', $dateLimite)->count(),
+        ];
+
+        return view('laboratoires.admin.dashboard-new', compact(
+            'laboratoire',
+            'stats',
+            'projetsStats',
+            'equipementsStats',
+            'projetsRecents',
+            'equipementsPopulaires',
+            'activiteRecente'
+        ));
     }
 
     public function membres($code_lab, Request $request)
@@ -1271,6 +1390,163 @@ class AdminLaboratoireController extends Controller
 
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Générer un rapport PDF du laboratoire
+     */
+    public function generateReportPDF($code_lab, Request $request)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $type = $request->input('type', 'general');
+
+        // Récupérer les données selon le type de rapport
+        $data = $this->getReportData($code_lab, $type);
+
+        // Générer le PDF
+        $pdf = \PDF::loadView('laboratoires.admin.reports.pdf', compact('laboratoire', 'data', 'type'));
+
+        $filename = "rapport_{$laboratoire->code_lab}_{$type}_" . now()->format('Y-m-d') . ".pdf";
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Générer un rapport Excel du laboratoire
+     */
+    public function generateReportExcel($code_lab, Request $request)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $type = $request->input('type', 'general');
+
+        // Récupérer les données selon le type de rapport
+        $data = $this->getReportData($code_lab, $type);
+
+        $filename = "rapport_{$laboratoire->code_lab}_{$type}_" . now()->format('Y-m-d') . ".xlsx";
+
+        return \Excel::download(new \App\Exports\LaboratoireReportExport($laboratoire, $data, $type), $filename);
+    }
+
+    /**
+     * Afficher les statistiques d'utilisation des équipements
+     */
+    public function equipementsStats($code_lab, Request $request)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        $periode = $request->input('periode', '30'); // jours
+        $dateDebut = now()->subDays($periode);
+
+        // Statistiques d'utilisation par équipement
+        $statsUtilisation = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+            $q->where('code_lab', $code_lab);
+        })
+        ->where('debut_reserv', '>=', $dateDebut)
+        ->with('equipement')
+        ->get()
+        ->groupBy('code_equip')
+        ->map(function($reservations) {
+            return [
+                'total_heures' => $reservations->sum(function($r) {
+                    return \Carbon\Carbon::parse($r->debut_reserv)->diffInHours($r->fin_reserv);
+                }),
+                'nombre_reservations' => $reservations->count(),
+                'taux_utilisation' => $reservations->where('statut', 'confirmé')->count() / max($reservations->count(), 1) * 100
+            ];
+        });
+
+        // Équipements les plus utilisés
+        $equipementsPopulaires = Equipements::where('code_lab', $code_lab)
+            ->withCount(['reservations' => function($q) use ($dateDebut) {
+                $q->where('debut_reserv', '>=', $dateDebut);
+            }])
+            ->orderBy('reservations_count', 'desc')
+            ->get();
+
+        // Équipements sous-utilisés
+        $equipementsSousUtilises = Equipements::where('code_lab', $code_lab)
+            ->whereDoesntHave('reservations', function($q) use ($dateDebut) {
+                $q->where('debut_reserv', '>=', $dateDebut);
+            })
+            ->get();
+
+        // Statistiques par période (pour graphiques)
+        $statsParPeriode = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+            $q->where('code_lab', $code_lab);
+        })
+        ->where('debut_reserv', '>=', $dateDebut)
+        ->selectRaw('DATE(debut_reserv) as date, COUNT(*) as total_reservations')
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
+
+        return view('laboratoires.admin.equipements.stats', compact(
+            'laboratoire',
+            'statsUtilisation',
+            'equipementsPopulaires',
+            'equipementsSousUtilises',
+            'statsParPeriode',
+            'periode'
+        ));
+    }
+
+    /**
+     * Afficher la page de reporting
+     */
+    public function reporting($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
+        return view('laboratoires.admin.reporting', compact('laboratoire'));
+    }
+
+    /**
+     * Récupérer les données pour les rapports
+     */
+    private function getReportData($code_lab, $type)
+    {
+        switch ($type) {
+            case 'membres':
+                return [
+                    'membres' => LaboratoirePersLab::where('code_lab', $code_lab)
+                        ->with(['persLab', 'roleLabo'])
+                        ->get(),
+                    'roles' => \App\Models\laboratoires\RoleLabo::all(),
+                ];
+
+            case 'projets':
+                return [
+                    'projets' => ProjetLabo::where('code_lab', $code_lab)
+                        ->with(['participants', 'documents'])
+                        ->get(),
+                ];
+
+            case 'equipements':
+                return [
+                    'equipements' => Equipements::where('code_lab', $code_lab)
+                        ->with(['entretiens', 'reservations'])
+                        ->get(),
+                ];
+
+            case 'utilisations':
+                return [
+                    'reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+                        $q->where('code_lab', $code_lab);
+                    })->with(['equipement', 'personnel'])->get(),
+                ];
+
+            default: // general
+                return [
+                    'membres' => LaboratoirePersLab::where('code_lab', $code_lab)->count(),
+                    'projets' => ProjetLabo::where('code_lab', $code_lab)->count(),
+                    'equipements' => Equipements::where('code_lab', $code_lab)->count(),
+                    'publications' => Publication::where('code_lab', $code_lab)->count(),
+                    'externes' => UserExterne::where('code_lab', $code_lab)->count(),
+                                    'reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+                    $q->where('code_lab', $code_lab);
+                })->count(),
+                ];
         }
     }
 }

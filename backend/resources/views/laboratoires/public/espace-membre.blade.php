@@ -71,7 +71,7 @@
                                                 {{ ucfirst(str_replace('_', ' ', $projet->statut_projet)) }}
                                             </span>
                                             <small class="text-muted">
-                                                {{ $projet->date_debut_projet ? \Carbon\Carbon::parse($projet->date_debut_projet)->format('d/m/Y') : 'Non définie' }}
+                                                {{ $projet->debut_projet ? \Carbon\Carbon::parse($projet->debut_projet)->format('d/m/Y') : 'Non définie' }}
                                             </small>
                                         </div>
                                     </div>
@@ -99,13 +99,13 @@
                             <div class="col-md-6 mb-3">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title text-info">{{ $equipement->nom_equipement }}</h6>
+                                        <h6 class="card-title text-info">{{ $equipement->nom_equip }}</h6>
                                         <p class="card-text small text-muted">
-                                            {{ Str::limit($equipement->desc_equipement, 100) }}
+                                            {{ Str::limit($equipement->desc_equip, 100) }}
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="badge bg-{{ $equipement->statut_equipement === 'disponible' ? 'success' : 'danger' }}">
-                                                {{ ucfirst($equipement->statut_equipement) }}
+                                            <span class="badge bg-{{ $equipement->etat === 'disponible' ? 'success' : 'danger' }}">
+{{ ucfirst($equipement->etat) }}
                                             </span>
                                             <small class="text-muted">
                                                 {{ $equipement->marque_equipement }}
