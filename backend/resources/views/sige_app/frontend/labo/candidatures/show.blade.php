@@ -49,9 +49,22 @@
                                     <h5><i class='bx bx-message-square-detail'></i> Lettre de motivation</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="bg-light p-3 rounded">
-                                        {!! nl2br(e($candidature->motivation)) !!}
-                                    </div>
+                                    @if($candidature->motivation_path)
+                                        <a href="{{ asset('storage/' . $candidature->motivation_path) }}" target="_blank" class="btn btn-outline-primary">
+                                            <i class='bx bx-download'></i> Télécharger la lettre de motivation
+                                        </a>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class='bx bx-file'></i>
+                                                Fichier : {{ basename($candidature->motivation_path) }}
+                                            </small>
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning">
+                                            <i class='bx bx-exclamation-triangle'></i>
+                                            Aucune lettre de motivation fournie.
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 

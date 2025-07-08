@@ -7,19 +7,19 @@
         <div class="card-body">
             <h5 class="card-title">Identité</h5>
             <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><strong>ID Pers Lab :</strong> {{ $affectation->id_pers_lab }}</li>
-                <li class="list-group-item"><strong>Type :</strong> {{ $affectation->persLab->type_pers_lab ?? '-' }}</li>
+                <li class="list-group-item"><strong>ID :</strong> {{ $affectation->id_pers_lab ?? $affectation->id_user_externe }}</li>
+                <li class="list-group-item"><strong>Type :</strong> {{ $affectation->userExterne ? 'Externe' : ($affectation->persLab->type_pers_lab ?? '-') }}</li>
                 <li class="list-group-item"><strong>Nom :</strong>
-                    @if($affectation->persLab)
+                    @if($affectation->userExterne)
+                        {{ $affectation->userExterne->nom_user_ext }}
+                        {{ $affectation->userExterne->prenom_user_ext }}
+                    @elseif($affectation->persLab)
                         @if($affectation->persLab->type_pers_lab === 'personnel')
                             {{ optional(\App\Models\Personnel::find($affectation->id_pers_lab))->nom_pers }}
                             {{ optional(\App\Models\Personnel::find($affectation->id_pers_lab))->prenom_pers }}
                         @elseif($affectation->persLab->type_pers_lab === 'user')
                             {{ optional(\App\Models\Users::find($affectation->id_pers_lab))->nom_user }}
                             {{ optional(\App\Models\Users::find($affectation->id_pers_lab))->prenom_user }}
-                        @elseif($affectation->persLab->type_pers_lab === 'user_externe')
-                            {{ optional($affectation->userExterne)->nom_user_ext }}
-                            {{ optional($affectation->userExterne)->prenom_user_ext }}
                         @endif
                     @endif
                 </li>
@@ -45,8 +45,8 @@
                 </li>
             </ul>
             <div class="d-flex gap-2">
-                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $affectation->id_pers_lab]) }}" class="btn btn-primary"><i class="bx bx-edit"></i> Modifier</a>
-                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $affectation->id_pers_lab]) }}" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
+                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" class="btn btn-primary"><i class="bx bx-edit"></i> Modifier</a>
+                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
                     @csrf
                     <button type="submit" class="btn btn-danger"><i class="bx bx-trash"></i> Supprimer</button>
                 </form>

@@ -74,12 +74,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="motivation" class="form-label">Lettre de motivation *</label>
-                            <textarea class="form-control @error('motivation') is-invalid @enderror"
-                                      id="motivation" name="motivation" rows="6"
-                                      placeholder="Expliquez votre motivation pour rejoindre ce laboratoire, vos compétences, vos objectifs..." required>{{ old('motivation') }}</textarea>
-                            <div class="form-text">Minimum 100 caractères</div>
-                            @error('motivation')
+                            <label for="motivation_path" class="form-label">Lettre de motivation *</label>
+                            <input type="file" class="form-control @error('motivation_path') is-invalid @enderror"
+                                   id="motivation_path" name="motivation_path" accept=".pdf,.doc,.docx" required>
+                            <div class="form-text">Formats acceptés : PDF, DOC, DOCX (max 2MB)</div>
+                            @error('motivation_path')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

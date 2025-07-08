@@ -33,13 +33,16 @@ class CandidatureController extends Controller
             'prenom_user_ext' => 'required|string|max:255',
             'email_user_ext' => 'required|email|unique:user_externe,email_user_ext',
             'tel_user_ext' => 'required|string|max:20',
-            'motivation' => 'required|string|min:100',
+            'motivation_path' => 'required|file|mimes:pdf,doc,docx|max:2048',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
         ]);
 
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
         try {
+            // Gérer le fichier de lettre de motivation
+            $motivationPath = $request->file('motivation_path')->store('motivations', 'public');
+
             // Créer l'utilisateur externe
             $userExterne = UserExterne::create([
                 'code_lab' => $code_lab,
@@ -50,7 +53,7 @@ class CandidatureController extends Controller
                 'statut' => 'en_attente', // En attente de validation par l'admin
                 'pwd' => Hash::make(Str::random(12)), // Mot de passe temporaire
                 'date_debut' => now(),
-                'motivation' => $request->motivation
+                'motivation_path' => $motivationPath
             ]);
 
             // Gérer le CV si fourni
@@ -59,18 +62,9 @@ class CandidatureController extends Controller
                 $userExterne->update(['cv_path' => $cvPath]);
             }
 
-            // Créer l'entrée dans pers_lab
-            $persLab = PersLab::create([
-                'id_pers_lab' => $userExterne->id_user_ext,
-                'type_pers_lab' => 'user_externe',
-                'date_entree' => now(),
-                'statut' => 'en_attente'
-            ]);
-
-            // Créer l'affectation en attente
+            // Créer l'affectation en attente (sans pers_lab pour les externes)
             LaboratoirePersLab::create([
                 'code_lab' => $code_lab,
-                'id_pers_lab' => $persLab->id_pers_lab,
                 'id_user_externe' => $userExterne->id_user_ext,
                 'date_affectation' => now(),
                 'statut' => 'en_attente'
@@ -130,10 +124,6 @@ class CandidatureController extends Controller
             LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
                 ->update(['statut' => 'actif']);
 
-            // Mettre à jour pers_lab
-            PersLab::where('id_pers_lab', $candidature->id_user_ext)
-                ->update(['statut' => 'actif']);
-
             // TODO: Envoyer un email avec les identifiants
             // Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
 
@@ -158,10 +148,6 @@ class CandidatureController extends Controller
 
             // Mettre à jour l'affectation
             LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
-                ->update(['statut' => 'rejeté']);
-
-            // Mettre à jour pers_lab
-            PersLab::where('id_pers_lab', $candidature->id_user_ext)
                 ->update(['statut' => 'rejeté']);
 
             // TODO: Envoyer un email de rejet
