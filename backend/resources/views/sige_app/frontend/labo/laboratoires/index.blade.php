@@ -1,29 +1,22 @@
 @extends('sige_app.backend.template.backend')
 
 @section('js')
-    <script>
-        function confirmDelete(form) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce laboratoire ?')) {
-                form.submit();
-            }
-        }
-    </script>
 @endsection
 
 @section('content')
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="card mx-auto" style="max-width: 1000px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">Gestion des Laboratoires</h4>
                         <a href="{{ route('labo.laboratoires.create') }}" class="btn btn-primary">
                             <i class="bx bx-plus"></i> Nouveau Laboratoire
-                            </a>
+                        </a>
                     </div>
 
                     <div class="card-body">
-                        @if (session('success'))
+                        {{-- @if (session('success'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 {{ session('success') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -35,7 +28,7 @@
                                 {{ session('error') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        @endif
+                        @endif --}}
 
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
@@ -96,11 +89,13 @@
                                                     </a>
                                                     <form
                                                         action="{{ route('labo.laboratoires.destroy', $laboratoire->code_lab) }}"
-                                                        method="POST" style="display: inline;">
+                                                        method="POST" class="d-inline" id="delete-form-{{ $laboratoire->code_lab }}">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="button" class="btn btn-sm btn-danger"
-                                                            onclick="confirmDelete(this.form)" title="Supprimer">
+                                                        <button type="button" class="btn btn-sm btn-danger btn-delete-laboratoire"
+                                                            title="Supprimer"
+                                                            data-code="{{ $laboratoire->code_lab }}"
+                                                            data-name="{{ $laboratoire->label_labo }}">
                                                             <i class="bx bx-trash"></i>
                                                         </button>
                                                     </form>
@@ -124,7 +119,7 @@
 
                         @if($laboratoires->hasPages())
                             <div class="d-flex justify-content-center mt-3">
-                        {{ $laboratoires->links() }}
+                        {{ $laboratoires->links('pagination::bootstrap-5') }}
                             </div>
                         @endif
                     </div>
@@ -132,4 +127,74 @@
             </div>
         </div>
     </div>
-@endsection
+
+    <!-- Modal de confirmation de suppression de laboratoire -->
+    <div class="modal fade" id="confirmDeleteLaboratoireModal" tabindex="-1" aria-labelledby="confirmDeleteLaboratoireModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteLaboratoireModalLabel">
+                        <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h6 class="mb-3">Êtes-vous sûr de vouloir supprimer ce laboratoire ?</h6>
+                    <div class="alert alert-light border">
+                        <div class="mb-2">
+                            <strong>Code laboratoire:</strong> <span id="laboratoireCodeToDelete"></span>
+                        </div>
+                        <div>
+                            <strong>Nom laboratoire:</strong> <span id="laboratoireNameToDelete"></span>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        Cette action est irréversible. Toutes les données associées à ce laboratoire seront définitivement supprimées.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteLaboratoireBtn">
+                        <i class="fas fa-trash me-1"></i>Supprimer le laboratoire
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var confirmDeleteLaboratoireModal = document.getElementById('confirmDeleteLaboratoireModal');
+    var laboratoireCodeSpan = document.getElementById('laboratoireCodeToDelete');
+    var laboratoireNameSpan = document.getElementById('laboratoireNameToDelete');
+    var confirmDeleteLaboratoireBtn = document.getElementById('confirmDeleteLaboratoireBtn');
+    var formToSubmit = null;
+
+    // Attach click event to all delete buttons
+    document.querySelectorAll('.btn-delete-laboratoire').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var code = this.getAttribute('data-code');
+            var name = this.getAttribute('data-name');
+            laboratoireCodeSpan.textContent = code;
+            laboratoireNameSpan.textContent = name;
+            formToSubmit = document.getElementById('delete-form-' + code);
+            var modal = new bootstrap.Modal(confirmDeleteLaboratoireModal);
+            modal.show();
+        });
+    });
+
+    // Confirm delete button submits the form
+    confirmDeleteLaboratoireBtn.addEventListener('click', function() {
+        if (formToSubmit) {
+            formToSubmit.submit();
+        }
+    });
+});
+</script>

@@ -144,21 +144,20 @@
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a href="{{ route('laboratoires.admin.rapports.show', [$laboratoire->code_lab, $rapport->code_rl]) }}"
                                            class="btn btn-outline-secondary" title="Voir">
-                                            <i class="bi bi-eye"></i>
+                                            <i class="bi bi-eye fs-5"></i>
                                         </a>
                                         @if(file_exists(storage_path('app/' . $rapport->path_rl)))
                                             <a href="{{ route('laboratoires.admin.rapports.download', [$laboratoire->code_lab, $rapport->code_rl]) }}"
                                                class="btn btn-outline-primary" title="Télécharger">
-                                                <i class="bi bi-download"></i>
+                                                <i class="bi bi-download fs-5"></i>
                                             </a>
                                         @endif
-                                        <form action="{{ route('laboratoires.admin.rapports.destroy', [$laboratoire->code_lab, $rapport->code_rl]) }}"
-                                              method="POST" class="d-inline"
-                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce rapport ?')">
+                                    <form action="{{ route('laboratoires.admin.rapports.destroy', [$laboratoire->code_lab, $rapport->code_rl]) }}"
+                                              method="POST" class="d-inline" id="delete-form-{{ $rapport->code_rl }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger" title="Supprimer">
-                                                <i class="bi bi-trash"></i>
+                                            <button type="button" class="btn btn-outline-danger btn-delete-rapport" title="Supprimer" data-code="{{ $rapport->code_rl }}">
+                                                <i class="bi bi-trash fs-5"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -185,6 +184,43 @@
                     </a>
                 </div>
             @endif
+</div>
+</div>
+</div>
+
+<!-- Modal de confirmation de suppression de rapport -->
+<div class="modal fade" id="confirmDeleteRapportModal" tabindex="-1" aria-labelledby="confirmDeleteRapportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteRapportModalLabel">
+                    <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Êtes-vous sûr de vouloir supprimer ce rapport ?</h6>
+                <div class="alert alert-light border">
+                    <div class="mb-2">
+                        <strong>Code rapport:</strong> <span id="rapportCodeToDelete"></span>
+                    </div>
+                </div>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    Cette action est irréversible. Toutes les données associées à ce rapport seront définitivement supprimées.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteRapportBtn">
+                    <i class="fas fa-trash me-1"></i>Supprimer le rapport
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -226,4 +262,31 @@
     color: #6c757d !important;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var confirmDeleteRapportModal = document.getElementById('confirmDeleteRapportModal');
+    var rapportCodeSpan = document.getElementById('rapportCodeToDelete');
+    var confirmDeleteRapportBtn = document.getElementById('confirmDeleteRapportBtn');
+    var formToSubmit = null;
+
+    // Attach click event to all delete buttons
+    document.querySelectorAll('.btn-delete-rapport').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var code = this.getAttribute('data-code');
+            rapportCodeSpan.textContent = code;
+            formToSubmit = document.getElementById('delete-form-' + code);
+            var modal = new bootstrap.Modal(confirmDeleteRapportModal);
+            modal.show();
+        });
+    });
+
+    // Confirm delete button submits the form
+    confirmDeleteRapportBtn.addEventListener('click', function() {
+        if (formToSubmit) {
+            formToSubmit.submit();
+        }
+    });
+});
+</script>
 @endsection

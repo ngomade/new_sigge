@@ -1604,8 +1604,9 @@ class AdminLaboratoireController extends Controller
         $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
 
         // Supprimer le fichier physique
-        if (file_exists(storage_path('app/' . $rapport->path_rl))) {
-            unlink(storage_path('app/' . $rapport->path_rl));
+        $filePath = storage_path('app/' . $rapport->path_rl);
+        if (file_exists($filePath) && is_file($filePath)) {
+            unlink($filePath);
         }
 
         $rapport->delete();
@@ -1659,7 +1660,10 @@ class AdminLaboratoireController extends Controller
         $path = "rapports/{$laboratoire->code_lab}/" . $filename;
 
         // Créer le dossier s'il n'existe pas
-        \Storage::makeDirectory("rapports/{$laboratoire->code_lab}");
+        $dirPath = storage_path("app/rapports/{$laboratoire->code_lab}");
+        if (!file_exists($dirPath)) {
+            mkdir($dirPath, 0755, true);
+        }
 
         // Utiliser PhpWord pour générer le document Word
         $phpWord = new \PhpOffice\PhpWord\PhpWord();

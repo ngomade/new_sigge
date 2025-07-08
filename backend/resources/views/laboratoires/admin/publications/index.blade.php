@@ -1,5 +1,7 @@
 @extends('laboratoires.public.layout')
 
+
+
 @section('title', 'Liste des publications')
 
 @section('content')
@@ -178,22 +180,27 @@
                                         <a href="{{ route('labo.publications.show', $publication->code_publi) }}" class="btn btn-sm btn-info" title="Voir">
                                             <i class='bx bx-show'></i>
                                         </a>
-                                        @if($publication->rapport_path)
-                                            <a href="{{ Storage::url($publication->rapport_path) }}"
-                                               target="_blank"
-                                               class="btn btn-sm btn-primary"
-                                               title="Consulter le rapport">
-                                                <i class='bx bx-file-pdf'></i>
-                                            </a>
-                                        @endif
+@if($publication->rapport_path)
+    <a href="{{ Storage::url($publication->rapport_path) }}"
+       target="_blank"
+       class="btn btn-sm btn-primary"
+       title="Consulter le rapport"
+       style="font-size: 1.2rem; color: #004085;">
+        <i class='bx bx-file-pdf'></i>
+    </a>
+@endif
                                         <a href="{{ route('labo.publications.edit', $publication->code_publi) }}" class="btn btn-sm btn-warning" title="Modifier">
                                             <i class='bx bx-edit'></i>
                                         </a>
-                                        <form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Confirmer la suppression ?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer"><i class='bx bx-trash'></i></button>
-                                        </form>
+<form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" class="d-inline delete-requete-form" id="delete-form-{{ $publication->code_publi }}">
+    @csrf
+    @method('DELETE')
+    <button type="button" class="btn btn-sm btn-danger btn-delete-publication" title="Supprimer"
+        data-code="{{ $publication->code_publi }}"
+        data-title="{{ $publication->titre_publi }}">
+        <i class='bx bx-trash'></i>
+    </button>
+</form>
                                     </div>
                                 </td>
                             </tr>
@@ -224,4 +231,77 @@
         </div>
     </div>
 </div>
+<!-- Modal de confirmation de suppression de publication -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">
+                    <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Êtes-vous sûr de vouloir supprimer cette publication ?</h6>
+                <div class="alert alert-light border">
+                    <div class="mb-2">
+                        <strong>Code_publication:</strong> <span id="publicationCodeToDelete"></span>
+                    </div>
+                    <div>
+                        <strong>Titre_publication:</strong> <span id="publicationTitleToDelete"></span>
+                    </div>
+                </div>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    Cette action est irréversible. Toutes les données associées à cette publication seront définitivement supprimées.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash me-1"></i>Supprimer la publication
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    var publicationCodeSpan = document.getElementById('publicationCodeToDelete');
+    var publicationTitleSpan = document.getElementById('publicationTitleToDelete');
+    var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    var formToSubmit = null;
+
+    // Attach click event to all delete buttons
+    document.querySelectorAll('.btn-delete-publication').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var code = this.getAttribute('data-code');
+            var title = this.getAttribute('data-title');
+            publicationCodeSpan.textContent = code;
+            publicationTitleSpan.textContent = title;
+            formToSubmit = document.getElementById('delete-form-' + code);
+            var modal = new bootstrap.Modal(confirmDeleteModal);
+            modal.show();
+        });
+    });
+
+    // Confirm delete button submits the form
+    confirmDeleteBtn.addEventListener('click', function() {
+        if (formToSubmit) {
+            formToSubmit.submit();
+        }
+    });
+});
+</script>
 @endsection

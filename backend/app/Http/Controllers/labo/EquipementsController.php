@@ -38,7 +38,7 @@ class EquipementsController extends Controller
     public function create()
     {
         $laboratoires = Laboratoire::all();
-        return view('sige_app.frontend.labo.equipements.create', compact('laboratoires'));
+        return view('sige_app.frontend.admin.equipements.create', compact('laboratoires'));
     }
 
     /**
@@ -94,7 +94,7 @@ class EquipementsController extends Controller
         $equipement = Equipements::findOrFail($id);
         $laboratoires = Laboratoire::all();
 
-        return view('sige_app.frontend.labo.equipements.edit', compact('equipement', 'laboratoires'));
+        return view('sige_app.frontend.admin.equipements.edit', compact('equipement', 'laboratoires'));
     }
 
     /**

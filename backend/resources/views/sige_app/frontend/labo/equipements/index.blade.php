@@ -2,11 +2,30 @@
 
 @section('js')
     <script>
-        function confirmDelete(form) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?')) {
-                form.submit();
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var confirmDeleteEquipementModal = document.getElementById('confirmDeleteEquipementModal');
+            var equipementCodeSpan = document.getElementById('equipementCodeToDelete');
+            var confirmDeleteEquipementBtn = document.getElementById('confirmDeleteEquipementBtn');
+            var formToSubmit = null;
+
+            // Attach click event to all delete buttons
+            document.querySelectorAll('.btn-delete-equipement').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var code = this.getAttribute('data-code');
+                    equipementCodeSpan.textContent = code;
+                    formToSubmit = document.getElementById('delete-form-' + code);
+                    var modal = new bootstrap.Modal(confirmDeleteEquipementModal);
+                    modal.show();
+                });
+            });
+
+            // Confirm delete button submits the form
+            confirmDeleteEquipementBtn.addEventListener('click', function() {
+                if (formToSubmit) {
+                    formToSubmit.submit();
+                }
+            });
+        });
     </script>
 @endsection
 
@@ -25,20 +44,6 @@
                     </div>
 
                     <div class="card-body">
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        @endif
-
                         <!-- Filtres -->
                         <form method="GET" action="{{ route('labo.equipements.index') }}" class="mb-3">
                             <div class="row">
@@ -84,7 +89,7 @@
                                         <th>État</th>
                                         <th>Localisation</th>
                                         <th>Valeur</th>
-                                        <th>Actions</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,32 +111,33 @@
                                             </td>
                                             <td>{{ $equipement->localisation }}</td>
                                             <td>{{ number_format($equipement->valeur, 0, ',', ' ') }} FCFA</td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('labo.equipements.show', $equipement->code_equip) }}"
-                                                        class="btn btn-sm btn-info" title="Voir">
-                                                        <i class="fas fa-eye"></i>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ route('labo.equipements.show', $equipement->code_equip) }}"
+                                                    class="btn btn-outline-info" title="Voir">
+                                                    <i class="fas fa-eye fs-5"></i>
+                                                </a>
+                                                <a href="{{ route('labo.equipements.edit', $equipement->code_equip) }}"
+                                                    class="btn btn-outline-warning" title="Modifier">
+                                                    <i class="fas fa-edit fs-5"></i>
+                                                </a>
+                                                @if ($equipement->etat == 'disponible')
+                                                    <a href="{{ route('labo.equipements.reserver', $equipement->code_equip) }}"
+                                                        class="btn btn-outline-primary" title="Réserver">
+                                                        <i class="fas fa-calendar-plus fs-5"></i>
                                                     </a>
-                                                    <a href="{{ route('labo.equipements.edit', $equipement->code_equip) }}"
-                                                        class="btn btn-sm btn-warning" title="Modifier">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    @if ($equipement->etat == 'disponible')
-                                                        <a href="{{ route('labo.equipements.reserver', $equipement->code_equip) }}"
-                                                            class="btn btn-sm btn-primary" title="Réserver">
-                                                            <i class="fas fa-calendar-plus"></i>
-                                                        </a>
-                                                    @endif
-                                                    <form
-                                                        action="{{ route('labo.equipements.destroy', $equipement->code_equip) }}"
-                                                        method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-sm btn-danger"
-                                                            onclick="confirmDelete(this.form)" title="Supprimer">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                @endif
+                                                <form
+                                                    id="delete-form-{{ $equipement->code_equip }}"
+                                                    action="{{ route('labo.equipements.destroy', $equipement->code_equip) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" class="btn btn-outline-danger btn-delete-equipement"
+                                                        data-code="{{ $equipement->code_equip }}" title="Supprimer">
+                                                        <i class="fas fa-trash fs-5"></i>
+                                                    </button>
+                                                </form>
                                                 </div>
                                             </td>
                                         </tr>
@@ -146,6 +152,43 @@
 
                         {{ $equipements->links() }}
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation de suppression d'équipement -->
+    <div class="modal fade" id="confirmDeleteEquipementModal" tabindex="-1" aria-labelledby="confirmDeleteEquipementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteEquipementModalLabel">
+                        <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h6 class="mb-3">Êtes-vous sûr de vouloir supprimer cet équipement ?</h6>
+                    <div class="alert alert-light border">
+                        <div class="mb-2">
+                            <strong>Code équipement:</strong> <span id="equipementCodeToDelete"></span>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        Cette action est irréversible. Toutes les données associées à cet équipement seront définitivement supprimées.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteEquipementBtn">
+                        <i class="fas fa-trash me-1"></i>Supprimer l'équipement
+                    </button>
                 </div>
             </div>
         </div>

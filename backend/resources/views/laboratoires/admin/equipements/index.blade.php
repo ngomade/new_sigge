@@ -14,12 +14,12 @@
         </div>
     </div>
 
-    @if(session('success'))
+    {{-- @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    @endif --}}
 
     <!-- Statistiques -->
     <div class="row mb-4">
@@ -159,10 +159,10 @@
                                             <i class="uil uil-calendar-alt me-2"></i>Réservations
                                         </a>
                                         <div class="dropdown-divider"></div>
-                                        <form action="{{ route('laboratoires.admin.equipements.destroy', [$laboratoire->code_lab, $equipement->code_equip]) }}" method="POST" class="d-inline">
+                                        <form id="delete-form-{{ $equipement->code_equip }}" action="{{ route('laboratoires.admin.equipements.destroy', [$laboratoire->code_lab, $equipement->code_equip]) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?')">
+                                            <button type="button" class="dropdown-item text-danger btn-delete-equipement" data-code="{{ $equipement->code_equip }}">
                                                 <i class="uil uil-trash-alt me-2"></i>Supprimer
                                             </button>
                                         </form>
@@ -180,7 +180,7 @@
                             </td>
                         </tr>
                         @endforelse
-                    </tbody>
+</tbody>
                 </table>
             </div>
 
@@ -190,5 +190,71 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal de confirmation de suppression d'équipement -->
+<div class="modal fade" id="confirmDeleteEquipementModal" tabindex="-1" aria-labelledby="confirmDeleteEquipementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteEquipementModalLabel">
+                    <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Êtes-vous sûr de vouloir supprimer cet équipement ?</h6>
+                <div class="alert alert-light border">
+                    <div class="mb-2">
+                        <strong>Code équipement:</strong> <span id="equipementCodeToDelete"></span>
+                    </div>
+                </div>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    Cette action est irréversible. Toutes les données associées à cet équipement seront définitivement supprimées.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteEquipementBtn">
+                    <i class="fas fa-trash me-1"></i>Supprimer l'équipement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var confirmDeleteEquipementModal = document.getElementById('confirmDeleteEquipementModal');
+    var equipementCodeSpan = document.getElementById('equipementCodeToDelete');
+    var confirmDeleteEquipementBtn = document.getElementById('confirmDeleteEquipementBtn');
+    var formToSubmit = null;
+
+    // Attach click event to all delete buttons
+    document.querySelectorAll('.btn-delete-equipement').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var code = this.getAttribute('data-code');
+            equipementCodeSpan.textContent = code;
+            formToSubmit = document.getElementById('delete-form-' + code);
+            var modal = new bootstrap.Modal(confirmDeleteEquipementModal);
+            modal.show();
+        });
+    });
+
+    // Confirm delete button submits the form
+    confirmDeleteEquipementBtn.addEventListener('click', function() {
+        if (formToSubmit) {
+            formToSubmit.submit();
+        }
+    });
+});
+</script>
 </div>
 @endsection

@@ -54,7 +54,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('label_labo') is-invalid @enderror"
                                     id="label_labo" name="label_labo"
-                                    value="{{ old('label_labo', $laboratoire->label_labo) }}" required>
+                                    value="{{ old('label_labo', $laboratoire->label_labo) }}" >
                                 @error('label_labo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -64,7 +64,7 @@
                                 <label for="desc_labo" class="form-label">Description <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control @error('desc_labo') is-invalid @enderror" id="desc_labo" name="desc_labo" rows="5"
-                                    required>{{ old('desc_labo', $laboratoire->desc_labo) }}</textarea>
+                                    >{{ old('desc_labo', $laboratoire->desc_labo) }}</textarea>
                                 @error('desc_labo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -85,7 +85,7 @@
                                             class="text-danger">*</span></label>
                                     <input type="email" class="form-control @error('email_labo') is-invalid @enderror"
                                         id="email_labo" name="email_labo"
-                                        value="{{ old('email_labo', $laboratoire->email_labo) }}" required>
+                                        value="{{ old('email_labo', $laboratoire->email_labo) }}" >
                                     @error('email_labo')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -96,7 +96,7 @@
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('tel_labo') is-invalid @enderror"
                                         id="tel_labo" name="tel_labo"
-                                        value="{{ old('tel_labo', $laboratoire->tel_labo) }}" required>
+                                        value="{{ old('tel_labo', $laboratoire->tel_labo) }}" >
                                     @error('tel_labo')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -107,7 +107,7 @@
                                 <label for="adresse_labo" class="form-label">Adresse <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control @error('adresse_labo') is-invalid @enderror" id="adresse_labo" name="adresse_labo"
-                                    rows="2" required>{{ old('adresse_labo', $laboratoire->adresse_labo) }}</textarea>
+                                    rows="2" >{{ old('adresse_labo', $laboratoire->adresse_labo) }}</textarea>
                                 @error('adresse_labo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

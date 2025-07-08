@@ -190,9 +190,10 @@ Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations
 
 // Routes pour le reporting et les statistiques
 Route::get('/laboratoires/{code_lab}/admin/reporting', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'reporting'])->name('laboratoires.admin.reporting');
+Route::get('/laboratoires/{code_lab}/admin/equipements/stats', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementsStats'])->name('laboratoires.admin.equipements.stats');
 Route::get('/laboratoires/{code_lab}/admin/reports/pdf', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'generateReportPDF'])->name('laboratoires.admin.reports.pdf');
 Route::get('/laboratoires/{code_lab}/admin/reports/excel', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'generateReportExcel'])->name('laboratoires.admin.reports.excel');
-Route::get('/laboratoires/{code_lab}/admin/equipements/stats', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementsStats'])->name('laboratoires.admin.equipements.stats');
+// Route::get('/laboratoires/{code_lab}/admin/equipements/stat', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementsStats'])->name('laboratoires.admin.equipements.stats');
 
 // Routes pour les rapports personnalisés
 Route::get('/laboratoires/{code_lab}/admin/rapports', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapports'])->name('laboratoires.admin.rapports');
