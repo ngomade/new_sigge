@@ -13,7 +13,10 @@ use App\Models\laboratoires\UserExterne;
 use App\Models\laboratoires\RapportLabo;
 use App\Models\laboratoires\LabNotif;
 use App\Services\LaboratoireAlertService;
+use App\Mail\ExterneConfirmationMail;
+use App\Mail\ExternePasswordResetMail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class AdminLaboratoireController extends Controller
@@ -174,16 +177,29 @@ class AdminLaboratoireController extends Controller
             $query->where('statut', $statut);
         }
         if ($type) {
-            $query->whereHas('persLab', function($q) use ($type) {
-                $q->where('type_pers_lab', $type);
-            });
+            if ($type === 'user_externe') {
+                // Pour les externes : vérifier qu'ils ont un id_user_externe
+                $query->whereNotNull('id_user_externe');
+            } else {
+                // Pour personnel et users : vérifier dans persLab
+                $query->whereHas('persLab', function($q) use ($type) {
+                    $q->where('type_pers_lab', $type);
+                });
+            }
         }
         if ($search) {
-            $query->whereHas('persLab', function($q) use ($search) {
-                $q->where('id_pers_lab', 'like', "%$search%")
-                  ->orWhere('type_pers_lab', 'like', "%$search%")
-                  ->orWhere('id_pers_lab', 'like', "%$search%")
-                  ;
+            $query->where(function($q) use ($search) {
+                // Recherche dans persLab (personnel et users)
+                $q->whereHas('persLab', function($subQ) use ($search) {
+                    $subQ->where('id_pers_lab', 'like', "%$search%")
+                         ->orWhere('type_pers_lab', 'like', "%$search%");
+                })
+                // Ou recherche dans userExterne
+                ->orWhereHas('userExterne', function($subQ) use ($search) {
+                    $subQ->where('nom_user_ext', 'like', "%$search%")
+                         ->orWhere('prenom_user_ext', 'like', "%$search%")
+                         ->orWhere('email_user_ext', 'like', "%$search%");
+                });
             });
         }
 
@@ -214,30 +230,40 @@ class AdminLaboratoireController extends Controller
             'statut' => 'required|in:actif,inactif'
         ]);
 
-        // Créer ou récupérer dans pers_lab
-        $persLab = \App\Models\laboratoires\PersLab::firstOrCreate(
-            [
-                'id_pers_lab' => $request->id_pers_lab,
-                'type_pers_lab' => $request->type_pers_lab
-            ],
-            [
-                'date_entree' => now(),
-                'statut' => 'actif'
-            ]
-        );
-
-        // Créer l'affectation
-        $affectationData = [
-            'code_lab' => $code_lab,
-            'id_pers_lab' => $persLab->id_pers_lab,
-            'id_rl' => $request->id_rl,
-            'date_affectation' => $request->date_affectation,
-            'date_fin_affectation' => $request->date_fin_affectation,
-            'statut' => $request->statut
-        ];
+        // Créer l'affectation selon le type
         if ($request->type_pers_lab === 'user_externe') {
-            $affectationData['id_user_externe'] = $request->id_pers_lab;
+            // Pour les externes : pas de pers_lab, utiliser uniquement id_user_externe
+            $affectationData = [
+                'code_lab' => $code_lab,
+                'id_user_externe' => $request->id_pers_lab,
+                'id_rl' => $request->id_rl,
+                'date_affectation' => $request->date_affectation,
+                'date_fin_affectation' => $request->date_fin_affectation,
+                'statut' => $request->statut
+            ];
+        } else {
+            // Pour personnel et users : créer dans pers_lab puis affecter
+            $persLab = \App\Models\laboratoires\PersLab::firstOrCreate(
+                [
+                    'id_pers_lab' => $request->id_pers_lab,
+                    'type_pers_lab' => $request->type_pers_lab
+                ],
+                [
+                    'date_entree' => now(),
+                    'statut' => 'actif'
+                ]
+            );
+
+            $affectationData = [
+                'code_lab' => $code_lab,
+                'id_pers_lab' => $persLab->id_pers_lab,
+                'id_rl' => $request->id_rl,
+                'date_affectation' => $request->date_affectation,
+                'date_fin_affectation' => $request->date_fin_affectation,
+                'statut' => $request->statut
+            ];
         }
+
         \App\Models\laboratoires\LaboratoirePersLab::create($affectationData);
 
         return redirect()->route('laboratoires.admin.membres', $code_lab)
@@ -247,22 +273,30 @@ class AdminLaboratoireController extends Controller
     public function ficheMembre($code_lab, $membre)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
         $affectation = \App\Models\laboratoires\LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
             ->where('code_lab', $code_lab)
-            ->where('id_pers_lab', $membre)
+            ->where(function($q) use ($membre) {
+                $q->where('id_pers_lab', $membre)
+                  ->orWhere('id_user_externe', $membre);
+            })
             ->firstOrFail();
-        return view('laboratoires.admin.membres.show', compact('laboratoire', 'affectation'));
+        return view('laboratoires.admin.membres.show', compact('laboratoire', 'affectation', 'layout'));
     }
 
     public function modifierMembreForm($code_lab, $membre)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
         $affectation = \App\Models\laboratoires\LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
             ->where('code_lab', $code_lab)
-            ->where('id_pers_lab', $membre)
+            ->where(function($q) use ($membre) {
+                $q->where('id_pers_lab', $membre)
+                  ->orWhere('id_user_externe', $membre);
+            })
             ->firstOrFail();
         $roles = \App\Models\laboratoires\RoleLabo::all();
-        return view('laboratoires.admin.membres.edit', compact('laboratoire', 'affectation', 'roles'));
+        return view('laboratoires.admin.membres.edit', compact('laboratoire', 'affectation', 'roles', 'layout'));
     }
 
     public function modifierMembre(Request $request, $code_lab, $membre)
@@ -274,7 +308,10 @@ class AdminLaboratoireController extends Controller
             'statut' => 'required|in:actif,inactif'
         ]);
         $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-            ->where('id_pers_lab', $membre)
+            ->where(function($q) use ($membre) {
+                $q->where('id_pers_lab', $membre)
+                  ->orWhere('id_user_externe', $membre);
+            })
             ->firstOrFail();
         $affectation->update([
             'id_rl' => $request->id_rl,
@@ -289,7 +326,10 @@ class AdminLaboratoireController extends Controller
     public function supprimerMembre(Request $request, $code_lab, $membre)
     {
         $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-            ->where('id_pers_lab', $membre)
+            ->where(function($q) use ($membre) {
+                $q->where('id_pers_lab', $membre)
+                  ->orWhere('id_user_externe', $membre);
+            })
             ->firstOrFail();
         $affectation->delete();
         return redirect()->route('laboratoires.admin.membres', $code_lab)
@@ -306,7 +346,10 @@ class AdminLaboratoireController extends Controller
         $affected = 0;
         if ($action === 'delete') {
             $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-                ->whereIn('id_pers_lab', $ids)
+                ->where(function($q) use ($ids) {
+                    $q->whereIn('id_pers_lab', $ids)
+                      ->orWhereIn('id_user_externe', $ids);
+                })
                 ->delete();
             return back()->with('success', "$affected membre(s) supprimé(s) avec succès.");
         } elseif ($action === 'role') {
@@ -315,7 +358,10 @@ class AdminLaboratoireController extends Controller
                 return back()->with('error', 'Veuillez sélectionner un rôle.');
             }
             $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-                ->whereIn('id_pers_lab', $ids)
+                ->where(function($q) use ($ids) {
+                    $q->whereIn('id_pers_lab', $ids)
+                      ->orWhereIn('id_user_externe', $ids);
+                })
                 ->update(['id_rl' => $role]);
             return back()->with('success', "$affected membre(s) mis à jour (rôle).");
         } elseif ($action === 'statut') {
@@ -324,7 +370,10 @@ class AdminLaboratoireController extends Controller
                 return back()->with('error', 'Veuillez sélectionner un statut.');
             }
             $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-                ->whereIn('id_pers_lab', $ids)
+                ->where(function($q) use ($ids) {
+                    $q->whereIn('id_pers_lab', $ids)
+                      ->orWhereIn('id_user_externe', $ids);
+                })
                 ->update(['statut' => $statut]);
             return back()->with('success', "$affected membre(s) mis à jour (statut).");
         }
@@ -1247,18 +1296,10 @@ class AdminLaboratoireController extends Controller
                 $userExterne->update(['motivation_path' => $motivationPath]);
             }
 
-            // Créer l'entrée dans pers_lab
-            $persLab = \App\Models\laboratoires\PersLab::create([
-                'id_pers_lab' => $userExterne->id_user_ext,
-                'type_pers_lab' => 'user_externe',
-                'date_entree' => now(),
-                'statut' => $request->statut
-            ]);
-
-            // Créer l'affectation
+            // Créer l'affectation (pas d'entrée dans pers_lab pour les externes)
             \App\Models\laboratoires\LaboratoirePersLab::create([
                 'code_lab' => $code_lab,
-                'id_pers_lab' => $persLab->id_pers_lab,
+                'id_pers_lab' => null, // Les externes n'ont pas d'entrée dans pers_lab
                 'id_user_externe' => $userExterne->id_user_ext,
                 'id_rl' => $request->id_rl,
                 'date_affectation' => $request->date_debut,
@@ -1266,8 +1307,17 @@ class AdminLaboratoireController extends Controller
                 'statut' => $request->statut
             ]);
 
+            // Envoyer l'email de confirmation
+            try {
+                \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
+                    ->send(new ExterneConfirmationMail($userExterne, $laboratoire, $tempPassword));
+            } catch (\Exception $e) {
+                // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
+                \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: ' . $e->getMessage());
+            }
+
             return redirect()->route('laboratoires.admin.externes', $code_lab)
-                ->with('success', 'Utilisateur externe créé avec succès. Mot de passe temporaire : ' . $tempPassword);
+                ->with('success', 'Utilisateur externe créé avec succès. Un email de confirmation avec le mot de passe a été envoyé à ' . $userExterne->email_user_ext);
 
         } catch (\Exception $e) {
             return back()->withInput()
@@ -1346,13 +1396,9 @@ class AdminLaboratoireController extends Controller
                 $externe->update(['cv_path' => $cvPath]);
             }
 
-            // Mettre à jour pers_lab
-            \App\Models\laboratoires\PersLab::where('id_pers_lab', $externe->id_user_ext)
-                ->update(['statut' => $request->statut]);
-
-            // Mettre à jour l'affectation
+            // Mettre à jour l'affectation (pas de pers_lab pour les externes)
             \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-                ->where('id_user_ext', $externe->id_user_ext)
+                ->where('id_user_externe', $externe->id_user_ext)
                 ->update([
                     'id_rl' => $request->id_rl,
                     'date_affectation' => $request->date_debut,
@@ -1379,7 +1425,7 @@ class AdminLaboratoireController extends Controller
         try {
             // Supprimer l'affectation
             \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
-                ->where('id_user_ext', $externe->id_user_ext)
+                ->where('id_user_externe', $externe->id_user_ext)
                 ->delete();
 
             // Supprimer de pers_lab
@@ -1395,6 +1441,42 @@ class AdminLaboratoireController extends Controller
 
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Réinitialiser le mot de passe d'un utilisateur externe
+     */
+    public function externeResetPassword(Request $request, $code_lab, $externe)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $externe = UserExterne::where('code_lab', $code_lab)
+            ->where('id_user_ext', $externe)
+            ->firstOrFail();
+
+        try {
+            // Générer un nouveau mot de passe temporaire
+            $newPassword = Str::random(8);
+
+            // Mettre à jour le mot de passe
+            $externe->update([
+                'pwd' => \Illuminate\Support\Facades\Hash::make($newPassword)
+            ]);
+
+            // Envoyer l'email de réinitialisation
+            try {
+                Mail::to($externe->email_user_ext)
+                    ->send(new ExternePasswordResetMail($externe, $laboratoire, $newPassword));
+            } catch (\Exception $e) {
+                // Log l'erreur d'envoi d'email mais ne pas faire échouer la réinitialisation
+                \Illuminate\Support\Facades\Log::error('Erreur envoi email réinitialisation mot de passe externe: ' . $e->getMessage());
+            }
+
+            return redirect()->route('laboratoires.admin.externes.show', [$code_lab, $externe->id_user_ext])
+                ->with('success', 'Mot de passe réinitialisé avec succès. Un email avec le nouveau mot de passe a été envoyé à ' . $externe->email_user_ext);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la réinitialisation du mot de passe : ' . $e->getMessage());
         }
     }
 

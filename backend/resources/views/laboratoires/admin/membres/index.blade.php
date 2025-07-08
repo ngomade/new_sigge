@@ -88,23 +88,29 @@
                 <tbody>
                     @forelse($membres as $membre)
                         <tr>
-                            <td><input type="checkbox" name="ids[]" value="{{ $membre->id_pers_lab }}"></td>
-                            <td>{{ $membre->id_pers_lab }}</td>
+                            <td><input type="checkbox" name="ids[]" value="{{ $membre->id_pers_lab ?? $membre->id_user_externe }}"></td>
+                            <td>{{ $membre->id_pers_lab ?? $membre->id_user_externe }}</td>
                             <td>
-                                @if($membre->persLab)
+                                @if($membre->userExterne)
+                                    {{ $membre->userExterne->nom_user_ext }}
+                                    {{ $membre->userExterne->prenom_user_ext }}
+                                @elseif($membre->persLab)
                                     @if($membre->persLab->type_pers_lab === 'personnel')
                                         {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->nom_pers }}
                                         {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->prenom_pers }}
                                     @elseif($membre->persLab->type_pers_lab === 'user')
                                         {{ optional(\App\Models\Users::find($membre->id_pers_lab))->nom_user }}
                                         {{ optional(\App\Models\Users::find($membre->id_pers_lab))->prenom_user }}
-                                    @elseif($membre->persLab->type_pers_lab === 'user_externe')
-                                        {{ optional($membre->userExterne)->nom_user_ext }}
-                                        {{ optional($membre->userExterne)->prenom_user_ext }}
                                     @endif
                                 @endif
                             </td>
-                            <td>{{ $membre->persLab->type_pers_lab ?? '-' }}</td>
+                            <td>
+                                @if($membre->userExterne)
+                                    Externe
+                                @else
+                                    {{ $membre->persLab->type_pers_lab ?? '-' }}
+                                @endif
+                            </td>
                             <td>{{ $membre->roleLabo->lib_rl ?? '-' }}</td>
                             <td>
                                 <span class="badge bg-{{ $membre->statut === 'actif' ? 'success' : 'secondary' }}">{{ ucfirst($membre->statut) }}</span>
@@ -116,9 +122,9 @@
                                 {{ $date && $date instanceof \Carbon\Carbon ? $date->format('d/m/Y') : ($date ? \Carbon\Carbon::parse($date)->format('d/m/Y') : '-') }}
                             </td>
                             <td>
-                                <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membre->id_pers_lab]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
-                                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $membre->id_pers_lab]) }}" class="btn btn-sm btn-primary"><i class="bx bx-edit"></i></a>
-                                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $membre->id_pers_lab]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
+                                <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membre->id_pers_lab ?? $membre->id_user_externe]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
+                                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $membre->id_pers_lab ?? $membre->id_user_externe]) }}" class="btn btn-sm btn-primary"><i class="bx bx-edit"></i></a>
+                                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $membre->id_pers_lab ?? $membre->id_user_externe]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-danger"><i class="bx bx-trash"></i></button>
                                 </form>
@@ -162,3 +168,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endpush
 @endsection
+

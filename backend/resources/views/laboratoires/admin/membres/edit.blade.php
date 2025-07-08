@@ -3,26 +3,26 @@
 @section('content')
 <div class="container py-4">
     <h2 class="mb-4">Modifier le membre du laboratoire : {{ $laboratoire->label_labo }}</h2>
-    <form method="POST" action="{{ route('laboratoires.admin.membres.update', [$laboratoire->code_lab, $affectation->id_pers_lab]) }}">
+    <form method="POST" action="{{ route('laboratoires.admin.membres.update', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}">
         @csrf
         <div class="row mb-3">
             <div class="col-md-4">
                 <label class="form-label">Type de personne</label>
-                <input type="text" class="form-control" value="{{ $affectation->persLab->type_pers_lab ?? '-' }}" disabled>
+                <input type="text" class="form-control" value="{{ $affectation->userExterne ? 'Externe' : ($affectation->persLab->type_pers_lab ?? '-') }}" disabled>
             </div>
             <div class="col-md-8">
                 <label class="form-label">Personne</label>
                 <input type="text" class="form-control" value="
-                    @if($affectation->persLab)
+                    @if($affectation->userExterne)
+                        {{ $affectation->userExterne->nom_user_ext }}
+                        {{ $affectation->userExterne->prenom_user_ext }}
+                    @elseif($affectation->persLab)
                         @if($affectation->persLab->type_pers_lab === 'personnel')
                             {{ optional(\App\Models\Personnel::find($affectation->id_pers_lab))->nom_pers }}
                             {{ optional(\App\Models\Personnel::find($affectation->id_pers_lab))->prenom_pers }}
                         @elseif($affectation->persLab->type_pers_lab === 'user')
                             {{ optional(\App\Models\Users::find($affectation->id_pers_lab))->nom_user }}
                             {{ optional(\App\Models\Users::find($affectation->id_pers_lab))->prenom_user }}
-                        @elseif($affectation->persLab->type_pers_lab === 'user_externe')
-                            {{ optional($affectation->userExterne)->nom_user_ext }}
-                            {{ optional($affectation->userExterne)->prenom_user_ext }}
                         @endif
                     @endif
                 " disabled>

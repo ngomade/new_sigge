@@ -149,6 +149,9 @@ Route::post('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Cont
 Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeDestroy'])
     ->where('externe', '[A-Za-z0-9\-]+')
     ->name('laboratoires.admin.externes.destroy');
+Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/reset-password', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeResetPassword'])
+    ->where('externe', '[A-Za-z0-9\-]+')
+    ->name('laboratoires.admin.externes.reset-password');
 
 // Gestion des projets du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projets'])->name('laboratoires.admin.projets');

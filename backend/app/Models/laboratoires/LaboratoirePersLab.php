@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class LaboratoirePersLab extends Model
 {
     protected $table = 'laboratoire_pers_lab';
-    public $incrementing = false;
-    protected $primaryKey = null; // Pas de clé primaire auto-incrément
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
     protected $fillable = [
+        'id',
         'code_lab',
         'id_pers_lab',
         'id_user_externe',
