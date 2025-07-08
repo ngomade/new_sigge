@@ -56,8 +56,14 @@
                             <select class="form-select @error('id_pers_lab') is-invalid @enderror" id="id_pers_lab" name="id_pers_lab" required>
                                 <option value="">Sélectionner un membre</option>
                                 @foreach($personnel as $pers)
-                                    <option value="{{ $pers->id_pers_lab }}" {{ old('id_pers_lab') == $pers->id_pers_lab ? 'selected' : '' }}>
-                                        {{ $pers->persLab->nom ?? 'Membre non défini' }}
+                                    <option value="{{ $pers->id }}" {{ old('id_pers_lab') == $pers->id ? 'selected' : '' }}>
+                                        @if($pers->persLab)
+                                            {{ $pers->persLab->nom_complet }}
+                                        @elseif($pers->userExterne)
+                                            {{ $pers->userExterne->nom_user_ext }} {{ $pers->userExterne->prenom_user_ext }}
+                                        @else
+                                            Membre inconnu
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>
@@ -113,7 +119,16 @@
                             <tbody>
                                 @foreach($equipement->reservations->sortByDesc('created_at') as $reservation)
                                 <tr>
-                                    <td>{{ $reservation->personnel->persLab->nom ?? 'Non défini' }}</td>
+                                    <td>
+                                        {{ dd($reservation->personnel) }}
+                                        @if($reservation->personnel && $reservation->personnel->persLab)
+                                            {{ $reservation->personnel->persLab->nom_complet }}
+                                        @elseif($reservation->personnel && $reservation->personnel->userExterne)
+                                            {{ $reservation->personnel->userExterne->nom_user_ext }} {{ $reservation->personnel->userExterne->prenom_user_ext }}
+                                        @else
+                                            Non défini
+                                        @endif
+                                    </td>
                                     <td>
                                         <div>{{ $reservation->debut_formatted }}</div>
                                         <small class="text-muted">au {{ $reservation->fin_formatted }}</small>

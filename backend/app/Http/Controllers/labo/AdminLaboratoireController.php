@@ -920,7 +920,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id_pers_lab',
+            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id',
             'type_entretien' => 'required|in:entretien,reparation',
             'debut_entretien' => 'required|date',
             'fin_entretien' => 'required|date|after:debut_entretien',
@@ -1026,7 +1026,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id_pers_lab',
+            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id',
             'debut_reserv' => 'required|date|after_or_equal:today',
             'fin_reserv' => 'required|date|after:debut_reserv'
         ]);

@@ -274,7 +274,7 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <a href="{{ route('laboratoires.admin.equipements.stats', $laboratoire->code_lab) }}"
+                        <a href="{{ route('laboratoires.admin.stats.equipements', $laboratoire->code_lab) }}"
                            class="btn btn-sm btn-outline-secondary">
                             <i class="bi bi-graph-up"></i> Voir les Stats
                         </a>

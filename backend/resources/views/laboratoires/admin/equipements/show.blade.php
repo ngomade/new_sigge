@@ -67,7 +67,7 @@
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Laboratoire :</td>
-                                    <td>{{ $equipement->laboratoire->nom_lab }}</td>
+                                    <td>{{ $equipement->laboratoire->label_labo }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold">Ajouté le :</td>

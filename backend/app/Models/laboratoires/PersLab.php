@@ -50,7 +50,7 @@ class PersLab extends Model
     }
 
     // Méthode pour récupérer le nom complet selon le type
-    public function getNomCompletAttribute()
+    public function getNomCompletAttribute(): string
     {
         if ($this->type_pers_lab === 'personnel' && $this->personnel) {
             return $this->personnel->nom_pers . ' ' . $this->personnel->prenom_pers;
