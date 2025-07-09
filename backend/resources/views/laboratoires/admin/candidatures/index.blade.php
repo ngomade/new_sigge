@@ -9,12 +9,12 @@
         </a>
     </div>
 
-    @if(session('success'))
+    {{-- @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    @endif --}}
 
     <!-- Filtres -->
     <div class="card mb-4">
@@ -69,8 +69,8 @@
                                     <td>{{ $candidature->email_user_ext }}</td>
                                     <td>{{ $candidature->tel_user_ext }}</td>
                                     <td>
-                                        @if($candidature->statut == 'en_attente')
-                                            <span class="badge bg-warning">En attente</span>
+                                        @if($candidature->statut == 'inactif')
+                                            <span class="badge bg-warning">Inactif</span>
                                         @elseif($candidature->statut == 'actif')
                                             <span class="badge bg-success">Approuvé</span>
                                         @else

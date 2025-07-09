@@ -145,7 +145,7 @@ Route::get('/laboratoires/{code_lab}/admin/externes/create', [\App\Http\Controll
 Route::post('/laboratoires/{code_lab}/admin/externes', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeStore'])->name('laboratoires.admin.externes.store');
 Route::get('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeShow'])->name('laboratoires.admin.externes.show');
 Route::get('/laboratoires/{code_lab}/admin/externes/{externe}/edit', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeEdit'])->name('laboratoires.admin.externes.edit');
-Route::post('/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeUpdate'])->name('laboratoires.admin.externes.update');
+Route::match(['put', 'post'], '/laboratoires/{code_lab}/admin/externes/{externe}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeUpdate'])->name('laboratoires.admin.externes.update');
 Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externeDestroy'])
     ->where('externe', '[A-Za-z0-9\-]+')
     ->name('laboratoires.admin.externes.destroy');

@@ -13,7 +13,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    @if($errors->any())
+                    {{-- @if($errors->any())
                         <div class="alert alert-danger">
                             <ul class="mb-0">
                                 @foreach($errors->all() as $error)
@@ -21,7 +21,7 @@
                                 @endforeach
                             </ul>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Debug: Affichage des données -->
                     <div class="alert alert-info">

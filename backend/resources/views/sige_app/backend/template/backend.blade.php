@@ -142,5 +142,6 @@
             selector:'textarea.tinymce-editor',
         });
     </script>
+    @stack('scripts')
   </body>
 </html>

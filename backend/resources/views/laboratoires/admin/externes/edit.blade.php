@@ -17,7 +17,8 @@
         <div class="card-body">
             <form method="POST" action="{{ route('laboratoires.admin.externes.update', [$laboratoire->code_lab, $externe->id_user_ext]) }}" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
+               
+                @method('PUT') 
 
                 <div class="row">
                     <div class="col-md-6">

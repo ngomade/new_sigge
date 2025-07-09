@@ -1166,12 +1166,14 @@ class AdminLaboratoireController extends Controller
             ]);
 
             // Mettre à jour l'affectation
-            LaboratoirePersLab::where('id_user_ext', $candidature->id_user_ext)
+            LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
                 ->update(['statut' => 'actif']);
 
-            // Mettre à jour pers_lab
-            \App\Models\laboratoires\PersLab::where('id_pers_lab', $candidature->id_user_ext)
-                ->update(['statut' => 'actif']);
+            // Mettre à jour pers_lab uniquement si un enregistrement existe
+            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $candidature->id_user_ext)->first();
+            if ($persLab) {
+                $persLab->update(['statut' => 'actif']);
+            }
 
             // TODO: Envoyer un email avec les identifiants
             // Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
@@ -1196,13 +1198,14 @@ class AdminLaboratoireController extends Controller
             $candidature->update(['statut' => 'rejeté']);
 
             // Mettre à jour l'affectation
-            LaboratoirePersLab::where('id_user_ext', $candidature->id_user_ext)
+            LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
                 ->update(['statut' => 'rejeté']);
 
             // Mettre à jour pers_lab
-            \App\Models\laboratoires\PersLab::where('id_pers_lab', $candidature->id_user_ext)
-                ->update(['statut' => 'rejeté']);
-
+           $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $candidature->id_user_ext)->first();
+            if ($persLab) {
+                $persLab->update(['statut' => 'rejeté']);
+            }
             // TODO: Envoyer un email de rejet
             // Mail::to($candidature->email_user_ext)->send(new CandidatureRejectedMail($candidature));
 
@@ -1308,16 +1311,35 @@ class AdminLaboratoireController extends Controller
             ]);
 
             // Envoyer l'email de confirmation
-            try {
-                \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
-                    ->send(new ExterneConfirmationMail($userExterne, $laboratoire, $tempPassword));
-            } catch (\Exception $e) {
-                // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
-                \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: ' . $e->getMessage());
+            $emailSent = true;
+            $emailErrorMessage = '';
+
+            // Validate email format more strictly before sending
+            if (!filter_var($userExterne->email_user_ext, FILTER_VALIDATE_EMAIL)) {
+                $emailSent = false;
+                $emailErrorMessage = 'Adresse email invalide.';
+                \Illuminate\Support\Facades\Log::error('Email confirmation externe: adresse email invalide pour ' . $userExterne->email_user_ext);
+            } else {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
+                        ->send(new ExterneConfirmationMail($userExterne, $laboratoire, $tempPassword));
+                } catch (\Exception $e) {
+                    $emailSent = false;
+                    $emailErrorMessage = $e->getMessage();
+                    // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
+                    \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: ' . $emailErrorMessage);
+                }
+            }
+
+            $successMessage = 'Utilisateur externe créé avec succès.';
+            if ($emailSent) {
+                $successMessage .= ' Un email de confirmation avec le mot de passe a été envoyé à ' . $userExterne->email_user_ext;
+            } else {
+                $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : ' . $emailErrorMessage . '. Veuillez vérifier l\'adresse email du destinataire et la configuration du serveur SMTP.';
             }
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
-                ->with('success', 'Utilisateur externe créé avec succès. Un email de confirmation avec le mot de passe a été envoyé à ' . $userExterne->email_user_ext);
+                ->with('success', $successMessage);
 
         } catch (\Exception $e) {
             return back()->withInput()

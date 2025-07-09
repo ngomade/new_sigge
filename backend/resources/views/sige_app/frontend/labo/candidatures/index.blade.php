@@ -13,7 +13,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    @if(session('success'))
+                    {{-- @if(session('success'))
                         <div class="alert alert-success">
                             {{ session('success') }}
                         </div>
@@ -23,7 +23,7 @@
                         <div class="alert alert-danger">
                             {{ session('error') }}
                         </div>
-                    @endif
+                    @endif --}}
 
                     @if($candidatures->count() > 0)
                         <div class="table-responsive">

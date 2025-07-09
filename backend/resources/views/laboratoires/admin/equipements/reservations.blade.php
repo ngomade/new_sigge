@@ -56,7 +56,7 @@
                             <select class="form-select @error('id_pers_lab') is-invalid @enderror" id="id_pers_lab" name="id_pers_lab" required>
                                 <option value="">Sélectionner un membre</option>
                                 @foreach($personnel as $pers)
-                                    <option value="{{ $pers->id }}" {{ old('id_pers_lab') == $pers->id ? 'selected' : '' }}>
+                                    <option value="{{ $pers->id_pers_lab }}" {{ old('id_pers_lab') == $pers->id_pers_lab ? 'selected' : '' }}>
                                         @if($pers->persLab)
                                             {{ $pers->persLab->nom_complet }}
                                         @elseif($pers->userExterne)
@@ -120,7 +120,6 @@
                                 @foreach($equipement->reservations->sortByDesc('created_at') as $reservation)
                                 <tr>
                                     <td>
-                                        {{ dd($reservation->personnel) }}
                                         @if($reservation->personnel && $reservation->personnel->persLab)
                                             {{ $reservation->personnel->persLab->nom_complet }}
                                         @elseif($reservation->personnel && $reservation->personnel->userExterne)

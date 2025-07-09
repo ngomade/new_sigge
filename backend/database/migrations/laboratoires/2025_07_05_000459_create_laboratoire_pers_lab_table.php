@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_rl')->nullable();
             $table->date('date_affectation')->default(now());
             $table->date('date_fin_affectation')->nullable();
-            $table->enum('statut', ['actif', 'inactif'])->default('actif');
+            $table->enum('statut', ['actif', 'inactif'])->default('inactif');
             $table->timestamps();
 
             // Clé primaire composite

@@ -3,12 +3,12 @@
 @section('content')
 <div class="container py-4">
     <h2 class="mb-4">Gestion des membres du laboratoire : {{ $laboratoire->label_labo }}</h2>
-    @if(session('success'))
+    {{-- @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    @endif --}}
     <form method="GET" class="row g-3 mb-4">
         <div class="col-md-3">
             <input type="text" name="search" class="form-control" placeholder="Recherche (nom, id, etc.)" value="{{ $search }}">
@@ -122,12 +122,19 @@
                                 {{ $date && $date instanceof \Carbon\Carbon ? $date->format('d/m/Y') : ($date ? \Carbon\Carbon::parse($date)->format('d/m/Y') : '-') }}
                             </td>
                             <td>
-                                <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membre->id_pers_lab ?? $membre->id_user_externe]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
-                                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $membre->id_pers_lab ?? $membre->id_user_externe]) }}" class="btn btn-sm btn-primary"><i class="bx bx-edit"></i></a>
-                                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $membre->id_pers_lab ?? $membre->id_user_externe]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="bx bx-trash"></i></button>
-                                </form>
+                                @php
+                                    $membreId = $membre->id_pers_lab ?? $membre->id_user_externe;
+                                @endphp
+                                @if($membreId)
+                                    <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membreId]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
+                                    <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $membreId]) }}" class="btn btn-sm btn-primary"><i class="bx bx-edit"></i></a>
+                                    <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $membreId]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="bx bx-trash"></i></button>
+                                    </form>
+                                @else
+                                    <span class="text-muted">Actions indisponibles</span>
+                                @endif
                             </td>
                         </tr>
                     @empty

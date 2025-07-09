@@ -10,6 +10,8 @@ use App\Models\laboratoires\LaboratoirePersLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Mail\ExterneConfirmationMail;
+use App\Mail\ExternePasswordResetMail;
 use Illuminate\Support\Facades\Mail;
 
 class CandidatureController extends Controller
@@ -40,6 +42,8 @@ class CandidatureController extends Controller
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
         try {
+            // Générer un mot de passe temporaire
+            $tempPassword = \Illuminate\Support\Str::random(8);
             // Gérer le fichier de lettre de motivation
             $motivationPath = $request->file('motivation_path')->store('motivations', 'public');
 
@@ -67,11 +71,33 @@ class CandidatureController extends Controller
                 'code_lab' => $code_lab,
                 'id_user_externe' => $userExterne->id_user_ext,
                 'date_affectation' => now(),
-                'statut' => 'en_attente'
+                'statut' => 'actif'
             ]);
 
+            // Envoyer l'email de confirmation
+            $emailSent = true;
+            $emailErrorMessage = '';
+            try {
+                \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
+                    ->send(new ExterneConfirmationMail($userExterne, $laboratoire, $tempPassword));
+            } catch (\Exception $e) {
+                $emailSent = false;
+                $emailErrorMessage = $e->getMessage();
+                // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
+                \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: ' . $emailErrorMessage);
+            }
+
+            $successMessage = 'Utilisateur externe créé avec succès.';
+            if ($emailSent) {
+                $successMessage .= ' Un email de confirmation avec le mot de passe a été envoyé à ' . $userExterne->email_user_ext;
+            } else {
+                $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : ' . $emailErrorMessage;
+            }
+
+            
+
             return redirect()->route('laboratoires.show', $code_lab)
-                ->with('success', 'Votre candidature a été soumise avec succès ! Elle sera examinée par l\'administrateur du laboratoire.');
+                ->with('success', $successMessage);
 
         } catch (\Exception $e) {
             return back()->withInput()

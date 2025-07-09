@@ -93,11 +93,12 @@
                                                         <i class='bx bx-edit'></i>
                                                     </a>
                                                     <form action="{{ route('labo.laboratoires.membres.destroy', [$laboratoire, $membre->id_pers_lab]) }}"
-                                                          method="POST" class="d-inline"
-                                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce membre ?')">
+                                                          method="POST" class="d-inline" id="delete-form-{{ $membre->id_pers_lab }}">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-membre" title="Supprimer"
+                                                                data-id="{{ $membre->id_pers_lab }}"
+                                                                data-name="{{ $personnel->nom_pers ?? ($user->nom_user ?? ($userExt->nom_user_ext ?? '')) }}">
                                                             <i class='bx bx-trash'></i>
                                                         </button>
                                                     </form>
@@ -127,4 +128,57 @@
         </div>
     </div>
 </div>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmer la suppression</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer le membre <strong id="memberName"></strong> ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+ @push('scripts') 
+<script>
+$(document).ready(function () {
+    var deleteFormId = null;
+    var $confirmDeleteModal = $('#confirmDeleteModal');
+    var $memberNameElem = $('#memberName');
+    var $confirmDeleteBtn = $('#confirmDeleteBtn');
+
+    console.log('Modal element:', $confirmDeleteModal.length);
+
+    $(document).on('click', '.btn-delete-membre', function() {
+        console.log('Delete button clicked');
+        deleteFormId = 'delete-form-' + $(this).data('id');
+        console.log('Form ID to delete:', deleteFormId);
+        $memberNameElem.text($(this).data('name') || 'ce membre');
+        $confirmDeleteModal.modal('show');
+        console.log('Modal should be shown now');
+    });
+
+    $confirmDeleteBtn.on('click', function() {
+        console.log('Confirm delete button clicked');
+        if (deleteFormId) {
+            var form = document.getElementById(deleteFormId);
+            if (form) {
+                form.submit();
+            }
+        }
+    });
+});
+</script>
+ @endpush 
+
 @endsection

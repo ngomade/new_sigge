@@ -307,7 +307,7 @@
                     </div>
 
                     <div class="card-body">
-                        @if ($errors->any())
+                        {{-- @if ($errors->any())
                             <div class="alert alert-danger">
                                 <ul class="mb-0">
                                     @foreach ($errors->all() as $error)
@@ -322,7 +322,7 @@
                                 {{ session('error') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        @endif
+                        @endif --}}
 
                         <form action="{{ route('labo.laboratoires.store') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                             @csrf
