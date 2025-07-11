@@ -9,12 +9,18 @@
         </a>
     </div>
 
-    {{-- @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif --}}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <div class="row">
         <!-- Informations de l'équipement -->
@@ -68,8 +74,14 @@
                             <select class="form-select @error('id_pers_lab') is-invalid @enderror" id="id_pers_lab" name="id_pers_lab" required>
                                 <option value="">Sélectionner un membre</option>
                                 @foreach($personnel as $pers)
-                                    <option value="{{ $pers->id_pers_lab }}" {{ old('id_pers_lab') == $pers->id_pers_lab ? 'selected' : '' }}>
-                                        {{ $pers->persLab->nom ?? 'Membre non défini' }}
+                                    <option value="{{ $pers->id }}" {{ old('id_pers_lab') == $pers->id ? 'selected' : '' }}>
+                                        @if($pers->persLab)
+                                            {{ $pers->persLab->nom_complet ?? 'Membre interne' }}
+                                        @elseif($pers->userExterne)
+                                            {{ $pers->userExterne->nom_user_ext }} {{ $pers->userExterne->prenom_user_ext }}
+                                        @else
+                                            Membre inconnu
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>
@@ -150,7 +162,15 @@
                                             {{ $entretien->type_label }}
                                         </span>
                                     </td>
-                                    <td>{{ $entretien->personnel->persLab->nom ?? 'Non défini' }}</td>
+                                    <td>
+                                        @if($entretien->personnel && $entretien->personnel->persLab)
+                                            {{ $entretien->personnel->persLab->nom_complet ?? 'Membre interne' }}
+                                        @elseif($entretien->personnel && $entretien->personnel->userExterne)
+                                            {{ $entretien->personnel->userExterne->nom_user_ext }} {{ $entretien->personnel->userExterne->prenom_user_ext }}
+                                        @else
+                                            Non défini
+                                        @endif
+                                    </td>
                                     <td>
                                         <div>{{ $entretien->debut_formatted }}</div>
                                         <small class="text-muted">au {{ $entretien->fin_formatted }}</small>
@@ -159,6 +179,9 @@
                                         <span class="badge bg-{{ $entretien->statut_badge }}">
                                             {{ $entretien->statut_entretien }}
                                         </span>
+                                        @if($entretien->isEnCours())
+                                            <br><small class="text-muted">{{ $entretien->getJoursRestantsFormatted() }}</small>
+                                        @endif
                                     </td>
                                     <td>{{ $entretien->cout_formatted }}</td>
                                     <td>
@@ -183,9 +206,11 @@
                                                     <i class="bx bx-play me-2"></i>Reprendre
                                                 </a>
                                                 @endif
+                                                @if(!$entretien->isTermine() && !$entretien->isAnnule())
                                                 <a class="dropdown-item text-danger" href="#" onclick="changerStatut('{{ $entretien->id }}', 'Annulé')">
                                                     <i class="bx bx-x me-2"></i>Annuler
                                                 </a>
+                                                @endif
                                             </div>
                                         </div>
                                     </td>
@@ -264,6 +289,8 @@
     @csrf
     @method('PUT')
     <input type="hidden" name="statut_entretien" id="nouveauStatut">
+    <!-- Garder seulement les champs qui doivent être modifiés -->
+    <input type="hidden" name="keep_dates" value="true">
 </form>
 
 @endsection
@@ -271,7 +298,25 @@
 @push('scripts')
 <script>
 function changerStatut(entretienId, nouveauStatut) {
-    if (confirm('Êtes-vous sûr de vouloir changer le statut de cet entretien ?')) {
+    let message = '';
+    switch(nouveauStatut) {
+        case 'Terminé':
+            message = 'Êtes-vous sûr de vouloir marquer cet entretien comme terminé ?';
+            break;
+        case 'En pause':
+            message = 'Êtes-vous sûr de vouloir mettre cet entretien en pause ?';
+            break;
+        case 'En cours':
+            message = 'Êtes-vous sûr de vouloir reprendre cet entretien ?';
+            break;
+        case 'Annulé':
+            message = 'Êtes-vous sûr de vouloir annuler cet entretien ?';
+            break;
+        default:
+            message = 'Êtes-vous sûr de vouloir changer le statut de cet entretien ?';
+    }
+
+    if (confirm(message)) {
         document.getElementById('nouveauStatut').value = nouveauStatut;
         document.getElementById('changerStatutForm').action = '{{ url("/laboratoires/{$laboratoire->code_lab}/admin/equipements/{$equipement->code_equip}/entretiens") }}/' + entretienId;
         document.getElementById('changerStatutForm').submit();

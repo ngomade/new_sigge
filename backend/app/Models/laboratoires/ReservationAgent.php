@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ReservationAgent extends Model
 {
     protected $table = 'reservation_agent';
-    protected $primaryKey = ['code_equip', 'id_pers_lab'];
-    public $incrementing = false;
+    
+    // Changement important : utiliser 'id' comme clé primaire
+    protected $primaryKey = 'id';
+    public $incrementing = true;
 
     protected $fillable = [
         'code_equip',
@@ -34,7 +36,14 @@ class ReservationAgent extends Model
 
     public function personnel(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\laboratoires\PersLab::class, 'id_pers_lab', 'id_pers_lab');
+        // Relation corrigée pour pointer vers LaboratoirePersLab
+        return $this->belongsTo(LaboratoirePersLab::class, 'id_pers_lab', 'id');
+    }
+
+    // Pour la compatibilité, si vous avez besoin de la relation avec PersLab
+    public function persLab(): BelongsTo
+    {
+        return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
     }
 
     // Scopes
@@ -163,29 +172,31 @@ class ReservationAgent extends Model
             return '1 jour';
         }
 
-        return $duree . ' jour(s)';
+        return ($duree + 1) . ' jour' . ($duree > 0 ? 's' : '');
     }
 
     public function getJoursRestants()
     {
-        if (!$this->isActive()) {
+        if (!$this->isActive() || !$this->isConfirme()) {
             return null;
         }
 
-        return now()->diffInDays($this->fin_reserv);
+        return now()->diffInDays($this->fin_reserv, false);
     }
 
     public function getJoursRestantsFormatted()
     {
         $jours = $this->getJoursRestants();
         if ($jours === null) {
-            return 'Non applicable';
+            return '';
         }
 
         if ($jours === 0) {
-            return 'Dernier jour';
+            return 'Se termine aujourd\'hui';
+        } elseif ($jours < 0) {
+            return 'Terminé';
         }
 
-        return $jours . ' jour(s) restant(s)';
+        return $jours . ' jour' . ($jours > 1 ? 's' : '') . ' restant' . ($jours > 1 ? 's' : '');
     }
 }

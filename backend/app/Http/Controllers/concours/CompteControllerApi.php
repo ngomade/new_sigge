@@ -52,7 +52,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
             $result = $ocrService->extractDataFromReceipt($request->file('receipt'));
 
             return response()->json($result);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -153,7 +152,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
             DB::commit();
 
             return $authService->generateTokenFromUser($compte, true);
-
         } catch (Throwable $th) {
             DB::rollBack();
             Log::error('Erreur lors de la création du compte: ' . $th->getMessage());
@@ -233,7 +231,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
             DB::commit();
 
             return response()->json($compte);
-
         } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         } catch (Throwable $th) {
@@ -270,7 +267,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
             DB::commit();
 
             return response()->noContent();
-
         } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         } catch (Throwable $th) {
@@ -297,7 +293,6 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 'mime_type' => 'application/pdf',
                 'base64_pdf' => $base64
             ]);
-
         } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         }
@@ -322,7 +317,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
     private function storageRecu($file, $nom, $prenom, $extension)
     {
-        $filename = $nom . '-' . $prenom . '-' . now()->format('M_d_H_i'). '.' . $extension;
+        $filename = $nom . '-' . $prenom . '-' . now()->format('M_d_H_i') . '.' . $extension;
         return $file->storeAs(getdate()['year'], $filename);
     }
 }

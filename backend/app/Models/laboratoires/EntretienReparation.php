@@ -4,10 +4,13 @@ namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 class EntretienReparation extends Model
 {
     protected $table = 'entretien_reparation';
+    
+    // Utiliser 'id' comme clé primaire
     protected $primaryKey = 'id';
     public $incrementing = true;
 
@@ -38,7 +41,7 @@ class EntretienReparation extends Model
 
     public function personnel(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\laboratoires\PersLab::class, 'id_pers_lab', 'id_pers_lab');
+        return $this->belongsTo(LaboratoirePersLab::class, 'id_pers_lab', 'id');
     }
 
     // Scopes
@@ -60,16 +63,6 @@ class EntretienReparation extends Model
     public function scopeAnnule($query)
     {
         return $query->where('statut_entretien', 'Annulé');
-    }
-
-    public function scopeEntretien($query)
-    {
-        return $query->where('type_entretien', 'entretien');
-    }
-
-    public function scopeReparation($query)
-    {
-        return $query->where('type_entretien', 'reparation');
     }
 
     // Accesseurs
@@ -102,11 +95,6 @@ class EntretienReparation extends Model
         };
     }
 
-    public function getCoutFormattedAttribute()
-    {
-        return $this->cout ? number_format($this->cout, 0, ',', ' ') . ' FCFA' : 'Non défini';
-    }
-
     public function getDebutFormattedAttribute()
     {
         return $this->debut_entretien ? $this->debut_entretien->format('d/m/Y') : 'Non définie';
@@ -115,6 +103,14 @@ class EntretienReparation extends Model
     public function getFinFormattedAttribute()
     {
         return $this->fin_entretien ? $this->fin_entretien->format('d/m/Y') : 'Non définie';
+    }
+
+    public function getCoutFormattedAttribute()
+    {
+        if ($this->cout === null || $this->cout == 0) {
+            return 'Non défini';
+        }
+        return number_format($this->cout, 0, ',', ' ') . ' FCFA';
     }
 
     // Méthodes
@@ -138,16 +134,6 @@ class EntretienReparation extends Model
         return $this->statut_entretien === 'Annulé';
     }
 
-    public function isEntretien()
-    {
-        return $this->type_entretien === 'entretien';
-    }
-
-    public function isReparation()
-    {
-        return $this->type_entretien === 'reparation';
-    }
-
     public function getDuree()
     {
         if (!$this->debut_entretien || !$this->fin_entretien) {
@@ -168,6 +154,31 @@ class EntretienReparation extends Model
             return '1 jour';
         }
 
-        return $duree . ' jour(s)';
+        return ($duree + 1) . ' jour' . ($duree > 0 ? 's' : '');
+    }
+
+    public function getJoursRestants()
+    {
+        if (!$this->isEnCours() || !$this->fin_entretien) {
+            return null;
+        }
+
+        return now()->diffInDays($this->fin_entretien, false);
+    }
+
+    public function getJoursRestantsFormatted()
+    {
+        $jours = $this->getJoursRestants();
+        if ($jours === null) {
+            return '';
+        }
+
+        if ($jours === 0) {
+            return 'Se termine aujourd\'hui';
+        } elseif ($jours < 0) {
+            return 'En retard de ' . abs($jours) . ' jour' . (abs($jours) > 1 ? 's' : '');
+        }
+
+        return $jours . ' jour' . ($jours > 1 ? 's' : '') . ' restant' . ($jours > 1 ? 's' : '');
     }
 }

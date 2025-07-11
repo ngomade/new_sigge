@@ -61,6 +61,11 @@ class Equipements extends Model
     {
         return $query->where('etat', 'hors service');
     }
+    
+    public function scopeEnUtilisation($query)
+    {
+        return $query->where('etat', 'en utilisation');
+    }
 
     public function scopeByLaboratoire($query, $code_lab)
     {
@@ -74,6 +79,7 @@ class Equipements extends Model
             'disponible' => 'success',
             'en maintenance' => 'warning',
             'hors service' => 'danger',
+            'en utilisation' => 'info',
             'réservé' => 'info',
             default => 'secondary'
         };
@@ -85,6 +91,7 @@ class Equipements extends Model
             'disponible' => 'Disponible',
             'en maintenance' => 'En maintenance',
             'hors service' => 'Hors service',
+            'en utilisation' => 'En utilisation',
             'réservé' => 'Réservé',
             default => ucfirst($this->etat)
         };
@@ -115,6 +122,11 @@ class Equipements extends Model
     {
         return $this->etat === 'hors service';
     }
+    
+    public function isEnUtilisation()
+    {
+        return $this->etat === 'en utilisation';
+    }
 
     public function hasReservationActive()
     {
@@ -137,8 +149,54 @@ class Equipements extends Model
     public function getEntretienEnCours()
     {
         return $this->entretiens()
-            ->where('statut_entretien', 'En cours')
+            ->whereIn('statut_entretien', ['En cours', 'En pause'])
             ->first();
+    }
+    
+    /**
+     * Vérifier si l'équipement a des réservations futures confirmées
+     */
+    public function hasReservationsFutures()
+    {
+        return $this->reservations()
+            ->where('statut', 'confirmé')
+            ->where('debut_reserv', '>', now())
+            ->exists();
+    }
+    
+    /**
+     * Obtenir les réservations futures confirmées
+     */
+    public function getReservationsFutures()
+    {
+        return $this->reservations()
+            ->where('statut', 'confirmé')
+            ->where('debut_reserv', '>', now())
+            ->orderBy('debut_reserv')
+            ->get();
+    }
+    
+    /**
+     * Vérifier s'il y a un conflit de réservation pour une période donnée
+     */
+    public function hasConflitReservation($debut, $fin, $excludeId = null)
+    {
+        $query = $this->reservations()
+            ->where('statut', 'confirmé')
+            ->where(function($q) use ($debut, $fin) {
+                $q->whereBetween('debut_reserv', [$debut, $fin])
+                  ->orWhereBetween('fin_reserv', [$debut, $fin])
+                  ->orWhere(function($subQ) use ($debut, $fin) {
+                      $subQ->where('debut_reserv', '<=', $debut)
+                           ->where('fin_reserv', '>=', $fin);
+                  });
+            });
+            
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+        
+        return $query->exists();
     }
 
     /**
@@ -155,5 +213,46 @@ class Equipements extends Model
     public function getShortDescAttribute()
     {
         return Str::limit(strip_tags($this->desc_equip), 100);
+    }
+    
+    /**
+     * Obtenir le prochain entretien programmé
+     */
+    public function getProchainEntretien()
+    {
+        return $this->entretiens()
+            ->where('statut_entretien', 'En cours')
+            ->where('debut_entretien', '>', now())
+            ->orderBy('debut_entretien')
+            ->first();
+    }
+    
+    /**
+     * Calculer l'âge de l'équipement
+     */
+    public function getAgeAttribute()
+    {
+        if (!$this->date_achat) {
+            return null;
+        }
+        
+        return $this->date_achat->diffInYears(now());
+    }
+    
+    /**
+     * Obtenir l'âge formaté
+     */
+    public function getAgeFormattedAttribute()
+    {
+        $age = $this->age;
+        if ($age === null) {
+            return 'Âge inconnu';
+        }
+        
+        if ($age === 0) {
+            return 'Moins d\'un an';
+        }
+        
+        return $age . ' an' . ($age > 1 ? 's' : '');
     }
 }
