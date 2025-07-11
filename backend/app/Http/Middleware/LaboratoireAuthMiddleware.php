@@ -30,10 +30,18 @@ class LaboratoireAuthMiddleware
         }
 
         // Vérifier que l'affectation est toujours valide (dates et statut)
-        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
-            ->where('id_pers_lab', session('user_id'))
-            ->where('statut', 'actif')
-            ->first();
+$userType = session('user_type');
+
+$query = LaboratoirePersLab::where('code_lab', $code_lab)
+    ->where('statut', 'actif');
+
+if ($userType === 'externe') {
+    $query->where('id_user_externe', session('user_id'));
+} else {
+    $query->where('id_pers_lab', session('user_id'));
+}
+
+$affectation = $query->first();
 
         if (!$affectation) {
             // Nettoyer la session et rediriger

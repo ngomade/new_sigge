@@ -152,39 +152,31 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                            <a class="nav-link" href="{{ $isAdmin ? route('laboratoires.admin.dashboard', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab) }}">
+                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
+                            <a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">
                                 Présentation
                             </a>
-                        @else
-                            <a class="nav-link" href="#presentation">Présentation</a>
                         @endif
                     </li>
                     <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                            <a class="nav-link" href="{{ $isAdmin ? route('laboratoires.admin.projets', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab) }}">
+                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
+                            <a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">
                                 Projets
                             </a>
-                        @else
-                            <a class="nav-link" href="#projets">Projets</a>
                         @endif
                     </li>
                     <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                            <a class="nav-link" href="{{ $isAdmin ? route('laboratoires.admin.equipements', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab) }}">
+                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
+                            <a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">
                                 Équipements
                             </a>
-                        @else
-                            <a class="nav-link" href="#equipements">Équipements</a>
                         @endif
                     </li>
                     <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                            <a class="nav-link" href="{{ $isAdmin ? route('laboratoires.admin.membres', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab) }}">
+                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
+                            <a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">
                                 Membres
                             </a>
-                        @else
-                            <a class="nav-link" href="#membres">Membres</a>
                         @endif
                     </li>
                     <li class="nav-item">

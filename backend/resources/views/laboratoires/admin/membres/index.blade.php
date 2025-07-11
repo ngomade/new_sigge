@@ -106,7 +106,7 @@
                             </td>
                             <td>
                                 @if($membre->userExterne)
-                                    Externe
+                                    externe
                                 @else
                                     {{ $membre->persLab->type_pers_lab ?? '-' }}
                                 @endif
