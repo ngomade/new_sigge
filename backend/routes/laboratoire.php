@@ -204,6 +204,7 @@ Route::post('/laboratoires/{code_lab}/admin/rapports', [\App\Http\Controllers\La
 Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportShow'])->name('laboratoires.admin.rapports.show');
 Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}/download', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportDownload'])->name('laboratoires.admin.rapports.download');
 Route::delete('/laboratoires/{code_lab}/admin/rapports/{rapport}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportDestroy'])->name('laboratoires.admin.rapports.destroy');
+Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}/view', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportView'])->name('laboratoires.admin.rapports.view');
 
 // Routes pour les notifications et alertes
 Route::get('/laboratoires/{code_lab}/admin/notifications', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'notifications'])->name('laboratoires.admin.notifications');

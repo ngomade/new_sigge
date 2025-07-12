@@ -910,7 +910,7 @@ class AdminLaboratoireController extends Controller
         $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
-    
+
         $request->validate([
             'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id',
             'type_entretien' => 'required|in:entretien,reparation',
@@ -919,19 +919,19 @@ class AdminLaboratoireController extends Controller
             'desc_entretien' => 'nullable|string',
             'cout' => 'nullable|numeric|min:0'
         ]);
-    
+
         try {
             // Vérifier s'il y a déjà un entretien en cours
             $entretienEnCours = $equipement->getEntretienEnCours();
             if ($entretienEnCours) {
                 return back()->with('error', 'Cet équipement a déjà un entretien en cours.');
             }
-    
+
             // Vérifier si l'équipement est disponible pour maintenance
             if ($equipement->etat === 'hors service') {
                 return back()->with('error', 'Cet équipement est hors service et ne peut pas être entretenu.');
             }
-    
+
             \App\Models\laboratoires\EntretienReparation::create([
                 'code_equip' => $equipement->code_equip,
                 'id_pers_lab' => $request->id_pers_lab,
@@ -942,13 +942,13 @@ class AdminLaboratoireController extends Controller
                 'desc_entretien' => $request->desc_entretien,
                 'cout' => $request->cout
             ]);
-    
+
             // Mettre à jour l'état de l'équipement
             $equipement->update(['etat' => 'en maintenance']);
-    
+
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien programmé avec succès.');
-    
+
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la programmation : ' . $e->getMessage());
         }
@@ -960,35 +960,35 @@ class AdminLaboratoireController extends Controller
         $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
-    
+
         // Chercher l'entretien par son ID (pas par code_equip/id_pers_lab)
         $entretien = \App\Models\laboratoires\EntretienReparation::where('code_equip', $equipement->code_equip)
             ->where('id', $entretien) // Utiliser l'ID de l'entretien
             ->firstOrFail();
-    
+
         // Si on change seulement le statut (depuis les boutons d'action)
         if ($request->has('keep_dates') && $request->keep_dates === 'true') {
             $request->validate([
                 'statut_entretien' => 'required|in:En cours,Terminé,En pause,Annulé'
             ]);
-    
+
             try {
                 // Mettre à jour seulement le statut
                 $entretien->update([
                     'statut_entretien' => $request->statut_entretien
                 ]);
-    
+
                 // Mettre à jour l'état de l'équipement selon le statut
                 $this->updateEquipementStateAfterEntretien($equipement, $request->statut_entretien);
-    
+
                 return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                     ->with('success', 'Statut de l\'entretien mis à jour avec succès.');
-    
+
             } catch (\Exception $e) {
                 return back()->with('error', 'Erreur lors de la mise à jour du statut : ' . $e->getMessage());
             }
         }
-    
+
         // Sinon, c'est une mise à jour complète (depuis le modal)
         $request->validate([
             'statut_entretien' => 'required|in:En cours,Terminé,En pause,Annulé',
@@ -997,7 +997,7 @@ class AdminLaboratoireController extends Controller
             'desc_entretien' => 'nullable|string',
             'cout' => 'nullable|numeric|min:0'
         ]);
-    
+
         try {
             $entretien->update([
                 'statut_entretien' => $request->statut_entretien,
@@ -1006,18 +1006,18 @@ class AdminLaboratoireController extends Controller
                 'desc_entretien' => $request->desc_entretien,
                 'cout' => $request->cout
             ]);
-    
+
             // Mettre à jour l'état de l'équipement selon le statut
             $this->updateEquipementStateAfterEntretien($equipement, $request->statut_entretien);
-    
+
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien mis à jour avec succès.');
-    
+
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Mettre à jour l'état de l'équipement après modification d'un entretien
      */
@@ -1029,7 +1029,7 @@ class AdminLaboratoireController extends Controller
             $autresEntretiensEnCours = \App\Models\laboratoires\EntretienReparation::where('code_equip', $equipement->code_equip)
                 ->whereIn('statut_entretien', ['En cours', 'En pause'])
                 ->exists();
-    
+
             if (!$autresEntretiensEnCours) {
                 // Vérifier s'il y a des réservations actives
                 $reservationsActives = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
@@ -1037,14 +1037,14 @@ class AdminLaboratoireController extends Controller
                     ->where('debut_reserv', '<=', now())
                     ->where('fin_reserv', '>=', now())
                     ->exists();
-    
+
                 if ($reservationsActives) {
                     $equipement->update(['etat' => 'en utilisation']);
                 } else {
                     $equipement->update(['etat' => 'disponible']);
                 }
             }
-        } 
+        }
         // Si l'entretien est en cours ou en pause
         elseif (in_array($nouveauStatut, ['En cours', 'En pause'])) {
             $equipement->update(['etat' => 'en maintenance']);
@@ -1762,11 +1762,12 @@ class AdminLaboratoireController extends Controller
     {
         $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
 
-        if (!file_exists(storage_path('app/' . $rapport->path_rl))) {
+        $filePath = storage_path('app/' . $rapport->path_rl);
+        if (!file_exists($filePath)) {
             return back()->with('error', 'Fichier non trouvé.');
         }
 
-        return response()->download(storage_path('app/' . $rapport->path_rl));
+        return response()->download($filePath);
     }
 
     /**
@@ -1804,10 +1805,10 @@ class AdminLaboratoireController extends Controller
         $pdf = \PDF::loadView('laboratoires.admin.rapports.template-pdf', $data);
 
         $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".pdf";
-        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+        $path = "private/rapports/{$laboratoire->code_lab}/" . $filename;
 
         // Créer le dossier s'il n'existe pas
-        \Storage::makeDirectory("rapports/{$laboratoire->code_lab}");
+        \Storage::makeDirectory("private/rapports/{$laboratoire->code_lab}");
 
         // Sauvegarder le PDF
         \Storage::put($path, $pdf->output());
@@ -1830,10 +1831,10 @@ class AdminLaboratoireController extends Controller
         ];
 
         $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".docx";
-        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+        $path = "private/rapports/{$laboratoire->code_lab}/" . $filename;
 
         // Créer le dossier s'il n'existe pas
-        $dirPath = storage_path("app/rapports/{$laboratoire->code_lab}");
+        $dirPath = storage_path("app/private/rapports/{$laboratoire->code_lab}");
         if (!file_exists($dirPath)) {
             mkdir($dirPath, 0755, true);
         }
@@ -2103,5 +2104,20 @@ class AdminLaboratoireController extends Controller
             ->count();
 
         return response()->json(['count' => $count]);
+    }
+
+    public function rapportView($code_lab, $rapport)
+    {
+        $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
+        $filePath = storage_path('app/' . $rapport->path_rl);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Fichier non trouvé.');
+        }
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.basename($filePath).'"'
+        ]);
     }
 }
