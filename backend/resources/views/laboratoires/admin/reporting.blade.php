@@ -272,7 +272,7 @@
                         <div class="col-auto">
                             <i class="bi bi-bar-chart fa-2x text-gray-300"></i>
                         </div>
-                    </div>
+                    </div> 
                     <div class="mt-3">
                         <a href="{{ route('laboratoires.admin.stats.equipements', $laboratoire->code_lab) }}"
                            class="btn btn-sm btn-outline-secondary">

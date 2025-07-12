@@ -218,3 +218,18 @@ Route::post('/laboratoires/{code_lab}/admin/alertes/check', [\App\Http\Controlle
 // Routes AJAX pour les notifications
 Route::get('/laboratoires/{code_lab}/admin/notifications/unread', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'getUnreadNotifications'])->name('laboratoires.admin.notifications.unread');
 Route::get('/laboratoires/{code_lab}/admin/notifications/unread-count', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'getUnreadNotificationsCount'])->name('laboratoires.admin.notifications.unread-count');
+
+// Routes pour les invitations de laboratoire
+Route::get('/laboratoires/{code_lab}/admin/invitations', [\App\Http\Controllers\labo\InvitationController::class, 'index'])->name('laboratoires.admin.invitations');
+Route::post('/laboratoires/{code_lab}/admin/invitations', [\App\Http\Controllers\labo\InvitationController::class, 'store'])->name('laboratoires.admin.invitations.store');
+Route::delete('/laboratoires/{code_lab}/admin/invitations/{invitation}', [\App\Http\Controllers\labo\InvitationController::class, 'destroy'])->name('laboratoires.admin.invitations.destroy');
+
+// Routes publiques pour les invitations
+Route::get('/invitation/{token}', [\App\Http\Controllers\labo\InvitationController::class, 'accepterInvitation'])->name('laboratoires.invitation.accepter');
+Route::post('/invitation/{token}', [\App\Http\Controllers\labo\InvitationController::class, 'traiterInvitation'])->name('laboratoires.invitation.traiter');
+
+// Route courte pour les QR codes (plus fiable)
+Route::get('/i/{token}', [\App\Http\Controllers\labo\InvitationController::class, 'accepterInvitation'])->name('laboratoires.invitation.short');
+
+// Route pour télécharger le QR code
+Route::get('/invitation-qr/{token}', [\App\Http\Controllers\labo\InvitationController::class, 'telechargerQRCode'])->name('laboratoires.invitation.qr');

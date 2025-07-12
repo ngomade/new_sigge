@@ -36,15 +36,6 @@ class Laboratoire extends Model
     {
         return $this->hasMany(Publication::class, 'code_lab', 'code_lab');
     }
-
-    public function pages()
-    {
-        return $this->hasMany(LaboPage::class, 'code_lab', 'code_lab');
-    }
-    public function medias()
-    {
-        return $this->hasMany(LaboMedia::class, 'code_lab', 'code_lab');
-    }
     public function notifications()
     {
         return $this->hasMany(LabNotif::class, 'code_lab', 'code_lab');

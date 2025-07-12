@@ -68,6 +68,7 @@
             </div>
             <div class="col-md-8 text-end">
                 <a href="{{ route('labo.roles.index') }}" class="btn btn-outline-secondary me-2"><i class="bx bx-cog"></i> Gérer les rôles</a>
+                <a href="{{ route('laboratoires.admin.invitations', $laboratoire->code_lab) }}" class="btn btn-outline-info me-2"><i class="bx bx-link-alt"></i> Invitations</a>
                 <a href="{{ route('laboratoires.admin.membres.create', $laboratoire->code_lab) }}" class="btn btn-success"><i class="bx bx-user-plus"></i> Ajouter un membre</a>
             </div>
         </div>

@@ -9,22 +9,13 @@ class Kernel extends ConsoleKernel
 {
     /**
      * Define the application's command schedule.
+     *
+     * Note: Les tâches planifiées des laboratoires sont maintenant gérées
+     * dans le LaboratoireScheduleServiceProvider pour une meilleure organisation.
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Vérifier les alertes des laboratoires tous les jours à 8h00
-        $schedule->command('laboratoire:check-alerts')
-            ->dailyAt('08:00')
-            ->withoutOverlapping()
-            ->runInBackground();
-
-        // Vérifier les alertes des laboratoires toutes les heures en semaine
-        $schedule->command('laboratoire:check-alerts')
-            ->weekdays()
-            ->hourly()
-            ->between('09:00', '18:00')
-            ->withoutOverlapping()
-            ->runInBackground();
+        // Les tâches planifiées sont définies dans les Service Providers
     }
 
     /**
