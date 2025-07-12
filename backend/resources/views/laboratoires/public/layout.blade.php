@@ -151,43 +151,51 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
-                            <a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">
-                                Présentation
-                            </a>
+                    @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
+                        @if($isAdmin)
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">
+                                    Présentation
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">
+                                    Projets
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">
+                                    Équipements
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">
+                                    Membres
+                                </a>
+                            </li>
                         @endif
-                    </li>
-                    <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
-                            <a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">
-                                Projets
-                            </a>
-                        @endif
-                    </li>
-                    <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
-                            <a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">
-                                Équipements
-                            </a>
-                        @endif
-                    </li>
-                    <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel' && $isAdmin)
-                            <a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">
-                                Membres
-                            </a>
-                        @endif
-                    </li>
-                    <li class="nav-item">
-                        @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                            <a class="nav-link" href="{{ $isAdmin ? route('labo.publications.index', $laboratoire->code_lab) : route('labo.publications.index') }}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">
                                 Publications
                             </a>
-                        @else
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="#presentation">Présentation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#projets">Projets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#equipements">Équipements</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#membres">Membres</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#projets">Publications</a>
-                        @endif
-                    </li>
+                        </li>
+                    @endif
                 </ul>
 
                 <div class="navbar-nav">

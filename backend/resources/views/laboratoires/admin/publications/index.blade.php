@@ -11,23 +11,65 @@
             <h2><i class='bx bx-book'></i> Gestion des publications</h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
+                    @php
+                        $userId = session('user_id');
+                        $userType = session('user_type');
+                        $isAdmin = false;
+                        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                            ->where('statut', 'actif')
+                            ->where(function ($q) use ($userId, $userType) {
+                                if ($userType === 'externe') {
+                                    $q->where('id_user_externe', $userId);
+                                } else {
+                                    $q->where('id_pers_lab', $userId);
+                                }
+                            })
+                            ->with('roleLabo')
+                            ->first();
+                        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                            $isAdmin = true;
+                        }
+                    @endphp
+                    @if($isAdmin)
                     <li class="breadcrumb-item">
                         <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">
                             <i class='bx bx-home'></i> Dashboard
                         </a>
                     </li>
+                    @endif
                     <li class="breadcrumb-item active" aria-current="page">Publications</li>
                 </ol>
             </nav>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
-                <i class='bx bx-arrow-back'></i> Retour au dashboard
-            </a>
-            <a href="{{ route('labo.publications.create') }}" class="btn btn-success">
-                <i class='bx bx-plus'></i> Ajouter une publication
-            </a>
-        </div>
+    <div class="d-flex gap-2">
+        @php
+            $userId = session('user_id');
+            $userType = session('user_type');
+            $isAdmin = false;
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        @endphp
+        @if($isAdmin)
+        <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
+            <i class='bx bx-arrow-back'></i> Retour au dashboard
+        </a>
+        @endif
+        <a href="{{ route('labo.publications.create') }}" class="btn btn-success">
+            <i class='bx bx-plus'></i> Ajouter une publication
+        </a>
+    </div>
     </div>
 
     @include('laboratoires.partials.alerts')
@@ -189,9 +231,32 @@
         <i class='bx bx-file-pdf'></i>
     </a>
 @endif
-                                        <a href="{{ route('labo.publications.edit', $publication->code_publi) }}" class="btn btn-sm btn-warning" title="Modifier">
-                                            <i class='bx bx-edit'></i>
-                                        </a>
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $isAdmin = false;
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+        $isAdmin = true;
+    }
+@endphp
+
+@if($isAdmin || $publication->id_pers_lab === $userId)
+<a href="{{ route('labo.publications.edit', $publication->code_publi) }}"
+   class="btn btn-sm btn-warning"
+   title="Modifier">
+    <i class='bx bx-edit'></i>
+</a>
 <form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" class="d-inline delete-requete-form" id="delete-form-{{ $publication->code_publi }}">
     @csrf
     @method('DELETE')
@@ -201,6 +266,7 @@
         <i class='bx bx-trash'></i>
     </button>
 </form>
+@endif
                                     </div>
                                 </td>
                             </tr>

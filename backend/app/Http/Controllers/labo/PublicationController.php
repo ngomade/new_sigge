@@ -14,7 +14,30 @@ class PublicationController extends Controller
      */
     public function index(Request $request)
     {
+        $userId = session('user_id');
+        $userType = session('user_type');
+
         $query = Publication::with(['createur.personnel', 'createur.user', 'createur']);
+
+        $isAdmin = false;
+        if (session()->has('laboratoire_code') && $userId && $userType) {
+            $codeLab = session('laboratoire_code');
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
 
         // Filtres
         if ($request->filled('type')) {
@@ -125,11 +148,39 @@ class PublicationController extends Controller
      */
     public function show(string $code_publi)
     {
+        $userId = session('user_id');
+        $userType = session('user_type');
+
         $publication = Publication::with(['createur', 'laboratoire'])
             ->where('code_publi', $code_publi)
             ->firstOrFail();
 
         $laboratoire = $publication->laboratoire;
+
+        // Check if user is admin or creator
+        $isAdmin = false;
+        if (session()->has('laboratoire_code') && $userId && $userType) {
+            $codeLab = session('laboratoire_code');
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Unauthorized access to this publication.');
+        }
 
         return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
     }
@@ -139,11 +190,39 @@ class PublicationController extends Controller
      */
     public function edit(string $code_publi)
     {
+        $userId = session('user_id');
+        $userType = session('user_type');
+
         $publication = Publication::with(['createur', 'laboratoire'])
             ->where('code_publi', $code_publi)
             ->firstOrFail();
 
         $laboratoire = $publication->laboratoire;
+
+        // Check if user is admin or creator
+        $isAdmin = false;
+        if (session()->has('laboratoire_code') && $userId && $userType) {
+            $codeLab = session('laboratoire_code');
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Unauthorized access to edit this publication.');
+        }
 
         return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire'));
     }
@@ -153,7 +232,35 @@ class PublicationController extends Controller
      */
     public function update(Request $request, string $code_publi)
     {
+        $userId = session('user_id');
+        $userType = session('user_type');
+
         $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
+
+        // Check if user is admin or creator
+        $isAdmin = false;
+        if (session()->has('laboratoire_code') && $userId && $userType) {
+            $codeLab = session('laboratoire_code');
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Unauthorized access to update this publication.');
+        }
 
         $validated = $request->validate([
             'titre_publi' => 'required|max:255',
@@ -186,7 +293,36 @@ class PublicationController extends Controller
      */
     public function destroy(string $code_publi)
     {
+        $userId = session('user_id');
+        $userType = session('user_type');
+
         $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
+
+        // Check if user is admin or creator
+        $isAdmin = false;
+        if (session()->has('laboratoire_code') && $userId && $userType) {
+            $codeLab = session('laboratoire_code');
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Unauthorized access to delete this publication.');
+        }
+
         $publication->delete();
 
         return redirect()->route('labo.publications.index')
