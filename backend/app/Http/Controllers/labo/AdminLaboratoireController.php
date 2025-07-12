@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Labo;
 
 use App\Http\Controllers\Controller;
+use App\Models\laboratoires\ReservationAgent;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\laboratoires\Laboratoire;
 use App\Models\laboratoires\LaboratoirePersLab;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\LaboAnnonce;
 
 class AdminLaboratoireController extends Controller
 {
@@ -75,7 +78,7 @@ class AdminLaboratoireController extends Controller
             'nouveaux_projets' => ProjetLabo::where('code_lab', $code_lab)
                 ->where('created_at', '>=', $dateLimite)
                 ->count(),
-            'nouvelles_reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+            'nouvelles_reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                 $q->where('code_lab', $code_lab);
             })->where('created_at', '>=', $dateLimite)->count(),
         ];
@@ -143,7 +146,7 @@ class AdminLaboratoireController extends Controller
             'nouveaux_projets' => ProjetLabo::where('code_lab', $code_lab)
                 ->where('created_at', '>=', $dateLimite)
                 ->count(),
-            'nouvelles_reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+            'nouvelles_reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                 $q->where('code_lab', $code_lab);
             })->where('created_at', '>=', $dateLimite)->count(),
         ];
@@ -266,7 +269,7 @@ class AdminLaboratoireController extends Controller
             ];
         }
 
-        \App\Models\laboratoires\LaboratoirePersLab::create($affectationData);
+        LaboratoirePersLab::create($affectationData);
 
         return redirect()->route('laboratoires.admin.membres', $code_lab)
             ->with('success', 'Membre ajouté avec succès au laboratoire.');
@@ -276,7 +279,7 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
+        $affectation = LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
             ->where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
@@ -290,7 +293,7 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
+        $affectation = LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
             ->where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
@@ -309,7 +312,7 @@ class AdminLaboratoireController extends Controller
             'date_fin_affectation' => 'nullable|date|after:date_affectation',
             'statut' => 'required|in:actif,inactif'
         ]);
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
                     ->orWhere('id_user_externe', $membre);
@@ -327,7 +330,7 @@ class AdminLaboratoireController extends Controller
 
     public function supprimerMembre(Request $request, $code_lab, $membre)
     {
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
                     ->orWhere('id_user_externe', $membre);
@@ -347,7 +350,7 @@ class AdminLaboratoireController extends Controller
         }
         $affected = 0;
         if ($action === 'delete') {
-            $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            $affected = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where(function ($q) use ($ids) {
                     $q->whereIn('id_pers_lab', $ids)
                         ->orWhereIn('id_user_externe', $ids);
@@ -359,7 +362,7 @@ class AdminLaboratoireController extends Controller
             if (!$role) {
                 return back()->with('error', 'Veuillez sélectionner un rôle.');
             }
-            $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            $affected = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where(function ($q) use ($ids) {
                     $q->whereIn('id_pers_lab', $ids)
                         ->orWhereIn('id_user_externe', $ids);
@@ -371,7 +374,7 @@ class AdminLaboratoireController extends Controller
             if (!$statut) {
                 return back()->with('error', 'Veuillez sélectionner un statut.');
             }
-            $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            $affected = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where(function ($q) use ($ids) {
                     $q->whereIn('id_pers_lab', $ids)
                         ->orWhereIn('id_user_externe', $ids);
@@ -414,7 +417,7 @@ class AdminLaboratoireController extends Controller
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
         // Récupérer les membres actifs du laboratoire
-        $membres = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab', 'userExterne'])
             ->get();
@@ -466,7 +469,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.show', [$code_lab, $projet->code_projet])
                 ->with('success', 'Projet créé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la création : ' . $e->getMessage());
         }
@@ -492,7 +495,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         // Récupérer les membres actifs du laboratoire
-        $membres = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab', 'userExterne'])
             ->get();
@@ -526,7 +529,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.show', [$code_lab, $projet->code_projet])
                 ->with('success', 'Projet mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
@@ -551,7 +554,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets', $code_lab)
                 ->with('success', 'Projet supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -565,7 +568,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         // Récupérer les membres actifs du laboratoire
-        $membres = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab', 'userExterne'])
             ->get();
@@ -631,7 +634,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant ajouté avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -654,7 +657,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant retiré avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -695,7 +698,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
                 ->with('success', 'Document ajouté avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -721,7 +724,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
                 ->with('success', 'Document supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -735,7 +738,7 @@ class AdminLaboratoireController extends Controller
         $search = $request->input('search');
         $localisation = $request->input('localisation');
 
-        $query = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $query = Equipements::where('code_lab', $code_lab)
             ->with(['laboratoire', 'entretiens', 'reservations']);
 
         if ($etat) {
@@ -756,10 +759,10 @@ class AdminLaboratoireController extends Controller
 
         // Statistiques
         $stats = [
-            'total' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->count(),
-            'disponible' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->where('etat', 'disponible')->count(),
-            'maintenance' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->where('etat', 'en maintenance')->count(),
-            'hors_service' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->where('etat', 'hors service')->count(),
+            'total' => Equipements::where('code_lab', $code_lab)->count(),
+            'disponible' => Equipements::where('code_lab', $code_lab)->where('etat', 'disponible')->count(),
+            'maintenance' => Equipements::where('code_lab', $code_lab)->where('etat', 'en maintenance')->count(),
+            'hors_service' => Equipements::where('code_lab', $code_lab)->where('etat', 'hors service')->count(),
         ];
 
         return view('laboratoires.admin.equipements.index', compact('laboratoire', 'equipements', 'stats', 'etat', 'search', 'localisation'));
@@ -786,7 +789,7 @@ class AdminLaboratoireController extends Controller
         ]);
 
         try {
-            \App\Models\laboratoires\Equipements::create([
+            Equipements::create([
                 'nom_equip' => $request->nom_equip,
                 'ref_equip' => $request->ref_equip,
                 'desc_equip' => $request->desc_equip,
@@ -799,7 +802,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement ajouté avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -807,7 +810,7 @@ class AdminLaboratoireController extends Controller
     public function equipementShow($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->with(['laboratoire', 'entretiens.personnel', 'reservations.personnel'])
             ->firstOrFail();
@@ -818,7 +821,7 @@ class AdminLaboratoireController extends Controller
     public function equipementEdit($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -828,7 +831,7 @@ class AdminLaboratoireController extends Controller
     public function equipementUpdate(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -855,7 +858,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.equipements.show', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Équipement mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
@@ -863,7 +866,7 @@ class AdminLaboratoireController extends Controller
     public function equipementDestroy(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -882,7 +885,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -891,12 +894,12 @@ class AdminLaboratoireController extends Controller
     public function equipementEntretiens($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->with(['entretiens.personnel'])
             ->firstOrFail();
 
-        $personnel = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
@@ -907,7 +910,7 @@ class AdminLaboratoireController extends Controller
     public function equipementEntretienStore(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -949,7 +952,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien programmé avec succès.');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la programmation : ' . $e->getMessage());
         }
     }
@@ -957,7 +960,7 @@ class AdminLaboratoireController extends Controller
     public function equipementEntretienUpdate(Request $request, $code_lab, $equipement, $entretien)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -984,7 +987,7 @@ class AdminLaboratoireController extends Controller
                 return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                     ->with('success', 'Statut de l\'entretien mis à jour avec succès.');
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return back()->with('error', 'Erreur lors de la mise à jour du statut : ' . $e->getMessage());
             }
         }
@@ -1013,7 +1016,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien mis à jour avec succès.');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
@@ -1032,7 +1035,7 @@ class AdminLaboratoireController extends Controller
 
             if (!$autresEntretiensEnCours) {
                 // Vérifier s'il y a des réservations actives
-                $reservationsActives = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+                $reservationsActives = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('statut', 'confirmé')
                     ->where('debut_reserv', '<=', now())
                     ->where('fin_reserv', '>=', now())
@@ -1055,12 +1058,12 @@ class AdminLaboratoireController extends Controller
     public function equipementReservations($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->with(['reservations.personnel'])
             ->firstOrFail();
 
-        $personnel = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
@@ -1071,7 +1074,7 @@ class AdminLaboratoireController extends Controller
     public function equipementReservationStore(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -1088,7 +1091,7 @@ class AdminLaboratoireController extends Controller
             }
 
             // Vérifier s'il y a des conflits de réservation
-            $conflit = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+            $conflit = ReservationAgent::where('code_equip', $equipement->code_equip)
                 ->where('statut', 'confirmé')
                 ->where(function ($query) use ($request) {
                     $query->whereBetween('debut_reserv', [$request->debut_reserv, $request->fin_reserv])
@@ -1104,7 +1107,7 @@ class AdminLaboratoireController extends Controller
                 return back()->with('error', 'Il y a un conflit de réservation pour cette période.');
             }
 
-            \App\Models\laboratoires\ReservationAgent::create([
+            ReservationAgent::create([
                 'code_equip' => $equipement->code_equip,
                 'id_pers_lab' => $request->id_pers_lab,
                 'debut_reserv' => $request->debut_reserv,
@@ -1114,7 +1117,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Demande de réservation créée avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la création : ' . $e->getMessage());
         }
     }
@@ -1122,12 +1125,12 @@ class AdminLaboratoireController extends Controller
     public function equipementReservationUpdate(Request $request, $code_lab, $equipement, $reservation)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
         // Chercher la réservation par son ID (pas par id_pers_lab)
-        $reservation = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+        $reservation = ReservationAgent::where('code_equip', $equipement->code_equip)
             ->where('id', $reservation) // Utiliser l'ID de la réservation
             ->firstOrFail();
 
@@ -1141,7 +1144,7 @@ class AdminLaboratoireController extends Controller
             // Si la réservation est confirmée et qu'elle est active, mettre à jour l'état de l'équipement
             if ($request->statut === 'confirmé' && $reservation->isActive()) {
                 // Vérifier s'il n'y a pas d'autres réservations actives qui se chevauchent
-                $conflits = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+                $conflits = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('id', '!=', $reservation->id)
                     ->where('statut', 'confirmé')
                     ->where(function ($query) use ($reservation) {
@@ -1166,7 +1169,7 @@ class AdminLaboratoireController extends Controller
                 }
             } elseif ($request->statut === 'refusé' || $request->statut === 'annulé') {
                 // Vérifier s'il y a d'autres réservations actives en cours
-                $autresReservationsActives = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+                $autresReservationsActives = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('statut', 'confirmé')
                     ->where('id', '!=', $reservation->id)
                     ->where('debut_reserv', '<=', now())
@@ -1180,7 +1183,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Statut de la réservation mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
@@ -1255,7 +1258,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature approuvée avec succès. Un email a été envoyé au candidat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'approbation : ' . $e->getMessage());
         }
     }
@@ -1285,7 +1288,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature rejetée avec succès. Un email a été envoyé au candidat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors du rejet : ' . $e->getMessage());
         }
     }
@@ -1373,7 +1376,7 @@ class AdminLaboratoireController extends Controller
             }
 
             // Créer l'affectation (pas d'entrée dans pers_lab pour les externes)
-            \App\Models\laboratoires\LaboratoirePersLab::create([
+            LaboratoirePersLab::create([
                 'code_lab' => $code_lab,
                 'id_pers_lab' => null, // Les externes n'ont pas d'entrée dans pers_lab
                 'id_user_externe' => $userExterne->id_user_ext,
@@ -1396,7 +1399,7 @@ class AdminLaboratoireController extends Controller
                 try {
                     \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
                         ->send(new ExterneConfirmationMail($userExterne, $laboratoire, $tempPassword));
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $emailSent = false;
                     $emailErrorMessage = $e->getMessage();
                     // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
@@ -1413,7 +1416,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', $successMessage);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la création : ' . $e->getMessage());
         }
@@ -1427,7 +1430,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         // Récupérer l'affectation
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('id_user_externe', $externe->id_user_ext)
             ->with('roleLabo')
             ->first();
@@ -1444,7 +1447,7 @@ class AdminLaboratoireController extends Controller
         $roles = \App\Models\laboratoires\RoleLabo::all();
 
         // Récupérer l'affectation
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('id_user_externe', $externe->id_user_ext)
             ->first();
 
@@ -1491,7 +1494,7 @@ class AdminLaboratoireController extends Controller
             }
 
             // Mettre à jour l'affectation (pas de pers_lab pour les externes)
-            \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_user_externe', $externe->id_user_ext)
                 ->update([
                     'id_rl' => $request->id_rl,
@@ -1502,7 +1505,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', 'Utilisateur externe mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
@@ -1517,7 +1520,7 @@ class AdminLaboratoireController extends Controller
 
         try {
             // Supprimer l'affectation
-            \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_user_externe', $externe->id_user_ext)
                 ->delete();
 
@@ -1531,7 +1534,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', 'Utilisateur externe supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -1559,14 +1562,14 @@ class AdminLaboratoireController extends Controller
             try {
                 Mail::to($externe->email_user_ext)
                     ->send(new ExternePasswordResetMail($externe, $laboratoire, $newPassword));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Log l'erreur d'envoi d'email mais ne pas faire échouer la réinitialisation
                 \Illuminate\Support\Facades\Log::error('Erreur envoi email réinitialisation mot de passe externe: ' . $e->getMessage());
             }
 
             return redirect()->route('laboratoires.admin.externes.show', [$code_lab, $externe->id_user_ext])
                 ->with('success', 'Mot de passe réinitialisé avec succès. Un email avec le nouveau mot de passe a été envoyé à ' . $externe->email_user_ext);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la réinitialisation du mot de passe : ' . $e->getMessage());
         }
     }
@@ -1617,7 +1620,7 @@ class AdminLaboratoireController extends Controller
         $dateDebut = now()->subDays($periode);
 
         // Statistiques d'utilisation par équipement
-        $statsUtilisation = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+        $statsUtilisation = ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
             $q->where('code_lab', $code_lab);
         })
             ->where('debut_reserv', '>=', $dateDebut)
@@ -1650,7 +1653,7 @@ class AdminLaboratoireController extends Controller
             ->get();
 
         // Statistiques par période (pour graphiques)
-        $statsParPeriode = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+        $statsParPeriode = ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
             $q->where('code_lab', $code_lab);
         })
             ->where('debut_reserv', '>=', $dateDebut)
@@ -1898,7 +1901,7 @@ class AdminLaboratoireController extends Controller
 
             case 'utilisations':
                 return [
-                    'reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+                    'reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                         $q->where('code_lab', $code_lab);
                     })->with(['equipement', 'personnel'])->get(),
                 ];
@@ -1910,7 +1913,7 @@ class AdminLaboratoireController extends Controller
                     'equipements' => Equipements::where('code_lab', $code_lab)->count(),
                     'publications' => Publication::where('code_lab', $code_lab)->count(),
                     'externes' => UserExterne::where('code_lab', $code_lab)->count(),
-                    'reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+                    'reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                         $q->where('code_lab', $code_lab);
                     })->count(),
                 ];
@@ -2118,6 +2121,132 @@ class AdminLaboratoireController extends Controller
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.basename($filePath).'"'
+        ]);
+    }
+
+    /**
+     * Afficher les annonces du laboratoire (notifications)
+     */
+    public function annonces($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $annonces = LaboAnnonce::where('code_lab', $code_lab)->orderByDesc('created_at')->get();
+        $isAdmin = false;
+        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+            $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                ->where('id_pers_lab', session('user_id'))
+                ->where('statut', 'actif')
+                ->where('date_affectation', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('date_fin_affectation')
+                          ->orWhere('date_fin_affectation', '>=', now());
+                })
+                ->with('roleLabo')
+                ->first();
+            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+        return view('laboratoires.admin.annonces.index', compact('laboratoire', 'annonces', 'isAdmin'));
+    }
+
+    /**
+     * Poster une annonce (admin)
+     */
+    public function storeAnnonce(Request $request, $code_lab)
+    {
+        $request->validate([
+            'contenu' => 'required|string|max:2000',
+            'titre' => 'nullable|string|max:255',
+            'fichier' => 'nullable|file|max:5120', // 5 Mo max
+        ]);
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        // Vérifier que l'utilisateur est admin
+        $isAdmin = false;
+        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+            $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                ->where('id_pers_lab', session('user_id'))
+                ->where('statut', 'actif')
+                ->where('date_affectation', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('date_fin_affectation')
+                          ->orWhere('date_fin_affectation', '>=', now());
+                })
+                ->with('roleLabo')
+                ->first();
+            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+        if(!$isAdmin) {
+            abort(403, 'Seul l\'administrateur du laboratoire peut envoyer une annonce.');
+        }
+        $fichier = null;
+        if($request->hasFile('fichier')) {
+            // Correction : on stocke uniquement dans 'private/annonces' sans préfixer deux fois
+            $fichier = $request->file('fichier')->store('annonces', 'local');
+        }
+        LaboAnnonce::create([
+            'code_lab' => $code_lab,
+            'id_admin' => session('user_id'),
+            'titre' => $request->titre,
+            'contenu' => $request->contenu,
+            'fichier' => $fichier
+        ]);
+        return redirect()->route('laboratoires.admin.annonces', $code_lab)->with('success', 'Annonce envoyée à tous les membres du laboratoire.');
+    }
+
+    /**
+     * Supprimer une annonce (admin)
+     */
+    public function deleteAnnonce($code_lab, $id)
+    {
+        $annonce = LaboAnnonce::where('id', $id)->where('code_lab', $code_lab)->firstOrFail();
+        // Vérifier que l'utilisateur est admin
+        $isAdmin = false;
+        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+            $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                ->where('id_pers_lab', session('user_id'))
+                ->where('statut', 'actif')
+                ->where('date_affectation', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('date_fin_affectation')
+                          ->orWhere('date_fin_affectation', '>=', now());
+                })
+                ->with('roleLabo')
+                ->first();
+            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+        if(!$isAdmin) {
+            abort(403, 'Seul l\'administrateur du laboratoire peut supprimer une annonce.');
+        }
+        // Supprimer le fichier joint si existe
+        if($annonce->fichier && \Storage::disk('local')->exists($annonce->fichier)) {
+            \Storage::disk('local')->delete($annonce->fichier);
+        }
+        $annonce->delete();
+        return redirect()->route('laboratoires.admin.annonces', $code_lab)->with('success', 'Annonce supprimée.');
+    }
+
+    /**
+     * Télécharger le fichier joint d'une annonce
+     */
+    public function downloadAnnonceFile($code_lab, $id)
+    {
+        $annonce = \App\Models\LaboAnnonce::where('id', $id)->where('code_lab', $code_lab)->firstOrFail();
+        $chemin = storage_path('app/private/' . $annonce->fichier);
+        if (!is_file($chemin)) {
+            return response()->view('errors.fichier_annonce_introuvable', [
+                'message' => 'Le fichier joint de cette annonce est introuvable ou a été supprimé.',
+                'annonce' => $annonce,
+                'laboratoire' => $annonce->laboratoire
+            ], 404);
+        }
+        return response()->file($chemin, [
+            'Content-Type' => mime_content_type($chemin),
+            'Content-Disposition' => 'inline; filename="' . basename($chemin) . '"'
         ]);
     }
 }

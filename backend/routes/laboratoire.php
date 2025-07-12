@@ -234,3 +234,9 @@ Route::get('/i/{token}', [\App\Http\Controllers\labo\InvitationController::class
 
 // Route pour télécharger le QR code
 Route::get('/invitation-qr/{token}', [\App\Http\Controllers\labo\InvitationController::class, 'telechargerQRCode'])->name('laboratoires.invitation.qr');
+
+// Annonces labo (notifications globales)
+Route::get('/laboratoires/{code_lab}/admin/annonces', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'annonces'])->name('laboratoires.admin.annonces');
+Route::post('/laboratoires/{code_lab}/admin/annonces', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'storeAnnonce'])->name('laboratoires.admin.annonces.store');
+Route::delete('/laboratoires/{code_lab}/admin/annonces/{id}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'deleteAnnonce'])->name('laboratoires.admin.annonces.delete');
+Route::get('/laboratoires/{code_lab}/admin/annonces/{id}/download', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'downloadAnnonceFile'])->name('laboratoires.admin.annonces.download');
