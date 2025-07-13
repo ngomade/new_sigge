@@ -204,6 +204,7 @@ Route::post('/laboratoires/{code_lab}/admin/rapports', [\App\Http\Controllers\La
 Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportShow'])->name('laboratoires.admin.rapports.show');
 Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}/download', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportDownload'])->name('laboratoires.admin.rapports.download');
 Route::delete('/laboratoires/{code_lab}/admin/rapports/{rapport}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportDestroy'])->name('laboratoires.admin.rapports.destroy');
+Route::get('/laboratoires/{code_lab}/admin/rapports/{rapport}/view', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'rapportView'])->name('laboratoires.admin.rapports.view');
 
 // Routes pour les notifications et alertes
 Route::get('/laboratoires/{code_lab}/admin/notifications', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'notifications'])->name('laboratoires.admin.notifications');
@@ -233,3 +234,9 @@ Route::get('/i/{token}', [\App\Http\Controllers\labo\InvitationController::class
 
 // Route pour télécharger le QR code
 Route::get('/invitation-qr/{token}', [\App\Http\Controllers\labo\InvitationController::class, 'telechargerQRCode'])->name('laboratoires.invitation.qr');
+
+// Annonces labo (notifications globales)
+Route::get('/laboratoires/{code_lab}/admin/annonces', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'annonces'])->name('laboratoires.admin.annonces');
+Route::post('/laboratoires/{code_lab}/admin/annonces', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'storeAnnonce'])->name('laboratoires.admin.annonces.store');
+Route::delete('/laboratoires/{code_lab}/admin/annonces/{id}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'deleteAnnonce'])->name('laboratoires.admin.annonces.delete');
+Route::get('/laboratoires/{code_lab}/admin/annonces/{id}/download', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'downloadAnnonceFile'])->name('laboratoires.admin.annonces.download');

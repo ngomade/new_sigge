@@ -79,7 +79,7 @@
                     <div class="card-body p-0">
                         @if(str_contains($rapport->path_rl, '.pdf'))
                             <div class="ratio ratio-16x9">
-                                <iframe src="{{ route('laboratoires.admin.rapports.download', [$laboratoire->code_lab, $rapport->code_rl]) }}"
+                                <iframe src="{{ route('laboratoires.admin.rapports.view', [$laboratoire->code_lab, $rapport->code_rl]) }}"
                                         class="border-0"></iframe>
                             </div>
                         @else

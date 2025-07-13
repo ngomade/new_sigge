@@ -43,8 +43,8 @@
                                 <tr>
                                     <td>
                                         @if($participant->membre)
-                                            <strong>{{ $participant->membre->nom_pers_lab ?? 'N/A' }}</strong>
-                                            <br><small class="text-muted">{{ $participant->membre->email_pers_lab ?? 'N/A' }}</small>
+                                            <strong>{{ $participant->membre->nom_complet }}</strong>
+                                            <br><small class="text-muted">{{ $participant->membre->email ?? 'N/A' }}</small>
                                         @elseif($participant->userExterne)
                                             <strong>{{ $participant->userExterne->nom_user_ext }} {{ $participant->userExterne->prenom_user_ext }}</strong>
                                             <br><small class="text-muted">{{ $participant->userExterne->email_user_ext ?? 'N/A' }}</small>
@@ -54,7 +54,7 @@
                                     </td>
                                     <td>
                                         @if($participant->membre)
-                                            <span class="badge bg-primary">{{ $participant->membre->type_pers_lab }}</span>
+                                            <span class="badge bg-primary">{{ $participant->membre->type_label }}</span>
                                         @elseif($participant->userExterne)
                                             <span class="badge bg-info">Externe</span>
                                         @endif
@@ -69,10 +69,9 @@
                                         </small>
                                     </td>
                                     <td>
-                                        <form method="POST" action="{{ route('laboratoires.admin.projets.participants.destroy', [$laboratoire->code_lab, $projet->code_projet, $participant->id_pers_lab ?? $participant->id_user_ext]) }}"
+                                        <form method="POST" action="{{ route('laboratoires.admin.projets.participants.destroy', [$laboratoire->code_lab, $projet->code_projet, $participant->id]) }}"
                                               onsubmit="return confirm('Confirmer la suppression de ce participant ?')" style="display: inline;">
                                             @csrf
-                                            @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger">
                                                 <i class='bx bx-trash'></i>
                                             </button>
@@ -125,11 +124,19 @@
                             <label for="membre_id" class="form-label">Membre du laboratoire *</label>
                             <select class="form-select @error('membre_id') is-invalid @enderror" id="membre_id" name="membre_id">
                                 <option value="">Sélectionner un membre</option>
+<<<<<<< HEAD
 @foreach($membres as $membre)
     <option value="{{ $membre->id }}" {{ old('membre_id') == $membre->id ? 'selected' : '' }}>
         {{ $membre->persLab->nom_pers_lab ?? 'N/A' }} ({{ $membre->persLab->type_pers_lab ?? 'N/A' }})
     </option>
 @endforeach
+=======
+                                @foreach($membres as $membre)
+                                    <option value="{{ $membre->id }}" {{ old('membre_id') == $membre->id ? 'selected' : '' }}>
+                                        {{ $membre->nom_complet }} ({{ $membre->type_membre_label }})
+                                    </option>
+                                @endforeach
+>>>>>>> 2e52091f3e572695dd0fa905a518521558461686
                             </select>
                             @error('membre_id')
                                 <div class="invalid-feedback">{{ $message }}</div>

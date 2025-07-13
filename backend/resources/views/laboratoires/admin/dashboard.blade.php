@@ -119,24 +119,8 @@
                             <a href="{{ route('laboratoires.admin.alertes', $laboratoire->code_lab) }}" class="btn btn-warning">
                                 <i class="bi bi-exclamation-triangle"></i> Alertes actives
                             </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-center shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Communication</h5>
-                        <p class="display-4">
-                            <i class="bi bi-chat-dots text-info"></i>
-                        </p>
-                        <p class="text-muted">Gérez les communications internes</p>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <a href="{{ route('laboratoires.admin.notifications', $laboratoire->code_lab) }}" class="btn btn-outline-info">
-                                <i class="bi bi-envelope"></i> Messages
-                            </a>
-                            <a href="{{ route('laboratoires.admin.alertes', $laboratoire->code_lab) }}" class="btn btn-info">
-                                <i class="bi bi-gear"></i> Paramètres
+                            <a href="{{ route('laboratoires.admin.annonces', $laboratoire->code_lab) }}" class="btn btn-outline-primary">
+                                <i class="bi bi-megaphone"></i> Annonces
                             </a>
                         </div>
                     </div>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Labo;
 
 use App\Http\Controllers\Controller;
+use App\Models\laboratoires\ReservationAgent;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\laboratoires\Laboratoire;
 use App\Models\laboratoires\LaboratoirePersLab;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\LaboAnnonce;
 
 class AdminLaboratoireController extends Controller
 {
@@ -75,7 +78,7 @@ class AdminLaboratoireController extends Controller
             'nouveaux_projets' => ProjetLabo::where('code_lab', $code_lab)
                 ->where('created_at', '>=', $dateLimite)
                 ->count(),
-            'nouvelles_reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+            'nouvelles_reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                 $q->where('code_lab', $code_lab);
             })->where('created_at', '>=', $dateLimite)->count(),
         ];
@@ -143,7 +146,7 @@ class AdminLaboratoireController extends Controller
             'nouveaux_projets' => ProjetLabo::where('code_lab', $code_lab)
                 ->where('created_at', '>=', $dateLimite)
                 ->count(),
-            'nouvelles_reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+            'nouvelles_reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                 $q->where('code_lab', $code_lab);
             })->where('created_at', '>=', $dateLimite)->count(),
         ];
@@ -170,7 +173,12 @@ class AdminLaboratoireController extends Controller
         $search = $request->input('search');
 
         $query = LaboratoirePersLab::where('code_lab', $code_lab)
-            ->with(['persLab', 'roleLabo', 'userExterne']);
+            ->with([
+                'persLab.personnel',
+                'persLab.user',
+                'roleLabo',
+                'userExterne'
+            ]);
 
         if ($role) {
             $query->where('id_rl', $role);
@@ -266,7 +274,7 @@ class AdminLaboratoireController extends Controller
             ];
         }
 
-        \App\Models\laboratoires\LaboratoirePersLab::create($affectationData);
+        LaboratoirePersLab::create($affectationData);
 
         return redirect()->route('laboratoires.admin.membres', $code_lab)
             ->with('success', 'Membre ajouté avec succès au laboratoire.');
@@ -276,7 +284,7 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
+        $affectation = LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
             ->where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
@@ -290,7 +298,7 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $layout = session()->has('laboratoire_code') ? 'laboratoires.public.layout' : 'sige_app.backend.template.backend';
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
+        $affectation = LaboratoirePersLab::with(['persLab', 'roleLabo', 'userExterne'])
             ->where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
@@ -309,7 +317,7 @@ class AdminLaboratoireController extends Controller
             'date_fin_affectation' => 'nullable|date|after:date_affectation',
             'statut' => 'required|in:actif,inactif'
         ]);
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
                     ->orWhere('id_user_externe', $membre);
@@ -327,7 +335,7 @@ class AdminLaboratoireController extends Controller
 
     public function supprimerMembre(Request $request, $code_lab, $membre)
     {
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
                 $q->where('id_pers_lab', $membre)
                     ->orWhere('id_user_externe', $membre);
@@ -347,7 +355,7 @@ class AdminLaboratoireController extends Controller
         }
         $affected = 0;
         if ($action === 'delete') {
-            $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            $affected = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where(function ($q) use ($ids) {
                     $q->whereIn('id_pers_lab', $ids)
                         ->orWhereIn('id_user_externe', $ids);
@@ -359,7 +367,7 @@ class AdminLaboratoireController extends Controller
             if (!$role) {
                 return back()->with('error', 'Veuillez sélectionner un rôle.');
             }
-            $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            $affected = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where(function ($q) use ($ids) {
                     $q->whereIn('id_pers_lab', $ids)
                         ->orWhereIn('id_user_externe', $ids);
@@ -371,7 +379,7 @@ class AdminLaboratoireController extends Controller
             if (!$statut) {
                 return back()->with('error', 'Veuillez sélectionner un statut.');
             }
-            $affected = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            $affected = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where(function ($q) use ($ids) {
                     $q->whereIn('id_pers_lab', $ids)
                         ->orWhereIn('id_user_externe', $ids);
@@ -413,10 +421,14 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
-        // Récupérer les membres actifs du laboratoire
-        $membres = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        // Récupérer les membres actifs du laboratoire avec les relations imbriquées
+        $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
-            ->with(['persLab', 'userExterne'])
+            ->with([
+                'persLab.personnel',
+                'persLab.user',
+                'userExterne'
+            ])
             ->get();
 
         return view('laboratoires.admin.projets.create', compact('laboratoire', 'membres'));
@@ -466,7 +478,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.show', [$code_lab, $projet->code_projet])
                 ->with('success', 'Projet créé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la création : ' . $e->getMessage());
         }
@@ -477,7 +489,12 @@ class AdminLaboratoireController extends Controller
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $projet = \App\Models\laboratoires\ProjetLabo::where('code_lab', $code_lab)
             ->where('code_projet', $projet)
-            ->with(['participants.membre', 'participants.userExterne', 'docs'])
+            ->with([
+                'participants.membre.personnel',
+                'participants.membre.user',
+                'participants.userExterne',
+                'docs'
+            ])
             ->firstOrFail();
 
         return view('laboratoires.admin.projets.show', compact('laboratoire', 'projet'));
@@ -491,10 +508,14 @@ class AdminLaboratoireController extends Controller
             ->with(['participants.membre', 'participants.userExterne'])
             ->firstOrFail();
 
-        // Récupérer les membres actifs du laboratoire
-        $membres = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        // Récupérer les membres actifs du laboratoire avec les relations imbriquées
+        $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
-            ->with(['persLab', 'userExterne'])
+            ->with([
+                'persLab.personnel',
+                'persLab.user',
+                'userExterne'
+            ])
             ->get();
 
         return view('laboratoires.admin.projets.edit', compact('laboratoire', 'projet', 'membres'));
@@ -526,7 +547,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets.show', [$code_lab, $projet->code_projet])
                 ->with('success', 'Projet mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
@@ -551,7 +572,7 @@ class AdminLaboratoireController extends Controller
 
             return redirect()->route('laboratoires.admin.projets', $code_lab)
                 ->with('success', 'Projet supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -561,18 +582,62 @@ class AdminLaboratoireController extends Controller
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $projet = \App\Models\laboratoires\ProjetLabo::where('code_lab', $code_lab)
             ->where('code_projet', $projet)
-            ->with(['participants.membre', 'participants.userExterne'])
+            ->with([
+                'participants.membre.personnel',
+                'participants.membre.user',
+                'participants.userExterne'
+            ])
             ->firstOrFail();
 
-        // Récupérer les membres actifs du laboratoire
-        $membres = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        // Debug: vérifier les participants chargés
+        \Log::info('Participants chargés:', [
+            'count' => $projet->participants->count(),
+            'participants' => $projet->participants->map(function($p) {
+                return [
+                    'id_pers_lab' => $p->id_pers_lab,
+                    'id_user_ext' => $p->id_user_ext,
+                    'membre_loaded' => $p->relationLoaded('membre'),
+                    'userExterne_loaded' => $p->relationLoaded('userExterne'),
+                    'membre_type' => $p->membre ? $p->membre->type_pers_lab : null,
+                    'membre_nom' => $p->membre ? $p->membre->nom_complet : null,
+                    'membre_email' => $p->membre ? $p->membre->email : null,
+                ];
+            })->toArray()
+        ]);
+
+        // Récupérer les participants déjà dans le projet
+        $participantsExistants = $projet->participants;
+        $idsParticipantsExistants = [];
+
+        foreach ($participantsExistants as $participant) {
+            if ($participant->id_pers_lab) {
+                // Pour les membres internes, récupérer l'ID de l'affectation
+                $affectation = LaboratoirePersLab::where('id_pers_lab', $participant->id_pers_lab)
+                    ->where('code_lab', $code_lab)
+                    ->first();
+                if ($affectation) {
+                    $idsParticipantsExistants[] = $affectation->id;
+                }
+            } elseif ($participant->id_user_ext) {
+                $idsParticipantsExistants[] = $participant->id_user_ext;
+            }
+        }
+
+        // Récupérer les membres internes actifs du laboratoire (personnel et utilisateurs) avec les relations imbriquées
+        $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
-            ->with(['persLab', 'userExterne'])
+            ->whereNotNull('id_pers_lab') // Seulement les membres internes
+            ->whereNotIn('id', $idsParticipantsExistants) // Exclure ceux déjà dans le projet
+            ->with([
+                'persLab.personnel',
+                'persLab.user'
+            ])
             ->get();
 
-        // Récupérer les utilisateurs externes actifs
+        // Récupérer les utilisateurs externes actifs (exclure ceux déjà dans le projet)
         $usersExternes = \App\Models\laboratoires\UserExterne::where('code_lab', $code_lab)
             ->where('statut', 'actif')
+            ->whereNotIn('id_user_ext', $idsParticipantsExistants)
             ->get();
 
         return view('laboratoires.admin.projets.participants', compact('laboratoire', 'projet', 'membres', 'usersExternes'));
@@ -585,14 +650,28 @@ class AdminLaboratoireController extends Controller
             ->where('code_projet', $projet)
             ->firstOrFail();
 
+<<<<<<< HEAD
 $request->validate([
             'type_participant' => 'required|in:membre,externe',
             'membre_id' => 'required_if:type_participant,membre|exists:laboratoire_pers_lab,id',
             'user_externe_id' => 'required_if:type_participant,externe|exists:user_externe,id_user_ext',
+=======
+        $rules = [
+            'type_participant' => 'required|in:membre,externe',
+>>>>>>> 2e52091f3e572695dd0fa905a518521558461686
             'role' => 'required|string|max:100',
             'debut_participation' => 'required|date',
             'fin_participation' => 'nullable|date|after:debut_participation'
-        ]);
+        ];
+
+        // Ajouter les règles conditionnelles
+        if ($request->type_participant === 'membre') {
+            $rules['membre_id'] = 'required|exists:laboratoire_pers_lab,id';
+        } else {
+            $rules['user_externe_id'] = 'required|exists:user_externe,id_user_ext';
+        }
+
+        $request->validate($rules);
 
         // Additional check to prevent null id_pers_lab when type is membre
         if ($request->type_participant === 'membre' && empty($request->membre_id)) {
@@ -606,6 +685,7 @@ $request->validate([
             $id_pers_lab = null;
             $id_user_ext = null;
 
+<<<<<<< HEAD
 if ($request->type_participant === 'membre') {
     $laboratoirePersLab = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)->first();
     if (!$laboratoirePersLab) {
@@ -615,6 +695,30 @@ if ($request->type_participant === 'membre') {
 } else {
     $id_user_ext = $request->user_externe_id;
 }
+=======
+            if ($request->type_participant === 'membre') {
+                // Debug: afficher les données reçues
+                \Log::info('Ajout membre - type_participant: ' . $request->type_participant);
+                \Log::info('Ajout membre - membre_id: ' . $request->membre_id);
+
+                // Pour les membres, récupérer l'id_pers_lab depuis laboratoire_pers_lab
+                $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)
+                    ->where('code_lab', $code_lab)
+                    ->where('statut', 'actif')
+                    ->first();
+
+                if (!$affectation) {
+                    \Log::error('Affectation non trouvée pour membre_id: ' . $request->membre_id);
+                    return back()->with('error', 'Membre non trouvé ou inactif.');
+                }
+
+                $id_pers_lab = $affectation->id_pers_lab;
+                \Log::info('Ajout membre - id_pers_lab trouvé: ' . $id_pers_lab);
+            } else {
+                $id_user_ext = $request->user_externe_id;
+                \Log::info('Ajout externe - id_user_ext: ' . $id_user_ext);
+            }
+>>>>>>> 2e52091f3e572695dd0fa905a518521558461686
 
             // Vérifier si le participant n'est pas déjà dans le projet
             $existing = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
@@ -632,7 +736,8 @@ if ($request->type_participant === 'membre') {
                 return back()->with('error', 'Ce participant est déjà dans le projet.');
             }
 
-            \App\Models\laboratoires\ParticiperProjet::create([
+            // Debug: afficher les données avant création
+            \Log::info('Création participant avec données:', [
                 'code_projet' => $projet->code_projet,
                 'id_pers_lab' => $id_pers_lab,
                 'id_user_ext' => $id_user_ext,
@@ -641,9 +746,28 @@ if ($request->type_participant === 'membre') {
                 'fin_participation' => $request->fin_participation
             ]);
 
+            $participant = \App\Models\laboratoires\ParticiperProjet::create([
+                'code_projet' => $projet->code_projet,
+                'id_pers_lab' => $id_pers_lab,
+                'id_user_ext' => $id_user_ext,
+                'role' => $request->role,
+                'debut_participation' => $request->debut_participation,
+                'fin_participation' => $request->fin_participation
+            ]);
+
+            // Debug: vérifier que l'enregistrement a été créé
+            if (!$participant) {
+                \Log::error('Échec de création du participant');
+                return back()->with('error', 'Erreur lors de la création de l\'enregistrement participant.');
+            }
+
+            \Log::info('Participant créé avec succès, ID: ' . $participant->id);
+
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant ajouté avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            \Log::error('Erreur lors de l\'ajout du participant: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -656,17 +780,45 @@ if ($request->type_participant === 'membre') {
             ->firstOrFail();
 
         try {
-            // Supprimer le participant (peut être un membre ou un utilisateur externe)
-            \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
-                ->where(function ($query) use ($participant) {
-                    $query->where('id_pers_lab', $participant)
-                        ->orWhere('id_user_ext', $participant);
-                })
-                ->delete();
+            // Debug: afficher les informations de suppression
+            \Log::info('Suppression participant:', [
+                'code_lab' => $code_lab,
+                'code_projet' => $projet->code_projet,
+                'participant_id' => $participant
+            ]);
+
+            // Vérifier d'abord combien de participants existent
+            $totalParticipants = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)->count();
+            \Log::info('Nombre total de participants avant suppression: ' . $totalParticipants);
+
+            // Supprimer le participant par son ID dans la table participer_projet
+            $participantRecord = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
+                ->where('id', $participant)
+                ->first();
+
+            if (!$participantRecord) {
+                \Log::error('Participant non trouvé avec ID: ' . $participant);
+                return back()->with('error', 'Participant non trouvé.');
+            }
+
+            \Log::info('Participant trouvé:', [
+                'id' => $participantRecord->id,
+                'id_pers_lab' => $participantRecord->id_pers_lab,
+                'id_user_ext' => $participantRecord->id_user_ext,
+                'role' => $participantRecord->role
+            ]);
+
+            $participantRecord->delete();
+
+            // Vérifier combien de participants restent
+            $participantsRestants = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)->count();
+            \Log::info('Nombre de participants après suppression: ' . $participantsRestants);
 
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant retiré avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            \Log::error('Erreur lors de la suppression: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -707,7 +859,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
                 ->with('success', 'Document ajouté avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -733,7 +885,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
                 ->with('success', 'Document supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -747,7 +899,7 @@ if ($request->type_participant === 'membre') {
         $search = $request->input('search');
         $localisation = $request->input('localisation');
 
-        $query = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $query = Equipements::where('code_lab', $code_lab)
             ->with(['laboratoire', 'entretiens', 'reservations']);
 
         if ($etat) {
@@ -768,10 +920,10 @@ if ($request->type_participant === 'membre') {
 
         // Statistiques
         $stats = [
-            'total' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->count(),
-            'disponible' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->where('etat', 'disponible')->count(),
-            'maintenance' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->where('etat', 'en maintenance')->count(),
-            'hors_service' => \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)->where('etat', 'hors service')->count(),
+            'total' => Equipements::where('code_lab', $code_lab)->count(),
+            'disponible' => Equipements::where('code_lab', $code_lab)->where('etat', 'disponible')->count(),
+            'maintenance' => Equipements::where('code_lab', $code_lab)->where('etat', 'en maintenance')->count(),
+            'hors_service' => Equipements::where('code_lab', $code_lab)->where('etat', 'hors service')->count(),
         ];
 
         return view('laboratoires.admin.equipements.index', compact('laboratoire', 'equipements', 'stats', 'etat', 'search', 'localisation'));
@@ -798,7 +950,7 @@ if ($request->type_participant === 'membre') {
         ]);
 
         try {
-            \App\Models\laboratoires\Equipements::create([
+            Equipements::create([
                 'nom_equip' => $request->nom_equip,
                 'ref_equip' => $request->ref_equip,
                 'desc_equip' => $request->desc_equip,
@@ -811,7 +963,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement ajouté avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -819,7 +971,7 @@ if ($request->type_participant === 'membre') {
     public function equipementShow($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->with(['laboratoire', 'entretiens.personnel', 'reservations.personnel'])
             ->firstOrFail();
@@ -830,7 +982,7 @@ if ($request->type_participant === 'membre') {
     public function equipementEdit($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -840,7 +992,7 @@ if ($request->type_participant === 'membre') {
     public function equipementUpdate(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -867,7 +1019,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.equipements.show', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Équipement mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
@@ -875,7 +1027,7 @@ if ($request->type_participant === 'membre') {
     public function equipementDestroy(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -894,7 +1046,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -903,12 +1055,12 @@ if ($request->type_participant === 'membre') {
     public function equipementEntretiens($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->with(['entretiens.personnel'])
             ->firstOrFail();
 
-        $personnel = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
@@ -919,10 +1071,10 @@ if ($request->type_participant === 'membre') {
     public function equipementEntretienStore(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
-    
+
         $request->validate([
             'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id',
             'type_entretien' => 'required|in:entretien,reparation',
@@ -931,19 +1083,19 @@ if ($request->type_participant === 'membre') {
             'desc_entretien' => 'nullable|string',
             'cout' => 'nullable|numeric|min:0'
         ]);
-    
+
         try {
             // Vérifier s'il y a déjà un entretien en cours
             $entretienEnCours = $equipement->getEntretienEnCours();
             if ($entretienEnCours) {
                 return back()->with('error', 'Cet équipement a déjà un entretien en cours.');
             }
-    
+
             // Vérifier si l'équipement est disponible pour maintenance
             if ($equipement->etat === 'hors service') {
                 return back()->with('error', 'Cet équipement est hors service et ne peut pas être entretenu.');
             }
-    
+
             \App\Models\laboratoires\EntretienReparation::create([
                 'code_equip' => $equipement->code_equip,
                 'id_pers_lab' => $request->id_pers_lab,
@@ -954,14 +1106,14 @@ if ($request->type_participant === 'membre') {
                 'desc_entretien' => $request->desc_entretien,
                 'cout' => $request->cout
             ]);
-    
+
             // Mettre à jour l'état de l'équipement
             $equipement->update(['etat' => 'en maintenance']);
-    
+
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien programmé avec succès.');
-    
-        } catch (\Exception $e) {
+
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la programmation : ' . $e->getMessage());
         }
     }
@@ -969,38 +1121,38 @@ if ($request->type_participant === 'membre') {
     public function equipementEntretienUpdate(Request $request, $code_lab, $equipement, $entretien)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
-    
+
         // Chercher l'entretien par son ID (pas par code_equip/id_pers_lab)
         $entretien = \App\Models\laboratoires\EntretienReparation::where('code_equip', $equipement->code_equip)
             ->where('id', $entretien) // Utiliser l'ID de l'entretien
             ->firstOrFail();
-    
+
         // Si on change seulement le statut (depuis les boutons d'action)
         if ($request->has('keep_dates') && $request->keep_dates === 'true') {
             $request->validate([
                 'statut_entretien' => 'required|in:En cours,Terminé,En pause,Annulé'
             ]);
-    
+
             try {
                 // Mettre à jour seulement le statut
                 $entretien->update([
                     'statut_entretien' => $request->statut_entretien
                 ]);
-    
+
                 // Mettre à jour l'état de l'équipement selon le statut
                 $this->updateEquipementStateAfterEntretien($equipement, $request->statut_entretien);
-    
+
                 return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                     ->with('success', 'Statut de l\'entretien mis à jour avec succès.');
-    
-            } catch (\Exception $e) {
+
+            } catch (Exception $e) {
                 return back()->with('error', 'Erreur lors de la mise à jour du statut : ' . $e->getMessage());
             }
         }
-    
+
         // Sinon, c'est une mise à jour complète (depuis le modal)
         $request->validate([
             'statut_entretien' => 'required|in:En cours,Terminé,En pause,Annulé',
@@ -1009,7 +1161,7 @@ if ($request->type_participant === 'membre') {
             'desc_entretien' => 'nullable|string',
             'cout' => 'nullable|numeric|min:0'
         ]);
-    
+
         try {
             $entretien->update([
                 'statut_entretien' => $request->statut_entretien,
@@ -1018,18 +1170,18 @@ if ($request->type_participant === 'membre') {
                 'desc_entretien' => $request->desc_entretien,
                 'cout' => $request->cout
             ]);
-    
+
             // Mettre à jour l'état de l'équipement selon le statut
             $this->updateEquipementStateAfterEntretien($equipement, $request->statut_entretien);
-    
+
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien mis à jour avec succès.');
-    
-        } catch (\Exception $e) {
+
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Mettre à jour l'état de l'équipement après modification d'un entretien
      */
@@ -1041,22 +1193,22 @@ if ($request->type_participant === 'membre') {
             $autresEntretiensEnCours = \App\Models\laboratoires\EntretienReparation::where('code_equip', $equipement->code_equip)
                 ->whereIn('statut_entretien', ['En cours', 'En pause'])
                 ->exists();
-    
+
             if (!$autresEntretiensEnCours) {
                 // Vérifier s'il y a des réservations actives
-                $reservationsActives = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+                $reservationsActives = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('statut', 'confirmé')
                     ->where('debut_reserv', '<=', now())
                     ->where('fin_reserv', '>=', now())
                     ->exists();
-    
+
                 if ($reservationsActives) {
                     $equipement->update(['etat' => 'en utilisation']);
                 } else {
                     $equipement->update(['etat' => 'disponible']);
                 }
             }
-        } 
+        }
         // Si l'entretien est en cours ou en pause
         elseif (in_array($nouveauStatut, ['En cours', 'En pause'])) {
             $equipement->update(['etat' => 'en maintenance']);
@@ -1067,12 +1219,12 @@ if ($request->type_participant === 'membre') {
     public function equipementReservations($code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->with(['reservations.personnel'])
             ->firstOrFail();
 
-        $personnel = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
@@ -1083,7 +1235,7 @@ if ($request->type_participant === 'membre') {
     public function equipementReservationStore(Request $request, $code_lab, $equipement)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
@@ -1100,7 +1252,7 @@ if ($request->type_participant === 'membre') {
             }
 
             // Vérifier s'il y a des conflits de réservation
-            $conflit = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+            $conflit = ReservationAgent::where('code_equip', $equipement->code_equip)
                 ->where('statut', 'confirmé')
                 ->where(function ($query) use ($request) {
                     $query->whereBetween('debut_reserv', [$request->debut_reserv, $request->fin_reserv])
@@ -1116,7 +1268,7 @@ if ($request->type_participant === 'membre') {
                 return back()->with('error', 'Il y a un conflit de réservation pour cette période.');
             }
 
-            \App\Models\laboratoires\ReservationAgent::create([
+            ReservationAgent::create([
                 'code_equip' => $equipement->code_equip,
                 'id_pers_lab' => $request->id_pers_lab,
                 'debut_reserv' => $request->debut_reserv,
@@ -1126,7 +1278,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Demande de réservation créée avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la création : ' . $e->getMessage());
         }
     }
@@ -1134,12 +1286,12 @@ if ($request->type_participant === 'membre') {
     public function equipementReservationUpdate(Request $request, $code_lab, $equipement, $reservation)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $equipement = \App\Models\laboratoires\Equipements::where('code_lab', $code_lab)
+        $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
             ->firstOrFail();
 
         // Chercher la réservation par son ID (pas par id_pers_lab)
-        $reservation = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+        $reservation = ReservationAgent::where('code_equip', $equipement->code_equip)
             ->where('id', $reservation) // Utiliser l'ID de la réservation
             ->firstOrFail();
 
@@ -1153,7 +1305,7 @@ if ($request->type_participant === 'membre') {
             // Si la réservation est confirmée et qu'elle est active, mettre à jour l'état de l'équipement
             if ($request->statut === 'confirmé' && $reservation->isActive()) {
                 // Vérifier s'il n'y a pas d'autres réservations actives qui se chevauchent
-                $conflits = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+                $conflits = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('id', '!=', $reservation->id)
                     ->where('statut', 'confirmé')
                     ->where(function ($query) use ($reservation) {
@@ -1178,7 +1330,7 @@ if ($request->type_participant === 'membre') {
                 }
             } elseif ($request->statut === 'refusé' || $request->statut === 'annulé') {
                 // Vérifier s'il y a d'autres réservations actives en cours
-                $autresReservationsActives = \App\Models\laboratoires\ReservationAgent::where('code_equip', $equipement->code_equip)
+                $autresReservationsActives = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('statut', 'confirmé')
                     ->where('id', '!=', $reservation->id)
                     ->where('debut_reserv', '<=', now())
@@ -1192,7 +1344,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Statut de la réservation mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
@@ -1267,7 +1419,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature approuvée avec succès. Un email a été envoyé au candidat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de l\'approbation : ' . $e->getMessage());
         }
     }
@@ -1297,7 +1449,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature rejetée avec succès. Un email a été envoyé au candidat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors du rejet : ' . $e->getMessage());
         }
     }
@@ -1385,7 +1537,7 @@ if ($request->type_participant === 'membre') {
             }
 
             // Créer l'affectation (pas d'entrée dans pers_lab pour les externes)
-            \App\Models\laboratoires\LaboratoirePersLab::create([
+            LaboratoirePersLab::create([
                 'code_lab' => $code_lab,
                 'id_pers_lab' => null, // Les externes n'ont pas d'entrée dans pers_lab
                 'id_user_externe' => $userExterne->id_user_ext,
@@ -1408,7 +1560,7 @@ if ($request->type_participant === 'membre') {
                 try {
                     \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
                         ->send(new ExterneConfirmationMail($userExterne, $laboratoire, $tempPassword));
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $emailSent = false;
                     $emailErrorMessage = $e->getMessage();
                     // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
@@ -1425,7 +1577,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', $successMessage);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la création : ' . $e->getMessage());
         }
@@ -1439,7 +1591,7 @@ if ($request->type_participant === 'membre') {
             ->firstOrFail();
 
         // Récupérer l'affectation
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('id_user_externe', $externe->id_user_ext)
             ->with('roleLabo')
             ->first();
@@ -1456,7 +1608,7 @@ if ($request->type_participant === 'membre') {
         $roles = \App\Models\laboratoires\RoleLabo::all();
 
         // Récupérer l'affectation
-        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('id_user_externe', $externe->id_user_ext)
             ->first();
 
@@ -1503,7 +1655,7 @@ if ($request->type_participant === 'membre') {
             }
 
             // Mettre à jour l'affectation (pas de pers_lab pour les externes)
-            \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_user_externe', $externe->id_user_ext)
                 ->update([
                     'id_rl' => $request->id_rl,
@@ -1514,7 +1666,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', 'Utilisateur externe mis à jour avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
@@ -1529,7 +1681,7 @@ if ($request->type_participant === 'membre') {
 
         try {
             // Supprimer l'affectation
-            \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_user_externe', $externe->id_user_ext)
                 ->delete();
 
@@ -1543,7 +1695,7 @@ if ($request->type_participant === 'membre') {
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', 'Utilisateur externe supprimé avec succès.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
@@ -1571,14 +1723,14 @@ if ($request->type_participant === 'membre') {
             try {
                 Mail::to($externe->email_user_ext)
                     ->send(new ExternePasswordResetMail($externe, $laboratoire, $newPassword));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Log l'erreur d'envoi d'email mais ne pas faire échouer la réinitialisation
                 \Illuminate\Support\Facades\Log::error('Erreur envoi email réinitialisation mot de passe externe: ' . $e->getMessage());
             }
 
             return redirect()->route('laboratoires.admin.externes.show', [$code_lab, $externe->id_user_ext])
                 ->with('success', 'Mot de passe réinitialisé avec succès. Un email avec le nouveau mot de passe a été envoyé à ' . $externe->email_user_ext);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la réinitialisation du mot de passe : ' . $e->getMessage());
         }
     }
@@ -1629,7 +1781,7 @@ if ($request->type_participant === 'membre') {
         $dateDebut = now()->subDays($periode);
 
         // Statistiques d'utilisation par équipement
-        $statsUtilisation = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+        $statsUtilisation = ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
             $q->where('code_lab', $code_lab);
         })
             ->where('debut_reserv', '>=', $dateDebut)
@@ -1662,7 +1814,7 @@ if ($request->type_participant === 'membre') {
             ->get();
 
         // Statistiques par période (pour graphiques)
-        $statsParPeriode = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+        $statsParPeriode = ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
             $q->where('code_lab', $code_lab);
         })
             ->where('debut_reserv', '>=', $dateDebut)
@@ -1774,11 +1926,12 @@ if ($request->type_participant === 'membre') {
     {
         $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
 
-        if (!file_exists(storage_path('app/' . $rapport->path_rl))) {
+        $filePath = storage_path('app/' . $rapport->path_rl);
+        if (!file_exists($filePath)) {
             return back()->with('error', 'Fichier non trouvé.');
         }
 
-        return response()->download(storage_path('app/' . $rapport->path_rl));
+        return response()->download($filePath);
     }
 
     /**
@@ -1816,10 +1969,10 @@ if ($request->type_participant === 'membre') {
         $pdf = \PDF::loadView('laboratoires.admin.rapports.template-pdf', $data);
 
         $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".pdf";
-        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+        $path = "private/rapports/{$laboratoire->code_lab}/" . $filename;
 
         // Créer le dossier s'il n'existe pas
-        \Storage::makeDirectory("rapports/{$laboratoire->code_lab}");
+        \Storage::makeDirectory("private/rapports/{$laboratoire->code_lab}");
 
         // Sauvegarder le PDF
         \Storage::put($path, $pdf->output());
@@ -1842,10 +1995,10 @@ if ($request->type_participant === 'membre') {
         ];
 
         $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".docx";
-        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+        $path = "private/rapports/{$laboratoire->code_lab}/" . $filename;
 
         // Créer le dossier s'il n'existe pas
-        $dirPath = storage_path("app/rapports/{$laboratoire->code_lab}");
+        $dirPath = storage_path("app/private/rapports/{$laboratoire->code_lab}");
         if (!file_exists($dirPath)) {
             mkdir($dirPath, 0755, true);
         }
@@ -1909,7 +2062,7 @@ if ($request->type_participant === 'membre') {
 
             case 'utilisations':
                 return [
-                    'reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+                    'reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                         $q->where('code_lab', $code_lab);
                     })->with(['equipement', 'personnel'])->get(),
                 ];
@@ -1921,7 +2074,7 @@ if ($request->type_participant === 'membre') {
                     'equipements' => Equipements::where('code_lab', $code_lab)->count(),
                     'publications' => Publication::where('code_lab', $code_lab)->count(),
                     'externes' => UserExterne::where('code_lab', $code_lab)->count(),
-                    'reservations' => \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
+                    'reservations' => ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
                         $q->where('code_lab', $code_lab);
                     })->count(),
                 ];
@@ -2115,5 +2268,146 @@ if ($request->type_participant === 'membre') {
             ->count();
 
         return response()->json(['count' => $count]);
+    }
+
+    public function rapportView($code_lab, $rapport)
+    {
+        $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
+        $filePath = storage_path('app/' . $rapport->path_rl);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Fichier non trouvé.');
+        }
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.basename($filePath).'"'
+        ]);
+    }
+
+    /**
+     * Afficher les annonces du laboratoire (notifications)
+     */
+    public function annonces($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $annonces = LaboAnnonce::where('code_lab', $code_lab)->orderByDesc('created_at')->get();
+        $isAdmin = false;
+        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+            $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                ->where('id_pers_lab', session('user_id'))
+                ->where('statut', 'actif')
+                ->where('date_affectation', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('date_fin_affectation')
+                          ->orWhere('date_fin_affectation', '>=', now());
+                })
+                ->with('roleLabo')
+                ->first();
+            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+        return view('laboratoires.admin.annonces.index', compact('laboratoire', 'annonces', 'isAdmin'));
+    }
+
+    /**
+     * Poster une annonce (admin)
+     */
+    public function storeAnnonce(Request $request, $code_lab)
+    {
+        $request->validate([
+            'contenu' => 'required|string|max:2000',
+            'titre' => 'nullable|string|max:255',
+            'fichier' => 'nullable|file|max:5120', // 5 Mo max
+        ]);
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        // Vérifier que l'utilisateur est admin
+        $isAdmin = false;
+        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+            $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                ->where('id_pers_lab', session('user_id'))
+                ->where('statut', 'actif')
+                ->where('date_affectation', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('date_fin_affectation')
+                          ->orWhere('date_fin_affectation', '>=', now());
+                })
+                ->with('roleLabo')
+                ->first();
+            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+        if(!$isAdmin) {
+            abort(403, 'Seul l\'administrateur du laboratoire peut envoyer une annonce.');
+        }
+        $fichier = null;
+        if($request->hasFile('fichier')) {
+            // Correction : on stocke uniquement dans 'private/annonces' sans préfixer deux fois
+            $fichier = $request->file('fichier')->store('annonces', 'local');
+        }
+        LaboAnnonce::create([
+            'code_lab' => $code_lab,
+            'id_admin' => session('user_id'),
+            'titre' => $request->titre,
+            'contenu' => $request->contenu,
+            'fichier' => $fichier
+        ]);
+        return redirect()->route('laboratoires.admin.annonces', $code_lab)->with('success', 'Annonce envoyée à tous les membres du laboratoire.');
+    }
+
+    /**
+     * Supprimer une annonce (admin)
+     */
+    public function deleteAnnonce($code_lab, $id)
+    {
+        $annonce = LaboAnnonce::where('id', $id)->where('code_lab', $code_lab)->firstOrFail();
+        // Vérifier que l'utilisateur est admin
+        $isAdmin = false;
+        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+            $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+                ->where('id_pers_lab', session('user_id'))
+                ->where('statut', 'actif')
+                ->where('date_affectation', '<=', now())
+                ->where(function($query) {
+                    $query->whereNull('date_fin_affectation')
+                          ->orWhere('date_fin_affectation', '>=', now());
+                })
+                ->with('roleLabo')
+                ->first();
+            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+        }
+        if(!$isAdmin) {
+            abort(403, 'Seul l\'administrateur du laboratoire peut supprimer une annonce.');
+        }
+        // Supprimer le fichier joint si existe
+        if($annonce->fichier && \Storage::disk('local')->exists($annonce->fichier)) {
+            \Storage::disk('local')->delete($annonce->fichier);
+        }
+        $annonce->delete();
+        return redirect()->route('laboratoires.admin.annonces', $code_lab)->with('success', 'Annonce supprimée.');
+    }
+
+    /**
+     * Télécharger le fichier joint d'une annonce
+     */
+    public function downloadAnnonceFile($code_lab, $id)
+    {
+        $annonce = \App\Models\LaboAnnonce::where('id', $id)->where('code_lab', $code_lab)->firstOrFail();
+        $chemin = storage_path('app/private/' . $annonce->fichier);
+        if (!is_file($chemin)) {
+            return response()->view('errors.fichier_annonce_introuvable', [
+                'message' => 'Le fichier joint de cette annonce est introuvable ou a été supprimé.',
+                'annonce' => $annonce,
+                'laboratoire' => $annonce->laboratoire
+            ], 404);
+        }
+        return response()->file($chemin, [
+            'Content-Type' => mime_content_type($chemin),
+            'Content-Disposition' => 'inline; filename="' . basename($chemin) . '"'
+        ]);
     }
 }
