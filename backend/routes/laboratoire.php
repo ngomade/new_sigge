@@ -159,7 +159,7 @@ Route::get('/laboratoires/{code_lab}/admin/projets/create', [\App\Http\Controlle
 Route::post('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetStore'])->name('laboratoires.admin.projets.store');
 Route::get('/laboratoires/{code_lab}/admin/projets/{projet}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetShow'])->name('laboratoires.admin.projets.show');
 Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/edit', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetEdit'])->name('laboratoires.admin.projets.edit');
-Route::post('/laboratoires/{code_lab}/admin/projets/{projet}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetUpdate'])->name('laboratoires.admin.projets.update');
+Route::match(['put', 'post'], '/laboratoires/{code_lab}/admin/projets/{projet}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetUpdate'])->name('laboratoires.admin.projets.update');
 Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDestroy'])->name('laboratoires.admin.projets.destroy');
 
 // Gestion des participants aux projets
