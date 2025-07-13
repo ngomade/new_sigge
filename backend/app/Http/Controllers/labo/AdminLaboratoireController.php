@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Labo;
+namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
 use App\Models\laboratoires\ReservationAgent;
@@ -592,7 +592,7 @@ class AdminLaboratoireController extends Controller
         // Debug: vérifier les participants chargés
         \Log::info('Participants chargés:', [
             'count' => $projet->participants->count(),
-            'participants' => $projet->participants->map(function($p) {
+            'participants' => $projet->participants->map(function ($p) {
                 return [
                     'id_pers_lab' => $p->id_pers_lab,
                     'id_user_ext' => $p->id_user_ext,
@@ -650,19 +650,13 @@ class AdminLaboratoireController extends Controller
             ->where('code_projet', $projet)
             ->firstOrFail();
 
-<<<<<<< HEAD
-$request->validate([
-            'type_participant' => 'required|in:membre,externe',
-            'membre_id' => 'required_if:type_participant,membre|exists:laboratoire_pers_lab,id',
-            'user_externe_id' => 'required_if:type_participant,externe|exists:user_externe,id_user_ext',
-=======
-        $rules = [
-            'type_participant' => 'required|in:membre,externe',
->>>>>>> 2e52091f3e572695dd0fa905a518521558461686
-            'role' => 'required|string|max:100',
-            'debut_participation' => 'required|date',
-            'fin_participation' => 'nullable|date|after:debut_participation'
-        ];
+            $rules = [
+                'type_participant' => 'required|in:membre,externe',
+
+                'role' => 'required|string|max:100',
+                'debut_participation' => 'required|date',
+                'fin_participation' => 'nullable|date|after:debut_participation'
+            ];
 
         // Ajouter les règles conditionnelles
         if ($request->type_participant === 'membre') {
@@ -684,18 +678,16 @@ $request->validate([
         try {
             $id_pers_lab = null;
             $id_user_ext = null;
+            if ($request->type_participant === 'membre') {
+                $laboratoirePersLab = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)->first();
+                if (!$laboratoirePersLab) {
+                    return back()->withInput()->with('error', 'Membre du laboratoire invalide.');
+                }
+                $id_pers_lab = $laboratoirePersLab->id_pers_lab;
+            } else {
+                $id_user_ext = $request->user_externe_id;
+            }
 
-<<<<<<< HEAD
-if ($request->type_participant === 'membre') {
-    $laboratoirePersLab = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)->first();
-    if (!$laboratoirePersLab) {
-        return back()->withInput()->with('error', 'Membre du laboratoire invalide.');
-    }
-    $id_pers_lab = $laboratoirePersLab->id_pers_lab;
-} else {
-    $id_user_ext = $request->user_externe_id;
-}
-=======
             if ($request->type_participant === 'membre') {
                 // Debug: afficher les données reçues
                 \Log::info('Ajout membre - type_participant: ' . $request->type_participant);
@@ -718,7 +710,6 @@ if ($request->type_participant === 'membre') {
                 $id_user_ext = $request->user_externe_id;
                 \Log::info('Ajout externe - id_user_ext: ' . $id_user_ext);
             }
->>>>>>> 2e52091f3e572695dd0fa905a518521558461686
 
             // Vérifier si le participant n'est pas déjà dans le projet
             $existing = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
@@ -1210,8 +1201,7 @@ if ($request->type_participant === 'membre') {
                     $equipement->update(['etat' => 'disponible']);
                 }
             }
-        }
-        // Si l'entretien est en cours ou en pause
+        } // Si l'entretien est en cours ou en pause
         elseif (in_array($nouveauStatut, ['En cours', 'En pause'])) {
             $equipement->update(['etat' => 'en maintenance']);
         }
@@ -2285,7 +2275,7 @@ if ($request->type_participant === 'membre') {
 
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="'.basename($filePath).'"'
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
         ]);
     }
 
@@ -2297,18 +2287,18 @@ if ($request->type_participant === 'membre') {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $annonces = LaboAnnonce::where('code_lab', $code_lab)->orderByDesc('created_at')->get();
         $isAdmin = false;
-        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+        if (session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
             $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_pers_lab', session('user_id'))
                 ->where('statut', 'actif')
                 ->where('date_affectation', '<=', now())
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                        ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
-            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
                 $isAdmin = true;
             }
         }
@@ -2328,26 +2318,26 @@ if ($request->type_participant === 'membre') {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         // Vérifier que l'utilisateur est admin
         $isAdmin = false;
-        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+        if (session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
             $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_pers_lab', session('user_id'))
                 ->where('statut', 'actif')
                 ->where('date_affectation', '<=', now())
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                        ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
-            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
                 $isAdmin = true;
             }
         }
-        if(!$isAdmin) {
+        if (!$isAdmin) {
             abort(403, 'Seul l\'administrateur du laboratoire peut envoyer une annonce.');
         }
         $fichier = null;
-        if($request->hasFile('fichier')) {
+        if ($request->hasFile('fichier')) {
             // Correction : on stocke uniquement dans 'private/annonces' sans préfixer deux fois
             $fichier = $request->file('fichier')->store('annonces', 'local');
         }
@@ -2369,26 +2359,26 @@ if ($request->type_participant === 'membre') {
         $annonce = LaboAnnonce::where('id', $id)->where('code_lab', $code_lab)->firstOrFail();
         // Vérifier que l'utilisateur est admin
         $isAdmin = false;
-        if(session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
+        if (session('user_id') && session('laboratoire_code') === $code_lab && session('user_type') === 'personnel') {
             $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('id_pers_lab', session('user_id'))
                 ->where('statut', 'actif')
                 ->where('date_affectation', '<=', now())
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                        ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
-            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
                 $isAdmin = true;
             }
         }
-        if(!$isAdmin) {
+        if (!$isAdmin) {
             abort(403, 'Seul l\'administrateur du laboratoire peut supprimer une annonce.');
         }
         // Supprimer le fichier joint si existe
-        if($annonce->fichier && \Storage::disk('local')->exists($annonce->fichier)) {
+        if ($annonce->fichier && \Storage::disk('local')->exists($annonce->fichier)) {
             \Storage::disk('local')->delete($annonce->fichier);
         }
         $annonce->delete();
@@ -2432,12 +2422,11 @@ if ($request->type_participant === 'membre') {
         }
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('titre_publi', 'like', "%$search%")
-                  ->orWhere('domaine', 'like', "%$search%")
-                  ->orWhere('tags', 'like', "%$search%")
-                  ->orWhere('reference', 'like', "%$search%")
-                ;
+                    ->orWhere('domaine', 'like', "%$search%")
+                    ->orWhere('tags', 'like', "%$search%")
+                    ->orWhere('reference', 'like', "%$search%");
             });
         }
         $publications = $query->orderBy('created_at', 'desc')->paginate(10);

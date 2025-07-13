@@ -124,20 +124,11 @@
                             <label for="membre_id" class="form-label">Membre du laboratoire *</label>
                             <select class="form-select @error('membre_id') is-invalid @enderror" id="membre_id" name="membre_id">
                                 <option value="">Sélectionner un membre</option>
-<<<<<<< HEAD
-@foreach($membres as $membre)
-    <option value="{{ $membre->id }}" {{ old('membre_id') == $membre->id ? 'selected' : '' }}>
-        {{ $membre->persLab->nom_pers_lab ?? 'N/A' }} ({{ $membre->persLab->type_pers_lab ?? 'N/A' }})
-    </option>
-@endforeach
-=======
                                 @foreach($membres as $membre)
                                     <option value="{{ $membre->id }}" {{ old('membre_id') == $membre->id ? 'selected' : '' }}>
                                         {{ $membre->nom_complet }} ({{ $membre->type_membre_label }})
                                     </option>
-                                @endforeach
->>>>>>> 2e52091f3e572695dd0fa905a518521558461686
-                            </select>
+                                @endforeach</select>
                             @error('membre_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
