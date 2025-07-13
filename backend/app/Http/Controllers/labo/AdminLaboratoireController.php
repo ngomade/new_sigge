@@ -173,7 +173,12 @@ class AdminLaboratoireController extends Controller
         $search = $request->input('search');
 
         $query = LaboratoirePersLab::where('code_lab', $code_lab)
-            ->with(['persLab', 'roleLabo', 'userExterne']);
+            ->with([
+                'persLab.personnel',
+                'persLab.user',
+                'roleLabo',
+                'userExterne'
+            ]);
 
         if ($role) {
             $query->where('id_rl', $role);
@@ -416,10 +421,14 @@ class AdminLaboratoireController extends Controller
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
-        // Récupérer les membres actifs du laboratoire
+        // Récupérer les membres actifs du laboratoire avec les relations imbriquées
         $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
-            ->with(['persLab', 'userExterne'])
+            ->with([
+                'persLab.personnel',
+                'persLab.user',
+                'userExterne'
+            ])
             ->get();
 
         return view('laboratoires.admin.projets.create', compact('laboratoire', 'membres'));
@@ -480,7 +489,12 @@ class AdminLaboratoireController extends Controller
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $projet = \App\Models\laboratoires\ProjetLabo::where('code_lab', $code_lab)
             ->where('code_projet', $projet)
-            ->with(['participants.membre', 'participants.userExterne', 'docs'])
+            ->with([
+                'participants.membre.personnel',
+                'participants.membre.user',
+                'participants.userExterne',
+                'docs'
+            ])
             ->firstOrFail();
 
         return view('laboratoires.admin.projets.show', compact('laboratoire', 'projet'));
@@ -494,10 +508,14 @@ class AdminLaboratoireController extends Controller
             ->with(['participants.membre', 'participants.userExterne'])
             ->firstOrFail();
 
-        // Récupérer les membres actifs du laboratoire
+        // Récupérer les membres actifs du laboratoire avec les relations imbriquées
         $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
-            ->with(['persLab', 'userExterne'])
+            ->with([
+                'persLab.personnel',
+                'persLab.user',
+                'userExterne'
+            ])
             ->get();
 
         return view('laboratoires.admin.projets.edit', compact('laboratoire', 'projet', 'membres'));
@@ -564,18 +582,62 @@ class AdminLaboratoireController extends Controller
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $projet = \App\Models\laboratoires\ProjetLabo::where('code_lab', $code_lab)
             ->where('code_projet', $projet)
-            ->with(['participants.membre', 'participants.userExterne'])
+            ->with([
+                'participants.membre.personnel',
+                'participants.membre.user',
+                'participants.userExterne'
+            ])
             ->firstOrFail();
 
-        // Récupérer les membres actifs du laboratoire
+        // Debug: vérifier les participants chargés
+        \Log::info('Participants chargés:', [
+            'count' => $projet->participants->count(),
+            'participants' => $projet->participants->map(function($p) {
+                return [
+                    'id_pers_lab' => $p->id_pers_lab,
+                    'id_user_ext' => $p->id_user_ext,
+                    'membre_loaded' => $p->relationLoaded('membre'),
+                    'userExterne_loaded' => $p->relationLoaded('userExterne'),
+                    'membre_type' => $p->membre ? $p->membre->type_pers_lab : null,
+                    'membre_nom' => $p->membre ? $p->membre->nom_complet : null,
+                    'membre_email' => $p->membre ? $p->membre->email : null,
+                ];
+            })->toArray()
+        ]);
+
+        // Récupérer les participants déjà dans le projet
+        $participantsExistants = $projet->participants;
+        $idsParticipantsExistants = [];
+
+        foreach ($participantsExistants as $participant) {
+            if ($participant->id_pers_lab) {
+                // Pour les membres internes, récupérer l'ID de l'affectation
+                $affectation = LaboratoirePersLab::where('id_pers_lab', $participant->id_pers_lab)
+                    ->where('code_lab', $code_lab)
+                    ->first();
+                if ($affectation) {
+                    $idsParticipantsExistants[] = $affectation->id;
+                }
+            } elseif ($participant->id_user_ext) {
+                $idsParticipantsExistants[] = $participant->id_user_ext;
+            }
+        }
+
+        // Récupérer les membres internes actifs du laboratoire (personnel et utilisateurs) avec les relations imbriquées
         $membres = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
-            ->with(['persLab', 'userExterne'])
+            ->whereNotNull('id_pers_lab') // Seulement les membres internes
+            ->whereNotIn('id', $idsParticipantsExistants) // Exclure ceux déjà dans le projet
+            ->with([
+                'persLab.personnel',
+                'persLab.user'
+            ])
             ->get();
 
-        // Récupérer les utilisateurs externes actifs
+        // Récupérer les utilisateurs externes actifs (exclure ceux déjà dans le projet)
         $usersExternes = \App\Models\laboratoires\UserExterne::where('code_lab', $code_lab)
             ->where('statut', 'actif')
+            ->whereNotIn('id_user_ext', $idsParticipantsExistants)
             ->get();
 
         return view('laboratoires.admin.projets.participants', compact('laboratoire', 'projet', 'membres', 'usersExternes'));
@@ -588,23 +650,47 @@ class AdminLaboratoireController extends Controller
             ->where('code_projet', $projet)
             ->firstOrFail();
 
-        $request->validate([
+        $rules = [
             'type_participant' => 'required|in:membre,externe',
-            'membre_id' => 'required_if:type_participant,membre|exists:laboratoire_pers_lab,id_pers_lab',
-            'user_externe_id' => 'required_if:type_participant,externe|exists:user_externe,id_user_ext',
             'role' => 'required|string|max:100',
             'debut_participation' => 'required|date',
             'fin_participation' => 'nullable|date|after:debut_participation'
-        ]);
+        ];
+
+        // Ajouter les règles conditionnelles
+        if ($request->type_participant === 'membre') {
+            $rules['membre_id'] = 'required|exists:laboratoire_pers_lab,id';
+        } else {
+            $rules['user_externe_id'] = 'required|exists:user_externe,id_user_ext';
+        }
+
+        $request->validate($rules);
 
         try {
             $id_pers_lab = null;
             $id_user_ext = null;
 
             if ($request->type_participant === 'membre') {
-                $id_pers_lab = $request->membre_id;
+                // Debug: afficher les données reçues
+                \Log::info('Ajout membre - type_participant: ' . $request->type_participant);
+                \Log::info('Ajout membre - membre_id: ' . $request->membre_id);
+
+                // Pour les membres, récupérer l'id_pers_lab depuis laboratoire_pers_lab
+                $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)
+                    ->where('code_lab', $code_lab)
+                    ->where('statut', 'actif')
+                    ->first();
+
+                if (!$affectation) {
+                    \Log::error('Affectation non trouvée pour membre_id: ' . $request->membre_id);
+                    return back()->with('error', 'Membre non trouvé ou inactif.');
+                }
+
+                $id_pers_lab = $affectation->id_pers_lab;
+                \Log::info('Ajout membre - id_pers_lab trouvé: ' . $id_pers_lab);
             } else {
                 $id_user_ext = $request->user_externe_id;
+                \Log::info('Ajout externe - id_user_ext: ' . $id_user_ext);
             }
 
             // Vérifier si le participant n'est pas déjà dans le projet
@@ -623,7 +709,8 @@ class AdminLaboratoireController extends Controller
                 return back()->with('error', 'Ce participant est déjà dans le projet.');
             }
 
-            \App\Models\laboratoires\ParticiperProjet::create([
+            // Debug: afficher les données avant création
+            \Log::info('Création participant avec données:', [
                 'code_projet' => $projet->code_projet,
                 'id_pers_lab' => $id_pers_lab,
                 'id_user_ext' => $id_user_ext,
@@ -632,9 +719,28 @@ class AdminLaboratoireController extends Controller
                 'fin_participation' => $request->fin_participation
             ]);
 
+            $participant = \App\Models\laboratoires\ParticiperProjet::create([
+                'code_projet' => $projet->code_projet,
+                'id_pers_lab' => $id_pers_lab,
+                'id_user_ext' => $id_user_ext,
+                'role' => $request->role,
+                'debut_participation' => $request->debut_participation,
+                'fin_participation' => $request->fin_participation
+            ]);
+
+            // Debug: vérifier que l'enregistrement a été créé
+            if (!$participant) {
+                \Log::error('Échec de création du participant');
+                return back()->with('error', 'Erreur lors de la création de l\'enregistrement participant.');
+            }
+
+            \Log::info('Participant créé avec succès, ID: ' . $participant->id);
+
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant ajouté avec succès.');
         } catch (Exception $e) {
+            \Log::error('Erreur lors de l\'ajout du participant: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
         }
     }
@@ -647,17 +753,45 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         try {
-            // Supprimer le participant (peut être un membre ou un utilisateur externe)
-            \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
-                ->where(function ($query) use ($participant) {
-                    $query->where('id_pers_lab', $participant)
-                        ->orWhere('id_user_ext', $participant);
-                })
-                ->delete();
+            // Debug: afficher les informations de suppression
+            \Log::info('Suppression participant:', [
+                'code_lab' => $code_lab,
+                'code_projet' => $projet->code_projet,
+                'participant_id' => $participant
+            ]);
+
+            // Vérifier d'abord combien de participants existent
+            $totalParticipants = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)->count();
+            \Log::info('Nombre total de participants avant suppression: ' . $totalParticipants);
+
+            // Supprimer le participant par son ID dans la table participer_projet
+            $participantRecord = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
+                ->where('id', $participant)
+                ->first();
+
+            if (!$participantRecord) {
+                \Log::error('Participant non trouvé avec ID: ' . $participant);
+                return back()->with('error', 'Participant non trouvé.');
+            }
+
+            \Log::info('Participant trouvé:', [
+                'id' => $participantRecord->id,
+                'id_pers_lab' => $participantRecord->id_pers_lab,
+                'id_user_ext' => $participantRecord->id_user_ext,
+                'role' => $participantRecord->role
+            ]);
+
+            $participantRecord->delete();
+
+            // Vérifier combien de participants restent
+            $participantsRestants = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)->count();
+            \Log::info('Nombre de participants après suppression: ' . $participantsRestants);
 
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant retiré avec succès.');
         } catch (Exception $e) {
+            \Log::error('Erreur lors de la suppression: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }

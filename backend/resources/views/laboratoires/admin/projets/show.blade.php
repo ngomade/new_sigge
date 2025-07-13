@@ -90,7 +90,7 @@
                                         <tr>
                                             <td>
                                                 @if($participant->membre)
-                                                    {{ $participant->membre->nom_pers_lab ?? 'N/A' }}
+                                                    {{ $participant->membre->nom_complet }}
                                                 @elseif($participant->userExterne)
                                                     {{ $participant->userExterne->nom_user_ext }} {{ $participant->userExterne->prenom_user_ext }}
                                                 @else
@@ -99,7 +99,7 @@
                                             </td>
                                             <td>
                                                 @if($participant->membre)
-                                                    <span class="badge bg-primary">{{ $participant->membre->type_pers_lab }}</span>
+                                                    <span class="badge bg-primary">{{ $participant->membre->type_membre_label }}</span>
                                                 @elseif($participant->userExterne)
                                                     <span class="badge bg-info">Externe</span>
                                                 @endif
