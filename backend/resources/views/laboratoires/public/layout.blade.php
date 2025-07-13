@@ -6,21 +6,23 @@
     <title>{{ $laboratoire->label_labo ?? 'Laboratoire' }} - ESTLC</title>
 
     @php
-        $isAdmin = false;
-        if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab && session('user_type') === 'personnel') {
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $affectation = null;
+        $userRole = null;
+        if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab) {
             $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $laboratoire->code_lab)
-                ->where('id_pers_lab', session('user_id'))
                 ->where('statut', 'actif')
-                ->where('date_affectation', '<=', now())
-                ->where(function($query) {
-                    $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                ->where(function($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
                 })
                 ->with('roleLabo')
                 ->first();
-            if($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
-                $isAdmin = true;
-            }
+            $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
         }
     @endphp
 
@@ -143,7 +145,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{{ session('user_id') && session('laboratoire_code') === $laboratoire->code_lab ? ($isAdmin ? route('laboratoires.admin.dashboard', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab)) : route('laboratoires.show', $laboratoire->code_lab) }}">
+            <a class="navbar-brand" href="{{ session('user_id') && session('laboratoire_code') === $laboratoire->code_lab ? ($userRole === 'admin' ? route('laboratoires.admin.dashboard', $laboratoire->code_lab) : route('laboratoires.espace.membre', $laboratoire->code_lab)) : route('laboratoires.show', $laboratoire->code_lab) }}">
                 <i class='bx bx-flask'></i> {{ $laboratoire->label_labo }}
             </a>
 
@@ -154,49 +156,43 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     @if(session('user_id') && session('laboratoire_code') === $laboratoire->code_lab)
-                        @if($isAdmin)
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">
-                                    Présentation
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">
-                                    Projets
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">
-                                    Équipements
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">
-                                    Membres
-                                </a>
-                            </li>
+                        @if($userRole === 'admin')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">Membres</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.candidatures', $laboratoire->code_lab) }}">Candidatures</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
+                        @elseif($userRole === 'chef_projet')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">Membres</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.candidatures', $laboratoire->code_lab) }}">Candidatures</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
+                        @elseif($userRole === 'chercheur')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">Membres</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
+                        @elseif($userRole === 'technicien')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
+                        @elseif($userRole === 'secretaire')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.candidatures', $laboratoire->code_lab) }}">Candidatures</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">Membres</a></li>
+                        @elseif($userRole === 'membre')
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
                         @endif
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('labo.publications.index', $laboratoire->code_lab) }}">
-                                Publications
-                            </a>
-                        </li>
                     @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="#presentation">Présentation</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#projets">Projets</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#equipements">Équipements</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#membres">Membres</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#projets">Publications</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="#presentation">Présentation</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#projets">Projets</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#equipements">Équipements</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#membres">Membres</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#projets">Publications</a></li>
                     @endif
                 </ul>
 
@@ -205,13 +201,13 @@
                         <div class="dropdown">
                             <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class='bx bx-user'></i> {{ session('user_name') }}
-                                <span class="badge bg-secondary ms-1">{{ $isAdmin ? 'Admin' : ucfirst(session('user_type')) }}</span>
+                                <span class="badge bg-secondary ms-1">{{ $userRole ? ucfirst($userRole) : ucfirst(session('user_type')) }}</span>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="userDropdown">
                                 <li><span class="dropdown-item-text text-muted">Connecté en tant que</span></li>
                                 <li><span class="dropdown-item-text fw-bold">{{ session('user_name') }}</span></li>
                                 <li><hr class="dropdown-divider"></li>
-                                @if($isAdmin)
+                                @if($userRole === 'admin')
                                     <li>
                                         <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}" class="dropdown-item">
                                             <i class='bx bx-cog'></i> Dashboard admin

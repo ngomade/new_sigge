@@ -1,6 +1,34 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+
+@if($userRole !== 'admin' && $userRole !== 'chef_projet')
+    <div class="container py-4">
+        <div class="alert alert-danger">
+            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
+            <p>Vous n'avez pas les permissions nécessaires pour créer un projet.</p>
+            <a href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
+                <i class='bx bx-arrow-back'></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+@else
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-plus'></i> Créer un nouveau projet - {{ $laboratoire->label_labo }}</h2>
@@ -114,4 +142,5 @@ document.getElementById('fin_projet').addEventListener('change', function() {
     }
 });
 </script>
+@endif
 @endsection

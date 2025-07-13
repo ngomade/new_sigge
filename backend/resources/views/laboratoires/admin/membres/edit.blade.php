@@ -1,6 +1,34 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+
+@if($userRole !== 'admin' && $userRole !== 'chef_projet')
+    <div class="container py-4">
+        <div class="alert alert-danger">
+            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
+            <p>Vous n'avez pas les permissions nécessaires pour modifier ce membre.</p>
+            <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" class="btn btn-outline-secondary">
+                <i class='bx bx-arrow-back'></i> Retour au membre
+            </a>
+        </div>
+    </div>
+@else
 <div class="container py-4">
     <h2 class="mb-4">Modifier le membre du laboratoire : {{ $laboratoire->label_labo }}</h2>
     <form method="POST" action="{{ route('laboratoires.admin.membres.update', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}">
@@ -66,4 +94,5 @@
         </div>
     </form>
 </div>
+@endif
 @endsection

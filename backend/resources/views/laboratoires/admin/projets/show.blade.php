@@ -5,15 +5,34 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-folder'></i> Détails du projet - {{ $laboratoire->label_labo }}</h2>
         <div>
-            <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
-                <i class='bx bx-group'></i> Gérer les participants
-            </a>
-            <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
-                <i class='bx bx-file'></i> Documents
-            </a>
-            <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
-                <i class='bx bx-edit'></i> Modifier
-            </a>
+            @php
+                $userId = session('user_id');
+                $userType = session('user_type');
+                $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                    ->where('statut', 'actif')
+                    ->where(function ($q) use ($userId, $userType) {
+                        if ($userType === 'externe') {
+                            $q->where('id_user_externe', $userId);
+                        } else {
+                            $q->where('id_pers_lab', $userId);
+                        }
+                    })
+                    ->with('roleLabo')
+                    ->first();
+                $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+            @endphp
+
+            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
+                    <i class='bx bx-group'></i> Gérer les participants
+                </a>
+                <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
+                    <i class='bx bx-file'></i> Documents
+                </a>
+                <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
+                    <i class='bx bx-edit'></i> Modifier
+                </a>
+            @endif
             <a href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour à la liste
             </a>
@@ -69,62 +88,54 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class='bx bx-group'></i> Participants ({{ $projet->participants->count() }})</h5>
-                    <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
-                        <i class='bx bx-plus'></i> Ajouter
-                    </a>
+                    @if($userRole === 'admin' || $userRole === 'chef_projet')
+                        <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
+                            <i class='bx bx-plus'></i> Ajouter
+                        </a>
+                    @endif
                 </div>
                 <div class="card-body">
                     @if($projet->participants->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Nom</th>
-                                        <th>Type</th>
-                                        <th>Rôle</th>
-                                        <th>Période</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($projet->participants as $participant)
-                                        <tr>
-                                            <td>
-                                                @if($participant->membre)
-                                                    {{ $participant->membre->nom_complet }}
+                        <div class="row">
+                            @foreach($projet->participants as $participant)
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class='bx bx-user'></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">
+                                                @if($participant->persLab)
+                                                    {{ $participant->persLab->nom_complet ?? 'N/A' }}
                                                 @elseif($participant->userExterne)
-                                                    {{ $participant->userExterne->nom_user_ext }} {{ $participant->userExterne->prenom_user_ext }}
+                                                    {{ $participant->userExterne->nom_complet ?? 'N/A' }}
                                                 @else
                                                     N/A
                                                 @endif
-                                            </td>
-                                            <td>
-                                                @if($participant->membre)
-                                                    <span class="badge bg-primary">{{ $participant->membre->type_membre_label }}</span>
-                                                @elseif($participant->userExterne)
-                                                    <span class="badge bg-info">Externe</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $participant->role }}</td>
-                                            <td>
-                                                <small>
-                                                    Du {{ $participant->debut_participation ? \Carbon\Carbon::parse($participant->debut_participation)->format('d/m/Y') : 'N/A' }}
-                                                    @if($participant->fin_participation)
-                                                        <br>Au {{ \Carbon\Carbon::parse($participant->fin_participation)->format('d/m/Y') }}
-                                                    @endif
-                                                </small>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            </h6>
+                                            <small class="text-muted">
+                                                <strong>Rôle :</strong> {{ $participant->role ?? 'Non défini' }}
+                                            </small>
+                                            <br>
+                                            <small class="text-muted">
+                                                <strong>Depuis :</strong> {{ $participant->debut_participation ? \Carbon\Carbon::parse($participant->debut_participation)->format('d/m/Y') : 'N/A' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     @else
-                        <div class="text-center py-3">
-                            <i class='bx bx-user-x' style="font-size: 2rem; color: #ccc;"></i>
+                        <div class="text-center py-4">
+                            <i class='bx bx-group' style="font-size: 3rem; color: #ccc;"></i>
                             <p class="text-muted mt-2">Aucun participant pour le moment</p>
-                            <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
-                                <i class='bx bx-plus'></i> Ajouter le premier participant
-                            </a>
+                            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                                <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
+                                    <i class='bx bx-plus'></i> Ajouter le premier participant
+                                </a>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -134,9 +145,11 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class='bx bx-file'></i> Documents ({{ $projet->docs->count() }})</h5>
-                    <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
-                        <i class='bx bx-plus'></i> Ajouter
-                    </a>
+                    @if($userRole === 'admin' || $userRole === 'chef_projet')
+                        <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
+                            <i class='bx bx-plus'></i> Ajouter
+                        </a>
+                    @endif
                 </div>
                 <div class="card-body">
                     @if($projet->docs->count() > 0)
@@ -155,12 +168,14 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="text-center py-3">
-                            <i class='bx bx-file-x' style="font-size: 2rem; color: #ccc;"></i>
+                        <div class="text-center py-4">
+                            <i class='bx bx-file' style="font-size: 3rem; color: #ccc;"></i>
                             <p class="text-muted mt-2">Aucun document pour le moment</p>
-                            <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
-                                <i class='bx bx-plus'></i> Ajouter le premier document
-                            </a>
+                            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                                <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
+                                    <i class='bx bx-plus'></i> Ajouter le premier document
+                                </a>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -171,25 +186,27 @@
             <!-- Actions rapides -->
             <div class="card">
                 <div class="card-header">
-                    <h5><i class='bx bx-cog'></i> Actions</h5>
+                    <h5><i class='bx bx-cog'></i> Actions rapides</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
-                            <i class='bx bx-edit'></i> Modifier le projet
-                        </a>
-                        <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
-                            <i class='bx bx-group'></i> Gérer les participants
-                        </a>
-                        <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
-                            <i class='bx bx-file'></i> Gérer les documents
-                        </a>
-                        <form method="POST" action="{{ route('laboratoires.admin.projets.destroy', [$laboratoire->code_lab, $projet->code_projet]) }}" onsubmit="return confirm('Confirmer la suppression de ce projet ?')">
-                            @csrf
-                            <button type="submit" class="btn btn-danger w-100">
-                                <i class='bx bx-trash'></i> Supprimer le projet
-                            </button>
-                        </form>
+                        @if($userRole === 'admin' || $userRole === 'chef_projet')
+                            <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
+                                <i class='bx bx-edit'></i> Modifier le projet
+                            </a>
+                            <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
+                                <i class='bx bx-group'></i> Gérer les participants
+                            </a>
+                            <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
+                                <i class='bx bx-file'></i> Gérer les documents
+                            </a>
+                            <form method="POST" action="{{ route('laboratoires.admin.projets.destroy', [$laboratoire->code_lab, $projet->code_projet]) }}" onsubmit="return confirm('Confirmer la suppression de ce projet ?')">
+                                @csrf
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class='bx bx-trash'></i> Supprimer le projet
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

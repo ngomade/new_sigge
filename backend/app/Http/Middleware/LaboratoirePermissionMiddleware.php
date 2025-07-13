@@ -23,7 +23,7 @@ class LaboratoirePermissionMiddleware
 
         // Récupérer l'affectation
         $affectation = $request->attributes->get('affectation');
-        
+
         if (!$affectation) {
             $query = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('statut', 'actif')
@@ -39,7 +39,11 @@ class LaboratoirePermissionMiddleware
         }
 
         if (!$affectation || !$affectation->roleLabo) {
-            return redirect()->route('laboratoires.espace.membre', $code_lab)
+            if (!$code_lab) {
+                return redirect()->route('labo.laboratoires.index')
+                    ->with('error', 'Vous n\'avez pas les permissions nécessaires.');
+            }
+            return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
                 ->with('error', 'Vous n\'avez pas les permissions nécessaires.');
         }
 
@@ -57,6 +61,13 @@ class LaboratoirePermissionMiddleware
                 'publications.view',
                 'publications.create',
                 'publications.edit',
+            ],
+            'technicien' => [
+                'equipements.view',
+                'equipements.reserve',
+                'equipements.entretenir',
+                'projets.view',
+                'publications.view',
             ],
             'membre' => [
                 'projets.view',
@@ -77,7 +88,11 @@ class LaboratoirePermissionMiddleware
 
         // Vérifier si l'utilisateur a la permission
         if (!in_array('*', $userPermissions) && !in_array($permission, $userPermissions)) {
-            return redirect()->route('laboratoires.espace.membre', $code_lab)
+            if (!$code_lab) {
+                return redirect()->route('labo.laboratoires.index')
+                    ->with('error', 'Vous n\'avez pas la permission d\'effectuer cette action.');
+            }
+            return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
                 ->with('error', 'Vous n\'avez pas la permission d\'effectuer cette action.');
         }
 

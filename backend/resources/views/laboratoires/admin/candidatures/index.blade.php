@@ -1,3 +1,19 @@
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $laboratoire->code_lab)
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
 @extends('laboratoires.public.layout')
 
 @section('content')
@@ -82,7 +98,7 @@
                                         <a href="{{ route('laboratoires.admin.candidatures.show', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" class="btn btn-sm btn-info">
                                             <i class='bx bx-show'></i> Voir
                                         </a>
-                                        @if($candidature->statut == 'en_attente')
+                                        @if(($userRole === 'admin' || $userRole === 'chef_projet') && $candidature->statut == 'en_attente')
                                             <form method="POST" action="{{ route('laboratoires.admin.candidatures.approve', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" class="d-inline">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approuver cette candidature ?')">

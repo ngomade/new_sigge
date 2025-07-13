@@ -32,7 +32,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Utilisateurs externes actifs</h5>
                         <p class="display-4">{{ $stats['externes'] }}</p>
-                        <a href="{{ route('laboratoires.admin.externes', $laboratoire->code_lab) }}" class="btn btn-outline-info">Gérer les externes</a>
+                         <a href="{{ route('laboratoires.admin.externes', $laboratoire->code_lab) }}" class="btn btn-outline-info">Gérer les externes</a>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Publications</h5>
                         <p class="display-4">{{ $stats['publications'] }}</p>
-                        <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-dark">Voir les publications</a>
+                        <a href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}" class="btn btn-outline-dark">Voir les publications</a>
                     </div>
                 </div>
             </div>

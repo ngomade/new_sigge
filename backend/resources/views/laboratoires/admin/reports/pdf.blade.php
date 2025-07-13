@@ -145,7 +145,7 @@
                     <tr>
                         <td>{{ $membre->persLab->id_pers_lab ?? 'N/A' }}</td>
                         <td>{{ $membre->persLab->type_pers_lab ?? 'N/A' }}</td>
-                        <td>{{ $membre->roleLabo->nom_role ?? 'N/A' }}</td>
+                        <td>{{ $membre->roleLabo->lib_rl ?? 'N/A' }}</td>
                         <td>{{ \Carbon\Carbon::parse($membre->date_affectation)->format('d/m/Y') }}</td>
                         <td>{{ $membre->date_fin_affectation ? \Carbon\Carbon::parse($membre->date_fin_affectation)->format('d/m/Y') : 'En cours' }}</td>
                         <td>{{ ucfirst($membre->statut) }}</td>

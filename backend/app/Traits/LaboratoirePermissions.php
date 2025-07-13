@@ -16,7 +16,7 @@ trait LaboratoirePermissions
     {
         $userId = session('user_id');
         $userType = session('user_type');
-        
+
         if (!$userId || !$userType) {
             return false;
         }
@@ -63,7 +63,7 @@ trait LaboratoirePermissions
     {
         $userId = session('user_id');
         $userType = session('user_type');
-        
+
         if (!$userId || !$userType) {
             return false;
         }
@@ -91,8 +91,8 @@ trait LaboratoirePermissions
 
         $affectation = $query->first();
 
-        return $affectation && 
-               $affectation->roleLabo && 
+        return $affectation &&
+               $affectation->roleLabo &&
                strtolower($affectation->roleLabo->lib_rl) === 'admin';
     }
 
@@ -103,7 +103,7 @@ trait LaboratoirePermissions
     {
         $userId = session('user_id');
         $userType = session('user_type');
-        
+
         if (!$userId || !$userType) {
             return null;
         }
@@ -131,14 +131,14 @@ trait LaboratoirePermissions
     protected function getUserPermissions($code_lab = null): array
     {
         $affectation = $this->getCurrentAffectation($code_lab);
-        
+
         if (!$affectation || !$affectation->roleLabo) {
             return [];
         }
 
         $rolePermissions = $this->getRolePermissions();
         $userRole = strtolower($affectation->roleLabo->lib_rl);
-        
+
         return $rolePermissions[$userRole] ?? [];
     }
 
@@ -148,34 +148,40 @@ trait LaboratoirePermissions
     protected function getRolePermissions(): array
     {
         return [
-            'admin' => ['*'], // Toutes les permissions
+            'admin' => ['*'],
             'chef_projet' => [
-                'projets.view',
-                'projets.create',
-                'projets.edit',
-                'projets.delete',
-                'projets.participants',
-                'projets.documents',
-                'equipements.view',
-                'equipements.reserve',
-                'equipements.cancel_reservation',
-                'publications.view',
-                'publications.create',
-                'publications.edit',
+                'projets.view', 'projets.create', 'projets.edit', 'projets.delete',
+                'projets.participants', 'projets.documents',
+                'equipements.view', 'equipements.reserve', 'equipements.cancel_reservation',
+                'publications.view', 'publications.create', 'publications.edit',
                 'membres.view',
+                'dashboard.view', 'dashboard.stats',
+            ],
+            'chercheur' => [
+                'projets.view',
+                'equipements.view', 'equipements.reserve',
+                'publications.view', 'publications.create',
+                'membres.view',
+                'dashboard.view',
+            ],
+            'technicien' => [
+                'projets.view',
+                'equipements.view', 'equipements.create', 'equipements.edit', 'equipements.delete',
+                'equipements.maintenance', 'reservations.view', 'reservations.manage',
+                'dashboard.view', 'dashboard.stats',
+            ],
+            'secretaire' => [
+                'membres.view', 'membres.create', 'membres.edit',
+                'candidatures.view', 'candidatures.process',
+                'documents.view', 'documents.manage',
+                'dashboard.view', 'dashboard.stats',
             ],
             'membre' => [
                 'projets.view',
                 'equipements.view',
-                'equipements.reserve',
-                'publications.view',
-                'publications.create',
+                'publications.view', 'publications.create',
                 'membres.view',
-            ],
-            'externe' => [
-                'projets.view',
-                'equipements.view',
-                'publications.view',
+                'dashboard.view',
             ],
         ];
     }

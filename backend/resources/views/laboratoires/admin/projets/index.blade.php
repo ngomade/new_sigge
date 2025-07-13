@@ -5,9 +5,28 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-folder'></i> Gestion des projets - {{ $laboratoire->label_labo }}</h2>
         <div>
+            @php
+                $userId = session('user_id');
+                $userType = session('user_type');
+                $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                    ->where('statut', 'actif')
+                    ->where(function ($q) use ($userId, $userType) {
+                        if ($userType === 'externe') {
+                            $q->where('id_user_externe', $userId);
+                        } else {
+                            $q->where('id_pers_lab', $userId);
+                        }
+                    })
+                    ->with('roleLabo')
+                    ->first();
+                $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+            @endphp
+
+            @if($userRole === 'admin' || $userRole === 'chef_projet')
             <a href="{{ route('laboratoires.admin.projets.create', $laboratoire->code_lab) }}" class="btn btn-success">
                 <i class='bx bx-plus'></i> Nouveau projet
             </a>
+            @endif
             <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour au dashboard
             </a>
@@ -103,21 +122,30 @@
                                             <a href="{{ route('laboratoires.admin.projets.show', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-info">
                                                 <i class='bx bx-show'></i>
                                             </a>
+
+                                            @if($userRole === 'admin' || $userRole === 'chef_projet')
                                             <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-primary">
                                                 <i class='bx bx-edit'></i>
                                             </a>
+                                            @endif
+
+                                            @if($userRole === 'admin' || $userRole === 'chef_projet')
                                             <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
                                                 <i class='bx bx-group'></i>
                                             </a>
                                             <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
                                                 <i class='bx bx-file'></i>
                                             </a>
+                                            @endif
+
+                                            @if($userRole === 'admin' || $userRole === 'chef_projet')
                                             <form method="POST" action="{{ route('laboratoires.admin.projets.destroy', [$laboratoire->code_lab, $projet->code_projet]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce projet ?')">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-danger">
                                                     <i class='bx bx-trash'></i>
                                                 </button>
                                             </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -134,9 +162,11 @@
                 <div class="text-center py-4">
                     <i class='bx bx-folder-open' style="font-size: 3rem; color: #ccc;"></i>
                     <p class="text-muted mt-2">Aucun projet trouvé</p>
+                    @if($userRole === 'admin' || $userRole === 'chef_projet')
                     <a href="{{ route('laboratoires.admin.projets.create', $laboratoire->code_lab) }}" class="btn btn-primary">
                         <i class='bx bx-plus'></i> Créer le premier projet
                     </a>
+                    @endif
                 </div>
             @endif
         </div>

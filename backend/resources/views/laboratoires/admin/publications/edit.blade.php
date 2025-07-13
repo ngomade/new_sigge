@@ -3,6 +3,23 @@
 @section('title', 'Modifier la publication')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+@if($userRole === 'admin' || $userRole === 'chef_projet' || $publication->id_pers_lab === $userId)
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-book-edit'></i> Modifier la publication</h2>
@@ -10,9 +27,7 @@
             <i class='bx bx-arrow-back'></i> Retour à la liste
         </a>
     </div>
-
     @include('laboratoires.partials.alerts')
-
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Modifier les informations de la publication</h4>
@@ -30,20 +45,18 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="type_publi" class="form-label">Type <span class="text-danger">*</span></label>
-                            <select name="type_publi" id="type_publi" class="form-select @error('type_publi') is-invalid @enderror" required>
-                                <option value="">Sélectionner un type</option>
-                                <option value="article" {{ old('type_publi', $publication->type_publi) == 'article' ? 'selected' : '' }}>Article</option>
-                                <option value="conference" {{ old('type_publi', $publication->type_publi) == 'conference' ? 'selected' : '' }}>Conférence</option>
-                                <option value="livre" {{ old('type_publi', $publication->type_publi) == 'livre' ? 'selected' : '' }}>Livre</option>
-                                <option value="rapport" {{ old('type_publi', $publication->type_publi) == 'rapport' ? 'selected' : '' }}>Rapport</option>
-                                <option value="these" {{ old('type_publi', $publication->type_publi) == 'these' ? 'selected' : '' }}>Thèse</option>
-                            </select>
-                            @error('type_publi')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        <label for="type_publi" class="form-label">Type <span class="text-danger">*</span></label>
+                        <select name="type_publi" id="type_publi" class="form-select @error('type_publi') is-invalid @enderror" required>
+                            <option value="">Sélectionner un type</option>
+                            <option value="article" {{ old('type_publi', $publication->type_publi) == 'article' ? 'selected' : '' }}>Article</option>
+                            <option value="conference" {{ old('type_publi', $publication->type_publi) == 'conference' ? 'selected' : '' }}>Conférence</option>
+                            <option value="livre" {{ old('type_publi', $publication->type_publi) == 'livre' ? 'selected' : '' }}>Livre</option>
+                            <option value="rapport" {{ old('type_publi', $publication->type_publi) == 'rapport' ? 'selected' : '' }}>Rapport</option>
+                            <option value="these" {{ old('type_publi', $publication->type_publi) == 'these' ? 'selected' : '' }}>Thèse</option>
+                        </select>
+                        @error('type_publi')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="row">
@@ -111,4 +124,15 @@
         </div>
     </div>
 </div>
+@else
+    <div class="container py-4">
+        <div class="alert alert-danger">
+            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
+            <p>Vous n'avez pas les permissions nécessaires pour modifier cette publication.</p>
+            <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+                <i class='bx bx-arrow-back'></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+@endif
 @endsection

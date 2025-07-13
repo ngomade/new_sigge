@@ -94,7 +94,23 @@
                     <h5><i class='bx bx-cog'></i> Actions</h5>
                 </div>
                 <div class="card-body">
-                    @if($candidature->statut == 'en_attente')
+                    @php
+                        $userId = session('user_id');
+                        $userType = session('user_type');
+                        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                            ->where('statut', 'actif')
+                            ->where(function ($q) use ($userId, $userType) {
+                                if ($userType === 'externe') {
+                                    $q->where('id_user_externe', $userId);
+                                } else {
+                                    $q->where('id_pers_lab', $userId);
+                                }
+                            })
+                            ->with('roleLabo')
+                            ->first();
+                        $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+                    @endphp
+                    @if($candidature->statut == 'en_attente' && ($userRole === 'admin' || $userRole === 'chef_projet'))
                         <div class="d-grid gap-2">
                             <form action="{{ route('laboratoires.admin.candidatures.approve', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" method="POST">
                                 @csrf
@@ -103,7 +119,6 @@
                                     <i class='bx bx-check'></i> Approuver la candidature
                                 </button>
                             </form>
-
                             <form action="{{ route('laboratoires.admin.candidatures.reject', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-danger w-100"
@@ -111,6 +126,10 @@
                                     <i class='bx bx-x'></i> Rejeter la candidature
                                 </button>
                             </form>
+                        </div>
+                    @elseif($candidature->statut == 'en_attente')
+                        <div class="alert alert-warning">
+                            <i class='bx bx-lock'></i> Vous n'avez pas la permission de traiter cette candidature.
                         </div>
                     @else
                         <div class="alert alert-info">

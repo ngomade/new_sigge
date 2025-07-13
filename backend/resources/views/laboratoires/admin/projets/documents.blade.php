@@ -1,13 +1,32 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-file'></i> Gestion des documents - {{ $projet->theme_projet }}</h2>
         <div>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
-                <i class='bx bx-plus'></i> Ajouter un document
-            </button>
+            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                    <i class='bx bx-plus'></i> Ajouter un document
+                </button>
+            @endif
             <a href="{{ route('laboratoires.admin.projets.show', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour au projet
             </a>
@@ -21,86 +40,55 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+    <!-- Liste des documents -->
     <div class="card">
         <div class="card-header">
-            <h5><i class='bx bx-list-ul'></i> Liste des documents ({{ $projet->docs->count() }})</h5>
+            <h5 class="mb-0">Documents du projet ({{ $documents->total() }})</h5>
         </div>
         <div class="card-body">
-            @if($projet->docs->count() > 0)
+            @if($documents->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Titre</th>
-                                <th>Type</th>
-                                <th>Taille</th>
+                                <th>Description</th>
                                 <th>Date d'ajout</th>
+                                <th>Taille</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($projet->docs as $document)
+                            @foreach($documents as $doc)
                                 <tr>
                                     <td>
-                                        <strong>{{ $document->titre_doc }}</strong>
-                                        @if($document->description_doc)
-                                            <br><small class="text-muted">{{ $document->description_doc }}</small>
-                                        @endif
+                                        <strong>{{ $doc->titre_doc }}</strong>
                                     </td>
                                     <td>
-                                        @php
-                                            $extension = pathinfo($document->fichier, PATHINFO_EXTENSION);
-                                            $icon = 'bx-file';
-                                            if (in_array(strtolower($extension), ['pdf'])) {
-                                                $icon = 'bx-file-pdf';
-                                            } elseif (in_array(strtolower($extension), ['doc', 'docx'])) {
-                                                $icon = 'bx-file-doc';
-                                            } elseif (in_array(strtolower($extension), ['xls', 'xlsx'])) {
-                                                $icon = 'bx-file-spreadsheet';
-                                            } elseif (in_array(strtolower($extension), ['ppt', 'pptx'])) {
-                                                $icon = 'bx-file-presentation';
-                                            } elseif (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif'])) {
-                                                $icon = 'bx-file-image';
-                                            }
-                                        @endphp
-                                        <i class='bx {{ $icon }}'></i>
-                                        <span class="badge bg-secondary">{{ strtoupper($extension) }}</span>
+                                        <small class="text-muted">{{ Str::limit($doc->description_doc, 100) }}</small>
                                     </td>
                                     <td>
-                                        @if(file_exists(storage_path('app/public/' . $document->fichier)))
-                                            @php
-                                                $size = filesize(storage_path('app/public/' . $document->fichier));
-                                                if ($size < 1024) {
-                                                    $sizeStr = $size . ' B';
-                                                } elseif ($size < 1024 * 1024) {
-                                                    $sizeStr = round($size / 1024, 1) . ' KB';
-                                                } else {
-                                                    $sizeStr = round($size / (1024 * 1024), 1) . ' MB';
-                                                }
-                                            @endphp
-                                            {{ $sizeStr }}
-                                        @else
-                                            <span class="text-muted">Fichier manquant</span>
-                                        @endif
+                                        <small>{{ \Carbon\Carbon::parse($doc->created_at)->format('d/m/Y H:i') }}</small>
                                     </td>
                                     <td>
-                                        <small>{{ \Carbon\Carbon::parse($document->created_at)->format('d/m/Y H:i') }}</small>
+                                        <span class="badge bg-info">{{ number_format(filesize(storage_path('app/public/' . $doc->fichier)) / 1024, 1) }} KB</span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            @if(file_exists(storage_path('app/public/' . $document->fichier)))
-                                                <a href="{{ asset('storage/' . $document->fichier) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Télécharger">
-                                                    <i class='bx bx-download'></i>
-                                                </a>
-                                            @endif
-                                            <form method="POST" action="{{ route('laboratoires.admin.projets.documents.destroy', [$laboratoire->code_lab, $projet->code_projet, $document->id_doc]) }}"
-                                                  onsubmit="return confirm('Confirmer la suppression de ce document ?')" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
-                                                    <i class='bx bx-trash'></i>
+                                            <a href="{{ asset('storage/' . $doc->fichier) }}" target="_blank" class="btn btn-sm btn-primary">
+                                                <i class='bx bx-download'></i> Télécharger
+                                            </a>
+                                            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                                                <button type="button" class="btn btn-sm btn-warning" onclick="editDocument({{ $doc->id }})">
+                                                    <i class='bx bx-edit'></i> Modifier
                                                 </button>
-                                            </form>
+                                                <form method="POST" action="{{ route('laboratoires.admin.projets.documents.destroy', [$laboratoire->code_lab, $projet->code_projet, $doc->id]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce document ?')">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class='bx bx-trash'></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -108,30 +96,39 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $documents->appends(request()->query())->links() }}
+                </div>
             @else
-                <div class="text-center py-5">
-                    <i class='bx bx-file-x' style="font-size: 3rem; color: #ccc;"></i>
-                    <h5 class="text-muted mt-3">Aucun document</h5>
-                    <p class="text-muted">Commencez par ajouter des documents au projet.</p>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
-                        <i class='bx bx-plus'></i> Ajouter le premier document
-                    </button>
+                <div class="text-center py-4">
+                    <i class='bx bx-file' style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-2">Aucun document pour ce projet</p>
+                    @if($userRole === 'admin' || $userRole === 'chef_projet')
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                            <i class='bx bx-plus'></i> Ajouter le premier document
+                        </button>
+                    @endif
                 </div>
             @endif
         </div>
     </div>
 </div>
 
+@if($userRole === 'admin' || $userRole === 'chef_projet')
 <!-- Modal Ajout Document -->
-<div class="modal fade" id="addDocumentModal" tabindex="-1">
+<div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDocumentModalLabel">
+                    <i class='bx bx-plus'></i> Ajouter un document
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <form method="POST" action="{{ route('laboratoires.admin.projets.documents.store', [$laboratoire->code_lab, $projet->code_projet]) }}" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class='bx bx-plus'></i> Ajouter un document</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="titre_doc" class="form-label">Titre du document *</label>
@@ -165,9 +162,57 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class='bx bx-plus'></i> Ajouter le document
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class='bx bx-x'></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class='bx bx-save'></i> Ajouter le document
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Édition Document -->
+<div class="modal fade" id="editDocumentModal" tabindex="-1" aria-labelledby="editDocumentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDocumentModalLabel">
+                    <i class='bx bx-edit'></i> Modifier le document
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="editDocumentForm" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_titre_doc" class="form-label">Titre du document *</label>
+                        <input type="text" class="form-control" id="edit_titre_doc" name="titre_doc" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_description_doc" class="form-label">Description (optionnel)</label>
+                        <textarea class="form-control" id="edit_description_doc" name="description_doc" rows="3"
+                                  placeholder="Description du document..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_fichier" class="form-label">Nouveau fichier (optionnel)</label>
+                        <input type="file" class="form-control" id="edit_fichier" name="fichier">
+                        <div class="form-text">
+                            Laissez vide pour conserver le fichier actuel
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class='bx bx-x'></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class='bx bx-save'></i> Mettre à jour
                     </button>
                 </div>
             </form>
@@ -176,32 +221,16 @@
 </div>
 
 <script>
-// Validation du fichier
-document.getElementById('fichier').addEventListener('change', function() {
-    const file = this.files[0];
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'image/jpeg',
-        'image/png',
-        'image/gif'
-    ];
+function editDocument(docId) {
+    // Ici vous devriez récupérer les données du document via AJAX
+    // Pour l'instant, on utilise une approche simple
+    const form = document.getElementById('editDocumentForm');
+    form.action = `{{ route('laboratoires.admin.projets.documents.update', [$laboratoire->code_lab, $projet->code_projet, ':docId']) }}`.replace(':docId', docId);
 
-    if (file) {
-        if (file.size > maxSize) {
-            this.setCustomValidity('Le fichier est trop volumineux (max 10MB)');
-        } else if (!allowedTypes.includes(file.type)) {
-            this.setCustomValidity('Type de fichier non autorisé');
-        } else {
-            this.setCustomValidity('');
-        }
-    }
-});
+    // Ouvrir le modal
+    const modal = new bootstrap.Modal(document.getElementById('editDocumentModal'));
+    modal.show();
+}
 </script>
+@endif
 @endsection

@@ -48,7 +48,13 @@
                                             <span class="badge bg-info">{{ $role->affectations ? $role->affectations->count() : 0 }}</span>
                                             affectations
                                         </td>
-                                        <td>{{ $role->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>
+                                            @if($role->created_at)
+                                                {{ $role->created_at->format('d/m/Y H:i') }}
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{{ route('labo.roles.show', $role->id_rl) }}"

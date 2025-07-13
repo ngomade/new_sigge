@@ -1,6 +1,33 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+@if($userRole !== 'admin' && $userRole !== 'chef_projet')
+    <div class="container py-4">
+        <div class="alert alert-danger">
+            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
+            <p>Vous n'avez pas les permissions nécessaires pour modifier cet équipement.</p>
+            <a href="{{ route('laboratoires.admin.equipements.show', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-secondary">
+                <i class='bx bx-arrow-back'></i> Retour aux détails
+            </a>
+        </div>
+    </div>
+@else
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-edit'></i> Modifier l'Équipement - {{ $equipement->nom_equip }}</h2>
@@ -8,22 +35,18 @@
             <i class="bx bx-arrow-back"></i> Retour aux détails
         </a>
     </div>
-
     {{-- @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif --}}
-
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Modifier les informations de l'équipement</h4>
-
             <form action="{{ route('laboratoires.admin.equipements.update', [$laboratoire->code_lab, $equipement->code_equip]) }}" method="POST">
                 @csrf
                 @method('PUT')
-
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -36,7 +59,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="ref_equip" class="form-label">Référence</label>
@@ -49,7 +71,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mb-3">
                     <label for="desc_equip" class="form-label">Description</label>
                     <textarea class="form-control @error('desc_equip') is-invalid @enderror"
@@ -59,7 +80,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
@@ -75,7 +95,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="date_achat" class="form-label">Date d'achat</label>
@@ -87,7 +106,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <div class="col-md-4">
                         <div class="mb-3">
                             <label for="valeur" class="form-label">Valeur (FCFA)</label>
@@ -101,7 +119,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mb-3">
                     <label for="localisation" class="form-label">Localisation</label>
                     <input type="text" class="form-control @error('localisation') is-invalid @enderror"
@@ -112,7 +129,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('laboratoires.admin.equipements.show', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-secondary">
                         <i class="bx bx-arrow-back"></i> Annuler
@@ -125,4 +141,5 @@
         </div>
     </div>
 </div>
+@endif
 @endsection

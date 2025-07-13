@@ -1,6 +1,34 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+
+@if($userRole !== 'admin' && $userRole !== 'chef_projet')
+    <div class="container py-4">
+        <div class="alert alert-danger">
+            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
+            <p>Vous n'avez pas les permissions nécessaires pour ajouter un membre.</p>
+            <a href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
+                <i class='bx bx-arrow-back'></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+@else
 <div class="container py-4">
     <h2 class="mb-4">Ajouter un membre au laboratoire : {{ $laboratoire->label_labo }}</h2>
     <form method="POST" action="{{ route('laboratoires.admin.membres.store', $laboratoire->code_lab) }}">
@@ -95,28 +123,24 @@ document.addEventListener('DOMContentLoaded', function() {
             personneSelect.appendChild(option);
         });
     }
+    function filterList(searchTerm) {
+        if (!currentList) return;
+        const filtered = currentList.filter(function(personne) {
+            return personne.text.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+        populateSelect(filtered);
+    }
     typeSelect.addEventListener('change', function() {
         currentType = this.value;
+        currentList = personnesData[currentType] || [];
+        populateSelect(currentList);
         searchInput.value = '';
-        if (currentType && personnesData[currentType] && personnesData[currentType].length > 0) {
-            currentList = personnesData[currentType];
-            populateSelect(currentList);
-        } else {
-            currentList = [];
-            personneSelect.innerHTML = '<option value="">Aucune personne disponible pour ce type</option>';
-        }
     });
     searchInput.addEventListener('input', function() {
-        const search = this.value.toLowerCase();
-        if (currentType && currentList.length > 0) {
-            const filtered = currentList.filter(p => p.text.toLowerCase().includes(search));
-            populateSelect(filtered);
-        }
+        filterList(this.value);
     });
-    if (typeSelect.value) {
-        typeSelect.dispatchEvent(new Event('change'));
-    }
 });
 </script>
 @endpush
+@endif
 @endsection

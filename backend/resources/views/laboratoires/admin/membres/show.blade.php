@@ -1,6 +1,23 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+
 <div class="container py-4">
     <h2 class="mb-4">Fiche membre du laboratoire : {{ $laboratoire->label_labo }}</h2>
     <div class="card">
@@ -45,11 +62,15 @@
                 </li>
             </ul>
             <div class="d-flex gap-2">
-                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" class="btn btn-primary"><i class="bx bx-edit"></i> Modifier</a>
-                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
-                    @csrf
-                    <button type="submit" class="btn btn-danger"><i class="bx bx-trash"></i> Supprimer</button>
-                </form>
+                @if($userRole === 'admin' || $userRole === 'chef_projet')
+                    <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" class="btn btn-primary"><i class="bx bx-edit"></i> Modifier</a>
+                @endif
+                @if($userRole === 'admin')
+                    <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
+                        @csrf
+                        <button type="submit" class="btn btn-danger"><i class="bx bx-trash"></i> Supprimer</button>
+                    </form>
+                @endif
                 <a href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">Retour à la liste</a>
             </div>
         </div>

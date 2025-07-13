@@ -3,6 +3,33 @@
 @section('title', 'Ajouter une publication')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
+@if($userRole !== 'admin' && $userRole !== 'chef_projet')
+    <div class="container py-4">
+        <div class="alert alert-danger">
+            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
+            <p>Vous n'avez pas les permissions nécessaires pour ajouter une publication.</p>
+            <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+                <i class='bx bx-arrow-back'></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+@else
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-book-add'></i> Ajouter une publication @if(isset($laboratoire)) - {{ $laboratoire->label_labo }} @endif</h2>
@@ -10,9 +37,7 @@
             <i class='bx bx-arrow-back'></i> Retour à la liste
         </a>
     </div>
-
     @include('laboratoires.partials.alerts')
-
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Informations de la publication</h4>
@@ -105,4 +130,5 @@
         </div>
     </div>
 </div>
+@endif
 @endsection

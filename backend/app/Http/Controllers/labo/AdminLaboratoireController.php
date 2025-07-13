@@ -1033,12 +1033,14 @@ class AdminLaboratoireController extends Controller
             ->with(['entretiens.personnel'])
             ->firstOrFail();
 
+        $entretiens = $equipement->entretiens()->with('personnel')->orderByDesc('debut_entretien')->get();
+
         $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
 
-        return view('laboratoires.admin.equipements.entretiens', compact('laboratoire', 'equipement', 'personnel'));
+        return view('laboratoires.admin.equipements.entretiens', compact('laboratoire', 'equipement', 'personnel', 'entretiens'));
     }
 
     public function equipementEntretienStore(Request $request, $code_lab, $equipement)
@@ -1197,12 +1199,14 @@ class AdminLaboratoireController extends Controller
             ->with(['reservations.personnel'])
             ->firstOrFail();
 
+        $reservations = $equipement->reservations()->with('personnel')->orderByDesc('debut_reserv')->get();
+
         $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
 
-        return view('laboratoires.admin.equipements.reservations', compact('laboratoire', 'equipement', 'personnel'));
+        return view('laboratoires.admin.equipements.reservations', compact('laboratoire', 'equipement', 'personnel', 'reservations'));
     }
 
     public function equipementReservationStore(Request $request, $code_lab, $equipement)
@@ -1213,7 +1217,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id',
+            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id_pers_lab',
             'debut_reserv' => 'required|date|after_or_equal:today',
             'fin_reserv' => 'required|date|after:debut_reserv'
         ]);
@@ -2382,5 +2386,214 @@ class AdminLaboratoireController extends Controller
             'Content-Type' => mime_content_type($chemin),
             'Content-Disposition' => 'inline; filename="' . basename($chemin) . '"'
         ]);
+    }
+
+    // === Publications du laboratoire (admin) ===
+    public function publications($code_lab, Request $request)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $query = Publication::where('code_lab', $code_lab)->with(['createur.personnel', 'createur.user', 'createur']);
+        // Filtres
+        if ($request->filled('type')) {
+            $query->where('type_publi', $request->type);
+        }
+        if ($request->filled('domaine')) {
+            $query->where('domaine', 'like', '%' . $request->domaine . '%');
+        }
+        if ($request->filled('annee')) {
+            $query->whereYear('created_at', $request->annee);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('titre_publi', 'like', "%$search%")
+                  ->orWhere('domaine', 'like', "%$search%")
+                  ->orWhere('tags', 'like', "%$search%")
+                  ->orWhere('reference', 'like', "%$search%")
+                ;
+            });
+        }
+        $publications = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Statistiques
+        $stats = [
+            'total' => Publication::where('code_lab', $code_lab)->count(),
+            'par_type' => Publication::where('code_lab', $code_lab)->selectRaw('type_publi, COUNT(*) as total')->groupBy('type_publi')->pluck('total', 'type_publi')->toArray(),
+            'par_annee' => Publication::where('code_lab', $code_lab)->selectRaw('YEAR(created_at) as annee, COUNT(*) as total')->groupBy('annee')->orderBy('annee', 'desc')->pluck('total', 'annee')->toArray(),
+        ];
+        $types = ['article', 'conference', 'livre', 'rapport', 'these'];
+        $annees = Publication::where('code_lab', $code_lab)->selectRaw('YEAR(created_at) as annee')->distinct()->orderBy('annee', 'desc')->pluck('annee');
+        return view('laboratoires.admin.publications.index', compact('publications', 'laboratoire', 'stats', 'types', 'annees', 'request'));
+    }
+
+    public function publicationCreate($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        return view('laboratoires.admin.publications.create', compact('laboratoire'));
+    }
+
+    public function publicationStore(Request $request, $code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $validated = $request->validate([
+            'titre_publi' => 'required|max:255',
+            'type_publi' => 'required|in:article,conference,livre,rapport,these',
+            'domaine' => 'nullable|max:100',
+            'resume' => 'nullable',
+            'tags' => 'nullable|string',
+            'reference' => 'nullable|string',
+            'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240',
+        ]);
+        if ($request->hasFile('rapport')) {
+            $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
+            $validated['rapport_path'] = $rapportPath;
+        }
+        $userId = session('user_id');
+        $userType = session('user_type');
+        if (!$userId || !$userType) {
+            return back()->withInput()->with('error', 'Vous devez être connecté pour créer une publication.');
+        }
+        $validated['id_pers_lab'] = $userId;
+        $validated['code_lab'] = $code_lab;
+        Publication::create($validated);
+        return redirect()->route('laboratoires.admin.publications.index', $code_lab)
+            ->with('success', 'Publication ajoutée avec succès.');
+    }
+
+    public function publicationShow($code_lab, $publication)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $publication = Publication::with(['createur', 'laboratoire'])
+            ->where('code_lab', $code_lab)
+            ->where('code_publi', $publication)
+            ->firstOrFail();
+        // Check if user is admin ou créateur
+        $isAdmin = false;
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Accès non autorisé à cette publication.');
+        }
+        return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
+    }
+
+    public function publicationEdit($code_lab, $publication)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $publication = Publication::with(['createur', 'laboratoire'])
+            ->where('code_lab', $code_lab)
+            ->where('code_publi', $publication)
+            ->firstOrFail();
+        $isAdmin = false;
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Accès non autorisé à la modification de cette publication.');
+        }
+        return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire'));
+    }
+
+    public function publicationUpdate(Request $request, $code_lab, $publication)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $publication = Publication::where('code_lab', $code_lab)
+            ->where('code_publi', $publication)
+            ->firstOrFail();
+        $isAdmin = false;
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Accès non autorisé à la modification de cette publication.');
+        }
+        $validated = $request->validate([
+            'titre_publi' => 'required|max:255',
+            'type_publi' => 'required|in:article,conference,livre,rapport,these',
+            'domaine' => 'nullable|max:100',
+            'resume' => 'nullable',
+            'tags' => 'nullable|string',
+            'reference' => 'nullable|string',
+            'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240',
+        ]);
+        if ($request->hasFile('rapport')) {
+            if ($publication->rapport_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($publication->rapport_path);
+            }
+            $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
+            $validated['rapport_path'] = $rapportPath;
+        }
+        $publication->update($validated);
+        return redirect()->route('laboratoires.admin.publications.show', [$code_lab, $publication->code_publi])
+            ->with('success', 'Publication mise à jour avec succès.');
+    }
+
+    public function publicationDestroy($code_lab, $publication)
+    {
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $publication = Publication::where('code_lab', $code_lab)
+            ->where('code_publi', $publication)
+            ->firstOrFail();
+        $isAdmin = false;
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Accès non autorisé à la suppression de cette publication.');
+        }
+        $publication->delete();
+        return redirect()->route('laboratoires.admin.publications.index', $code_lab)
+            ->with('success', 'Publication supprimée avec succès.');
     }
 }

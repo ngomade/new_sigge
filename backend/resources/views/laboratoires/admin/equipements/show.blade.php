@@ -1,13 +1,31 @@
 @extends('laboratoires.public.layout')
 
 @section('content')
+@php
+    $userId = session('user_id');
+    $userType = session('user_type');
+    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+        ->where('statut', 'actif')
+        ->where(function ($q) use ($userId, $userType) {
+            if ($userType === 'externe') {
+                $q->where('id_user_externe', $userId);
+            } else {
+                $q->where('id_pers_lab', $userId);
+            }
+        })
+        ->with('roleLabo')
+        ->first();
+    $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+@endphp
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-cabinet'></i> Détails de l'Équipement - {{ $equipement->nom_equip }}</h2>
         <div class="d-flex gap-2">
-            <a href="{{ route('laboratoires.admin.equipements.edit', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-primary">
-                <i class="bx bx-edit"></i> Modifier
-            </a>
+            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                <a href="{{ route('laboratoires.admin.equipements.edit', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-primary">
+                    <i class="bx bx-edit"></i> Modifier
+                </a>
+            @endif
             <a href="{{ route('laboratoires.admin.equipements.entretiens', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-warning">
                 <i class="bx bx-wrench"></i> Entretiens
             </a>
@@ -165,20 +183,24 @@
                 <div class="card-body">
                     <h5 class="card-title">Actions rapides</h5>
                     <div class="d-grid gap-2">
-                        <a href="{{ route('laboratoires.admin.equipements.entretiens', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-warning">
-                            <i class="bx bx-wrench"></i> Programmer un entretien
-                        </a>
-                        <a href="{{ route('laboratoires.admin.equipements.reservations', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-info">
-                            <i class="bx bx-calendar-plus"></i> Créer une réservation
-                        </a>
-                        @if($equipement->isDisponible())
-                        <button class="btn btn-outline-success" onclick="changerEtat('en maintenance')">
-                            <i class="bx bx-wrench"></i> Mettre en maintenance
-                        </button>
-                        @elseif($equipement->isEnMaintenance())
-                        <button class="btn btn-outline-success" onclick="changerEtat('disponible')">
-                            <i class="bx bx-check"></i> Rendre disponible
-                        </button>
+                        @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
+                            <a href="{{ route('laboratoires.admin.equipements.entretiens', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-warning">
+                                <i class="bx bx-wrench"></i> Programmer un entretien
+                            </a>
+                        @endif
+                        @if($userRole === 'admin' || $userRole === 'chef_projet')
+                            <a href="{{ route('laboratoires.admin.equipements.reservations', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-info">
+                                <i class="bx bx-calendar-plus"></i> Créer une réservation
+                            </a>
+                            @if($equipement->isDisponible())
+                                <button class="btn btn-outline-success" onclick="changerEtat('en maintenance')">
+                                    <i class="bx bx-wrench"></i> Mettre en maintenance
+                                </button>
+                            @elseif($equipement->isEnMaintenance())
+                                <button class="btn btn-outline-success" onclick="changerEtat('disponible')">
+                                    <i class="bx bx-check"></i> Rendre disponible
+                                </button>
+                            @endif
                         @endif
                     </div>
                 </div>

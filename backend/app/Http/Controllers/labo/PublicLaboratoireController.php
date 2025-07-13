@@ -87,7 +87,7 @@ class PublicLaboratoireController extends Controller
                                 return redirect()->route('laboratoires.admin.dashboard', $code_lab)
                                     ->with('success', 'Connexion réussie !');
                             } else {
-                                return redirect()->route('laboratoires.espace.membre', $code_lab)
+                                return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
                                     ->with('success', 'Connexion réussie !');
                             }
                         }
@@ -125,7 +125,7 @@ class PublicLaboratoireController extends Controller
                                 'user_name' => $user->nom_user . ' ' . $user->prenom_user
                             ]);
                             // Redirection membre classique
-                            return redirect()->route('laboratoires.espace.membre', $code_lab)
+                            return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
                                 ->with('success', 'Connexion réussie !');
                         }
                     }
@@ -189,7 +189,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
             'user_name' => $userExterne->nom_user_ext . ' ' . $userExterne->prenom_user_ext
         ]);
         // Redirection membre classique
-        return redirect()->route('laboratoires.espace.membre', $code_lab)
+        return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
             ->with('success', 'Connexion réussie !');
     } else {
         Log::warning('External user affectation inactive or missing', ['user_id' => $userExterne->id_user_ext]);
