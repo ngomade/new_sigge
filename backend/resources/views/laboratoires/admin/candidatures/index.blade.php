@@ -98,7 +98,7 @@
                                         <a href="{{ route('laboratoires.admin.candidatures.show', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" class="btn btn-sm btn-info">
                                             <i class='bx bx-show'></i> Voir
                                         </a>
-                                        @if(($userRole === 'admin' || $userRole === 'chef_projet') && $candidature->statut == 'en_attente')
+                                        @if($candidature->statut == 'en_attente')
                                             <form method="POST" action="{{ route('laboratoires.admin.candidatures.approve', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" class="d-inline">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approuver cette candidature ?')">

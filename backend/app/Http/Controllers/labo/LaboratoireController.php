@@ -119,7 +119,7 @@ class LaboratoireController extends Controller
      */
     public function show(string $code_lab)
     {
-        $laboratoire = Laboratoire::with(['projets', 'membres', 'equipements', 'pages'])
+        $laboratoire = Laboratoire::with(['projets', 'membres', 'equipements'])
             ->where('code_lab', $code_lab)
             ->firstOrFail();
 

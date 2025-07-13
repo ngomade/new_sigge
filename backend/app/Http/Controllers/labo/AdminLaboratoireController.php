@@ -650,8 +650,15 @@ class AdminLaboratoireController extends Controller
             ->where('code_projet', $projet)
             ->firstOrFail();
 
+<<<<<<< HEAD
+$request->validate([
+            'type_participant' => 'required|in:membre,externe',
+            'membre_id' => 'required_if:type_participant,membre|exists:laboratoire_pers_lab,id',
+            'user_externe_id' => 'required_if:type_participant,externe|exists:user_externe,id_user_ext',
+=======
         $rules = [
             'type_participant' => 'required|in:membre,externe',
+>>>>>>> 2e52091f3e572695dd0fa905a518521558461686
             'role' => 'required|string|max:100',
             'debut_participation' => 'required|date',
             'fin_participation' => 'nullable|date|after:debut_participation'
@@ -666,10 +673,29 @@ class AdminLaboratoireController extends Controller
 
         $request->validate($rules);
 
+        // Additional check to prevent null id_pers_lab when type is membre
+        if ($request->type_participant === 'membre' && empty($request->membre_id)) {
+            return back()->withInput()->with('error', 'Veuillez sélectionner un membre du laboratoire.');
+        }
+        if ($request->type_participant === 'externe' && empty($request->user_externe_id)) {
+            return back()->withInput()->with('error', 'Veuillez sélectionner un utilisateur externe.');
+        }
+
         try {
             $id_pers_lab = null;
             $id_user_ext = null;
 
+<<<<<<< HEAD
+if ($request->type_participant === 'membre') {
+    $laboratoirePersLab = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)->first();
+    if (!$laboratoirePersLab) {
+        return back()->withInput()->with('error', 'Membre du laboratoire invalide.');
+    }
+    $id_pers_lab = $laboratoirePersLab->id_pers_lab;
+} else {
+    $id_user_ext = $request->user_externe_id;
+}
+=======
             if ($request->type_participant === 'membre') {
                 // Debug: afficher les données reçues
                 \Log::info('Ajout membre - type_participant: ' . $request->type_participant);
@@ -692,6 +718,7 @@ class AdminLaboratoireController extends Controller
                 $id_user_ext = $request->user_externe_id;
                 \Log::info('Ajout externe - id_user_ext: ' . $id_user_ext);
             }
+>>>>>>> 2e52091f3e572695dd0fa905a518521558461686
 
             // Vérifier si le participant n'est pas déjà dans le projet
             $existing = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
