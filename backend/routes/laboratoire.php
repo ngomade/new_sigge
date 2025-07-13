@@ -276,9 +276,10 @@ Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/documents', [\App\Ht
 Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/documents', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocumentsStore'])
     ->name('laboratoires.admin.projets.documents.store')
     ->middleware('laboratoire.permission:projets.documents');
-Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/documents/{document}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocumentsDestroy'])
-    ->name('laboratoires.admin.projets.documents.destroy')
-    ->middleware('laboratoire.permission:projets.documents');
+Route::delete('/laboratoires/{code_lab}/admin/projets/{projet}/documents/{document}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocumentsDestroy'])
+    ->name('laboratoires.admin.projets.documents.destroy');
+Route::put('/laboratoires/{code_lab}/admin/projets/{projet}/documents/{document}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetDocumentsUpdate'])
+    ->name('laboratoires.admin.projets.documents.update');
 
 // Gestion des équipements du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/equipements', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipements'])

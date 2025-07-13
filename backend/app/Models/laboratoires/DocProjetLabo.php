@@ -11,7 +11,7 @@ class DocProjetLabo extends Model
     protected $primaryKey = 'id_doc';
     public $incrementing = true;
     protected $fillable = [
-        'id_doc', 'code_projet', 'titre_doc', 'fichier'
+        'id_doc', 'code_projet', 'titre_doc', 'path'
     ];
 
     public function projet()

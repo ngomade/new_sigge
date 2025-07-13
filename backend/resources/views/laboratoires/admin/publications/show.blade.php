@@ -36,9 +36,9 @@
             <p><strong>Tags :</strong> {{ $publication->tags }}</p>
             <p><strong>Référence :</strong> {{ $publication->reference }}</p>
             <!-- Section Rapport -->
-            @if($publication->rapport_path)
+                @if($publication->rapport_path)
                 <p><strong>Rapport :</strong> <a href="{{ Storage::url($publication->rapport_path) }}" target="_blank" class="btn btn-sm btn-primary"><i class='bx bx-file-pdf'></i> Consulter</a></p>
-            @endif
+                @endif
             <p><strong>Créateur :</strong>
                 @if($publication->createur)
                     <span class="badge bg-info me-1">{{ ucfirst($publication->createur->type_pers_lab) }}</span>
@@ -52,9 +52,9 @@
     </div>
     <div class="mt-3 d-flex gap-2">
         @if($userRole === 'admin' || $userRole === 'chef_projet' || $publication->id_pers_lab === $userId)
-            <a href="{{ route('labo.publications.edit', $publication->code_publi) }}" class="btn btn-warning">
-                <i class='bx bx-edit'></i> Modifier
-            </a>
+        <a href="{{ route('labo.publications.edit', $publication->code_publi) }}" class="btn btn-warning">
+            <i class='bx bx-edit'></i> Modifier
+        </a>
             <form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')

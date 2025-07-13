@@ -3,22 +3,22 @@
 @section('title', 'Liste des publications')
 
 @section('content')
-@php
-    $userId = session('user_id');
-    $userType = session('user_type');
-    $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
-        ->where('statut', 'actif')
-        ->where(function ($q) use ($userId, $userType) {
-            if ($userType === 'externe') {
-                $q->where('id_user_externe', $userId);
-            } else {
-                $q->where('id_pers_lab', $userId);
-            }
-        })
-        ->with('roleLabo')
-        ->first();
+                    @php
+                        $userId = session('user_id');
+                        $userType = session('user_type');
+                        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                            ->where('statut', 'actif')
+                            ->where(function ($q) use ($userId, $userType) {
+                                if ($userType === 'externe') {
+                                    $q->where('id_user_externe', $userId);
+                                } else {
+                                    $q->where('id_pers_lab', $userId);
+                                }
+                            })
+                            ->with('roleLabo')
+                            ->first();
     $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
-@endphp
+                    @endphp
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -37,12 +37,12 @@
             </nav>
         </div>
         @if($userRole === 'admin' || $userRole === 'chef_projet')
-            <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
-                <i class='bx bx-arrow-back'></i> Retour au dashboard
-            </a>
-            <a href="{{ route('labo.publications.create') }}" class="btn btn-success">
-                <i class='bx bx-plus'></i> Ajouter une publication
-            </a>
+        <a href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
+            <i class='bx bx-arrow-back'></i> Retour au dashboard
+        </a>
+        <a href="{{ route('labo.publications.create') }}" class="btn btn-success">
+            <i class='bx bx-plus'></i> Ajouter une publication
+        </a>
         @endif
     </div>
     @include('laboratoires.partials.alerts')
@@ -160,20 +160,20 @@
                                             <i class='bx bx-show'></i>
                                         </a>
                                         @if($userRole === 'admin' || $userRole === 'chef_projet' || $publication->id_pers_lab === $userId)
-                                            <a href="{{ route('labo.publications.edit', $publication->code_publi) }}"
-                                               class="btn btn-sm btn-warning"
-                                               title="Modifier">
-                                                <i class='bx bx-edit'></i>
-                                            </a>
-                                            <form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" class="d-inline delete-requete-form" id="delete-form-{{ $publication->code_publi }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-danger btn-delete-publication" title="Supprimer"
-                                                    data-code="{{ $publication->code_publi }}"
-                                                    data-title="{{ $publication->titre_publi }}">
-                                                    <i class='bx bx-trash'></i>
-                                                </button>
-                                            </form>
+<a href="{{ route('labo.publications.edit', $publication->code_publi) }}"
+   class="btn btn-sm btn-warning"
+   title="Modifier">
+    <i class='bx bx-edit'></i>
+</a>
+<form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" class="d-inline delete-requete-form" id="delete-form-{{ $publication->code_publi }}">
+    @csrf
+    @method('DELETE')
+    <button type="button" class="btn btn-sm btn-danger btn-delete-publication" title="Supprimer"
+        data-code="{{ $publication->code_publi }}"
+        data-title="{{ $publication->titre_publi }}">
+        <i class='bx bx-trash'></i>
+    </button>
+</form>
                                         @endif
                                         @if($publication->rapport_path)
                                             <a href="{{ Storage::url($publication->rapport_path) }}"
@@ -183,7 +183,7 @@
                                                style="font-size: 1.2rem; color: #004085;">
                                                 <i class='bx bx-file-pdf'></i>
                                             </a>
-                                        @endif
+@endif
                                     </div>
                                 </td>
                             </tr>

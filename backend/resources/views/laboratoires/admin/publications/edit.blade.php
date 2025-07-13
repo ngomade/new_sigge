@@ -45,18 +45,18 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="type_publi" class="form-label">Type <span class="text-danger">*</span></label>
-                        <select name="type_publi" id="type_publi" class="form-select @error('type_publi') is-invalid @enderror" required>
-                            <option value="">Sélectionner un type</option>
-                            <option value="article" {{ old('type_publi', $publication->type_publi) == 'article' ? 'selected' : '' }}>Article</option>
-                            <option value="conference" {{ old('type_publi', $publication->type_publi) == 'conference' ? 'selected' : '' }}>Conférence</option>
-                            <option value="livre" {{ old('type_publi', $publication->type_publi) == 'livre' ? 'selected' : '' }}>Livre</option>
-                            <option value="rapport" {{ old('type_publi', $publication->type_publi) == 'rapport' ? 'selected' : '' }}>Rapport</option>
-                            <option value="these" {{ old('type_publi', $publication->type_publi) == 'these' ? 'selected' : '' }}>Thèse</option>
-                        </select>
-                        @error('type_publi')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                            <label for="type_publi" class="form-label">Type <span class="text-danger">*</span></label>
+                            <select name="type_publi" id="type_publi" class="form-select @error('type_publi') is-invalid @enderror" required>
+                                <option value="">Sélectionner un type</option>
+                                <option value="article" {{ old('type_publi', $publication->type_publi) == 'article' ? 'selected' : '' }}>Article</option>
+                                <option value="conference" {{ old('type_publi', $publication->type_publi) == 'conference' ? 'selected' : '' }}>Conférence</option>
+                                <option value="livre" {{ old('type_publi', $publication->type_publi) == 'livre' ? 'selected' : '' }}>Livre</option>
+                                <option value="rapport" {{ old('type_publi', $publication->type_publi) == 'rapport' ? 'selected' : '' }}>Rapport</option>
+                                <option value="these" {{ old('type_publi', $publication->type_publi) == 'these' ? 'selected' : '' }}>Thèse</option>
+                            </select>
+                            @error('type_publi')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                     </div>
                 </div>
                 <div class="row">

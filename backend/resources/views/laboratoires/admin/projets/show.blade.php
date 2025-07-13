@@ -161,7 +161,7 @@
                                         <strong>{{ $doc->titre_doc }}</strong>
                                         <br><small class="text-muted">Ajouté le {{ \Carbon\Carbon::parse($doc->created_at)->format('d/m/Y H:i') }}</small>
                                     </div>
-                                    <a href="{{ asset('storage/' . $doc->fichier) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ asset('storage/' . $doc->path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                         <i class='bx bx-download'></i> Télécharger
                                     </a>
                                 </div>

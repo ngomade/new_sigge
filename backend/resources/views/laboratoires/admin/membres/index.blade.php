@@ -93,66 +93,66 @@
         </div>
     @endif
 
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-            <thead class="table-light">
-                <tr>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
                     @if($userRole === 'admin')
                         <th><input type="checkbox" id="select-all"></th>
                     @endif
-                    <th>#</th>
-                    <th>Nom</th>
-                    <th>Type</th>
-                    <th>Rôle</th>
-                    <th>Statut</th>
-                    <th>Date d'affectation</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($membres as $membre)
-                    <tr>
+                        <th>#</th>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th>Date d'affectation</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($membres as $membre)
+                        <tr>
                         @if($userRole === 'admin')
                             <td><input type="checkbox" name="ids[]" value="{{ $membre->id_pers_lab ?? $membre->id_user_externe }}"></td>
                         @endif
-                        <td>{{ $membre->id_pers_lab ?? $membre->id_user_externe }}</td>
-                        <td>
-                            @if($membre->userExterne)
-                                {{ $membre->userExterne->nom_user_ext }}
-                                {{ $membre->userExterne->prenom_user_ext }}
-                            @elseif($membre->persLab)
-                                @if($membre->persLab->type_pers_lab === 'personnel')
-                                    {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->nom_pers }}
-                                    {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->prenom_pers }}
-                                @elseif($membre->persLab->type_pers_lab === 'user')
-                                    {{ optional(\App\Models\Users::find($membre->id_pers_lab))->nom_user }}
-                                    {{ optional(\App\Models\Users::find($membre->id_pers_lab))->prenom_user }}
+                            <td>{{ $membre->id_pers_lab ?? $membre->id_user_externe }}</td>
+                            <td>
+                                @if($membre->userExterne)
+                                    {{ $membre->userExterne->nom_user_ext }}
+                                    {{ $membre->userExterne->prenom_user_ext }}
+                                @elseif($membre->persLab)
+                                    @if($membre->persLab->type_pers_lab === 'personnel')
+                                        {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->nom_pers }}
+                                        {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->prenom_pers }}
+                                    @elseif($membre->persLab->type_pers_lab === 'user')
+                                        {{ optional(\App\Models\Users::find($membre->id_pers_lab))->nom_user }}
+                                        {{ optional(\App\Models\Users::find($membre->id_pers_lab))->prenom_user }}
+                                    @endif
                                 @endif
-                            @endif
-                        </td>
-                        <td>
-                            @if($membre->userExterne)
-                                externe
-                            @else
-                                {{ $membre->persLab->type_pers_lab ?? '-' }}
-                            @endif
-                        </td>
-                        <td>{{ $membre->roleLabo->lib_rl ?? '-' }}</td>
-                        <td>
-                            <span class="badge bg-{{ $membre->statut === 'actif' ? 'success' : 'secondary' }}">{{ ucfirst($membre->statut) }}</span>
-                        </td>
-                        <td>
-                            @php
-                                $date = $membre->date_affectation;
-                            @endphp
-                            {{ $date && $date instanceof \Carbon\Carbon ? $date->format('d/m/Y') : ($date ? \Carbon\Carbon::parse($date)->format('d/m/Y') : '-') }}
-                        </td>
-                        <td>
-                            @php
-                                $membreId = $membre->id_pers_lab ?? $membre->id_user_externe;
-                            @endphp
-                            @if($membreId)
-                                <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membreId]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
+                            </td>
+                            <td>
+                                @if($membre->userExterne)
+                                    externe
+                                @else
+                                    {{ $membre->persLab->type_pers_lab ?? '-' }}
+                                @endif
+                            </td>
+                            <td>{{ $membre->roleLabo->lib_rl ?? '-' }}</td>
+                            <td>
+                                <span class="badge bg-{{ $membre->statut === 'actif' ? 'success' : 'secondary' }}">{{ ucfirst($membre->statut) }}</span>
+                            </td>
+                            <td>
+                                @php
+                                    $date = $membre->date_affectation;
+                                @endphp
+                                {{ $date && $date instanceof \Carbon\Carbon ? $date->format('d/m/Y') : ($date ? \Carbon\Carbon::parse($date)->format('d/m/Y') : '-') }}
+                            </td>
+                            <td>
+                                @php
+                                    $membreId = $membre->id_pers_lab ?? $membre->id_user_externe;
+                                @endphp
+                                @if($membreId)
+                                    <a href="{{ route('laboratoires.admin.membres.show', [$laboratoire->code_lab, $membreId]) }}" class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
                                 @if($userRole === 'admin' || $userRole === 'chef_projet')
                                     <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $membreId]) }}" class="btn btn-sm btn-primary"><i class="bx bx-edit"></i></a>
                                 @endif
@@ -162,22 +162,22 @@
                                         <button type="submit" class="btn btn-sm btn-danger"><i class="bx bx-trash"></i></button>
                                     </form>
                                 @endif
-                            @else
-                                <span class="text-muted">Actions indisponibles</span>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
+                                @else
+                                    <span class="text-muted">Actions indisponibles</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
                         <td colspan="{{ $userRole === 'admin' ? '8' : '7' }}" class="text-center text-muted">Aucun membre trouvé.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-3">
-        {{ $membres->withQueryString()->links() }}
-    </div>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            {{ $membres->withQueryString()->links() }}
+        </div>
     @if($userRole === 'admin')
     </form>
     @endif

@@ -822,7 +822,9 @@ class AdminLaboratoireController extends Controller
             ->with('docs')
             ->firstOrFail();
 
-        return view('laboratoires.admin.projets.documents', compact('laboratoire', 'projet'));
+        $documents = $projet->docs()->orderByDesc('created_at')->paginate(20);
+
+        return view('laboratoires.admin.projets.documents', compact('laboratoire', 'projet', 'documents'));
     }
 
     public function projetDocumentsStore(Request $request, $code_lab, $projet)
@@ -835,17 +837,17 @@ class AdminLaboratoireController extends Controller
         $request->validate([
             'titre_doc' => 'required|string|max:255',
             'description_doc' => 'nullable|string|max:1000',
-            'fichier' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240'
+            'path' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240'
         ]);
 
         try {
-            $fichierPath = $request->file('fichier')->store('documents_projets', 'public');
+            $path = $request->file('path')->store('documents_projets', 'public');
 
             \App\Models\laboratoires\DocProjetLabo::create([
                 'code_projet' => $projet->code_projet,
                 'titre_doc' => $request->titre_doc,
                 'description_doc' => $request->description_doc,
-                'fichier' => $fichierPath
+                'path' => $path
             ]);
 
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
@@ -855,30 +857,27 @@ class AdminLaboratoireController extends Controller
         }
     }
 
-    public function projetDocumentsDestroy(Request $request, $code_lab, $projet, $document)
+    public function projetDocumentsDestroy($code_lab, $projet, $document)
     {
-        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $projet = \App\Models\laboratoires\ProjetLabo::where('code_lab', $code_lab)
+        // Récupérer le document par id_doc et code_projet
+        $doc = \App\Models\laboratoires\DocProjetLabo::where('id_doc', $document)
             ->where('code_projet', $projet)
             ->firstOrFail();
 
-        try {
-            $doc = \App\Models\laboratoires\DocProjetLabo::where('code_projet', $projet->code_projet)
-                ->where('id_doc', $document)
-                ->firstOrFail();
-
-            // Supprimer le fichier
-            if ($doc->fichier) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($doc->fichier);
-            }
-
-            $doc->delete();
-
-            return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
-                ->with('success', 'Document supprimé avec succès.');
-        } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+        // Supprimer le fichier physique si présent
+        if ($doc->path && \Storage::disk('public')->exists($doc->path)) {
+            \Storage::disk('public')->delete($doc->path);
         }
+
+        $doc->delete();
+
+        return back()->with('success', 'Document supprimé avec succès.');
+    }
+
+    public function projetDocumentsUpdate(Request $request, $code_lab, $projet, $document)
+    {
+        // TODO: Ajouter la logique de validation et de mise à jour du document
+        return back()->with('success', 'Document mis à jour (méthode à compléter).');
     }
 
     public function equipements($code_lab, Request $request)

@@ -23,9 +23,9 @@
         <h2><i class='bx bx-file'></i> Gestion des documents - {{ $projet->theme_projet }}</h2>
         <div>
             @if($userRole === 'admin' || $userRole === 'chef_projet')
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
-                    <i class='bx bx-plus'></i> Ajouter un document
-                </button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                <i class='bx bx-plus'></i> Ajouter un document
+            </button>
             @endif
             <a href="{{ route('laboratoires.admin.projets.show', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour au projet
@@ -71,21 +71,22 @@
                                         <small>{{ \Carbon\Carbon::parse($doc->created_at)->format('d/m/Y H:i') }}</small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-info">{{ number_format(filesize(storage_path('app/public/' . $doc->fichier)) / 1024, 1) }} KB</span>
+                                        <span class="badge bg-info">{{ number_format(filesize(storage_path('app/public/' . $doc->path)) / 1024, 1) }} KB</span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ asset('storage/' . $doc->fichier) }}" target="_blank" class="btn btn-sm btn-primary">
+                                            <a href="{{ asset('storage/' . $doc->path) }}" target="_blank" class="btn btn-sm btn-primary">
                                                 <i class='bx bx-download'></i> Télécharger
-                                            </a>
+                                                </a>
                                             @if($userRole === 'admin' || $userRole === 'chef_projet')
                                                 <button type="button" class="btn btn-sm btn-warning" onclick="editDocument({{ $doc->id }})">
                                                     <i class='bx bx-edit'></i> Modifier
                                                 </button>
-                                                <form method="POST" action="{{ route('laboratoires.admin.projets.documents.destroy', [$laboratoire->code_lab, $projet->code_projet, $doc->id]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce document ?')">
+                                                <form action="{{ route('laboratoires.admin.projets.documents.destroy', [$laboratoire->code_lab, $projet->code_projet, $doc->id_doc]) }}" method="POST" style="display:inline">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        <i class='bx bx-trash'></i> Supprimer
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce document ?')">
+                                                        <i class="bx bx-trash"></i>
                                                     </button>
                                                 </form>
                                             @endif
@@ -107,8 +108,8 @@
                     <p class="text-muted mt-2">Aucun document pour ce projet</p>
                     @if($userRole === 'admin' || $userRole === 'chef_projet')
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
-                            <i class='bx bx-plus'></i> Ajouter le premier document
-                        </button>
+                        <i class='bx bx-plus'></i> Ajouter le premier document
+                    </button>
                     @endif
                 </div>
             @endif
@@ -150,13 +151,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="fichier" class="form-label">Fichier *</label>
-                        <input type="file" class="form-control @error('fichier') is-invalid @enderror"
-                               id="fichier" name="fichier" required>
+                        <label for="path" class="form-label">Fichier *</label>
+                        <input type="file" class="form-control @error('path') is-invalid @enderror"
+                               id="path" name="path" required>
                         <div class="form-text">
                             Formats acceptés : PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, JPG, PNG, GIF (max 10MB)
                         </div>
-                        @error('fichier')
+                        @error('path')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -200,8 +201,8 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="edit_fichier" class="form-label">Nouveau fichier (optionnel)</label>
-                        <input type="file" class="form-control" id="edit_fichier" name="fichier">
+                        <label for="edit_path" class="form-label">Nouveau fichier (optionnel)</label>
+                        <input type="file" class="form-control" id="edit_path" name="path">
                         <div class="form-text">
                             Laissez vide pour conserver le fichier actuel
                         </div>
@@ -230,7 +231,7 @@ function editDocument(docId) {
     // Ouvrir le modal
     const modal = new bootstrap.Modal(document.getElementById('editDocumentModal'));
     modal.show();
-}
+        }
 </script>
 @endif
 @endsection

@@ -22,9 +22,9 @@
         <h2><i class='bx bx-cabinet'></i> Détails de l'Équipement - {{ $equipement->nom_equip }}</h2>
         <div class="d-flex gap-2">
             @if($userRole === 'admin' || $userRole === 'chef_projet')
-                <a href="{{ route('laboratoires.admin.equipements.edit', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-primary">
-                    <i class="bx bx-edit"></i> Modifier
-                </a>
+            <a href="{{ route('laboratoires.admin.equipements.edit', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-primary">
+                <i class="bx bx-edit"></i> Modifier
+            </a>
             @endif
             <a href="{{ route('laboratoires.admin.equipements.entretiens', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-warning">
                 <i class="bx bx-wrench"></i> Entretiens
@@ -184,22 +184,22 @@
                     <h5 class="card-title">Actions rapides</h5>
                     <div class="d-grid gap-2">
                         @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
-                            <a href="{{ route('laboratoires.admin.equipements.entretiens', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-warning">
-                                <i class="bx bx-wrench"></i> Programmer un entretien
-                            </a>
+                        <a href="{{ route('laboratoires.admin.equipements.entretiens', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-warning">
+                            <i class="bx bx-wrench"></i> Programmer un entretien
+                        </a>
                         @endif
                         @if($userRole === 'admin' || $userRole === 'chef_projet')
-                            <a href="{{ route('laboratoires.admin.equipements.reservations', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-info">
-                                <i class="bx bx-calendar-plus"></i> Créer une réservation
-                            </a>
-                            @if($equipement->isDisponible())
-                                <button class="btn btn-outline-success" onclick="changerEtat('en maintenance')">
-                                    <i class="bx bx-wrench"></i> Mettre en maintenance
-                                </button>
-                            @elseif($equipement->isEnMaintenance())
-                                <button class="btn btn-outline-success" onclick="changerEtat('disponible')">
-                                    <i class="bx bx-check"></i> Rendre disponible
-                                </button>
+                        <a href="{{ route('laboratoires.admin.equipements.reservations', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="btn btn-outline-info">
+                            <i class="bx bx-calendar-plus"></i> Créer une réservation
+                        </a>
+                        @if($equipement->isDisponible())
+                        <button class="btn btn-outline-success" onclick="changerEtat('en maintenance')">
+                            <i class="bx bx-wrench"></i> Mettre en maintenance
+                        </button>
+                        @elseif($equipement->isEnMaintenance())
+                        <button class="btn btn-outline-success" onclick="changerEtat('disponible')">
+                            <i class="bx bx-check"></i> Rendre disponible
+                        </button>
                             @endif
                         @endif
                     </div>
