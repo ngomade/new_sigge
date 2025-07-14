@@ -61,6 +61,7 @@ class LaboratoirePermissionMiddleware
                 'publications.view',
                 'publications.create',
                 'publications.edit',
+                'publications.delete',
             ],
             'technicien' => [
                 'equipements.view',
@@ -68,6 +69,9 @@ class LaboratoirePermissionMiddleware
                 'equipements.entretenir',
                 'projets.view',
                 'publications.view',
+                'publications.create',
+                'publications.edit',
+                'publications.delete',
             ],
             'membre' => [
                 'projets.view',
@@ -75,11 +79,16 @@ class LaboratoirePermissionMiddleware
                 'equipements.reserve',
                 'publications.view',
                 'publications.create',
+                'publications.edit',
+                'publications.delete',
             ],
             'externe' => [
                 'projets.view',
                 'equipements.view',
                 'publications.view',
+                'publications.create',
+                'publications.edit',
+                'publications.delete',
             ],
         ];
 

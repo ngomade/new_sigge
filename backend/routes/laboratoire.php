@@ -85,17 +85,6 @@ Route::prefix('labo')->name('labo.')->group(function () {
     Route::post('equipements/{id}/reserver', [EquipementsController::class, 'storeReservation'])
         ->name('equipements.reservation.store')->middleware('laboratoire.permission:equipements.reserve');
 
-    // Publications
-    Route::resource('publications', PublicationController::class)->middleware([
-        'index' => 'laboratoire.permission:publications.view',
-        'create' => 'laboratoire.permission:publications.create',
-        'store' => 'laboratoire.permission:publications.create',
-        'edit' => 'laboratoire.permission:publications.edit',
-        'update' => 'laboratoire.permission:publications.edit',
-        'destroy' => 'laboratoire.permission:publications.delete',
-        'show' => 'laboratoire.permission:publications.view',
-    ]);
-
     // Utilisateurs externes
     Route::resource('externes', UserExterneController::class)->middleware('laboratoire.permission:membres.view');
 

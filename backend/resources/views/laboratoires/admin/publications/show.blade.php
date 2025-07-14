@@ -22,7 +22,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-book-content'></i> Détails de la publication</h2>
-        <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('laboratoires.admin.publications.index', $publication->code_lab) }}" class="btn btn-outline-secondary">
             <i class='bx bx-arrow-back'></i> Retour à la liste
         </a>
     </div>
@@ -52,10 +52,10 @@
     </div>
     <div class="mt-3 d-flex gap-2">
         @if($userRole === 'admin' || $userRole === 'chef_projet' || $publication->id_pers_lab === $userId)
-        <a href="{{ route('labo.publications.edit', $publication->code_publi) }}" class="btn btn-warning">
+        <a href="{{ route('laboratoires.admin.publications.edit', [$publication->code_lab, $publication->code_publi]) }}" class="btn btn-warning">
             <i class='bx bx-edit'></i> Modifier
         </a>
-            <form action="{{ route('labo.publications.destroy', $publication->code_publi) }}" method="POST" class="d-inline">
+            <form action="{{ route('laboratoires.admin.publications.destroy', [$publication->code_lab, $publication->code_publi]) }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer la suppression de cette publication ?')">
@@ -63,7 +63,7 @@
                 </button>
             </form>
         @endif
-        <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('laboratoires.admin.publications.index', $publication->code_lab) }}" class="btn btn-outline-secondary">
             <i class='bx bx-arrow-back'></i> Retour à la liste
         </a>
     </div>

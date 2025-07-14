@@ -651,11 +651,11 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
             $rules = [
-                'type_participant' => 'required|in:membre,externe',
+            'type_participant' => 'required|in:membre,externe',
 
-                'role' => 'required|string|max:100',
-                'debut_participation' => 'required|date',
-                'fin_participation' => 'nullable|date|after:debut_participation'
+            'role' => 'required|string|max:100',
+            'debut_participation' => 'required|date',
+            'fin_participation' => 'nullable|date|after:debut_participation'
             ];
 
         // Ajouter les règles conditionnelles
@@ -867,12 +867,12 @@ class AdminLaboratoireController extends Controller
         // Supprimer le fichier physique si présent
         if ($doc->path && \Storage::disk('public')->exists($doc->path)) {
             \Storage::disk('public')->delete($doc->path);
-        }
+            }
 
-        $doc->delete();
+            $doc->delete();
 
         return back()->with('success', 'Document supprimé avec succès.');
-    }
+        }
 
     public function projetDocumentsUpdate(Request $request, $code_lab, $projet, $document)
     {
@@ -2293,7 +2293,7 @@ class AdminLaboratoireController extends Controller
                 ->where('date_affectation', '<=', now())
                 ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                        ->orWhere('date_fin_affectation', '>=', now());
+                          ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
@@ -2324,7 +2324,7 @@ class AdminLaboratoireController extends Controller
                 ->where('date_affectation', '<=', now())
                 ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                        ->orWhere('date_fin_affectation', '>=', now());
+                          ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
@@ -2365,7 +2365,7 @@ class AdminLaboratoireController extends Controller
                 ->where('date_affectation', '<=', now())
                 ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                        ->orWhere('date_fin_affectation', '>=', now());
+                          ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
@@ -2404,7 +2404,7 @@ class AdminLaboratoireController extends Controller
         ]);
     }
 
-    // === Publications du laboratoire (admin) ===
+    // === Publications du laboratoire ===
     public function publications($code_lab, Request $request)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
@@ -2483,8 +2483,8 @@ class AdminLaboratoireController extends Controller
             ->where('code_lab', $code_lab)
             ->where('code_publi', $publication)
             ->firstOrFail();
-        // Check if user is admin ou créateur
-        $isAdmin = false;
+        // Vérifier que l'utilisateur est bien membre du laboratoire
+        $isMembre = false;
         $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->where(function ($q) use ($userId, $userType) {
@@ -2494,14 +2494,14 @@ class AdminLaboratoireController extends Controller
                     $q->where('id_pers_lab', $userId);
                 }
             })
-            ->with('roleLabo')
             ->first();
-        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
-            $isAdmin = true;
+        if ($affectation) {
+            $isMembre = true;
         }
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Accès non autorisé à cette publication.');
+        if (!$isMembre) {
+            abort(403, 'Vous devez être membre du laboratoire pour consulter cette publication.');
         }
+        // Plus de restriction sur l'auteur ou l'admin pour la consultation
         return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
     }
 
@@ -2529,8 +2529,9 @@ class AdminLaboratoireController extends Controller
         if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
             $isAdmin = true;
         }
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Accès non autorisé à la modification de cette publication.');
+        // Seul l'auteur ou l'admin peut modifier
+        if ($publication->id_pers_lab != $userId) {
+            abort(403, 'Vous n\'êtes pas autorisé à modifier cette publication.');
         }
         return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire'));
     }
@@ -2558,8 +2559,9 @@ class AdminLaboratoireController extends Controller
         if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
             $isAdmin = true;
         }
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Accès non autorisé à la modification de cette publication.');
+        // Seul l'auteur ou l'admin peut modifier
+        if ($publication->id_pers_lab != $userId) {
+            abort(403, 'Vous n\'êtes pas autorisé à modifier cette publication.');
         }
         $validated = $request->validate([
             'titre_publi' => 'required|max:255',
@@ -2604,8 +2606,9 @@ class AdminLaboratoireController extends Controller
         if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
             $isAdmin = true;
         }
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Accès non autorisé à la suppression de cette publication.');
+        // Seul l'auteur ou l'admin peut supprimer
+        if ($publication->id_pers_lab != $userId) {
+            abort(403, 'Vous n\'êtes pas autorisé à supprimer cette publication.');
         }
         $publication->delete();
         return redirect()->route('laboratoires.admin.publications.index', $code_lab)

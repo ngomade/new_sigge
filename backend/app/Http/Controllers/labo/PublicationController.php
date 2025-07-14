@@ -157,8 +157,8 @@ class PublicationController extends Controller
 
         $laboratoire = $publication->laboratoire;
 
-        // Check if user is admin or creator
-        $isAdmin = false;
+        // Vérifier que l'utilisateur est bien membre du laboratoire
+        $isMembre = false;
         if (session()->has('laboratoire_code') && $userId && $userType) {
             $codeLab = session('laboratoire_code');
             $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
@@ -170,18 +170,15 @@ class PublicationController extends Controller
                         $q->where('id_pers_lab', $userId);
                     }
                 })
-                ->with('roleLabo')
                 ->first();
-
-            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
-                $isAdmin = true;
+            if ($affectation) {
+                $isMembre = true;
             }
         }
-
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Unauthorized access to this publication.');
+        if (!$isMembre) {
+            abort(403, 'Vous devez être membre du laboratoire pour consulter cette publication.');
         }
-
+        // Plus de restriction sur l'auteur ou l'admin pour la consultation
         return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
     }
 

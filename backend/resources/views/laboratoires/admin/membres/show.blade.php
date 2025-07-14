@@ -63,13 +63,13 @@
             </ul>
             <div class="d-flex gap-2">
                 @if($userRole === 'admin' || $userRole === 'chef_projet')
-                    <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" class="btn btn-primary"><i class="bx bx-edit"></i> Modifier</a>
+                <a href="{{ route('laboratoires.admin.membres.edit', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" class="btn btn-primary"><i class="bx bx-edit"></i> Modifier</a>
                 @endif
                 @if($userRole === 'admin')
-                    <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
-                        @csrf
-                        <button type="submit" class="btn btn-danger"><i class="bx bx-trash"></i> Supprimer</button>
-                    </form>
+                <form method="POST" action="{{ route('laboratoires.admin.membres.destroy', [$laboratoire->code_lab, $affectation->id_pers_lab ?? $affectation->id_user_externe]) }}" onsubmit="return confirm('Confirmer la suppression de ce membre ?');">
+                    @csrf
+                    <button type="submit" class="btn btn-danger"><i class="bx bx-trash"></i> Supprimer</button>
+                </form>
                 @endif
                 <a href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">Retour à la liste</a>
             </div>

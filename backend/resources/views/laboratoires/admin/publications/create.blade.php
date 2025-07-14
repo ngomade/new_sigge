@@ -19,21 +19,11 @@
         ->first();
     $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
 @endphp
-@if($userRole !== 'admin' && $userRole !== 'chef_projet')
-    <div class="container py-4">
-        <div class="alert alert-danger">
-            <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
-            <p>Vous n'avez pas les permissions nécessaires pour ajouter une publication.</p>
-            <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
-                <i class='bx bx-arrow-back'></i> Retour à la liste
-            </a>
-        </div>
-    </div>
-@else
+
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-book-add'></i> Ajouter une publication @if(isset($laboratoire)) - {{ $laboratoire->label_labo }} @endif</h2>
-        <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
             <i class='bx bx-arrow-back'></i> Retour à la liste
         </a>
     </div>
@@ -41,7 +31,7 @@
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Informations de la publication</h4>
-            <form action="{{ route('labo.publications.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('laboratoires.admin.publications.store', $laboratoire->code_lab) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-md-6">
@@ -119,7 +109,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('labo.publications.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}" class="btn btn-secondary">
                         <i class="bx bx-arrow-back"></i> Annuler
                     </a>
                     <button type="submit" class="btn btn-primary">
@@ -130,5 +120,4 @@
         </div>
     </div>
 </div>
-@endif
 @endsection

@@ -23,15 +23,15 @@
             @endphp
 
             @if($userRole === 'admin' || $userRole === 'chef_projet')
-                <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
-                    <i class='bx bx-group'></i> Gérer les participants
-                </a>
-                <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
-                    <i class='bx bx-file'></i> Documents
-                </a>
-                <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
-                    <i class='bx bx-edit'></i> Modifier
-                </a>
+            <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
+                <i class='bx bx-group'></i> Gérer les participants
+            </a>
+            <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
+                <i class='bx bx-file'></i> Documents
+            </a>
+            <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
+                <i class='bx bx-edit'></i> Modifier
+            </a>
             @endif
             <a href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour à la liste
@@ -89,15 +89,15 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class='bx bx-group'></i> Participants ({{ $projet->participants->count() }})</h5>
                     @if($userRole === 'admin' || $userRole === 'chef_projet')
-                        <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
-                            <i class='bx bx-plus'></i> Ajouter
-                        </a>
+                    <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
+                        <i class='bx bx-plus'></i> Ajouter
+                    </a>
                     @endif
                 </div>
                 <div class="card-body">
                     @if($projet->participants->count() > 0)
                         <div class="row">
-                            @foreach($projet->participants as $participant)
+                                    @foreach($projet->participants as $participant)
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0">
@@ -121,11 +121,11 @@
                                             <br>
                                             <small class="text-muted">
                                                 <strong>Depuis :</strong> {{ $participant->debut_participation ? \Carbon\Carbon::parse($participant->debut_participation)->format('d/m/Y') : 'N/A' }}
-                                            </small>
+                                                </small>
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                                    @endforeach
                         </div>
                     @else
                         <div class="text-center py-4">
@@ -133,8 +133,8 @@
                             <p class="text-muted mt-2">Aucun participant pour le moment</p>
                             @if($userRole === 'admin' || $userRole === 'chef_projet')
                                 <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
-                                    <i class='bx bx-plus'></i> Ajouter le premier participant
-                                </a>
+                                <i class='bx bx-plus'></i> Ajouter le premier participant
+                            </a>
                             @endif
                         </div>
                     @endif
@@ -146,9 +146,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class='bx bx-file'></i> Documents ({{ $projet->docs->count() }})</h5>
                     @if($userRole === 'admin' || $userRole === 'chef_projet')
-                        <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
-                            <i class='bx bx-plus'></i> Ajouter
-                        </a>
+                    <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
+                        <i class='bx bx-plus'></i> Ajouter
+                    </a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -173,8 +173,8 @@
                             <p class="text-muted mt-2">Aucun document pour le moment</p>
                             @if($userRole === 'admin' || $userRole === 'chef_projet')
                                 <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
-                                    <i class='bx bx-plus'></i> Ajouter le premier document
-                                </a>
+                                <i class='bx bx-plus'></i> Ajouter le premier document
+                            </a>
                             @endif
                         </div>
                     @endif
@@ -191,21 +191,21 @@
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         @if($userRole === 'admin' || $userRole === 'chef_projet')
-                            <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
-                                <i class='bx bx-edit'></i> Modifier le projet
-                            </a>
-                            <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
-                                <i class='bx bx-group'></i> Gérer les participants
-                            </a>
-                            <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
-                                <i class='bx bx-file'></i> Gérer les documents
-                            </a>
-                            <form method="POST" action="{{ route('laboratoires.admin.projets.destroy', [$laboratoire->code_lab, $projet->code_projet]) }}" onsubmit="return confirm('Confirmer la suppression de ce projet ?')">
-                                @csrf
-                                <button type="submit" class="btn btn-danger w-100">
-                                    <i class='bx bx-trash'></i> Supprimer le projet
-                                </button>
-                            </form>
+                        <a href="{{ route('laboratoires.admin.projets.edit', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
+                            <i class='bx bx-edit'></i> Modifier le projet
+                        </a>
+                        <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-warning">
+                            <i class='bx bx-group'></i> Gérer les participants
+                        </a>
+                        <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-secondary">
+                            <i class='bx bx-file'></i> Gérer les documents
+                        </a>
+                        <form method="POST" action="{{ route('laboratoires.admin.projets.destroy', [$laboratoire->code_lab, $projet->code_projet]) }}" onsubmit="return confirm('Confirmer la suppression de ce projet ?')">
+                            @csrf
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class='bx bx-trash'></i> Supprimer le projet
+                            </button>
+                        </form>
                         @endif
                     </div>
                 </div>

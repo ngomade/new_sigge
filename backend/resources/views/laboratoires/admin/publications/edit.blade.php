@@ -19,11 +19,11 @@
         ->first();
     $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
 @endphp
-@if($userRole === 'admin' || $userRole === 'chef_projet' || $publication->id_pers_lab === $userId)
+@if($publication->id_pers_lab == $userId)
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-book-edit'></i> Modifier la publication</h2>
-        <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('laboratoires.admin.publications.index', $publication->code_lab) }}" class="btn btn-outline-secondary">
             <i class='bx bx-arrow-back'></i> Retour à la liste
         </a>
     </div>
@@ -31,7 +31,7 @@
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Modifier les informations de la publication</h4>
-            <form action="{{ route('labo.publications.update', $publication->code_publi) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('laboratoires.admin.publications.update', [$publication->code_lab, $publication->code_publi]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="row">
@@ -113,7 +113,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('labo.publications.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('laboratoires.admin.publications.index', $publication->code_lab) }}" class="btn btn-secondary">
                         <i class="bx bx-arrow-back"></i> Annuler
                     </a>
                     <button type="submit" class="btn btn-primary">
@@ -129,7 +129,7 @@
         <div class="alert alert-danger">
             <h4><i class='bx bx-error-circle'></i> Accès refusé</h4>
             <p>Vous n'avez pas les permissions nécessaires pour modifier cette publication.</p>
-            <a href="{{ route('labo.publications.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('laboratoires.admin.publications.index', $publication->code_lab) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour à la liste
             </a>
         </div>

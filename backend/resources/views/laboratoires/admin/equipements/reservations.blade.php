@@ -78,27 +78,27 @@
                                     <input type="text" class="form-control" value="{{ $affectation->nom_complet }}" readonly>
                                 </div>
                             @else
-                                <div class="mb-3">
+                            <div class="mb-3">
                                     <label for="id_pers_lab" class="form-label">Membre <span class="text-danger">*</span></label>
                                     <select class="form-select @error('id_pers_lab') is-invalid @enderror" id="id_pers_lab" name="id_pers_lab" required>
-                                        <option value="">Sélectionner un membre</option>
-                                        @foreach ($personnel as $pers)
+                                    <option value="">Sélectionner un membre</option>
+                                    @foreach ($personnel as $pers)
                                             <option value="{{ $pers->id_pers_lab }}" {{ old('id_pers_lab') == $pers->id_pers_lab ? 'selected' : '' }}>
-                                                @if ($pers->persLab)
-                                                    {{ $pers->persLab->nom_complet ?? 'Membre interne' }}
-                                                @elseif($pers->userExterne)
-                                                    {{ $pers->userExterne->nom_user_ext }}
-                                                    {{ $pers->userExterne->prenom_user_ext }}
-                                                @else
-                                                    Membre inconnu
-                                                @endif
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('id_pers_lab')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                            @if ($pers->persLab)
+                                                {{ $pers->persLab->nom_complet ?? 'Membre interne' }}
+                                            @elseif($pers->userExterne)
+                                                {{ $pers->userExterne->nom_user_ext }}
+                                                {{ $pers->userExterne->prenom_user_ext }}
+                                            @else
+                                                Membre inconnu
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_pers_lab')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                             @endif
                             <div class="mb-3">
                                 <label for="debut_reserv" class="form-label">Date de début <span class="text-danger">*</span></label>
@@ -130,46 +130,46 @@
                     <div class="card-body">
                         <h5 class="card-title">Historique des réservations</h5>
                         @if($reservations->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-centered table-nowrap">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Membre</th>
-                                        <th>Période</th>
-                                        <th>Statut</th>
-                                        <th>Durée</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Membre</th>
+                                            <th>Période</th>
+                                            <th>Statut</th>
+                                            <th>Durée</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     @foreach($reservations as $reservation)
-                                    <tr>
-                                        <td>
+                                            <tr>
+                                                <td>
                                             @if($reservation->personnel && $reservation->personnel->persLab)
                                                 {{ $reservation->personnel->persLab->nom_complet ?? 'Membre interne' }}
-                                            @elseif($reservation->personnel && $reservation->personnel->userExterne)
-                                                {{ $reservation->personnel->userExterne->nom_user_ext }}
-                                                {{ $reservation->personnel->userExterne->prenom_user_ext }}
-                                            @else
+                                                    @elseif($reservation->personnel && $reservation->personnel->userExterne)
+                                                        {{ $reservation->personnel->userExterne->nom_user_ext }}
+                                                        {{ $reservation->personnel->userExterne->prenom_user_ext }}
+                                                    @else
                                                 Membre inconnu
-                                            @endif
-                                        </td>
+                                                    @endif
+                                                </td>
                                         <td>{{ $reservation->debut_formatted }} - {{ $reservation->fin_formatted }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ $reservation->statut_badge }}">
-                                                {{ $reservation->statut_label }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $reservation->getDureeFormatted() }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                                <td>
+                                                    <span class="badge bg-{{ $reservation->statut_badge }}">
+                                                        {{ $reservation->statut_label }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ $reservation->getDureeFormatted() }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         @else
-                        <div class="text-center py-4">
-                            <i class="bx bx-calendar font-size-48 text-muted"></i>
+                            <div class="text-center py-4">
+                                <i class="bx bx-calendar font-size-48 text-muted"></i>
                             <p class="text-muted mt-2">Aucune réservation enregistrée</p>
-                        </div>
+                            </div>
                         @endif
                     </div>
                 </div>

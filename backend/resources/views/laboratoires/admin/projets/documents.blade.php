@@ -87,8 +87,8 @@
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce document ?')">
                                                         <i class="bx bx-trash"></i>
-                                                    </button>
-                                                </form>
+                                                </button>
+                                            </form>
                                             @endif
                                         </div>
                                     </td>
