@@ -20,6 +20,15 @@
                     <i class="bi bi-download me-1"></i>Télécharger
                 </a>
             @endif
+            @if($userRole)
+                <form action="{{ route('laboratoires.admin.rapports.destroy', [$laboratoire->code_lab, $rapport->code_rl]) }}" method="POST" class="d-inline" id="delete-form-{{ $rapport->code_rl }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Confirmer la suppression de ce rapport ?')">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 

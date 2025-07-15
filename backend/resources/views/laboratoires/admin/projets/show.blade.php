@@ -145,7 +145,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class='bx bx-file'></i> Documents ({{ $projet->docs->count() }})</h5>
-                    @if($userRole === 'admin' || $userRole === 'chef_projet')
+                    @if($userRole)
                     <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
                         <i class='bx bx-plus'></i> Ajouter
                     </a>
@@ -171,7 +171,7 @@
                         <div class="text-center py-4">
                             <i class='bx bx-file' style="font-size: 3rem; color: #ccc;"></i>
                             <p class="text-muted mt-2">Aucun document pour le moment</p>
-                            @if($userRole === 'admin' || $userRole === 'chef_projet')
+                            @if($userRole)
                                 <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-primary">
                                 <i class='bx bx-plus'></i> Ajouter le premier document
                             </a>

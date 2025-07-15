@@ -62,15 +62,25 @@
                                                             $userExt = \App\Models\laboratoires\UserExterne::where('id_user_ext', $membre->persLab->id_pers_lab)->first();
                                                         @endphp
                                                         {{ $userExt ? $userExt->nom_user_ext . ' ' . $userExt->prenom_user_ext : 'N/A' }}
+                                                    @else
+                                                        <span class="text-muted">Type inconnu</span>
                                                     @endif
+                                                @elseif($membre->userExterne)
+                                                    {{ $membre->userExterne->nom_user_ext }} {{ $membre->userExterne->prenom_user_ext }}
                                                 @else
                                                     N/A
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge bg-{{ $membre->persLab->type_pers_lab === 'personnel' ? 'primary' : ($membre->persLab->type_pers_lab === 'users' ? 'success' : 'warning') }}">
-                                                    {{ ucfirst(str_replace('_', ' ', $membre->persLab->type_pers_lab)) }}
-                                                </span>
+                                                @if($membre->persLab)
+                                                    <span class="badge bg-{{ $membre->persLab->type_pers_lab === 'personnel' ? 'primary' : ($membre->persLab->type_pers_lab === 'users' ? 'success' : 'warning') }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $membre->persLab->type_pers_lab)) }}
+                                                    </span>
+                                                @elseif($membre->userExterne)
+                                                    <span class="badge bg-warning">Externe</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Inconnu</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($membre->roleLabo)
@@ -87,21 +97,34 @@
                                                 </span>
                                             </td>
                                             <td>
+                                                @php
+                                                    $membreId = $membre->id_pers_lab ?? $membre->id_user_externe;
+                                                    $isExterne = $membre->userExterne || (isset($membre->persLab) && $membre->persLab->type_pers_lab === 'user_externe');
+                                                    $nomMembre = '';
+                                                    if(isset($personnel)) $nomMembre = $personnel->nom_pers ?? '';
+                                                    elseif(isset($user)) $nomMembre = $user->nom_user ?? '';
+                                                    elseif(isset($userExt)) $nomMembre = $userExt->nom_user_ext ?? '';
+                                                    elseif($membre->userExterne) $nomMembre = $membre->userExterne->nom_user_ext ?? '';
+                                                @endphp
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('labo.laboratoires.membres.edit', [$laboratoire, $membre->id_pers_lab]) }}"
-                                                       class="btn btn-sm btn-outline-primary" title="Modifier">
-                                                        <i class='bx bx-edit'></i>
-                                                    </a>
-                                                    <form action="{{ route('labo.laboratoires.membres.destroy', [$laboratoire, $membre->id_pers_lab]) }}"
-                                                          method="POST" class="d-inline" id="delete-form-{{ $membre->id_pers_lab }}">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-membre" title="Supprimer"
-                                                                data-id="{{ $membre->id_pers_lab }}"
-                                                                data-name="{{ $personnel->nom_pers ?? ($user->nom_user ?? ($userExt->nom_user_ext ?? '')) }}">
-                                                            <i class='bx bx-trash'></i>
-                                                        </button>
-                                                    </form>
+                                                    @if($membreId)
+                                                        <a href="{{ route('labo.laboratoires.membres.edit', [$laboratoire, $membreId]) }}"
+                                                           class="btn btn-sm btn-outline-primary" title="Modifier">
+                                                            <i class='bx bx-edit'></i>
+                                                        </a>
+                                                        <form action="{{ route('labo.laboratoires.membres.destroy', [$laboratoire, $membreId]) }}"
+                                                              method="POST" class="d-inline" id="delete-form-{{ $membreId }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-membre" title="Supprimer"
+                                                                    data-id="{{ $membreId }}"
+                                                                    data-name="{{ $nomMembre }}">
+                                                                <i class='bx bx-trash'></i>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <span class="text-muted">Actions indisponibles</span>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -149,7 +172,7 @@
   </div>
 </div>
 
- @push('scripts') 
+ @push('scripts')
 <script>
 $(document).ready(function () {
     var deleteFormId = null;
@@ -179,6 +202,6 @@ $(document).ready(function () {
     });
 });
 </script>
- @endpush 
+ @endpush
 
 @endsection

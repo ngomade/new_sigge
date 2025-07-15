@@ -49,13 +49,16 @@ class LaboratoirePermissionMiddleware
 
         // Définir les permissions par rôle
         $rolePermissions = [
-            'admin' => ['*'], // Toutes les permissions
+            'admin' => ['*', 'projets.documents.create', 'projets.documents.edit', 'projets.documents.delete'],
             'chef_projet' => [
                 'projets.view',
                 'projets.create',
                 'projets.edit',
                 'projets.participants',
                 'projets.documents',
+                'projets.documents.create',
+                'projets.documents.edit',
+                'projets.documents.delete',
                 'equipements.view',
                 'equipements.reserve',
                 'publications.view',
@@ -68,6 +71,10 @@ class LaboratoirePermissionMiddleware
                 'equipements.reserve',
                 'equipements.entretenir',
                 'projets.view',
+                'projets.documents',
+                'projets.documents.create',
+                'projets.documents.edit',
+                'projets.documents.delete',
                 'publications.view',
                 'publications.create',
                 'publications.edit',
@@ -75,6 +82,10 @@ class LaboratoirePermissionMiddleware
             ],
             'membre' => [
                 'projets.view',
+                'projets.documents',
+                'projets.documents.create',
+                'projets.documents.edit',
+                'projets.documents.delete',
                 'equipements.view',
                 'equipements.reserve',
                 'publications.view',
@@ -84,6 +95,10 @@ class LaboratoirePermissionMiddleware
             ],
             'externe' => [
                 'projets.view',
+                'projets.documents',
+                'projets.documents.create',
+                'projets.documents.edit',
+                'projets.documents.delete',
                 'equipements.view',
                 'publications.view',
                 'publications.create',

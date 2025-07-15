@@ -118,23 +118,26 @@
                             <td>{{ $membre->id_pers_lab ?? $membre->id_user_externe }}</td>
                             <td>
                                 @if($membre->userExterne)
-                                    {{ $membre->userExterne->nom_user_ext }}
-                                    {{ $membre->userExterne->prenom_user_ext }}
+                                    {{ $membre->userExterne->nom_user_ext }} {{ $membre->userExterne->prenom_user_ext }}
                                 @elseif($membre->persLab)
                                     @if($membre->persLab->type_pers_lab === 'personnel')
-                                        {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->nom_pers }}
-                                        {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->prenom_pers }}
+                                        {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->nom_pers }} {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->prenom_pers }}
                                     @elseif($membre->persLab->type_pers_lab === 'user')
-                                        {{ optional(\App\Models\Users::find($membre->id_pers_lab))->nom_user }}
-                                        {{ optional(\App\Models\Users::find($membre->id_pers_lab))->prenom_user }}
+                                        {{ optional(\App\Models\Users::find($membre->id_pers_lab))->nom_user }} {{ optional(\App\Models\Users::find($membre->id_pers_lab))->prenom_user }}
+                                    @else
+                                        <span class="text-muted">Type inconnu</span>
                                     @endif
+                                @else
+                                    <span class="text-muted">Utilisateur inconnu</span>
                                 @endif
                             </td>
                             <td>
                                 @if($membre->userExterne)
-                                    externe
+                                    <span class="badge bg-warning">Externe</span>
+                                @elseif($membre->persLab)
+                                    <span class="badge bg-primary">{{ ucfirst($membre->persLab->type_pers_lab) }}</span>
                                 @else
-                                    {{ $membre->persLab->type_pers_lab ?? '-' }}
+                                    <span class="badge bg-secondary">Inconnu</span>
                                 @endif
                             </td>
                             <td>{{ $membre->roleLabo->lib_rl ?? '-' }}</td>

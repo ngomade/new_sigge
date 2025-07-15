@@ -14,9 +14,11 @@
             <a href="{{ route('laboratoires.admin.reporting', $laboratoire->code_lab) }}" class="btn btn-light btn-sm">
                 <i class="bi bi-arrow-left me-1"></i>Retour
             </a>
+            @if($userRole)
             <a href="{{ route('laboratoires.admin.rapports.create', $laboratoire->code_lab) }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-circle me-1"></i>Nouveau Rapport
             </a>
+            @endif
         </div>
     </div>
 
@@ -152,6 +154,7 @@
                                                 <i class="bi bi-download fs-5"></i>
                                             </a>
                                         @endif
+                                        @if($userRole)
                                     <form action="{{ route('laboratoires.admin.rapports.destroy', [$laboratoire->code_lab, $rapport->code_rl]) }}"
                                               method="POST" class="d-inline" id="delete-form-{{ $rapport->code_rl }}">
                                             @csrf
@@ -160,6 +163,7 @@
                                                 <i class="bi bi-trash fs-5"></i>
                                             </button>
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

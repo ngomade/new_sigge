@@ -133,10 +133,10 @@
                                             <a href="{{ route('laboratoires.admin.projets.participants', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-warning">
                                                 <i class='bx bx-group'></i>
                                             </a>
+                                            @endif
                                             <a href="{{ route('laboratoires.admin.projets.documents', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-sm btn-secondary">
                                                 <i class='bx bx-file'></i>
                                             </a>
-                                            @endif
 
                                             @if($userRole === 'admin' || $userRole === 'chef_projet')
                                             <form method="POST" action="{{ route('laboratoires.admin.projets.destroy', [$laboratoire->code_lab, $projet->code_projet]) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression de ce projet ?')">

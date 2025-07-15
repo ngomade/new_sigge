@@ -876,8 +876,37 @@ class AdminLaboratoireController extends Controller
 
     public function projetDocumentsUpdate(Request $request, $code_lab, $projet, $document)
     {
-        // TODO: Ajouter la logique de validation et de mise à jour du document
-        return back()->with('success', 'Document mis à jour (méthode à compléter).');
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $projet = \App\Models\laboratoires\ProjetLabo::where('code_lab', $code_lab)
+            ->where('code_projet', $projet)
+            ->firstOrFail();
+        $doc = \App\Models\laboratoires\DocProjetLabo::where('id_doc', $document)
+            ->where('code_projet', $projet->code_projet)
+                ->firstOrFail();
+
+        $request->validate([
+            'titre_doc' => 'required|string|max:255',
+            'path' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240'
+        ]);
+
+        try {
+            $data = [
+                'titre_doc' => $request->titre_doc,
+            ];
+            if ($request->hasFile('path')) {
+                // Supprimer l'ancien fichier
+                if ($doc->path && \Storage::disk('public')->exists($doc->path)) {
+                    \Storage::disk('public')->delete($doc->path);
+                }
+                $data['path'] = $request->file('path')->store('documents_projets', 'public');
+            }
+            $doc->update($data);
+
+            return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
+                ->with('success', 'Document modifié avec succès.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la modification : ' . $e->getMessage());
+        }
     }
 
     public function equipements($code_lab, Request $request)

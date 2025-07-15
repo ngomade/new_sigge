@@ -46,7 +46,7 @@ Route::prefix('laboratoires')->name('laboratoires.')->group(function () {
 Route::prefix('labo')->name('labo.')->group(function () {
 
     // Laboratoires
-    Route::resource('laboratoires', LaboratoireController::class)->middleware('laboratoire.permission:dashboard.view');
+    Route::resource('laboratoires', LaboratoireController::class);
 
     // Projets
     Route::resource('projets', ProjetLaboController::class)->middleware([
@@ -128,6 +128,7 @@ Route::prefix('labo')->name('labo.')->group(function () {
 
 Route::get('/presentation_ufd_tsi', [LaboratoireController::class, 'index']);
 //Route::get('/presentation_labo/{id}',  [LaboratoireController::class, 'show']);
+
 
 // Dashboard admin du laboratoire
 Route::get('/laboratoires/{code_lab}/admin', [AdminLaboratoireController::class, 'dashboard'])

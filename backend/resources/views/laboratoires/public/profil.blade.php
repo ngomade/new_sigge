@@ -95,6 +95,13 @@
                                     </div>
                                     @endif
                                 </div>
+                                @if($userType === 'externe')
+                                    <div class="mb-3">
+                                        <label for="pwd" class="form-label">Nouveau mot de passe</label>
+                                        <input type="password" class="form-control" id="pwd" name="pwd" minlength="6" autocomplete="new-password" placeholder="Laisser vide pour ne pas changer">
+                                        <small class="form-text text-muted">Laisser vide si vous ne souhaitez pas modifier votre mot de passe.</small>
+                                    </div>
+                                @endif
                             @endif
 
                             <div class="d-flex justify-content-between">

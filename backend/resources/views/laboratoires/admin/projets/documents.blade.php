@@ -22,7 +22,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-file'></i> Gestion des documents - {{ $projet->theme_projet }}</h2>
         <div>
-            @if($userRole === 'admin' || $userRole === 'chef_projet')
+            @if($userRole)
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
                 <i class='bx bx-plus'></i> Ajouter un document
             </button>
@@ -78,13 +78,13 @@
                                             <a href="{{ asset('storage/' . $doc->path) }}" target="_blank" class="btn btn-sm btn-primary">
                                                 <i class='bx bx-download'></i> Télécharger
                                                 </a>
-                                            @if($userRole === 'admin' || $userRole === 'chef_projet')
-                                                <button type="button" class="btn btn-sm btn-warning" onclick="editDocument({{ $doc->id }})">
+                                            @if($userRole)
+                                                <button type="button" class="btn btn-sm btn-warning" data-doc-id="{{ $doc->id_doc }}" onclick="editDocument(this)">
                                                     <i class='bx bx-edit'></i> Modifier
                                                 </button>
                                                 <form action="{{ route('laboratoires.admin.projets.documents.destroy', [$laboratoire->code_lab, $projet->code_projet, $doc->id_doc]) }}" method="POST" style="display:inline">
-                                                    @csrf
-                                                    @method('DELETE')
+                                                @csrf
+                                                @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce document ?')">
                                                         <i class="bx bx-trash"></i>
                                                 </button>
@@ -106,7 +106,7 @@
                 <div class="text-center py-4">
                     <i class='bx bx-file' style="font-size: 3rem; color: #ccc;"></i>
                     <p class="text-muted mt-2">Aucun document pour ce projet</p>
-                    @if($userRole === 'admin' || $userRole === 'chef_projet')
+                    @if($userRole)
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
                         <i class='bx bx-plus'></i> Ajouter le premier document
                     </button>
@@ -117,7 +117,7 @@
     </div>
 </div>
 
-@if($userRole === 'admin' || $userRole === 'chef_projet')
+@if($userRole)
 <!-- Modal Ajout Document -->
 <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -136,16 +136,6 @@
                         <input type="text" class="form-control @error('titre_doc') is-invalid @enderror"
                                id="titre_doc" name="titre_doc" value="{{ old('titre_doc') }}" required>
                         @error('titre_doc')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description_doc" class="form-label">Description (optionnel)</label>
-                        <textarea class="form-control @error('description_doc') is-invalid @enderror"
-                                  id="description_doc" name="description_doc" rows="3"
-                                  placeholder="Description du document...">{{ old('description_doc') }}</textarea>
-                        @error('description_doc')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -195,12 +185,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="edit_description_doc" class="form-label">Description (optionnel)</label>
-                        <textarea class="form-control" id="edit_description_doc" name="description_doc" rows="3"
-                                  placeholder="Description du document..."></textarea>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="edit_path" class="form-label">Nouveau fichier (optionnel)</label>
                         <input type="file" class="form-control" id="edit_path" name="path">
                         <div class="form-text">
@@ -222,16 +206,18 @@
 </div>
 
 <script>
-function editDocument(docId) {
-    // Ici vous devriez récupérer les données du document via AJAX
-    // Pour l'instant, on utilise une approche simple
+function editDocument(btn) {
+    const row = btn.closest('tr');
+    const titre = row.querySelector('td strong').textContent.trim();
+    document.getElementById('edit_titre_doc').value = titre;
+
+    const docId = btn.getAttribute('data-doc-id');
     const form = document.getElementById('editDocumentForm');
     form.action = `{{ route('laboratoires.admin.projets.documents.update', [$laboratoire->code_lab, $projet->code_projet, ':docId']) }}`.replace(':docId', docId);
 
-    // Ouvrir le modal
     const modal = new bootstrap.Modal(document.getElementById('editDocumentModal'));
     modal.show();
-        }
+}
 </script>
 @endif
 @endsection

@@ -16,16 +16,37 @@
                         <div class="col-md-6">
                             <h6><i class='bx bx-info-circle'></i> Informations générales</h6>
                             <p><strong>Code :</strong> {{ $laboratoire->code_lab }}</p>
-                            <p><strong>Responsable :</strong> {{ $laboratoire->responsable_labo }}</p>
-                            <p><strong>Statut :</strong>
-                                <span class="badge bg-{{ $laboratoire->statut_labo === 'actif' ? 'success' : 'secondary' }}">
-                                    {{ ucfirst($laboratoire->statut_labo) }}
-                                </span>
+                            <p><strong>Responsable :</strong>
+                                @php
+                                    $admin = $laboratoire->admin_pers_labo;
+                                    $nomResponsable = 'Non défini';
+                                    $emailResponsable = '';
+                                    if (is_object($admin) && method_exists($admin, 'getNomCompletAttribute')) {
+                                        $nomResponsable = $admin->nom_complet;
+                                        $emailResponsable = $admin->email ?? '';
+                                    } elseif (is_string($admin)) {
+                                        $persLab = \App\Models\laboratoires\PersLab::find($admin);
+                                        if ($persLab) {
+                                            $nomResponsable = $persLab->nom_complet;
+                                            $emailResponsable = $persLab->email;
+                                        } else {
+                                            $userExt = \App\Models\laboratoires\UserExterne::find($admin);
+                                            if ($userExt) {
+                                                $nomResponsable = $userExt->nom_user_ext . ' ' . $userExt->prenom_user_ext;
+                                                $emailResponsable = $userExt->email_user_ext;
+                                            }
+                                        }
+                                    }
+                                @endphp
+                                {{ $nomResponsable }}
+                                @if($emailResponsable)
+                                    <br><small class="text-muted"><i class='bx bx-envelope'></i> {{ $emailResponsable }}</small>
+                                @endif
                             </p>
                         </div>
                         <div class="col-md-6">
                             <h6><i class='bx bx-calendar'></i> Dates</h6>
-                            <p><strong>Création :</strong> {{ $laboratoire->date_creation_labo ? \Carbon\Carbon::parse($laboratoire->date_creation_labo)->format('d/m/Y') : 'Non définie' }}</p>
+                            <p><strong>Création :</strong> {{ $laboratoire->created_at ? \Carbon\Carbon::parse($laboratoire->created_at)->format('d/m/Y') : 'Non définie' }}</p>
                             <p><strong>Dernière modification :</strong> {{ \Carbon\Carbon::parse($laboratoire->updated_at)->format('d/m/Y H:i') }}</p>
                         </div>
                     </div>
@@ -62,7 +83,7 @@
                             <div class="col-md-6 mb-3">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title text-primary">{{ $projet->titre_projet }}</h6>
+                                        <h6 class="card-title text-primary">{{ $projet->theme_projet }}</h6>
                                         <p class="card-text small text-muted">
                                             {{ Str::limit($projet->desc_projet, 100) }}
                                         </p>
