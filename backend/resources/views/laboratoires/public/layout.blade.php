@@ -25,7 +25,8 @@
             $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
         }
     @endphp
-
+    <link href="{{asset('share/img/logo_estlc.png')}}" rel="icon">
+    <link href="{{asset('share/img/logo_estlc.png')}}" rel="apple-touch-icon">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -35,9 +36,9 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-hover: #5f61e6;
-            --primary-dark: #595cd9;
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --primary-dark: #21618c;
             --secondary-color: #6c757d;
             --accent-color: #dc3545;
             --light-bg: #f8f9fa;
@@ -59,19 +60,19 @@
 
         .card {
             border: none;
-            box-shadow: 0 0.125rem 0.25rem 0 rgba(105, 108, 255, 0.4);
+            box-shadow: 0 0.125rem 0.25rem 0 rgba(52, 152, 219, 0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem 0 rgba(105, 108, 255, 0.4);
+            box-shadow: 0 0.5rem 1rem 0 rgba(52, 152, 219, 0.4);
         }
 
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
-            box-shadow: 0 0.125rem 0.25rem 0 rgba(105, 108, 255, 0.4);
+            box-shadow: 0 0.125rem 0.25rem 0 rgba(52, 152, 219, 0.4);
         }
 
         .btn-primary:hover {
