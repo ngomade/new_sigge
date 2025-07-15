@@ -295,12 +295,19 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
         $userType = session('user_type');
         $userId = session('user_id');
 
-        $request->validate([
+        $rules = [
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'email' => 'required|email',
             'telephone' => 'nullable|string|max:20',
-        ]);
+        ];
+        // Ajout validation mot de passe si externe
+        if ($userType == 'externe') {
+            if ($request->filled('pwd')) {
+                $rules['pwd'] = 'required|string';
+            }
+        }
+        $request->validate($rules);
 
         try {
             switch ($userType) {
@@ -329,12 +336,16 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
                 case 'externe':
                     $user = UserExterne::where('id_user_ext', $userId)->first();
                     if ($user) {
-                        $user->update([
+                        $updateData = [
                             'nom_user_ext' => $request->nom,
                             'prenom_user_ext' => $request->prenom,
                             'email_user_ext' => $request->email,
                             'tel_user_ext' => $request->telephone,
-                        ]);
+                        ];
+                        if ($request->filled('pwd')) {
+                            $updateData['pwd'] = Hash::make($request->pwd); // ou Hash::make si tu veux migrer
+                        }
+                        $user->update($updateData);
                     }
                     break;
             }
