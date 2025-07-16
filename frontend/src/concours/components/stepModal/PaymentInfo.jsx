@@ -5,11 +5,18 @@ import {toast} from 'react-toastify';
 import {createCompte} from '../../api/routes/compte';
 import {useDispatch} from 'react-redux';
 import {push_candidate_info} from '../../app/modules/candidate';
-// import {useNavigate} from 'react-router-dom';
 
 function PaymentInfo({onClose, isLoad, setLoadingState}) {
-    const [ setImageObject] = useState("");
-    const [formData, setFormData] = useState({});
+    const [imageObject, setImageObject] = useState("");
+    const [formData, setFormData] = useState({
+        ca_nom: '',
+        ca_prenom: '',
+        ca_email: '',
+        ca_num_recu: '',
+        ca_pwd: '',
+        ca_confirm_pwd: '',
+        ca_recu: null
+    });
     const [showPassword, setPasswordShow] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
@@ -17,14 +24,18 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
     const [ocrData, setOcrData] = useState(null);
 
     const dispatch = useDispatch();
-    // const navigate = useNavigate();
 
     useEffect(() => {
         fieldSet('#form_pay', setFormData, {});
         return () => {
             fieldSet('#form_pay', setFormData, {});
+            // Nettoyage des URLs créées
+            if (imageObject) {
+                URL.revokeObjectURL(imageObject);
+            }
         };
-    }, []);
+    }, [imageObject]);
+
 
     // Fonction pour extraire les données avec OCR
     async function extractDataWithOCR(file) {
@@ -35,14 +46,14 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
         try {
             const response = await fetch('http://localhost:8000/api/concours/comptes/extract-receipt', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
+                // headers: {
+                //     'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                // },
                 body: formData
             });
 
             const result = await response.json();
-            console.log('Réponse reçue:', response);
+            console.log('Réponse reçue:', result);
             
             if (result.success && result.data) {
                 setOcrData(result.data);
@@ -50,26 +61,12 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                 // Pré-remplir le formulaire avec les données extraites
                 setFormData(prevData => ({
                     ...prevData,
-                    ca_nom: result.data.ca_nom || prevData.ca_nom || '',
-                    ca_prenom: result.data.ca_prenom || prevData.ca_prenom || '',
-                    ca_email: result.data.ca_email || prevData.ca_email || '',
-                    ca_num_recu: result.data.ca_num_recu || prevData.ca_num_recu || '',
+                    ca_nom: result.data.ca_nom || '',
+                    ca_prenom: result.data.ca_prenom || '',
+                    ca_email: result.data.ca_email || '',
+                    ca_num_recu: result.data.ca_num_recu || '',
                     ca_recu: file
                 }));
-
-                // Mettre à jour les valeurs des inputs
-                if (result.data.ca_nom) {
-                    document.getElementById('ca_nom').value = result.data.ca_nom;
-                }
-                if (result.data.ca_prenom) {
-                    document.getElementById('ca_prenom').value = result.data.ca_prenom;
-                }
-                if (result.data.ca_email) {
-                    document.getElementById('ca_email').value = result.data.ca_email;
-                }
-                if (result.data.ca_num_recu) {
-                    document.getElementById('ca_recu').value = result.data.ca_num_recu;
-                }
 
                 toast.success("Données extraites avec succès ! Vérifiez et complétez si nécessaire.");
             } else {
@@ -105,14 +102,22 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                 const response = await createCompte(data, ca_recu);
                 if (response.ok) {
                     setLoadingState(false);
-                    setIsSubmitting(false); // Fin du traitement
+                    setIsSubmitting(false);
                     onClose();
                     const data = await response.json()
                     const {access_token, compte, user, user_type} = data
                     localStorage.setItem('token', access_token)
                     localStorage.setItem('user', JSON.stringify(user))
                     localStorage.setItem('user_type', user_type)
-                    fieldSet('#form_pay', setFormData, {});
+                    setFormData({
+                        ca_nom: '',
+                        ca_prenom: '',
+                        ca_email: '',
+                        ca_num_recu: '',
+                        ca_pwd: '',
+                        ca_confirm_pwd: '',
+                        ca_recu: null
+                    });
                     dispatch(push_candidate_info(compte));
                     toast.success("Les informations ont été soumises avec succès");
                     window.location.href = "/candidate";
@@ -120,8 +125,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                     const error = await response.json()
                     const {erreur} = error
                     setLoadingState(false);
-                    setIsSubmitting(false); // Réinitialiser l'état de soumission
-                    //onClose();
+                    setIsSubmitting(false);
                     return toast.error(erreur, {autoClose: 5000});
                 }
             } catch (error) {
@@ -196,13 +200,23 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                                 className="z-10 p-2 border opacity-0 appearance-none file:appearance-none file:bg-transparent file:border"
                             />
                             <span className="absolute text-5xl text-teal-500 top-9 left-3">
-                            <FileUp/>
-                        </span>
+                                <FileUp/>
+                            </span>
                             <p className="text-red-500">
                                 Reçu scanné en PDF, ou en Image( jpg, png, jpeg ) ne dépassant pas 2 Mo
                             </p>
                         </div>
-
+       {/* Afficher l'aperçu de l'image si disponible */}
+       {imageObject && (
+                            <div className="mt-2">
+                                <p className="font-semibold mb-1">Aperçu :</p>
+                                <img 
+                                    src={imageObject} 
+                                    alt="Aperçu du reçu" 
+                                    className="max-w-xs max-h-40 border rounded-md"
+                                />
+                            </div>
+                        )}
                         <label htmlFor="ca_nom">
                             Nom<sup className="text-red-600">*</sup> <i>(En Majuscule)</i>
                         </label>
@@ -213,7 +227,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                             placeholder="Exp MAHOP MAHOP"
                             className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
                             onChange={onChange}
-                            defaultValue={ocrData?.ca_nom || ''}
+                            value={formData.ca_nom || ''}
                         />
                     </div>
                     <div className="flex flex-col gap-3 mb-3">
@@ -227,7 +241,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                             placeholder="Exp BORIS JUNIOR"
                             className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
                             onChange={onChange}
-                            defaultValue={ocrData?.ca_prenom || ''}
+                            value={formData.ca_prenom || ''}
                         />
                     </div>
                     <div className="flex flex-col gap-3 mb-3">
@@ -241,23 +255,23 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                             placeholder="Exp cicsoestlc@gmail.com"
                             className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
                             onChange={onChange}
-                            defaultValue={ocrData?.ca_email || ''}
+                            value={formData.ca_email || ''}
                         />
                     </div>
                     <div className="flex flex-col gap-3 mb-3">
-                        <label htmlFor="ca_recu">
+                        <label htmlFor="ca_num_recu">
                             N° de reçu<sup className="text-red-600">*</sup> <i>(exactement 6 chiffres)</i>
                         </label>
                         <input
                             type="text"
-                            id="ca_recu"
+                            id="ca_num_recu"
                             name="ca_num_recu"
                             placeholder="056210"
                             className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
                             onChange={onChange}
+                            value={formData.ca_num_recu || ''}
                             maxLength={6}
                             minLength={6}
-                            defaultValue={ocrData?.ca_num_recu || ''}
                         />
                     </div>
                     <div className="flex flex-col gap-3 mb-3">
@@ -272,6 +286,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                                 placeholder="869532@erdsd12"
                                 className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1 w-full"
                                 onChange={onChange}
+                                value={formData.ca_pwd || ''}
                                 minLength={8}
                             />
                             <div className="absolute top-2 flex text-teal-500 cursor-pointer right-2" onClick={showPwd}>
@@ -291,6 +306,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                                 placeholder="869532@erdsd12"
                                 className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1 w-full"
                                 onChange={onChange}
+                                value={formData.ca_confirm_pwd || ''}
                             />
                             <div className="absolute top-2 flex text-teal-500 cursor-pointer right-2" onClick={showPwd}>
                                 {showPassword ? <EyeOff size={25}/> : <Eye size={25}/>}
@@ -328,10 +344,9 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                         <li>En cas de succès, vous serez invité à continuer votre inscription .</li>
                     </ul>
                 </div>
-                <div
-                    className="text-lg text-center md:text-justify shadow-inner shadow-green-800 rounded p-6 animate-bounce">
+                <div className="text-lg text-center md:text-justify shadow-inner shadow-green-800 rounded p-6 animate-bounce">
                     <p>Apres la création de votre compte, vous recevrez par mail vos informations de connexion. veuillez
-                        vérifier vos spams également. </p>
+                        vérifier vos spams également.</p>
                 </div>
             </div>
         </div>
