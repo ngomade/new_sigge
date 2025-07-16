@@ -127,6 +127,28 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-4">
+{{--            @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')--}}
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bx bx-wrench"></i> Tous les entretiens</h5>
+                        <p class="card-text">Voir et gérer tous les entretiens du laboratoire.</p>
+                        <a href="{{ route('laboratoires.admin.equipements.entretiens_all', $laboratoire->code_lab) }}" class="btn btn-outline-warning">Voir les entretiens</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bx bx-calendar"></i> Toutes les réservations</h5>
+                        <p class="card-text">Voir et gérer toutes les réservations du laboratoire.</p>
+                        <a href="{{ route('laboratoires.admin.equipements.reservations_all', $laboratoire->code_lab) }}" class="btn btn-outline-info">Voir les réservations</a>
+                    </div>
+                </div>
+            </div>
+{{--            @endif--}}
+        </div>
         <div class="row mt-5">
             <div class="col-12">
                 <div class="alert alert-info text-center">

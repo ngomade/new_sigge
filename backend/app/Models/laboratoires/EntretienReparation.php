@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class EntretienReparation extends Model
 {
     protected $table = 'entretien_reparation';
-    
+
     // Utiliser 'id' comme clé primaire
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -17,6 +17,7 @@ class EntretienReparation extends Model
     protected $fillable = [
         'code_equip',
         'id_pers_lab',
+        'id_user_ext', // nouveau champ
         'statut_entretien',
         'debut_entretien',
         'fin_entretien',
@@ -42,6 +43,11 @@ class EntretienReparation extends Model
     public function personnel(): BelongsTo
     {
         return $this->belongsTo(LaboratoirePersLab::class, 'id_pers_lab', 'id');
+    }
+
+    public function userExterne(): BelongsTo
+    {
+        return $this->belongsTo(UserExterne::class, 'id_user_ext', 'id_user_ext');
     }
 
     // Scopes

@@ -8,14 +8,15 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 class Kernel extends ConsoleKernel
 {
     /**
-     * Define the application's command schedule.
+     * The application's global command schedule.
      *
-     * Note: Les tâches planifiées des laboratoires sont maintenant gérées
-     * dans le LaboratoireScheduleServiceProvider pour une meilleure organisation.
+     * This schedule defines the commands that should be run on a daily,
+     * weekly, or monthly basis.
      */
-    protected function schedule(Schedule $schedule): void
+    protected function schedule(Schedule $schedule)
     {
         // Les tâches planifiées sont définies dans les Service Providers
+        $schedule->command('equipements:update-etats')->hourly();
     }
 
     /**

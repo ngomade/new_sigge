@@ -75,6 +75,9 @@
                                     <th>Responsable</th>
                                     <th>Statut</th>
                                     <th>Coût</th>
+                                    @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
+                                    <th>Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -85,6 +88,48 @@
                                     <td>{{ $entretien->personnel->nom_complet ?? 'Non défini' }}</td>
                                     <td><span class="badge bg-{{ $entretien->statut_badge }}">{{ $entretien->statut_entretien }}</span></td>
                                     <td>{{ $entretien->cout_formatted }}</td>
+                                    @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
+                                    <td>
+                                        @if($entretien->statut_entretien === 'En cours')
+                                        <form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.update', [$laboratoire->code_lab, $equipement->code_equip, $entretien->id]) }}" style="display:inline-block;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="statut_entretien" value="Terminé">
+                                            <input type="hidden" name="keep_dates" value="true">
+                                            <button type="submit" class="btn btn-success btn-sm" title="Terminer"><i class="bx bx-check"></i></button>
+                                        </form>
+                                        <form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.update', [$laboratoire->code_lab, $equipement->code_equip, $entretien->id]) }}" style="display:inline-block;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="statut_entretien" value="En pause">
+                                            <input type="hidden" name="keep_dates" value="true">
+                                            <button type="submit" class="btn btn-warning btn-sm" title="Mettre en pause"><i class="bx bx-pause"></i></button>
+                                        </form>
+                                        <form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.update', [$laboratoire->code_lab, $equipement->code_equip, $entretien->id]) }}" style="display:inline-block;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="statut_entretien" value="Annulé">
+                                            <input type="hidden" name="keep_dates" value="true">
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Annuler"><i class="bx bx-x"></i></button>
+                                        </form>
+                                        @elseif($entretien->statut_entretien === 'En pause')
+                                        <form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.update', [$laboratoire->code_lab, $equipement->code_equip, $entretien->id]) }}" style="display:inline-block;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="statut_entretien" value="En cours">
+                                            <input type="hidden" name="keep_dates" value="true">
+                                            <button type="submit" class="btn btn-info btn-sm" title="Reprendre"><i class="bx bx-play"></i></button>
+                                        </form>
+                                        <form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.update', [$laboratoire->code_lab, $equipement->code_equip, $entretien->id]) }}" style="display:inline-block;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="statut_entretien" value="Annulé">
+                                            <input type="hidden" name="keep_dates" value="true">
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Annuler"><i class="bx bx-x"></i></button>
+                                        </form>
+                                        @endif
+                                    </td>
+                                    @endif
                                 </tr>
                                 @endforeach
                             </tbody>

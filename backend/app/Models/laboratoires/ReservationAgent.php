@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ReservationAgent extends Model
 {
     protected $table = 'reservation_agent';
-    
+
     // Changement important : utiliser 'id' comme clé primaire
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -16,6 +16,7 @@ class ReservationAgent extends Model
     protected $fillable = [
         'code_equip',
         'id_pers_lab',
+        'id_user_ext', // nouveau champ
         'debut_reserv',
         'fin_reserv',
         'statut'
@@ -44,6 +45,11 @@ class ReservationAgent extends Model
     public function persLab(): BelongsTo
     {
         return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
+    }
+
+    public function userExterne(): BelongsTo
+    {
+        return $this->belongsTo(UserExterne::class, 'id_user_ext', 'id_user_ext');
     }
 
     // Scopes

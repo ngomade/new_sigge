@@ -169,6 +169,8 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.dashboard', $laboratoire->code_lab) }}">Dashboard</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.reservations_all', $laboratoire->code_lab) }}">Toutes les réservations</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.entretiens_all', $laboratoire->code_lab) }}">Tous les entretiens</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">Membres</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.candidatures', $laboratoire->code_lab) }}">Candidatures</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
@@ -176,12 +178,16 @@
                         @elseif($userRole === 'chercheur')
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.reservations_all', $laboratoire->code_lab) }}">Toutes les réservations</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.entretiens_all', $laboratoire->code_lab) }}">Tous les entretiens</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.membres', $laboratoire->code_lab) }}">Membres</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.annonces', $laboratoire->code_lab) }}">Annonces</a></li>
                         @elseif($userRole === 'technicien')
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.reservations_all', $laboratoire->code_lab) }}">Toutes les réservations</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.entretiens_all', $laboratoire->code_lab) }}">Tous les entretiens</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.annonces', $laboratoire->code_lab) }}">Annonces</a></li>
                         @elseif($userRole === 'secretaire')
@@ -191,6 +197,8 @@
                         @elseif($userRole === 'membre')
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.projets', $laboratoire->code_lab) }}">Projets</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements', $laboratoire->code_lab) }}">Équipements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.reservations_all', $laboratoire->code_lab) }}">Toutes les réservations</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.equipements.entretiens_all', $laboratoire->code_lab) }}">Tous les entretiens</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}">Publications</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('laboratoires.admin.annonces', $laboratoire->code_lab) }}">Annonces</a></li>
                         @endif

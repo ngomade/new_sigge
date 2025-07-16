@@ -2,19 +2,30 @@
 <form method="POST" action="">
     @csrf
     <div class="mb-3">
-        @if(isset($userRole) && $userRole === 'technicien')
-            <label class="form-label">Responsable</label>
-            <input type="hidden" name="id_pers_lab" value="{{ $affectation->id }}">
-            <input type="text" class="form-control" value="{{ $affectation->nom_complet }}" readonly>
-        @else
-            <label for="id_pers_lab" class="form-label">Responsable</label>
-            <select class="form-select" id="id_pers_lab" name="id_pers_lab" required>
-                <option value="">-- Sélectionner --</option>
-                @foreach($personnel as $pers)
-                    <option value="{{ $pers->id }}">{{ $pers->nom_complet }}</option>
-                @endforeach
-            </select>
-        @endif
+        <label for="participant_type" class="form-label">Type de participant</label>
+        <select class="form-select" id="participant_type" name="participant_type" required onchange="toggleParticipantSelect()">
+            <option value="">-- Sélectionner --</option>
+            <option value="interne">Membre interne</option>
+            <option value="externe">User externe</option>
+        </select>
+    </div>
+    <div class="mb-3" id="select_interne" style="display:none;">
+        <label for="id_pers_lab" class="form-label">Membre interne</label>
+        <select class="form-select" id="id_pers_lab" name="id_pers_lab">
+            <option value="">-- Sélectionner --</option>
+            @foreach($personnel as $pers)
+                <option value="{{ $pers->id }}">{{ $pers->nom_complet }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="mb-3" id="select_externe" style="display:none;">
+        <label for="id_user_ext" class="form-label">User externe</label>
+        <select class="form-select" id="id_user_ext" name="id_user_ext">
+            <option value="">-- Sélectionner --</option>
+            @foreach($externes as $ext)
+                <option value="{{ $ext->id_user_ext }}">{{ $ext->nom_user_ext }} {{ $ext->prenom_user_ext }}</option>
+            @endforeach
+        </select>
     </div>
     <div class="mb-3">
         <label for="type_entretien" class="form-label">Type d'entretien</label>
@@ -42,4 +53,15 @@
     </div>
     <button type="submit" class="btn btn-primary">Enregistrer l'entretien</button>
 </form>
- 
+<script>
+function toggleParticipantSelect() {
+    var type = document.getElementById('participant_type').value;
+    document.getElementById('select_interne').style.display = (type === 'interne') ? '' : 'none';
+    document.getElementById('select_externe').style.display = (type === 'externe') ? '' : 'none';
+    if(type === 'interne') {
+        document.getElementById('id_user_ext').value = '';
+    } else if(type === 'externe') {
+        document.getElementById('id_pers_lab').value = '';
+    }
+}
+</script>

@@ -1080,13 +1080,15 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $entretiens = $equipement->entretiens()->with('personnel')->orderByDesc('debut_entretien')->get();
-
         $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
+        $externes = \App\Models\laboratoires\UserExterne::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->get();
 
-        return view('laboratoires.admin.equipements.entretiens', compact('laboratoire', 'equipement', 'personnel', 'entretiens'));
+        return view('laboratoires.admin.equipements.entretiens', compact('laboratoire', 'equipement', 'personnel', 'entretiens', 'externes'));
     }
 
     public function equipementEntretienStore(Request $request, $code_lab, $equipement)
@@ -1097,7 +1099,9 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id',
+            'participant_type' => 'required|in:interne,externe',
+            'id_pers_lab' => 'nullable|exists:laboratoire_pers_lab,id',
+            'id_user_ext' => 'nullable|exists:user_externe,id_user_ext',
             'type_entretien' => 'required|in:entretien,reparation',
             'debut_entretien' => 'required|date',
             'fin_entretien' => 'required|date|after:debut_entretien',
@@ -1105,21 +1109,29 @@ class AdminLaboratoireController extends Controller
             'cout' => 'nullable|numeric|min:0'
         ]);
 
+        // Validation logique
+        if ($request->participant_type === 'interne' && !$request->id_pers_lab) {
+            return back()->with('error', 'Veuillez sélectionner un membre interne.');
+        }
+        if ($request->participant_type === 'externe' && !$request->id_user_ext) {
+            return back()->with('error', 'Veuillez sélectionner un user externe.');
+        }
+        if ($request->id_pers_lab && $request->id_user_ext) {
+            return back()->with('error', 'Un seul type de participant doit être sélectionné.');
+        }
+
         try {
-            // Vérifier s'il y a déjà un entretien en cours
             $entretienEnCours = $equipement->getEntretienEnCours();
             if ($entretienEnCours) {
                 return back()->with('error', 'Cet équipement a déjà un entretien en cours.');
             }
-
-            // Vérifier si l'équipement est disponible pour maintenance
             if ($equipement->etat === 'hors service') {
                 return back()->with('error', 'Cet équipement est hors service et ne peut pas être entretenu.');
             }
-
             \App\Models\laboratoires\EntretienReparation::create([
                 'code_equip' => $equipement->code_equip,
-                'id_pers_lab' => $request->id_pers_lab,
+                'id_pers_lab' => $request->participant_type === 'interne' ? $request->id_pers_lab : null,
+                'id_user_ext' => $request->participant_type === 'externe' ? $request->id_user_ext : null,
                 'statut_entretien' => 'En cours',
                 'debut_entretien' => $request->debut_entretien,
                 'fin_entretien' => $request->fin_entretien,
@@ -1127,13 +1139,11 @@ class AdminLaboratoireController extends Controller
                 'desc_entretien' => $request->desc_entretien,
                 'cout' => $request->cout
             ]);
-
-            // Mettre à jour l'état de l'équipement
             $equipement->update(['etat' => 'en maintenance']);
-
+            // Après la création d'un entretien
+            $equipement->updateEtatAutomatique();
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien programmé avec succès.');
-
         } catch (Exception $e) {
             return back()->with('error', 'Erreur lors de la programmation : ' . $e->getMessage());
         }
@@ -1141,6 +1151,9 @@ class AdminLaboratoireController extends Controller
 
     public function equipementEntretienUpdate(Request $request, $code_lab, $equipement, $entretien)
     {
+        if (!$this->peutValider($code_lab)) {
+            abort(403, 'Vous n\'êtes pas autorisé à valider ou refuser un entretien.');
+        }
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
@@ -1245,13 +1258,15 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $reservations = $equipement->reservations()->with('personnel')->orderByDesc('debut_reserv')->get();
-
         $personnel = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->with(['persLab'])
             ->get();
+        $externes = \App\Models\laboratoires\UserExterne::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->get();
 
-        return view('laboratoires.admin.equipements.reservations', compact('laboratoire', 'equipement', 'personnel', 'reservations'));
+        return view('laboratoires.admin.equipements.reservations', compact('laboratoire', 'equipement', 'personnel', 'reservations', 'externes'));
     }
 
     public function equipementReservationStore(Request $request, $code_lab, $equipement)
@@ -1262,18 +1277,25 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'id_pers_lab' => 'required|exists:laboratoire_pers_lab,id_pers_lab',
+            'participant_type' => 'required|in:interne,externe',
+            'id_pers_lab' => 'nullable|exists:laboratoire_pers_lab,id_pers_lab',
+            'id_user_ext' => 'nullable|exists:user_externe,id_user_ext',
             'debut_reserv' => 'required|date|after_or_equal:today',
             'fin_reserv' => 'required|date|after:debut_reserv'
         ]);
-
+        if ($request->participant_type === 'interne' && !$request->id_pers_lab) {
+            return back()->with('error', 'Veuillez sélectionner un membre interne.');
+        }
+        if ($request->participant_type === 'externe' && !$request->id_user_ext) {
+            return back()->with('error', 'Veuillez sélectionner un user externe.');
+        }
+        if ($request->id_pers_lab && $request->id_user_ext) {
+            return back()->with('error', 'Un seul type de participant doit être sélectionné.');
+        }
         try {
-            // Vérifier si l'équipement est disponible
             if (!$equipement->isDisponible()) {
                 return back()->with('error', 'Cet équipement n\'est pas disponible pour la réservation.');
             }
-
-            // Vérifier s'il y a des conflits de réservation
             $conflit = ReservationAgent::where('code_equip', $equipement->code_equip)
                 ->where('statut', 'confirmé')
                 ->where(function ($query) use ($request) {
@@ -1285,19 +1307,19 @@ class AdminLaboratoireController extends Controller
                         });
                 })
                 ->first();
-
             if ($conflit) {
                 return back()->with('error', 'Il y a un conflit de réservation pour cette période.');
             }
-
             ReservationAgent::create([
                 'code_equip' => $equipement->code_equip,
-                'id_pers_lab' => $request->id_pers_lab,
+                'id_pers_lab' => $request->participant_type === 'interne' ? $request->id_pers_lab : null,
+                'id_user_ext' => $request->participant_type === 'externe' ? $request->id_user_ext : null,
                 'debut_reserv' => $request->debut_reserv,
                 'fin_reserv' => $request->fin_reserv,
                 'statut' => 'en attente'
             ]);
-
+            // Après la création d'une réservation
+            $equipement->updateEtatAutomatique();
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Demande de réservation créée avec succès.');
         } catch (Exception $e) {
@@ -1307,6 +1329,9 @@ class AdminLaboratoireController extends Controller
 
     public function equipementReservationUpdate(Request $request, $code_lab, $equipement, $reservation)
     {
+        if (!$this->peutValider($code_lab)) {
+            abort(403, 'Vous n\'êtes pas autorisé à valider ou refuser une réservation.');
+        }
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
         $equipement = Equipements::where('code_lab', $code_lab)
             ->where('code_equip', $equipement)
@@ -2642,5 +2667,52 @@ class AdminLaboratoireController extends Controller
         $publication->delete();
         return redirect()->route('laboratoires.admin.publications.index', $code_lab)
             ->with('success', 'Publication supprimée avec succès.');
+    }
+
+    /**
+     * Vérifie si l'utilisateur connecté a le droit de valider (admin, technicien, chef de projet)
+     */
+    private function peutValider($code_lab)
+    {
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if (!$affectation || !$affectation->roleLabo) return false;
+        $role = strtolower($affectation->roleLabo->lib_rl);
+        return in_array($role, ['admin', 'technicien', 'chef de projet', 'chef_projet', 'chef-projet']);
+    }
+
+    /**
+     * Affiche tous les entretiens du laboratoire
+     */
+    public function tousLesEntretiens($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $entretiens = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function($q) use ($code_lab) {
+            $q->where('code_lab', $code_lab);
+        })->with(['equipement', 'personnel.persLab', 'personnel.userExterne'])->orderByDesc('debut_entretien')->get();
+        return view('laboratoires.admin.equipements.entretiens_all', compact('laboratoire', 'entretiens'));
+    }
+
+    /**
+     * Affiche toutes les réservations du laboratoire
+     */
+    public function toutesLesReservations($code_lab)
+    {
+        $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $reservations = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+            $q->where('code_lab', $code_lab);
+        })->with(['equipement', 'personnel.persLab', 'personnel.userExterne', 'userExterne'])->orderByDesc('debut_reserv')->get();
+        return view('laboratoires.admin.equipements.reservations_all', compact('laboratoire', 'reservations'));
     }
 }
