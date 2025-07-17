@@ -85,7 +85,15 @@
                                 <tr>
                                     <td>{{ $entretien->debut_formatted }}</td>
                                     <td><span class="badge bg-{{ $entretien->type_badge }}">{{ $entretien->type_label }}</span></td>
-                                    <td>{{ $entretien->personnel->nom_complet ?? 'Non défini' }}</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <strong>{{ $entretien->responsable['nom'] }}</strong>
+                                            <small class="text-muted">{{ $entretien->responsable['email'] }}</small>
+                                            @if($entretien->responsable['telephone'] !== 'Non défini')
+                                                <small class="text-muted">{{ $entretien->responsable['telephone'] }}</small>
+                                            @endif
+                                        </div>
+                                    </td>
                                     <td><span class="badge bg-{{ $entretien->statut_badge }}">{{ $entretien->statut_entretien }}</span></td>
                                     <td>{{ $entretien->cout_formatted }}</td>
                                     @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
@@ -129,7 +137,7 @@
                                         </form>
                                         @endif
                                     </td>
-                                    @endif
+                                                @endif
                                 </tr>
                                 @endforeach
                             </tbody>

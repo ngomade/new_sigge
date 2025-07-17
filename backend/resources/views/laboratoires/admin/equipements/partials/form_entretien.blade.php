@@ -1,31 +1,23 @@
 {{-- Formulaire d'entretien d'équipement --}}
-<form method="POST" action="">
+<form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.store', [$laboratoire->code_lab, $equipement->code_equip]) }}">
     @csrf
+    @php
+        $userType = session('user_type');
+        $userId = session('user_id');
+    @endphp
+    <input type="hidden" name="participant_type" value="{{ $userType === 'externe' ? 'externe' : 'interne' }}">
+    @if($userType === 'externe')
+        <input type="hidden" name="id_user_ext" value="{{ $userId }}">
+    @else
+        <input type="hidden" name="id_pers_lab" value="{{ $userId }}">
+    @endif
     <div class="mb-3">
-        <label for="participant_type" class="form-label">Type de participant</label>
-        <select class="form-select" id="participant_type" name="participant_type" required onchange="toggleParticipantSelect()">
-            <option value="">-- Sélectionner --</option>
-            <option value="interne">Membre interne</option>
-            <option value="externe">User externe</option>
-        </select>
-    </div>
-    <div class="mb-3" id="select_interne" style="display:none;">
-        <label for="id_pers_lab" class="form-label">Membre interne</label>
-        <select class="form-select" id="id_pers_lab" name="id_pers_lab">
-            <option value="">-- Sélectionner --</option>
-            @foreach($personnel as $pers)
-                <option value="{{ $pers->id }}">{{ $pers->nom_complet }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="mb-3" id="select_externe" style="display:none;">
-        <label for="id_user_ext" class="form-label">User externe</label>
-        <select class="form-select" id="id_user_ext" name="id_user_ext">
-            <option value="">-- Sélectionner --</option>
-            @foreach($externes as $ext)
-                <option value="{{ $ext->id_user_ext }}">{{ $ext->nom_user_ext }} {{ $ext->prenom_user_ext }}</option>
-            @endforeach
-        </select>
+        <label class="form-label">Responsable de l'entretien</label>
+        <div class="alert alert-info mb-0">
+            <i class="bx bx-user"></i>
+            <strong>{{ session('user_name') }}</strong>
+            <br><small class="text-muted">Vous effectuez cet entretien</small>
+        </div>
     </div>
     <div class="mb-3">
         <label for="type_entretien" class="form-label">Type d'entretien</label>
@@ -51,17 +43,7 @@
         <label for="cout" class="form-label">Coût (FCFA)</label>
         <input type="number" class="form-control" id="cout" name="cout" min="0" step="1">
     </div>
-    <button type="submit" class="btn btn-primary">Enregistrer l'entretien</button>
+    <button type="submit" class="btn btn-primary w-100">
+        <i class="bx bx-save"></i> Enregistrer l'entretien
+    </button>
 </form>
-<script>
-function toggleParticipantSelect() {
-    var type = document.getElementById('participant_type').value;
-    document.getElementById('select_interne').style.display = (type === 'interne') ? '' : 'none';
-    document.getElementById('select_externe').style.display = (type === 'externe') ? '' : 'none';
-    if(type === 'interne') {
-        document.getElementById('id_user_ext').value = '';
-    } else if(type === 'externe') {
-        document.getElementById('id_pers_lab').value = '';
-    }
-}
-</script>

@@ -256,6 +256,9 @@ Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/participants', [\App
 Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsStore'])
     ->name('laboratoires.admin.projets.participants.store')
     ->middleware('laboratoire.permission:projets.participants');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants/add-all', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsAddAll'])
+    ->name('laboratoires.admin.projets.participants.add-all')
+    ->middleware('laboratoire.permission:projets.participants');
 Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants/{participant}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsDestroy'])
     ->name('laboratoires.admin.projets.participants.destroy')
     ->middleware('laboratoire.permission:projets.participants');

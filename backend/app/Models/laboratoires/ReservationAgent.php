@@ -37,11 +37,10 @@ class ReservationAgent extends Model
 
     public function personnel(): BelongsTo
     {
-        // Relation corrigée pour pointer vers LaboratoirePersLab
-        return $this->belongsTo(LaboratoirePersLab::class, 'id_pers_lab', 'id');
+        return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
     }
 
-    // Pour la compatibilité, si vous avez besoin de la relation avec PersLab
+    // Relation correcte vers PersLab
     public function persLab(): BelongsTo
     {
         return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
@@ -90,6 +89,57 @@ class ReservationAgent extends Model
     }
 
     // Accesseurs
+    public function getResponsableAttribute()
+    {
+        if ($this->id_pers_lab && $this->persLab) {
+            $pers = $this->persLab;
+            if ($pers->type_pers_lab === 'personnel' && $pers->personnel) {
+                return [
+                    'nom' => $pers->personnel->nom_pers ?? 'Non défini',
+                    'email' => $pers->personnel->email_pers ?? 'Non défini',
+                    'telephone' => $pers->personnel->first_phone_pers ?? 'Non défini',
+                    'type' => 'personnel'
+                ];
+            } elseif ($pers->type_pers_lab === 'users' && $pers->user) {
+                return [
+                    'nom' => $pers->user->nom_user ?? 'Non défini',
+                    'email' => $pers->user->email_user ?? 'Non défini',
+                    'telephone' => $pers->user->first_phone_user ?? 'Non défini',
+                    'type' => 'users'
+                ];
+            } elseif ($pers->type_pers_lab === 'user_externe') {
+                $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $pers->id_pers_lab)->first();
+                return [
+                    'nom' => $userExterne->nom_user_ext ?? 'Non défini',
+                    'email' => $userExterne->email_user_ext ?? 'Non défini',
+                    'telephone' => $userExterne->tel_user_ext ?? 'Non défini',
+                    'type' => 'user_externe'
+                ];
+            }
+            return [
+                'nom' => 'Membre interne',
+                'email' => 'Non défini',
+                'telephone' => 'Non défini',
+                'type' => $pers->type_pers_lab ?? 'personnel'
+            ];
+        }
+        if ($this->id_user_ext && $this->userExterne) {
+            return [
+                'nom' => $this->userExterne->nom_user_ext ?? 'Non défini',
+                'email' => $this->userExterne->email_user_ext ?? 'Non défini',
+                'telephone' => $this->userExterne->tel_user_ext ?? 'Non défini',
+                'institution' => $this->userExterne->institution_user_ext ?? 'Non défini',
+                'type' => 'externe'
+            ];
+        }
+        return [
+            'nom' => 'Non défini',
+            'email' => 'Non défini',
+            'telephone' => 'Non défini',
+            'type' => 'inconnu'
+        ];
+    }
+
     public function getStatutBadgeAttribute()
     {
         return match($this->statut) {

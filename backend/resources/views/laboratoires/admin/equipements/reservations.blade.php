@@ -72,31 +72,19 @@
                             action="{{ route('laboratoires.admin.equipements.reservation.store', [$laboratoire->code_lab, $equipement->code_equip]) }}"
                             method="POST">
                             @csrf
+                            <input type="hidden" name="participant_type" value="{{ $userType === 'externe' ? 'externe' : 'interne' }}">
+                            @if($userType === 'externe')
+                                <input type="hidden" name="id_user_ext" value="{{ $userId }}">
+                            @else
+                                <input type="hidden" name="id_pers_lab" value="{{ $userId }}">
+                            @endif
                             <div class="mb-3">
-                                <label for="participant_type" class="form-label">Type de participant</label>
-                                <select class="form-select" id="participant_type" name="participant_type" required onchange="toggleParticipantSelect()">
-                                    <option value="">-- Sélectionner --</option>
-                                    <option value="interne">Membre interne</option>
-                                    <option value="externe">User externe</option>
-                                </select>
-                            </div>
-                            <div class="mb-3" id="select_interne" style="display:none;">
-                                <label for="id_pers_lab" class="form-label">Membre interne</label>
-                                <select class="form-select" id="id_pers_lab" name="id_pers_lab">
-                                    <option value="">-- Sélectionner --</option>
-                                    @foreach ($personnel as $pers)
-                                        <option value="{{ $pers->id_pers_lab }}">{{ $pers->persLab->nom_complet ?? 'Membre interne' }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-3" id="select_externe" style="display:none;">
-                                <label for="id_user_ext" class="form-label">User externe</label>
-                                <select class="form-select" id="id_user_ext" name="id_user_ext">
-                                    <option value="">-- Sélectionner --</option>
-                                    @foreach ($externes as $ext)
-                                        <option value="{{ $ext->id_user_ext }}">{{ $ext->nom_user_ext }} {{ $ext->prenom_user_ext }}</option>
-                                    @endforeach
-                                </select>
+                                <label class="form-label">Responsable de la réservation</label>
+                                <div class="alert alert-info">
+                                    <i class="bx bx-user"></i>
+                                    <strong>{{ session('user_name') }}</strong>
+                                    <br><small class="text-muted">Vous effectuez cette réservation pour vous-même</small>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="debut_reserv" class="form-label">Date de début <span class="text-danger">*</span></label>
@@ -118,18 +106,6 @@
                                 <i class="bx bx-plus"></i> Créer la réservation
                             </button>
                         </form>
-                        <script>
-                            function toggleParticipantSelect() {
-                                var type = document.getElementById('participant_type').value;
-                                document.getElementById('select_interne').style.display = (type === 'interne') ? '' : 'none';
-                                document.getElementById('select_externe').style.display = (type === 'externe') ? '' : 'none';
-                                if(type === 'interne') {
-                                    document.getElementById('id_user_ext').value = '';
-                                } else if(type === 'externe') {
-                                    document.getElementById('id_pers_lab').value = '';
-                                }
-                            }
-                        </script>
                     </div>
                 </div>
                 @endif
@@ -157,15 +133,13 @@
                                     @foreach($reservations as $reservation)
                                             <tr>
                                                 <td>
-                                                    @if($reservation->personnel && $reservation->personnel->persLab)
-                                                        {{ $reservation->personnel->persLab->nom_complet ?? 'Membre interne' }}
-                                                    @elseif($reservation->personnel && $reservation->personnel->userExterne)
-                                                        {{ $reservation->personnel->userExterne->nom_user_ext }} {{ $reservation->personnel->userExterne->prenom_user_ext }}
-                                                    @elseif($reservation->userExterne)
-                                                        {{ $reservation->userExterne->nom_user_ext }} {{ $reservation->userExterne->prenom_user_ext }}
-                                                    @else
-                                                        Membre inconnu
-                                                    @endif
+                                                    <div class="d-flex flex-column">
+                                                        <strong>{{ $reservation->responsable['nom'] }}</strong>
+                                                        <small class="text-muted">{{ $reservation->responsable['email'] }}</small>
+                                                        @if($reservation->responsable['telephone'] !== 'Non défini')
+                                                            <small class="text-muted">{{ $reservation->responsable['telephone'] }}</small>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                                 <td>{{ $reservation->debut_formatted }} - {{ $reservation->fin_formatted }}</td>
                                                 <td>

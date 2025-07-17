@@ -141,11 +141,11 @@ class LaboratoireModuleSeeder extends Seeder
             ['id_pers_lab' => 'PERS001', 'type_pers_lab' => 'personnel', 'date_entree' => '2020-01-15', 'statut' => 'actif'],
             ['id_pers_lab' => 'PERS002', 'type_pers_lab' => 'personnel', 'date_entree' => '2021-03-20', 'statut' => 'actif'],
             ['id_pers_lab' => 'PERS003', 'type_pers_lab' => 'personnel', 'date_entree' => '2019-09-10', 'statut' => 'actif'],
-            ['id_pers_lab' => 'USER001', 'type_pers_lab' => 'user', 'date_entree' => '2022-01-10', 'statut' => 'actif'],
-            ['id_pers_lab' => 'USER002', 'type_pers_lab' => 'user', 'date_entree' => '2022-02-15', 'statut' => 'actif'],
-            ['id_pers_lab' => 'USER003', 'type_pers_lab' => 'user', 'date_entree' => '2022-03-20', 'statut' => 'actif'],
-            ['id_pers_lab' => 'USER004', 'type_pers_lab' => 'user', 'date_entree' => '2022-04-25', 'statut' => 'actif'],
-            ['id_pers_lab' => 'USER005', 'type_pers_lab' => 'user', 'date_entree' => '2022-05-30', 'statut' => 'actif'],
+            ['id_pers_lab' => 'USER001', 'type_pers_lab' => 'users', 'date_entree' => '2022-01-10', 'statut' => 'actif'],
+            ['id_pers_lab' => 'USER002', 'type_pers_lab' => 'users', 'date_entree' => '2022-02-15', 'statut' => 'actif'],
+            ['id_pers_lab' => 'USER003', 'type_pers_lab' => 'users', 'date_entree' => '2022-03-20', 'statut' => 'actif'],
+            ['id_pers_lab' => 'USER004', 'type_pers_lab' => 'users', 'date_entree' => '2022-04-25', 'statut' => 'actif'],
+            ['id_pers_lab' => 'USER005', 'type_pers_lab' => 'users', 'date_entree' => '2022-05-30', 'statut' => 'actif'],
         ];
 
         DB::table('pers_lab')->insert($membres);

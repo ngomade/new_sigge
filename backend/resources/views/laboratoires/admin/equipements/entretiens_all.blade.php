@@ -41,10 +41,8 @@
                             <td>{{ $entretien->equipement->nom_equip ?? '-' }}</td>
                             <td><span class="badge bg-{{ $entretien->type_badge }}">{{ $entretien->type_label }}</span></td>
                             <td>
-                                @if($entretien->personnel && $entretien->personnel->persLab)
-                                    {{ $entretien->personnel->persLab->nom_complet ?? 'Membre interne' }}
-                                @elseif($entretien->personnel && $entretien->personnel->userExterne)
-                                    {{ $entretien->personnel->userExterne->nom_user_ext }} {{ $entretien->personnel->userExterne->prenom_user_ext }}
+                                @if($entretien->personnel && $entretien->persLab)
+                                    {{ $entretien->personnel->nom_complet ?? 'Membre interne' }}
                                 @elseif($entretien->userExterne)
                                     {{ $entretien->userExterne->nom_user_ext }} {{ $entretien->userExterne->prenom_user_ext }}
                                 @else

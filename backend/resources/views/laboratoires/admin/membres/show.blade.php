@@ -34,7 +34,7 @@
                         @if($affectation->persLab->type_pers_lab === 'personnel')
                             {{ optional(\App\Models\Personnel::find($affectation->id_pers_lab))->nom_pers }}
                             {{ optional(\App\Models\Personnel::find($affectation->id_pers_lab))->prenom_pers }}
-                        @elseif($affectation->persLab->type_pers_lab === 'user')
+                        @elseif($affectation->persLab->type_pers_lab === 'users')
                             {{ optional(\App\Models\Users::find($affectation->id_pers_lab))->nom_user }}
                             {{ optional(\App\Models\Users::find($affectation->id_pers_lab))->prenom_user }}
                         @endif

@@ -39,10 +39,8 @@
                         <tr>
                             <td>{{ $reservation->equipement->nom_equip ?? '-' }}</td>
                             <td>
-                                @if($reservation->personnel && $reservation->personnel->persLab)
-                                    {{ $reservation->personnel->persLab->nom_complet ?? 'Membre interne' }}
-                                @elseif($reservation->personnel && $reservation->personnel->userExterne)
-                                    {{ $reservation->personnel->userExterne->nom_user_ext }} {{ $reservation->personnel->userExterne->prenom_user_ext }}
+                                @if($reservation->personnel)
+                                    {{ $reservation->personnel->nom_complet ?? 'Membre interne' }}
                                 @elseif($reservation->userExterne)
                                     {{ $reservation->userExterne->nom_user_ext }} {{ $reservation->userExterne->prenom_user_ext }}
                                 @else

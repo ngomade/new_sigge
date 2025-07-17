@@ -21,26 +21,43 @@
                                     $admin = $laboratoire->admin_pers_labo;
                                     $nomResponsable = 'Non défini';
                                     $emailResponsable = '';
+                                    $telephoneResponsable = '';
                                     if (is_object($admin) && method_exists($admin, 'getNomCompletAttribute')) {
                                         $nomResponsable = $admin->nom_complet;
                                         $emailResponsable = $admin->email ?? '';
+                                        $telephoneResponsable = $admin->first_phone_pers ?? $admin->first_phone_user ?? '';
                                     } elseif (is_string($admin)) {
                                         $persLab = \App\Models\laboratoires\PersLab::find($admin);
                                         if ($persLab) {
                                             $nomResponsable = $persLab->nom_complet;
                                             $emailResponsable = $persLab->email;
+                                            $telephoneResponsable = $persLab->telephone ?? '';
                                         } else {
                                             $userExt = \App\Models\laboratoires\UserExterne::find($admin);
                                             if ($userExt) {
                                                 $nomResponsable = $userExt->nom_user_ext . ' ' . $userExt->prenom_user_ext;
                                                 $emailResponsable = $userExt->email_user_ext;
+                                                $telephoneResponsable = $userExt->tel_user_ext ?? '';
                                             }
                                         }
                                     }
                                 @endphp
                                 {{ $nomResponsable }}
                                 @if($emailResponsable)
-                                    <br><small class="text-muted"><i class='bx bx-envelope'></i> {{ $emailResponsable }}</small>
+                                    <br><small class="text-muted">
+                                        <i class='bx bx-envelope'></i>
+                                        <a href="mailto:{{ $emailResponsable }}" class="text-decoration-none">
+                                            {{ $emailResponsable }}
+                                        </a>
+                                    </small>
+                                @endif
+                                @if($telephoneResponsable)
+                                    <br><small class="text-muted">
+                                        <i class='bx bx-phone'></i>
+                                        <a href="tel:{{ $telephoneResponsable }}" class="text-decoration-none">
+                                            {{ $telephoneResponsable }}
+                                        </a>
+                                    </small>
                                 @endif
                             </p>
                         </div>
@@ -162,7 +179,7 @@
                         </div>
                         <h6 class="text-center">{{ $user->nom_user_ext ?? $user->nom_pers ?? $user->nom_user }} {{ $user->prenom_user_ext ?? $user->prenom_pers ?? $user->prenom_user }}</h6>
                         <p class="text-center text-muted mb-3">
-                            <span class="badge bg-{{ $userType === 'personnel' ? 'primary' : ($userType === 'user' ? 'success' : 'warning') }}">
+                            <span class="badge bg-{{ $userType === 'personnel' ? 'primary' : ($userType === 'users' ? 'success' : 'warning') }}">
                                 {{ ucfirst($userType) }}
                             </span>
                         </p>

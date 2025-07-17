@@ -49,7 +49,7 @@
             <select name="type" class="form-select">
                 <option value="">Tous types</option>
                 <option value="personnel" {{ $type == 'personnel' ? 'selected' : '' }}>Personnel</option>
-                <option value="user" {{ $type == 'user' ? 'selected' : '' }}>Étudiant</option>
+                <option value="users" {{ $type == 'users' ? 'selected' : '' }}>Étudiant</option>
                 <option value="user_externe" {{ $type == 'user_externe' ? 'selected' : '' }}>Externe</option>
             </select>
         </div>
@@ -120,13 +120,7 @@
                                 @if($membre->userExterne)
                                     {{ $membre->userExterne->nom_user_ext }} {{ $membre->userExterne->prenom_user_ext }}
                                 @elseif($membre->persLab)
-                                    @if($membre->persLab->type_pers_lab === 'personnel')
-                                        {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->nom_pers }} {{ optional(\App\Models\Personnel::find($membre->id_pers_lab))->prenom_pers }}
-                                    @elseif($membre->persLab->type_pers_lab === 'user')
-                                        {{ optional(\App\Models\Users::find($membre->id_pers_lab))->nom_user }} {{ optional(\App\Models\Users::find($membre->id_pers_lab))->prenom_user }}
-                                    @else
-                                        <span class="text-muted">Type inconnu</span>
-                                    @endif
+                                    {{ $membre->persLab->nom_complet ?? 'N/A' }}
                                 @else
                                     <span class="text-muted">Utilisateur inconnu</span>
                                 @endif
