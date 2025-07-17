@@ -180,6 +180,41 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Publications récentes du projet -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class='bx bx-book'></i> Publications récentes du projet</h5>
+                    <a href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}?projet={{ $projet->code_projet }}" class="btn btn-sm btn-primary">
+                        <i class='bx bx-list-ul'></i> Voir toutes les publications du projet
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if($publicationsProjet->count())
+                        <ul class="list-group">
+                            @foreach($publicationsProjet as $publi)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ $publi->titre_publi }}</strong>
+                                        <br><small class="text-muted">{{ $publi->created_at->format('d/m/Y à H:i') }}</small>
+                                    </div>
+                                    <a href="{{ route('laboratoires.admin.publications.show', [$laboratoire->code_lab, $publi->code_publi]) }}" class="btn btn-sm btn-outline-info">
+                                        <i class='bx bx-show'></i> Voir
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="text-muted">Aucune publication récente pour ce projet.</div>
+                    @endif
+                </div>
+            </div>
+            <!-- Lien vers toutes les publications du labo -->
+            <div class="text-center mb-4">
+                <a href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}" class="btn btn-outline-secondary">
+                    <i class='bx bx-book'></i> Voir toutes les publications du laboratoire
+                </a>
+            </div>
         </div>
 
         <div class="col-md-4">

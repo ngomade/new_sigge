@@ -94,13 +94,42 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    @php
+                        $userId = session('user_id');
+                        $userType = session('user_type');
+                        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $laboratoire->code_lab)
+                            ->where('statut', 'actif')
+                            ->where(function ($q) use ($userId, $userType) {
+                                if ($userType === 'externe') {
+                                    $q->where('id_user_externe', $userId);
+                                } else {
+                                    $q->where('id_pers_lab', $userId);
+                                }
+                            })
+                            ->with('roleLabo')
+                            ->first();
+                        $isAdmin = $affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin';
+                    @endphp
                     @if($projets->count() > 0)
                         <div class="row">
                             @foreach($projets as $projet)
+                                @php
+                                    $estMembre = $isAdmin ? true : $projet->participants()
+                                        ->where(function($q) use ($userId, $userType) {
+                                            if ($userType === 'externe') {
+                                                $q->where('id_user_ext', $userId);
+                                            } else {
+                                                $q->where('id_pers_lab', $userId);
+                                            }
+                                        })->exists();
+                                @endphp
+                                @if($estMembre)
                             <div class="col-md-6 mb-3">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title text-primary">{{ $projet->theme_projet }}</h6>
+                                        <h6 class="card-title text-primary">
+                                            <a href="{{ route('laboratoires.admin.projets.show', [$laboratoire->code_lab, $projet->code_projet]) }}" class="text-decoration-underline">{{ $projet->theme_projet }}</a>
+                                        </h6>
                                         <p class="card-text small text-muted">
                                             {{ Str::limit($projet->desc_projet, 100) }}
                                         </p>
@@ -115,10 +144,52 @@
                                     </div>
                                 </div>
                             </div>
+                                @endif
                             @endforeach
                         </div>
                     @else
                         <p class="text-muted text-center">Aucun projet en cours pour le moment.</p>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Publications du laboratoire -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class='bx bx-book'></i> Publications récentes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if(isset($publications) && $publications->count() > 0)
+                        <ul class="list-group list-group-flush">
+                            @foreach($publications as $publication)
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ $publication->titre_publi }}</strong>
+                                            <br>
+                                            <span class="text-muted small">{{ ucfirst($publication->type_publi) }} | {{ $publication->created_at->format('d/m/Y H:i') }}</span>
+                                        </div>
+                                        <a href="{{ route('laboratoires.admin.publications.show', [$laboratoire->code_lab, $publication->code_publi]) }}" class="btn btn-outline-primary btn-sm"><i class='bx bx-show'></i> Voir</a>
+                                    </div>
+                                    @if($publication->code_projet)
+                                        <div class="small text-muted mt-1">Projet lié :
+                                            @if($publication->projetLabo)
+                                                <a href="{{ route('laboratoires.admin.projets.show', [$laboratoire->code_lab, $publication->code_projet]) }}" class="fw-bold text-decoration-underline">{{ $publication->projetLabo->theme_projet }}</a>
+                                            @else
+                                                <span class="fw-bold">{{ $publication->code_projet }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                        <div class="text-end mt-2">
+                            <a href="{{ route('laboratoires.admin.publications.index', $laboratoire->code_lab) }}" class="btn btn-primary btn-sm"><i class='bx bx-list-ul'></i> Voir toutes les publications</a>
+                        </div>
+                    @else
+                        <p class="text-muted text-center">Aucune publication récente.</p>
                     @endif
                 </div>
             </div>
@@ -137,7 +208,9 @@
                             <div class="col-md-6 mb-3">
                                 <div class="card h-100 border-0 shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title text-info">{{ $equipement->nom_equip }}</h6>
+                                        <h6 class="card-title text-info">
+                                            <a href="{{ route('laboratoires.admin.equipements.show', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="text-decoration-underline">{{ $equipement->nom_equip }}</a>
+                                        </h6>
                                         <p class="card-text small text-muted">
                                             {{ Str::limit($equipement->desc_equip, 100) }}
                                         </p>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\laboratoires\Publication;
 use App\Models\laboratoires\PersLab;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PublicationController extends Controller
 {
@@ -62,6 +63,43 @@ class PublicationController extends Controller
             });
         }
 
+        // Récupérer la liste des projets accessibles pour le filtre
+        $projets = collect();
+        if (session()->has('laboratoire_code')) {
+            $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+            $isAdmin = false;
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $laboratoire->code_lab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+            if ($isAdmin) {
+                $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', $laboratoire->code_lab)->get();
+            } else {
+                $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', $laboratoire->code_lab)
+                    ->whereHas('participants', function($q) use ($userId, $userType) {
+                        if ($userType === 'externe') {
+                            $q->where('id_user_ext', $userId);
+                        } else {
+                            $q->where('id_pers_lab', $userId);
+                        }
+                    })->get();
+            }
+        }
+        // Filtre par projet
+        if ($request->filled('projet')) {
+            $query->where('code_projet', $request->projet);
+        }
+
         $publications = $query->orderBy('created_at', 'desc')->paginate(10);
 
         $laboratoire = null;
@@ -86,7 +124,8 @@ class PublicationController extends Controller
             'stats',
             'types',
             'annees',
-            'request'
+            'request',
+            'projets'
         ));
     }
 
@@ -96,11 +135,44 @@ class PublicationController extends Controller
     public function create()
     {
         $laboratoire = null;
+        $projets = collect();
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $isAdmin = false;
         if (session()->has('laboratoire_code')) {
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
+            if ($laboratoire) {
+                // Vérifier si admin
+                $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
+                    ->where('statut', 'actif')
+                    ->where(function ($q) use ($userId, $userType) {
+                        if ($userType === 'externe') {
+                            $q->where('id_user_externe', $userId);
+                        } else {
+                            $q->where('id_pers_lab', $userId);
+                        }
+                    })
+                    ->with('roleLabo')
+                    ->first();
+                if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                    $isAdmin = true;
+                }
+                if ($isAdmin) {
+                    $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))->get();
+                } else {
+                    // Récupérer les projets où l'utilisateur est participant
+                    $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))
+                        ->whereHas('participants', function($q) use ($userId, $userType) {
+                            if ($userType === 'externe') {
+                                $q->where('id_user_ext', $userId);
+                            } else {
+                                $q->where('id_pers_lab', $userId);
+                            }
+                        })->get();
+                }
+            }
         }
-
-        return view('laboratoires.admin.publications.create', compact('laboratoire'));
+        return view('laboratoires.admin.publications.create', compact('laboratoire', 'projets'));
     }
 
     /**
@@ -116,12 +188,21 @@ class PublicationController extends Controller
             'tags' => 'nullable|string',
             'reference' => 'nullable|string',
             'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240', // 10MB max
+            'video_publi' => 'nullable|file|mimes:mp4,mov,avi,webm|max:204800', // 200MB max
+        ], [
+            'video_publi.max' => 'La vidéo ne doit pas dépasser 200 Mo.',
+            'video_publi.mimes' => 'Le format de la vidéo n’est pas supporté.',
         ]);
 
         // Gérer l'upload du fichier rapport
         if ($request->hasFile('rapport')) {
             $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
             $validated['rapport_path'] = $rapportPath;
+        }
+        // Gérer l'upload de la vidéo
+        if ($request->hasFile('video_publi')) {
+            $videoPath = $request->file('video_publi')->store('publications/videos', 'public');
+            $validated['video_path'] = $videoPath;
         }
 
         // Récupérer l'utilisateur connecté depuis la session
@@ -136,7 +217,39 @@ class PublicationController extends Controller
         // L'id_pers_lab est le même que l'user_id pour tous les types
         $validated['id_pers_lab'] = $userId;
         $validated['code_lab'] = $codeLab;
-
+        // Gérer le projet associé (optionnel)
+        if ($request->filled('code_projet')) {
+            $codeProjet = $request->input('code_projet');
+            // Vérification droit : admin ou membre du projet
+            $isAdmin = false;
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+                ->where('statut', 'actif')
+                ->where(function ($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_externe', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })
+                ->with('roleLabo')
+                ->first();
+            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+                $isAdmin = true;
+            }
+            $estMembreProjet = \App\Models\laboratoires\ProjetLabo::where('code_projet', $codeProjet)
+                ->where('code_lab', $codeLab)
+                ->whereHas('participants', function($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_ext', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })->exists();
+            if (!$isAdmin && !$estMembreProjet) {
+                return back()->withInput()->with('error', 'Vous n’êtes pas membre de ce projet.');
+            }
+            $validated['code_projet'] = $codeProjet;
+        }
         Publication::create($validated);
 
         return redirect()->route('labo.publications.index')
@@ -189,18 +302,14 @@ class PublicationController extends Controller
     {
         $userId = session('user_id');
         $userType = session('user_type');
-
-        $publication = Publication::with(['createur', 'laboratoire'])
+        $projets = collect();
+        $isAdmin = false;
+        $publication = Publication::with(['createur', 'laboratoire', 'projetLabo'])
             ->where('code_publi', $code_publi)
             ->firstOrFail();
-
         $laboratoire = $publication->laboratoire;
-
-        // Check if user is admin or creator
-        $isAdmin = false;
-        if (session()->has('laboratoire_code') && $userId && $userType) {
-            $codeLab = session('laboratoire_code');
-            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+        if (session()->has('laboratoire_code')) {
+            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', session('laboratoire_code'))
                 ->where('statut', 'actif')
                 ->where(function ($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
@@ -211,17 +320,27 @@ class PublicationController extends Controller
                 })
                 ->with('roleLabo')
                 ->first();
-
             if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
                 $isAdmin = true;
             }
+            if ($isAdmin) {
+                $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))->get();
+            } else {
+                $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))
+                    ->whereHas('participants', function($q) use ($userId, $userType) {
+                        if ($userType === 'externe') {
+                            $q->where('id_user_ext', $userId);
+                        } else {
+                            $q->where('id_pers_lab', $userId);
+                        }
+                    })->get();
+            }
         }
-
+        // Check if user is admin or creator
         if (!$isAdmin && $publication->id_pers_lab !== $userId) {
             abort(403, 'Unauthorized access to edit this publication.');
         }
-
-        return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire'));
+        return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire', 'projets'));
     }
 
     /**
@@ -229,15 +348,41 @@ class PublicationController extends Controller
      */
     public function update(Request $request, string $code_publi)
     {
-        $userId = session('user_id');
-        $userType = session('user_type');
-
         $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
-
-        // Check if user is admin or creator
-        $isAdmin = false;
-        if (session()->has('laboratoire_code') && $userId && $userType) {
-            $codeLab = session('laboratoire_code');
+        $validated = $request->validate([
+            'titre_publi' => 'required|max:255',
+            'type_publi' => 'required|in:article,conference,livre,rapport,these',
+            'domaine' => 'nullable|max:100',
+            'resume' => 'nullable',
+            'tags' => 'nullable|string',
+            'reference' => 'nullable|string',
+            'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240',
+            'video_publi' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
+        ]);
+        // Gérer l'upload du fichier rapport
+        if ($request->hasFile('rapport')) {
+            if ($publication->rapport_path) {
+                \Storage::disk('public')->delete($publication->rapport_path);
+            }
+            $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
+            $validated['rapport_path'] = $rapportPath;
+        }
+        // Gérer l'upload de la vidéo
+        if ($request->hasFile('video_publi')) {
+            if ($publication->video_path) {
+                \Storage::disk('public')->delete($publication->video_path);
+            }
+            $videoPath = $request->file('video_publi')->store('publications/videos', 'public');
+            $validated['video_path'] = $videoPath;
+        }
+        // Gérer le projet associé (optionnel)
+        if ($request->filled('code_projet')) {
+            $codeProjet = $request->input('code_projet');
+            // Vérification droit : admin ou membre du projet
+            $isAdmin = false;
+            $userId = session('user_id');
+            $userType = session('user_type');
+            $codeLab = $publication->code_lab;
             $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
                 ->where('statut', 'actif')
                 ->where(function ($q) use ($userId, $userType) {
@@ -249,38 +394,26 @@ class PublicationController extends Controller
                 })
                 ->with('roleLabo')
                 ->first();
-
             if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
                 $isAdmin = true;
             }
-        }
-
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Unauthorized access to update this publication.');
-        }
-
-        $validated = $request->validate([
-            'titre_publi' => 'required|max:255',
-            'type_publi' => 'required|in:article,conference,livre,rapport,these',
-            'domaine' => 'nullable|max:100',
-            'resume' => 'nullable',
-            'tags' => 'nullable|string',
-            'reference' => 'nullable|string',
-            'rapport' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx|max:10240', // 10MB max
-        ]);
-
-        // Gérer l'upload du fichier rapport
-        if ($request->hasFile('rapport')) {
-            // Supprimer l'ancien fichier s'il existe
-            if ($publication->rapport_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($publication->rapport_path);
+            $estMembreProjet = \App\Models\laboratoires\ProjetLabo::where('code_projet', $codeProjet)
+                ->where('code_lab', $codeLab)
+                ->whereHas('participants', function($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_ext', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })->exists();
+            if (!$isAdmin && !$estMembreProjet) {
+                return back()->withInput()->with('error', 'Vous n’êtes pas membre de ce projet.');
             }
-            $rapportPath = $request->file('rapport')->store('publications/rapports', 'public');
-            $validated['rapport_path'] = $rapportPath;
+            $validated['code_projet'] = $codeProjet;
+        } else {
+            $validated['code_projet'] = null;
         }
-
         $publication->update($validated);
-
         return redirect()->route('labo.publications.show', $publication->code_publi)
             ->with('success', 'Publication mise à jour avec succès.');
     }
@@ -295,29 +428,39 @@ class PublicationController extends Controller
 
         $publication = Publication::where('code_publi', $code_publi)->firstOrFail();
 
-        // Check if user is admin or creator
+        // Vérification droit suppression : admin ou membre du projet (si publication liée à un projet)
         $isAdmin = false;
-        if (session()->has('laboratoire_code') && $userId && $userType) {
-            $codeLab = session('laboratoire_code');
-            $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
-                ->where('statut', 'actif')
-                ->where(function ($q) use ($userId, $userType) {
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $codeLab = $publication->code_lab;
+        $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('code_lab', $codeLab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        $estMembreProjet = false;
+        if ($publication->code_projet) {
+            $estMembreProjet = \App\Models\laboratoires\ProjetLabo::where('code_projet', $publication->code_projet)
+                ->where('code_lab', $codeLab)
+                ->whereHas('participants', function($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
-                        $q->where('id_user_externe', $userId);
+                        $q->where('id_user_ext', $userId);
                     } else {
                         $q->where('id_pers_lab', $userId);
                     }
-                })
-                ->with('roleLabo')
-                ->first();
-
-            if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
-                $isAdmin = true;
-            }
+                })->exists();
         }
-
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
-            abort(403, 'Unauthorized access to delete this publication.');
+        if (!$isAdmin && !$estMembreProjet && $publication->id_pers_lab !== $userId) {
+            abort(403, 'Vous n’êtes pas autorisé à supprimer cette publication.');
         }
 
         $publication->delete();
