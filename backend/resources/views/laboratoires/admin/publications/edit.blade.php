@@ -45,6 +45,25 @@
                         </div>
                     </div>
                     <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="code_projet" class="form-label">Projet associé (optionnel)</label>
+                            <select name="code_projet" id="code_projet" class="form-select @error('code_projet') is-invalid @enderror">
+                                <option value="">Aucun projet</option>
+                                @foreach($projets as $projet)
+                                    <option value="{{ $projet->code_projet }}" {{ old('code_projet', $publication->code_projet) == $projet->code_projet ? 'selected' : '' }}>
+                                        {{ $projet->theme_projet }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('code_projet')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
                             <label for="type_publi" class="form-label">Type <span class="text-danger">*</span></label>
                             <select name="type_publi" id="type_publi" class="form-select @error('type_publi') is-invalid @enderror" required>
                                 <option value="">Sélectionner un type</option>
@@ -57,9 +76,8 @@
                             @error('type_publi')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="domaine" class="form-label">Domaine</label>
@@ -69,11 +87,22 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="tags" class="form-label">Tags</label>
                             <input type="text" name="tags" id="tags" class="form-control @error('tags') is-invalid @enderror" value="{{ old('tags', $publication->tags) }}" placeholder="Ex: biologie, chimie">
                             @error('tags')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="reference" class="form-label">Référence</label>
+                            <input type="text" name="reference" id="reference" class="form-control @error('reference') is-invalid @enderror" value="{{ old('reference', $publication->reference) }}" placeholder="Référence bibliographique">
+                            @error('reference')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -89,15 +118,6 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="reference" class="form-label">Référence</label>
-                            <input type="text" name="reference" id="reference" class="form-control @error('reference') is-invalid @enderror" value="{{ old('reference', $publication->reference) }}" placeholder="Référence bibliographique">
-                            @error('reference')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
                             <label for="rapport" class="form-label">Rapport (optionnel)</label>
                             <input type="file" name="rapport" id="rapport" class="form-control @error('rapport') is-invalid @enderror" accept=".pdf,.doc,.docx,.ppt,.pptx">
                             <div class="form-text">
@@ -109,6 +129,25 @@
                             @error('rapport')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="video_publi" class="form-label">Joindre une vidéo (optionnel)</label>
+                            @if ($errors->has('video_publi'))
+                                <div class="alert alert-danger">
+                                    {{ $errors->first('video_publi') }}
+                                </div>
+                            @endif
+                            <input type="file" class="form-control" id="video_publi" name="video_publi" accept="video/*">
+                            @if($publication->video_path)
+                                <div class="mt-2">
+                                    <video width="320" height="180" controls>
+                                        <source src="{{ asset('storage/' . $publication->video_path) }}" type="video/mp4">
+                                        Votre navigateur ne supporte pas la lecture vidéo.
+                                    </video>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -136,3 +175,15 @@
     </div>
 @endif
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('video_publi').addEventListener('change', function(e) {
+    const maxSize = 200 * 1024 * 1024; // 200 Mo en octets
+    if (this.files[0] && this.files[0].size > maxSize) {
+        alert('La vidéo sélectionnée dépasse la taille maximale autorisée (200 Mo).');
+        this.value = '';
+    }
+});
+</script>
+@endpush

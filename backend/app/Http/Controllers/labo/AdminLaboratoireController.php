@@ -497,7 +497,16 @@ class AdminLaboratoireController extends Controller
             ])
             ->firstOrFail();
 
-        return view('laboratoires.admin.projets.show', compact('laboratoire', 'projet'));
+        $publicationsProjet = \App\Models\laboratoires\Publication::where('code_projet', $projet->code_projet)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        $publicationsLabo = \App\Models\laboratoires\Publication::where('code_lab', $laboratoire->code_lab)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('laboratoires.admin.projets.show', compact('laboratoire', 'projet', 'publicationsProjet', 'publicationsLabo'));
     }
 
     public function projetEdit($code_lab, $projet)
@@ -2558,6 +2567,36 @@ class AdminLaboratoireController extends Controller
     public function publications($code_lab, Request $request)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $isAdmin = false;
+        $projets = collect();
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        if ($isAdmin) {
+            $projets = ProjetLabo::where('code_lab', $code_lab)->get();
+        } else {
+            $projets = ProjetLabo::where('code_lab', $code_lab)
+                ->whereHas('participants', function($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_ext', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })->get();
+        }
         $query = Publication::where('code_lab', $code_lab)->with(['createur.personnel', 'createur.user', 'createur']);
         // Filtres
         if ($request->filled('type')) {
@@ -2578,6 +2617,10 @@ class AdminLaboratoireController extends Controller
                     ->orWhere('reference', 'like', "%$search%");
             });
         }
+        // Filtre par projet
+        if ($request->filled('projet')) {
+            $query->where('code_projet', $request->projet);
+        }
         $publications = $query->orderBy('created_at', 'desc')->paginate(10);
         // Statistiques
         $stats = [
@@ -2587,13 +2630,43 @@ class AdminLaboratoireController extends Controller
         ];
         $types = ['article', 'conference', 'livre', 'rapport', 'these'];
         $annees = Publication::where('code_lab', $code_lab)->selectRaw('YEAR(created_at) as annee')->distinct()->orderBy('annee', 'desc')->pluck('annee');
-        return view('laboratoires.admin.publications.index', compact('publications', 'laboratoire', 'stats', 'types', 'annees', 'request'));
+        return view('laboratoires.admin.publications.index', compact('publications', 'laboratoire', 'stats', 'types', 'annees', 'request', 'projets'));
     }
 
     public function publicationCreate($code_lab)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        return view('laboratoires.admin.publications.create', compact('laboratoire'));
+        $userId = session('user_id');
+        $userType = session('user_type');
+        $isAdmin = false;
+        $projets = collect();
+        $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif')
+            ->where(function ($q) use ($userId, $userType) {
+                if ($userType === 'externe') {
+                    $q->where('id_user_externe', $userId);
+                } else {
+                    $q->where('id_pers_lab', $userId);
+                }
+            })
+            ->with('roleLabo')
+            ->first();
+        if ($affectation && $affectation->roleLabo && strtolower($affectation->roleLabo->lib_rl) === 'admin') {
+            $isAdmin = true;
+        }
+        if ($isAdmin) {
+            $projets = ProjetLabo::where('code_lab', $code_lab)->get();
+        } else {
+            $projets = ProjetLabo::where('code_lab', $code_lab)
+                ->whereHas('participants', function($q) use ($userId, $userType) {
+                    if ($userType === 'externe') {
+                        $q->where('id_user_ext', $userId);
+                    } else {
+                        $q->where('id_pers_lab', $userId);
+                    }
+                })->get();
+        }
+        return view('laboratoires.admin.publications.create', compact('laboratoire', 'projets'));
     }
 
     public function publicationStore(Request $request, $code_lab)
@@ -2619,6 +2692,11 @@ class AdminLaboratoireController extends Controller
         }
         $validated['id_pers_lab'] = $userId;
         $validated['code_lab'] = $code_lab;
+        if ($request->filled('code_projet')) {
+            $validated['code_projet'] = $request->input('code_projet');
+        } else {
+            $validated['code_projet'] = null;
+        }
         Publication::create($validated);
         return redirect()->route('laboratoires.admin.publications.index', $code_lab)
             ->with('success', 'Publication ajoutée avec succès.');

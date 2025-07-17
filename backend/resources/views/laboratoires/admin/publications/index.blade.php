@@ -85,6 +85,17 @@ $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->ro
                         @endforeach
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <label for="projet" class="form-label">Projet</label>
+                    <select class="form-select" id="projet" name="projet">
+                        <option value="">Tous les projets</option>
+                        @foreach($projets as $projet)
+                            <option value="{{ $projet->code_projet }}" {{ $request->projet == $projet->code_projet ? 'selected' : '' }}>
+                                {{ $projet->theme_projet }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="col-md-3 d-flex align-items-end">
                     <div class="d-flex gap-2 w-100">
                         <button type="submit" class="btn btn-primary">
@@ -167,7 +178,7 @@ $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->ro
                                         </span>
                                     @endif
                                 </td>
-                                <td>{{ $publication->created_at->format('d/m/Y') }}</td>
+                                <td>{{ $publication->created_at->format('d/m/Y à H:i') }}</td>
                                 <td>
                                     <div class="btn-group" role="group">
                                             <a href="{{ route('laboratoires.admin.publications.show', [$laboratoire->code_lab, $publication->code_publi]) }}"

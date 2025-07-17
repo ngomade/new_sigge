@@ -120,7 +120,7 @@ class PublicLaboratoireController extends Controller
                         if ($affectation) {
                             session([
                                 'user_id' => $user->code_user,
-                                'user_type' => 'users',
+                                'user_type' => 'user',
                                 'laboratoire_code' => $code_lab,
                                 'user_name' => $user->nom_user . ' ' . $user->prenom_user
                             ]);
@@ -244,7 +244,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
             case 'personnel':
                 $user = \App\Models\Personnel::where('code_pers', $userId)->first();
                 break;
-            case 'users':
+            case 'user':
                 $user = \App\Models\Users::where('code_user', $userId)->first();
                 break;
             case 'externe':
@@ -258,7 +258,13 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
         // Récupérer les équipements du laboratoire via la relation
         $equipements = $laboratoire->equipements;
 
-        return view('laboratoires.public.espace-membre', compact('laboratoire', 'user', 'userType', 'projets', 'equipements'));
+        // Récupérer les publications du laboratoire (10 dernières)
+        $publications = \App\Models\laboratoires\Publication::where('code_lab', $laboratoire->code_lab)
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('laboratoires.public.espace-membre', compact('laboratoire', 'user', 'userType', 'projets', 'equipements', 'publications'));
     }
 
     /**
@@ -276,7 +282,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
             case 'personnel':
                 $user = \App\Models\Personnel::where('code_pers', $userId)->first();
                 break;
-            case 'users':
+            case 'user':
                 $user = \App\Models\Users::where('code_user', $userId)->first();
                 break;
             case 'externe':
@@ -322,7 +328,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
                         ]);
                     }
                     break;
-                case 'users':
+                case 'user':
                     $user = \App\Models\Users::where('code_user', $userId)->first();
                     if ($user) {
                         $user->update([

@@ -39,6 +39,21 @@
                 @if($publication->rapport_path)
                 <p><strong>Rapport :</strong> <a href="{{ Storage::url($publication->rapport_path) }}" target="_blank" class="btn btn-sm btn-primary"><i class='bx bx-file-pdf'></i> Consulter</a></p>
                 @endif
+            @if($publication->video_path)
+                <div class="mb-3">
+                    <video width="480" height="270" controls>
+                        <source src="{{ Storage::url($publication->video_path) }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                </div>
+            @endif
+            <p><strong>Projet associé :</strong>
+                @if($publication->projetLabo)
+                    <a href="{{ route('laboratoires.admin.projets.show', [$publication->code_lab, $publication->code_projet]) }}" class="badge bg-primary">{{ $publication->projetLabo->theme_projet }}</a>
+                @else
+                    <span class="text-muted">Aucun</span>
+                @endif
+            </p>
             <p><strong>Créateur :</strong>
                 @if($publication->createur)
                     <span class="badge bg-info me-1">{{ ucfirst($publication->createur->type_pers_lab) }}</span>
@@ -47,7 +62,7 @@
                     <span class="text-muted">N/A</span>
                 @endif
             </p>
-            <p><strong>Date de création :</strong> {{ $publication->created_at->format('d/m/Y') }}</p>
+            <p><strong>Date de création :</strong> {{ $publication->created_at->format('d/m/Y à H:i') }}</p>
         </div>
     </div>
     <div class="mt-3 d-flex gap-2">
