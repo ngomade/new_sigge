@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux';
 import {push_candidate_info} from '../../app/modules/candidate';
 
 function PaymentInfo({onClose, isLoad, setLoadingState}) {
-    const [imageObject, setImageObject] = useState("");
+    const [setImageObject] = useState("");
     const [formData, setFormData] = useState({
         ca_nom: '',
         ca_prenom: '',
@@ -29,13 +29,8 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
         fieldSet('#form_pay', setFormData, {});
         return () => {
             fieldSet('#form_pay', setFormData, {});
-            // Nettoyage des URLs créées
-            if (imageObject) {
-                URL.revokeObjectURL(imageObject);
-            }
         };
-    }, [imageObject]);
-
+    }, []);
 
     // Fonction pour extraire les données avec OCR
     async function extractDataWithOCR(file) {
@@ -47,7 +42,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
             const response = await fetch('http://localhost:8000/api/concours/comptes/extract-receipt', {
                 method: 'POST',
                 // headers: {
-                //     'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                //     'Authorization': Bearer ${localStorage.getItem('token')},
                 // },
                 body: formData
             });
@@ -206,17 +201,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                                 Reçu scanné en PDF, ou en Image( jpg, png, jpeg ) ne dépassant pas 2 Mo
                             </p>
                         </div>
-       {/* Afficher l'aperçu de l'image si disponible */}
-       {imageObject && (
-                            <div className="mt-2">
-                                <p className="font-semibold mb-1">Aperçu :</p>
-                                <img 
-                                    src={imageObject} 
-                                    alt="Aperçu du reçu" 
-                                    className="max-w-xs max-h-40 border rounded-md"
-                                />
-                            </div>
-                        )}
+
                         <label htmlFor="ca_nom">
                             Nom<sup className="text-red-600">*</sup> <i>(En Majuscule)</i>
                         </label>
