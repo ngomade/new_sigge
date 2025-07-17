@@ -70,7 +70,7 @@
                                     <p class="mb-1"><strong>Date de naissance :</strong> {{ $user->date_naissance_pers ? $user->date_naissance_pers->format('d/m/Y') : 'Non définie' }}</p>
                                     <p class="mb-0"><strong>Lieu de naissance :</strong> {{ $user->lieu_naissance_pers ?? 'Non défini' }}</p>
                                 </div>
-                            @elseif($userType === 'user')
+                            @elseif($userType === 'users')
                                 <div class="alert alert-info">
                                     <h6><i class='bx bx-info-circle'></i> Informations Étudiant</h6>
                                     <p class="mb-1"><strong>Code :</strong> {{ $user->code_user }}</p>

@@ -61,7 +61,7 @@ class Equipements extends Model
     {
         return $query->where('etat', 'hors service');
     }
-    
+
     public function scopeEnUtilisation($query)
     {
         return $query->where('etat', 'en utilisation');
@@ -122,7 +122,7 @@ class Equipements extends Model
     {
         return $this->etat === 'hors service';
     }
-    
+
     public function isEnUtilisation()
     {
         return $this->etat === 'en utilisation';
@@ -152,7 +152,7 @@ class Equipements extends Model
             ->whereIn('statut_entretien', ['En cours', 'En pause'])
             ->first();
     }
-    
+
     /**
      * Vérifier si l'équipement a des réservations futures confirmées
      */
@@ -163,7 +163,7 @@ class Equipements extends Model
             ->where('debut_reserv', '>', now())
             ->exists();
     }
-    
+
     /**
      * Obtenir les réservations futures confirmées
      */
@@ -175,7 +175,7 @@ class Equipements extends Model
             ->orderBy('debut_reserv')
             ->get();
     }
-    
+
     /**
      * Vérifier s'il y a un conflit de réservation pour une période donnée
      */
@@ -191,11 +191,11 @@ class Equipements extends Model
                            ->where('fin_reserv', '>=', $fin);
                   });
             });
-            
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
-        
+
         return $query->exists();
     }
 
@@ -214,7 +214,7 @@ class Equipements extends Model
     {
         return Str::limit(strip_tags($this->desc_equip), 100);
     }
-    
+
     /**
      * Obtenir le prochain entretien programmé
      */
@@ -226,7 +226,7 @@ class Equipements extends Model
             ->orderBy('debut_entretien')
             ->first();
     }
-    
+
     /**
      * Calculer l'âge de l'équipement
      */
@@ -235,10 +235,10 @@ class Equipements extends Model
         if (!$this->date_achat) {
             return null;
         }
-        
+
         return $this->date_achat->diffInYears(now());
     }
-    
+
     /**
      * Obtenir l'âge formaté
      */
@@ -248,11 +248,44 @@ class Equipements extends Model
         if ($age === null) {
             return 'Âge inconnu';
         }
-        
+
         if ($age === 0) {
             return 'Moins d\'un an';
         }
-        
+
         return $age . ' an' . ($age > 1 ? 's' : '');
+    }
+
+    /**
+     * Met à jour automatiquement l'état de l'équipement selon les entretiens et réservations.
+     * - Si un entretien en cours/pause : 'en maintenance'
+     * - Sinon, si réservation confirmée active : 'en utilisation'
+     * - Sinon : 'disponible'
+     */
+    public function updateEtatAutomatique()
+    {
+        // Vérifier s'il y a un entretien en cours ou en pause
+        $entretienEnCours = $this->entretiens()
+            ->whereIn('statut_entretien', ['En cours', 'En pause'])
+            ->exists();
+        if ($entretienEnCours) {
+            $this->etat = 'en maintenance';
+            $this->save();
+            return;
+        }
+        // Vérifier s'il y a une réservation confirmée active
+        $reservationActive = $this->reservations()
+            ->where('statut', 'confirmé')
+            ->where('debut_reserv', '<=', now())
+            ->where('fin_reserv', '>=', now())
+            ->exists();
+        if ($reservationActive) {
+            $this->etat = 'en utilisation';
+            $this->save();
+            return;
+        }
+        // Sinon, disponible
+        $this->etat = 'disponible';
+        $this->save();
     }
 }

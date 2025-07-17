@@ -5,8 +5,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class='bx bx-group'></i> Gestion des participants - {{ $projet->theme_projet }}</h2>
         <div>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
+            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
                 <i class='bx bx-plus'></i> Ajouter un participant
+            </button>
+            <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#addAllMembersModal">
+                <i class='bx bx-group'></i> Ajouter tous les membres
             </button>
             <a href="{{ route('laboratoires.admin.projets.show', [$laboratoire->code_lab, $projet->code_projet]) }}" class="btn btn-outline-secondary">
                 <i class='bx bx-arrow-back'></i> Retour au projet
@@ -43,8 +46,8 @@
                                 <tr>
                                     <td>
                                         @if($participant->membre)
-                                            <strong>{{ $participant->membre->nom_complet }}</strong>
-                                            <br><small class="text-muted">{{ $participant->membre->email ?? 'N/A' }}</small>
+                                                <strong>{{ $participant->membre->nom_complet ?? 'N/A' }}</strong>
+                                                <br><small class="text-muted">{{ $participant->membre->email ?? 'N/A' }}</small>
                                         @elseif($participant->userExterne)
                                             <strong>{{ $participant->userExterne->nom_user_ext }} {{ $participant->userExterne->prenom_user_ext }}</strong>
                                             <br><small class="text-muted">{{ $participant->userExterne->email_user_ext ?? 'N/A' }}</small>
@@ -54,7 +57,13 @@
                                     </td>
                                     <td>
                                         @if($participant->membre)
-                                            <span class="badge bg-primary">{{ $participant->membre->type_label }}</span>
+                                            @if($participant->membre->type_pers_lab === 'personnel')
+                                                <span class="badge bg-primary">Personnel</span>
+                                            @elseif($participant->membre->type_pers_lab === 'users')
+                                                <span class="badge bg-success">Étudiant</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ ucfirst($participant->membre->type_pers_lab ?? 'Inconnu') }}</span>
+                                            @endif
                                         @elseif($participant->userExterne)
                                             <span class="badge bg-info">Externe</span>
                                         @endif
@@ -190,6 +199,115 @@
                     <button type="submit" class="btn btn-success">
                         <i class='bx bx-plus'></i> Ajouter le participant
                     </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajouter Tous les Membres -->
+<div class="modal fade" id="addAllMembersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('laboratoires.admin.projets.participants.add-all', [$laboratoire->code_lab, $projet->code_projet]) }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class='bx bx-group'></i> Ajouter tous les membres du laboratoire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class='bx bx-info-circle'></i>
+                        <strong>Information :</strong> Cette action ajoutera tous les membres actifs du laboratoire qui ne sont pas encore participants au projet.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="default_role" class="form-label">Rôle par défaut pour tous les membres *</label>
+                        <input type="text" class="form-control @error('default_role') is-invalid @enderror"
+                               id="default_role" name="default_role" value="{{ old('default_role', 'Participant') }}"
+                               placeholder="Ex: Participant, Chercheur, Assistant..." required>
+                        @error('default_role')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="debut_participation_all" class="form-label">Date de début de participation *</label>
+                                <input type="date" class="form-control @error('debut_participation_all') is-invalid @enderror"
+                                       id="debut_participation_all" name="debut_participation_all"
+                                       value="{{ old('debut_participation_all', date('Y-m-d')) }}" required>
+                                @error('debut_participation_all')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fin_participation_all" class="form-label">Date de fin de participation (optionnel)</label>
+                                <input type="date" class="form-control @error('fin_participation_all') is-invalid @enderror"
+                                       id="fin_participation_all" name="fin_participation_all" value="{{ old('fin_participation_all') }}">
+                                @error('fin_participation_all')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Membres qui seront ajoutés :</label>
+                        <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                            @php
+                                $membresDisponibles = $membres->count();
+                                $usersExternesDisponibles = $usersExternes->count();
+                                $totalDisponibles = $membresDisponibles + $usersExternesDisponibles;
+                            @endphp
+
+                            @if($totalDisponibles > 0)
+                                <div class="mb-2">
+                                    <strong>Membres internes ({{ $membresDisponibles }}) :</strong>
+                                </div>
+                                @foreach($membres as $membre)
+                                    <div class="small text-muted mb-1">
+                                        <i class='bx bx-user'></i> {{ $membre->nom_complet }} ({{ $membre->type_membre_label }})
+                                    </div>
+                                @endforeach
+
+                                @if($usersExternesDisponibles > 0)
+                                    <div class="mb-2 mt-3">
+                                        <strong>Utilisateurs externes ({{ $usersExternesDisponibles }}) :</strong>
+                                    </div>
+                                    @foreach($usersExternes as $user)
+                                        <div class="small text-muted mb-1">
+                                            <i class='bx bx-user'></i> {{ $user->nom_user_ext }} {{ $user->prenom_user_ext }}
+                                        </div>
+                                    @endforeach
+                                @endif
+
+                                <div class="mt-3">
+                                    <strong class="text-primary">Total : {{ $totalDisponibles }} participant(s) à ajouter</strong>
+                                </div>
+                            @else
+                                <div class="text-center text-muted">
+                                    <i class='bx bx-info-circle'></i>
+                                    Tous les membres du laboratoire sont déjà participants à ce projet.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    @if($totalDisponibles > 0)
+                        <button type="submit" class="btn btn-warning">
+                            <i class='bx bx-group'></i> Ajouter tous les membres ({{ $totalDisponibles }})
+                        </button>
+                    @else
+                        <button type="button" class="btn btn-secondary" disabled>
+                            Aucun membre à ajouter
+                        </button>
+                    @endif
                 </div>
             </form>
         </div>

@@ -23,11 +23,11 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Date de création :</strong></td>
-                                    <td>{{ $role->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $role->created_at ? $role->created_at->format('d/m/Y H:i') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Dernière modification :</strong></td>
-                                    <td>{{ $role->updated_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $role->updated_at ? $role->updated_at->format('d/m/Y H:i') : '-' }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -78,16 +78,28 @@
                                         @foreach($role->affectations as $affectation)
                                             <tr>
                                                 <td>
-                                                    <strong>{{ $affectation->laboratoire->label_labo }}</strong>
-                                                    <br><small class="text-muted">{{ $affectation->laboratoire->code_lab }}</small>
+                                                    <strong>{{ $affectation->laboratoire->label_labo ?? '-' }}</strong>
+                                                    <br><small class="text-muted">{{ $affectation->laboratoire->code_lab ?? '-' }}</small>
                                                 </td>
                                                 <td>
-                                                    <strong>{{ $affectation->persLab->id_pers_lab }}</strong>
+                                                    @if($affectation->persLab)
+                                                        <strong>{{ $affectation->persLab->id_pers_lab }}</strong>
+                                                    @elseif($affectation->userExterne)
+                                                        <strong>{{ $affectation->userExterne->nom_user_ext }} {{ $affectation->userExterne->prenom_user_ext }}</strong>
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
                                                 <td>
-                                                    <span class="badge bg-info">{{ $affectation->persLab->type_pers_lab }}</span>
+                                                    @if($affectation->persLab)
+                                                        <span class="badge bg-info">{{ $affectation->persLab->type_pers_lab }}</span>
+                                                    @elseif($affectation->userExterne)
+                                                        <span class="badge bg-warning text-dark">Utilisateur externe</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">-</span>
+                                                    @endif
                                                 </td>
-                                                <td>{{ \Carbon\Carbon::parse($affectation->date_affectation)->format('d/m/Y') }}</td>
+                                                <td>{{ $affectation->date_affectation ? \Carbon\Carbon::parse($affectation->date_affectation)->format('d/m/Y') : '-' }}</td>
                                                 <td>
                                                     <span class="badge bg-{{ $affectation->statut == 'actif' ? 'success' : 'danger' }}">
                                                         {{ ucfirst($affectation->statut) }}

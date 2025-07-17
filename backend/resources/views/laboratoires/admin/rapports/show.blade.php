@@ -14,13 +14,13 @@
             <a href="{{ route('laboratoires.admin.rapports', $laboratoire->code_lab) }}" class="btn btn-light btn-sm">
                 <i class="bi bi-arrow-left me-1"></i>Retour
             </a>
-            @if(file_exists(storage_path('app/' . $rapport->path_rl)))
+            @if(file_exists(storage_path('app/private/' . $rapport->path_rl)))
                 <a href="{{ route('laboratoires.admin.rapports.download', [$laboratoire->code_lab, $rapport->code_rl]) }}"
                    class="btn btn-primary btn-sm">
                     <i class="bi bi-download me-1"></i>Télécharger
                 </a>
             @endif
-            @if($userRole)
+{{--            @if($userRole)--}}
                 <form action="{{ route('laboratoires.admin.rapports.destroy', [$laboratoire->code_lab, $rapport->code_rl]) }}" method="POST" class="d-inline" id="delete-form-{{ $rapport->code_rl }}">
                     @csrf
                     @method('DELETE')
@@ -28,7 +28,7 @@
                         <i class="bi bi-trash"></i> Supprimer
                     </button>
                 </form>
-            @endif
+{{--            @endif--}}
         </div>
     </div>
 
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Aperçu du fichier -->
-            @if(file_exists(storage_path('app/' . $rapport->path_rl)))
+            @if(file_exists(storage_path('app/private/' . $rapport->path_rl)))
                 <div class="card border-0 bg-white shadow-sm">
                     <div class="card-header bg-transparent border-0 py-3">
                         <h5 class="mb-0 fw-semibold text-dark">Aperçu du Fichier</h5>
@@ -132,7 +132,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        @if(file_exists(storage_path('app/' . $rapport->path_rl)))
+                        @if(file_exists(storage_path('app/private/' . $rapport->path_rl)))
                             <a href="{{ route('laboratoires.admin.rapports.download', [$laboratoire->code_lab, $rapport->code_rl]) }}"
                                class="list-group-item list-group-item-action border-0 py-3">
                                 <div class="d-flex align-items-center">
@@ -189,14 +189,14 @@
                         <label class="form-label fw-medium text-muted">Chemin du fichier</label>
                         <div class="small text-muted font-monospace">{{ $rapport->path_rl }}</div>
                     </div>
-                    @if(file_exists(storage_path('app/' . $rapport->path_rl)))
+                    @if(file_exists(storage_path('app/private/' . $rapport->path_rl)))
                         <div class="mb-3">
                             <label class="form-label fw-medium text-muted">Taille du fichier</label>
-                            <div>{{ number_format(filesize(storage_path('app/' . $rapport->path_rl)) / 1024, 2) }} KB</div>
+                            <div>{{ number_format(filesize(storage_path('app/private/' . $rapport->path_rl)) / 1024, 2) }} KB</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-medium text-muted">Date de modification</label>
-                            <div>{{ \Carbon\Carbon::createFromTimestamp(filemtime(storage_path('app/' . $rapport->path_rl)))->format('d/m/Y H:i') }}</div>
+                            <div>{{ \Carbon\Carbon::createFromTimestamp(filemtime(storage_path('app/private/' . $rapport->path_rl)))->format('d/m/Y H:i') }}</div>
                         </div>
                     @else
                         <div class="alert alert-warning mb-0">

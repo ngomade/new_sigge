@@ -149,7 +149,7 @@
                                     <h6 class="card-title">
                                         @if($membre->type_pers_lab === 'personnel')
                                             {{ \App\Models\Personnel::where('code_pers', $membre->id_pers_lab)->first()->nom_pers ?? 'Membre' }}
-                                        @elseif($membre->type_pers_lab === 'user')
+                                        @elseif($membre->type_pers_lab === 'users')
                                             {{ \App\Models\Users::where('code_user', $membre->id_pers_lab)->first()->nom_user ?? 'Membre' }}
                                         @else
                                             Membre

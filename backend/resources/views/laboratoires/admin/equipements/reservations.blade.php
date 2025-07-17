@@ -16,6 +16,7 @@
         ->with('roleLabo')
         ->first();
     $userRole = $affectation && $affectation->roleLabo ? strtolower($affectation->roleLabo->lib_rl) : null;
+    $peutReserver = $userRole !== 'secretaire';
 @endphp
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -63,7 +64,7 @@
                     </div>
                 </div>
                 <!-- Nouvelle réservation -->
-                @if($userRole === 'admin' || $userRole === 'chef_projet')
+                @if($peutReserver)
                 <div class="card mt-3">
                     <div class="card-body">
                         <h5 class="card-title">Créer une réservation</h5>
@@ -71,35 +72,20 @@
                             action="{{ route('laboratoires.admin.equipements.reservation.store', [$laboratoire->code_lab, $equipement->code_equip]) }}"
                             method="POST">
                             @csrf
-                            @if(isset($userRole) && $userRole === 'technicien')
-                                <div class="mb-3">
-                                    <label class="form-label">Membre</label>
-                                    <input type="hidden" name="id_pers_lab" value="{{ $affectation->id_pers_lab }}">
-                                    <input type="text" class="form-control" value="{{ $affectation->nom_complet }}" readonly>
-                                </div>
+                            <input type="hidden" name="participant_type" value="{{ $userType === 'externe' ? 'externe' : 'interne' }}">
+                            @if($userType === 'externe')
+                                <input type="hidden" name="id_user_ext" value="{{ $userId }}">
                             @else
-                            <div class="mb-3">
-                                    <label for="id_pers_lab" class="form-label">Membre <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('id_pers_lab') is-invalid @enderror" id="id_pers_lab" name="id_pers_lab" required>
-                                    <option value="">Sélectionner un membre</option>
-                                    @foreach ($personnel as $pers)
-                                            <option value="{{ $pers->id_pers_lab }}" {{ old('id_pers_lab') == $pers->id_pers_lab ? 'selected' : '' }}>
-                                            @if ($pers->persLab)
-                                                {{ $pers->persLab->nom_complet ?? 'Membre interne' }}
-                                            @elseif($pers->userExterne)
-                                                {{ $pers->userExterne->nom_user_ext }}
-                                                {{ $pers->userExterne->prenom_user_ext }}
-                                            @else
-                                                Membre inconnu
-                                            @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('id_pers_lab')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <input type="hidden" name="id_pers_lab" value="{{ $userId }}">
                             @endif
+                            <div class="mb-3">
+                                <label class="form-label">Responsable de la réservation</label>
+                                <div class="alert alert-info">
+                                    <i class="bx bx-user"></i>
+                                    <strong>{{ session('user_name') }}</strong>
+                                    <br><small class="text-muted">Vous effectuez cette réservation pour vous-même</small>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label for="debut_reserv" class="form-label">Date de début <span class="text-danger">*</span></label>
                                 <input type="date" class="form-control @error('debut_reserv') is-invalid @enderror"
@@ -138,28 +124,55 @@
                                             <th>Période</th>
                                             <th>Statut</th>
                                             <th>Durée</th>
+                                            @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
+                                            <th>Actions</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($reservations as $reservation)
                                             <tr>
                                                 <td>
-                                            @if($reservation->personnel && $reservation->personnel->persLab)
-                                                {{ $reservation->personnel->persLab->nom_complet ?? 'Membre interne' }}
-                                                    @elseif($reservation->personnel && $reservation->personnel->userExterne)
-                                                        {{ $reservation->personnel->userExterne->nom_user_ext }}
-                                                        {{ $reservation->personnel->userExterne->prenom_user_ext }}
-                                                    @else
-                                                Membre inconnu
-                                                    @endif
+                                                    <div class="d-flex flex-column">
+                                                        <strong>{{ $reservation->responsable['nom'] }}</strong>
+                                                        <small class="text-muted">{{ $reservation->responsable['email'] }}</small>
+                                                        @if($reservation->responsable['telephone'] !== 'Non défini')
+                                                            <small class="text-muted">{{ $reservation->responsable['telephone'] }}</small>
+                                                        @endif
+                                                    </div>
                                                 </td>
-                                        <td>{{ $reservation->debut_formatted }} - {{ $reservation->fin_formatted }}</td>
+                                                <td>{{ $reservation->debut_formatted }} - {{ $reservation->fin_formatted }}</td>
                                                 <td>
                                                     <span class="badge bg-{{ $reservation->statut_badge }}">
                                                         {{ $reservation->statut_label }}
                                                     </span>
                                                 </td>
                                                 <td>{{ $reservation->getDureeFormatted() }}</td>
+                                                @if($userRole === 'admin' || $userRole === 'chef_projet' || $userRole === 'technicien')
+                                                <td>
+                                                    @if($reservation->statut === 'en attente')
+                                                    <form method="POST" action="{{ route('laboratoires.admin.equipements.reservation.update', [$laboratoire->code_lab, $equipement->code_equip, $reservation->id]) }}" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="statut" value="confirmé">
+                                                        <button type="submit" class="btn btn-success btn-sm" title="Valider"><i class="bx bx-check"></i></button>
+                                                    </form>
+                                                    <form method="POST" action="{{ route('laboratoires.admin.equipements.reservation.update', [$laboratoire->code_lab, $equipement->code_equip, $reservation->id]) }}" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="statut" value="refusé">
+                                                        <button type="submit" class="btn btn-danger btn-sm" title="Refuser"><i class="bx bx-x"></i></button>
+                                                    </form>
+                                                    @elseif($reservation->statut === 'confirmé')
+                                                    <form method="POST" action="{{ route('laboratoires.admin.equipements.reservation.update', [$laboratoire->code_lab, $equipement->code_equip, $reservation->id]) }}" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="statut" value="annulé">
+                                                        <button type="submit" class="btn btn-warning btn-sm" title="Annuler"><i class="bx bx-block"></i></button>
+                                                    </form>
+                                                    @endif
+                                                </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>

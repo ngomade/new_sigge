@@ -264,12 +264,98 @@
                     <span class="lab-info-value">{{ $laboratoire->code_lab }}</span>
                 </div>
                 <div class="lab-info-item">
-                    <span class="lab-info-label">Type :</span>
-                    <span class="lab-info-value">{{ $laboratoire->type_labo ?? 'Non spécifié' }}</span>
+                    <span class="lab-info-label">Responsable :</span>
+                    <span class="lab-info-value">
+                        @php
+                            $admin = $laboratoire->admin_pers_labo;
+                            $nomResponsable = 'Non défini';
+                            $emailResponsable = '';
+                            $telephoneResponsable = '';
+
+                            if (is_object($admin) && method_exists($admin, 'getNomCompletAttribute')) {
+                                $nomResponsable = $admin->nom_complet;
+                                $emailResponsable = $admin->email ?? '';
+                                $telephoneResponsable = $admin->first_phone_pers ?? $admin->first_phone_user ?? '';
+                            } elseif (is_string($admin)) {
+                                $persLab = \App\Models\laboratoires\PersLab::find($admin);
+                                if ($persLab) {
+                                    $nomResponsable = $persLab->nom_complet;
+                                    $emailResponsable = $persLab->email ?? '';
+                                    $telephoneResponsable = $persLab->telephone ?? '';
+                                } else {
+                                    $userExt = \App\Models\laboratoires\UserExterne::find($admin);
+                                    if ($userExt) {
+                                        $nomResponsable = $userExt->nom_user_ext . ' ' . $userExt->prenom_user_ext;
+                                        $emailResponsable = $userExt->email_user_ext;
+                                        $telephoneResponsable = $userExt->tel_user_ext ?? '';
+                                    }
+                                }
+                            }
+                        @endphp
+                        {{ $nomResponsable }}
+                        @if($emailResponsable)
+                            <br><small style="color: #666;">{{ $emailResponsable }}</small>
+                        @endif
+                        @if($telephoneResponsable)
+                            <br><small style="color: #666;">{{ $telephoneResponsable }}</small>
+                        @endif
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations du créateur -->
+    <div class="info-section">
+        <div class="content-section">
+            <h3>Informations du Créateur du Laboratoire</h3>
+            @php
+                $admin = $laboratoire->admin_pers_labo;
+                $typeCreateur = '';
+
+                if (is_object($admin) && method_exists($admin, 'getNomCompletAttribute')) {
+                    if ($admin instanceof \App\Models\Personnel) {
+                        $typeCreateur = 'Personnel';
+                    } elseif ($admin instanceof \App\Models\Users) {
+                        $typeCreateur = 'Étudiant';
+                    }
+                } elseif (is_string($admin)) {
+                    $persLab = \App\Models\laboratoires\PersLab::find($admin);
+                    if ($persLab) {
+                        if ($persLab->type_pers_lab === 'personnel') {
+                            $typeCreateur = 'Personnel';
+                        } elseif ($persLab->type_pers_lab === 'users') {
+                            $typeCreateur = 'Étudiant';
+                        }
+                    } else {
+                        $userExt = \App\Models\laboratoires\UserExterne::find($admin);
+                        if ($userExt) {
+                            $typeCreateur = 'Utilisateur Externe';
+                        }
+                    }
+                }
+            @endphp
+            <div class="lab-info-grid">
+                <div class="lab-info-item">
+                    <span class="lab-info-label">Nom complet :</span>
+                    <span class="lab-info-value">{{ $nomResponsable }}</span>
                 </div>
                 <div class="lab-info-item">
-                    <span class="lab-info-label">Responsable :</span>
-                    <span class="lab-info-value">{{ $laboratoire->responsable_labo ?? 'Non spécifié' }}</span>
+                    <span class="lab-info-label">Type :</span>
+                    <span class="lab-info-value">{{$typeCreateur }}</span>
+                </div>
+
+                <div class="lab-info-item">
+                    <span class="lab-info-label">Email :</span>
+                    <span class="lab-info-value">{{ $emailResponsable ?: 'Non spécifié' }}</span>
+                </div>
+                <div class="lab-info-item">
+                    <span class="lab-info-label">Téléphone :</span>
+                    <span class="lab-info-value">{{ $telephoneResponsable ?: 'Non spécifié' }}</span>
+                </div>
+                <div class="lab-info-item">
+                    <span class="lab-info-label">Date de création :</span>
+                    <span class="lab-info-value">{{ $laboratoire->created_at ? \Carbon\Carbon::parse($laboratoire->created_at)->format('d/m/Y') : 'Non spécifiée' }}</span>
                 </div>
             </div>
         </div>

@@ -165,39 +165,45 @@ class EquipementsController extends Controller
     public function storeReservation(Request $request, $id)
     {
         $equipement = Equipements::findOrFail($id);
-
-        $validated = $request->validate([
-            'id_pers_lab' => 'required|exists:pers_lab,id_pers_lab',
+        $request->validate([
+            'participant_type' => 'required|in:interne,externe',
+            'id_pers_lab' => 'nullable|exists:pers_lab,id_pers_lab',
+            'id_user_ext' => 'nullable|exists:user_externe,id_user_ext',
             'debut_reserv' => 'required|date|after:now',
             'fin_reserv' => 'required|date|after:debut_reserv'
         ]);
-
-        // Vérifier la disponibilité
+        if ($request->participant_type === 'interne' && !$request->id_pers_lab) {
+            return redirect()->back()->with('error', 'Veuillez sélectionner un membre interne.');
+        }
+        if ($request->participant_type === 'externe' && !$request->id_user_ext) {
+            return redirect()->back()->with('error', 'Veuillez sélectionner un user externe.');
+        }
+        if ($request->id_pers_lab && $request->id_user_ext) {
+            return redirect()->back()->with('error', 'Un seul type de participant doit être sélectionné.');
+        }
         $conflict = ReservationAgent::where('code_equip', $id)
             ->where('statut', 'confirmee')
-            ->where(function ($query) use ($validated) {
-                $query->whereBetween('debut_reserv', [$validated['debut_reserv'], $validated['fin_reserv']])
-                    ->orWhereBetween('fin_reserv', [$validated['debut_reserv'], $validated['fin_reserv']])
-                    ->orWhere(function ($q) use ($validated) {
-                        $q->where('debut_reserv', '<=', $validated['debut_reserv'])
-                            ->where('fin_reserv', '>=', $validated['fin_reserv']);
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('debut_reserv', [$request->debut_reserv, $request->fin_reserv])
+                    ->orWhereBetween('fin_reserv', [$request->debut_reserv, $request->fin_reserv])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('debut_reserv', '<=', $request->debut_reserv)
+                            ->where('fin_reserv', '>=', $request->fin_reserv);
                     });
             })
             ->exists();
-
         if ($conflict) {
-            return redirect()->back()
-                ->with('error', 'L\'équipement n\'est pas disponible pour cette période.');
+            return redirect()->back()->with('error', 'L\'équipement n\'est pas disponible pour cette période.');
         }
-
         ReservationAgent::create([
             'code_equip' => $id,
-            'id_pers_lab' => $validated['id_pers_lab'],
-            'debut_reserv' => $validated['debut_reserv'],
-            'fin_reserv' => $validated['fin_reserv'],
+            'id_pers_lab' => $request->participant_type === 'interne' ? $request->id_pers_lab : null,
+            'id_user_ext' => $request->participant_type === 'externe' ? $request->id_user_ext : null,
+            'debut_reserv' => $request->debut_reserv,
+            'fin_reserv' => $request->fin_reserv,
             'statut' => 'en_attente'
         ]);
-
+        $equipement->updateEtatAutomatique();
         return redirect()->route('equipements.show', $id)
             ->with('success', 'Demande de réservation enregistrée avec succès.');
     }

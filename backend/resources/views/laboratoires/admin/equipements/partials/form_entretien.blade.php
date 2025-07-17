@@ -1,20 +1,23 @@
 {{-- Formulaire d'entretien d'équipement --}}
-<form method="POST" action="">
+<form method="POST" action="{{ route('laboratoires.admin.equipements.entretien.store', [$laboratoire->code_lab, $equipement->code_equip]) }}">
     @csrf
+    @php
+        $userType = session('user_type');
+        $userId = session('user_id');
+    @endphp
+    <input type="hidden" name="participant_type" value="{{ $userType === 'externe' ? 'externe' : 'interne' }}">
+    @if($userType === 'externe')
+        <input type="hidden" name="id_user_ext" value="{{ $userId }}">
+    @else
+        <input type="hidden" name="id_pers_lab" value="{{ $userId }}">
+    @endif
     <div class="mb-3">
-        @if(isset($userRole) && $userRole === 'technicien')
-            <label class="form-label">Responsable</label>
-            <input type="hidden" name="id_pers_lab" value="{{ $affectation->id }}">
-            <input type="text" class="form-control" value="{{ $affectation->nom_complet }}" readonly>
-        @else
-            <label for="id_pers_lab" class="form-label">Responsable</label>
-            <select class="form-select" id="id_pers_lab" name="id_pers_lab" required>
-                <option value="">-- Sélectionner --</option>
-                @foreach($personnel as $pers)
-                    <option value="{{ $pers->id }}">{{ $pers->nom_complet }}</option>
-                @endforeach
-            </select>
-        @endif
+        <label class="form-label">Responsable de l'entretien</label>
+        <div class="alert alert-info mb-0">
+            <i class="bx bx-user"></i>
+            <strong>{{ session('user_name') }}</strong>
+            <br><small class="text-muted">Vous effectuez cet entretien</small>
+        </div>
     </div>
     <div class="mb-3">
         <label for="type_entretien" class="form-label">Type d'entretien</label>
@@ -40,6 +43,7 @@
         <label for="cout" class="form-label">Coût (FCFA)</label>
         <input type="number" class="form-control" id="cout" name="cout" min="0" step="1">
     </div>
-    <button type="submit" class="btn btn-primary">Enregistrer l'entretien</button>
+    <button type="submit" class="btn btn-primary w-100">
+        <i class="bx bx-save"></i> Enregistrer l'entretien
+    </button>
 </form>
- 

@@ -217,7 +217,7 @@ function editDocument(btn) {
 
     const modal = new bootstrap.Modal(document.getElementById('editDocumentModal'));
     modal.show();
-}
+        }
 </script>
 @endif
 @endsection

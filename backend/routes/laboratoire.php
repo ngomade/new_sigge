@@ -40,6 +40,7 @@ Route::prefix('laboratoires')->name('laboratoires.')->group(function () {
         Route::get('/{code_lab}/profil', [PublicLaboratoireController::class, 'profil'])->name('profil');
         Route::put('/{code_lab}/profil', [PublicLaboratoireController::class, 'updateProfil'])->name('profil.update');
     });
+
 });
 
 // Routes pour le module Laboratoire
@@ -255,6 +256,9 @@ Route::get('/laboratoires/{code_lab}/admin/projets/{projet}/participants', [\App
 Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsStore'])
     ->name('laboratoires.admin.projets.participants.store')
     ->middleware('laboratoire.permission:projets.participants');
+Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants/add-all', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsAddAll'])
+    ->name('laboratoires.admin.projets.participants.add-all')
+    ->middleware('laboratoire.permission:projets.participants');
 Route::post('/laboratoires/{code_lab}/admin/projets/{projet}/participants/{participant}/delete', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projetParticipantsDestroy'])
     ->name('laboratoires.admin.projets.participants.destroy')
     ->middleware('laboratoire.permission:projets.participants');
@@ -304,6 +308,9 @@ Route::post('/laboratoires/{code_lab}/admin/equipements/{equipement}/entretiens'
 Route::put('/laboratoires/{code_lab}/admin/equipements/{equipement}/entretiens/{entretien}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementEntretienUpdate'])
     ->name('laboratoires.admin.equipements.entretien.update')
     ->middleware('laboratoire.permission:equipements.entretenir');
+
+Route::get('laboratoires/{code_lab}/equipements/entretiens/all', [\App\Http\Controllers\labo\AdminLaboratoireController::class, 'tousLesEntretiens'])->name('laboratoires.admin.equipements.entretiens_all');
+Route::get('laboratoires/{code_lab}/equipements/reservations/all', [\App\Http\Controllers\labo\AdminLaboratoireController::class, 'toutesLesReservations'])->name('laboratoires.admin.equipements.reservations_all');
 
 // Gestion des réservations des équipements
 Route::get('/laboratoires/{code_lab}/admin/equipements/{equipement}/reservations', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'equipementReservations'])

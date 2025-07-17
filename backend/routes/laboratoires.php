@@ -1,0 +1,2 @@
+Route::get('admin/{code_lab}/equipements/entretiens/all', [\App\Http\Controllers\labo\AdminLaboratoireController::class, 'tousLesEntretiens'])->name('laboratoires.admin.equipements.entretiens_all');
+Route::get('admin/{code_lab}/equipements/reservations/all', [\App\Http\Controllers\labo\AdminLaboratoireController::class, 'toutesLesReservations'])->name('laboratoires.admin.equipements.reservations_all');

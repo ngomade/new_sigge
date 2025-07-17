@@ -110,7 +110,7 @@
                                                 @if($participant->persLab)
                                                     {{ $participant->persLab->nom_complet ?? 'N/A' }}
                                                 @elseif($participant->userExterne)
-                                                    {{ $participant->userExterne->nom_complet ?? 'N/A' }}
+                                                {{ $participant->userExterne->nom_user_ext }} {{ $participant->userExterne->prenom_user_ext }}
                                                 @else
                                                     N/A
                                                 @endif

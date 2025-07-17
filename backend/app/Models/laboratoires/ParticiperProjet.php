@@ -50,6 +50,10 @@ class ParticiperProjet extends Model
     {
         return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
     }
+    public function persLab()
+    {
+        return $this->belongsTo(PersLab::class, 'id_pers_lab', 'id_pers_lab');
+    }
 
     public function userExterne()
     {

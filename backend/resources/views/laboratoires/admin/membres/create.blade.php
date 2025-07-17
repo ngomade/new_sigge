@@ -39,7 +39,7 @@
                 <select class="form-select" id="type_pers_lab" name="type_pers_lab" required>
                     <option value="">Sélectionner un type</option>
                     <option value="personnel" {{ old('type_pers_lab') === 'personnel' ? 'selected' : '' }}>Personnel</option>
-                    <option value="user" {{ old('type_pers_lab') === 'user' ? 'selected' : '' }}>Étudiant</option>
+                    <option value="users" {{ old('type_pers_lab') === 'users' ? 'selected' : '' }}>Étudiant</option>
                     <option value="user_externe" {{ old('type_pers_lab') === 'user_externe' ? 'selected' : '' }}>Utilisateur externe</option>
                 </select>
             </div>
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 { id: '{{ $p->code_pers }}', text: '{{ $p->nom_pers }} {{ $p->prenom_pers }} ({{ $p->code_pers }})' },
             @endforeach
         ],
-        user: [
+        users: [
             @foreach($users as $u)
                 { id: '{{ $u->code_user }}', text: '{{ $u->nom_user }} {{ $u->prenom_user }} ({{ $u->code_user }})' },
             @endforeach

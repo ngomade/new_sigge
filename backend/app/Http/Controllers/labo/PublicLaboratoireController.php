@@ -120,7 +120,7 @@ class PublicLaboratoireController extends Controller
                         if ($affectation) {
                             session([
                                 'user_id' => $user->code_user,
-                                'user_type' => 'user',
+                                'user_type' => 'users',
                                 'laboratoire_code' => $code_lab,
                                 'user_name' => $user->nom_user . ' ' . $user->prenom_user
                             ]);
@@ -244,7 +244,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
             case 'personnel':
                 $user = \App\Models\Personnel::where('code_pers', $userId)->first();
                 break;
-            case 'user':
+            case 'users':
                 $user = \App\Models\Users::where('code_user', $userId)->first();
                 break;
             case 'externe':
@@ -276,7 +276,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
             case 'personnel':
                 $user = \App\Models\Personnel::where('code_pers', $userId)->first();
                 break;
-            case 'user':
+            case 'users':
                 $user = \App\Models\Users::where('code_user', $userId)->first();
                 break;
             case 'externe':
@@ -322,7 +322,7 @@ Log::debug('External user affectation query result', ['affectation' => $affectat
                         ]);
                     }
                     break;
-                case 'user':
+                case 'users':
                     $user = \App\Models\Users::where('code_user', $userId)->first();
                     if ($user) {
                         $user->update([
