@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Exports\ExportCandidat;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class ImpressionController extends Controller
 {
@@ -19,9 +20,33 @@ class ImpressionController extends Controller
     {
         try {
             $ca = Candidat::findorfail($id);
-            $pdf = PDF::loadView("concours.pdf.fiche_candidat", compact("ca"))->setPaper('a4');
+
+            $diplome = null;
+            $centreExamen = null;
+            $centreDepot = null;
+
+            Log::info("Generating PDF for Candidat ID: $id");
+            Log::info("ca_diplome_admission: " . $ca->ca_diplome_admission);
+            Log::info("ca_centre_examen: " . $ca->ca_centre_examen);
+            Log::info("ca_centre_depot: " . $ca->ca_centre_depot);
+
+            if ($ca->ca_diplome_admission) {
+                $diplome = \App\Models\Diplome::find($ca->ca_diplome_admission);
+                Log::info("Diplome found: " . ($diplome ? $diplome->label_dip : 'null'));
+            }
+            if ($ca->ca_centre_examen) {
+                $centreExamen = \App\Models\concours\CentreExamen::find($ca->ca_centre_examen);
+                Log::info("CentreExamen found: " . ($centreExamen ? $centreExamen->centre_exam_label : 'null'));
+            }
+            if ($ca->ca_centre_depot) {
+                $centreDepot = \App\Models\CentreDepot::find($ca->ca_centre_depot);
+                Log::info("CentreDepot found: " . ($centreDepot ? $centreDepot->centre_depot_label : 'null'));
+            }
+
+            $pdf = PDF::loadView("concours.pdf.fiche_candidat", compact("ca", "diplome", "centreExamen", "centreDepot"))->setPaper('a4');
             return $pdf->download("Fiche_" . $id . '.pdf');
         } catch (Exception $e) {
+            Log::error("Error generating PDF for Candidat ID: $id - " . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Candidat non trouvé ou erreur lors de la génération du PDF.']);
         }
     }

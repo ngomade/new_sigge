@@ -45,8 +45,15 @@ class CandidatControllerApi extends Controller
             DB::beginTransaction();
             $candidat = Candidat::create($validatedData);
             $compte = Compte::where("ca_num_recu", $candidat->ca_num_recu)->first();
-            $compte->ca_code = $candidat->ca_code;
-            $compte->save();
+            if ($compte !== null) {
+                Log::info('Compte found before update: ' . json_encode($compte));
+                Log::info('Compte ca_code before update: ' . $compte->ca_code);
+                $compte->ca_code = $candidat->ca_code;
+                $compte->save();
+                Log::info('Compte ca_code after update: ' . $compte->ca_code);
+            } else {
+                Log::warning('Compte not found for ca_num_recu: ' . $candidat->ca_num_recu);
+            }
             if (!empty($validatedData['ecoles'])) {
                 $candidat->ecoles()->attach($validatedData['ecoles']); // Synchroniser les écoles si fournies
             }

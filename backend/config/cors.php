@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*', 'https://sigge.vercel.app/','http://localhost:8000/api/concours/comptes/extract-receipt'],
+    'allowed_origins' => ['*', 'https://sigge.vercel.app/'],
 
     'allowed_origins_patterns' => [],
 

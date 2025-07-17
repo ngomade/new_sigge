@@ -44,12 +44,13 @@
 
     <div class="info">
         <h3 style="margin-top: -5px;"><span>Informations Académique / Academic Informations</span></h3>
+        
         <div class="item-info-3"> Filière: <span style="font-size: 0.9em;">TRONC COMMUN {{$ca->cursus_code}} </span></div>
-        <div class="item-info-2" > Diplôme d'admission: <span> {{$ca->ca_diplome_admission}} {{$ca->ca_serie_diplome}} </span></div>
+        <div class="item-info-2" > Diplôme d'admission: <span> {{$diplome ? $diplome->label_dip : ''}} {{$ca->ca_serie_diplome}} </span></div>
         <div class="item-info-4" style="margin-left: -25px;">Mention: <span> {{$ca->ca_mention_diplome}} </span></div>
         <div class="item-info-3" >Année diplôme : <span> {{$ca->ca_annee_diplome}} </span></div>
-        <div class="item-info-3" style="margin-left: -50px;">Centre d'examen : <span> {{$ca->ca_centre_examen}} </span></div>
-        <div class="item-info-3" style="margin-left: -25px;"> Centre de dépôt: <span> {{$ca->ca_centre_depot}} </span></div>
+        <div class="item-info-3" style="margin-left: -50px;">Centre d'examen : <span> {{$centreExamen ? $centreExamen->centre_exam_label : ''}} </span></div>
+        <div class="item-info-3" style="margin-left: -25px;"> Centre de dépôt: <span> {{$centreDepot ? $centreDepot->centre_depot_label : ''}} </span></div>
     </div>
 
     <div class="info">
