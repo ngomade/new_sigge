@@ -40,13 +40,20 @@
         <!-- Informations de l'équipement -->
         <div class="col-lg-4">
             <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ $equipement->nom_equip }}</h5>
-                    <p class="text-muted">Code: {{ $equipement->code_equip }}</p>
-                    <div class="mb-3">
-                        <span class="badge bg-{{ $equipement->etat_badge }} fs-6">
-                            {{ $equipement->etat_label }}
-                        </span>
+                <div class="card-body d-flex align-items-center gap-3">
+                    @if($equipement->image_path)
+                        <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" class="img-fluid rounded shadow" style="max-height: 60px; max-width: 80px;">
+                    @else
+                        <i class='bx bx-cog' style="font-size: 2rem; color: var(--primary-color);"></i>
+                    @endif
+                    <div>
+                        <h5 class="card-title mb-1">{{ $equipement->nom_equip }}</h5>
+                        <p class="text-muted mb-0">Code: {{ $equipement->code_equip }}</p>
+                        <div class="mb-1">
+                            <span class="badge bg-{{ $equipement->etat_badge }} fs-6">
+                                {{ $equipement->etat_label }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,7 +98,7 @@
                                             <small class="text-muted">{{ $entretien->responsable['email'] }}</small>
                                             @if($entretien->responsable['telephone'] !== 'Non défini')
                                                 <small class="text-muted">{{ $entretien->responsable['telephone'] }}</small>
-                                            @endif
+                                        @endif
                                         </div>
                                     </td>
                                     <td><span class="badge bg-{{ $entretien->statut_badge }}">{{ $entretien->statut_entretien }}</span></td>

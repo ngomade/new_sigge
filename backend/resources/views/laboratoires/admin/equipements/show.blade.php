@@ -46,6 +46,16 @@
     @endif --}}
 
     <div class="row">
+        <!-- Image de l'équipement -->
+        <div class="col-lg-4 mb-3">
+            <div class="text-center">
+                @if($equipement->image_path)
+                    <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" class="img-fluid rounded shadow" style="max-height: 200px;">
+                @else
+                    <i class='bx bx-cog' style="font-size: 6rem; color: var(--primary-color);"></i>
+                @endif
+            </div>
+        </div>
         <!-- Informations principales -->
         <div class="col-lg-8">
             <div class="card">

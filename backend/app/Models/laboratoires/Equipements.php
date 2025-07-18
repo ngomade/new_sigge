@@ -16,6 +16,7 @@ class Equipements extends Model
         'nom_equip',
         'ref_equip',
         'desc_equip',
+        'image_path',
         'etat',
         'date_achat',
         'valeur',

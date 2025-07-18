@@ -390,3 +390,10 @@ Route::prefix('/laboratoires/{code_lab}/admin/publications')->name('laboratoires
     Route::delete('/{publication}', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'publicationDestroy'])
         ->name('destroy')->middleware('laboratoire.permission:publications.delete');
 });
+
+// Chat général du laboratoire
+Route::middleware('laboratoire.auth')->group(function () {
+    Route::get('/{code_lab}/chat', [\App\Http\Controllers\labo\LaboChatController::class, 'index'])->name('chat.index');
+    Route::get('/{code_lab}/chat/fetch', [\App\Http\Controllers\labo\LaboChatController::class, 'fetch'])->name('chat.fetch');
+    Route::post('/{code_lab}/chat/send', [\App\Http\Controllers\labo\LaboChatController::class, 'send'])->name('chat.send');
+});

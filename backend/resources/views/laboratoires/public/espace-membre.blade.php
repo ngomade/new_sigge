@@ -5,6 +5,11 @@
     <div class="row">
         <!-- Informations du laboratoire -->
         <div class="col-lg-8">
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ route('chat.index', $laboratoire->code_lab) }}" class="btn btn-outline-primary">
+                    <i class='bx bx-chat'></i> Salon de discussion
+                </a>
+            </div>
             <div class="card shadow mb-4">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
@@ -206,7 +211,14 @@
                         <div class="row">
                             @foreach($equipements as $equipement)
                             <div class="col-md-6 mb-3">
-                                <div class="card h-100 border-0 shadow-sm">
+                                <div class="card h-100 border-0 shadow-sm d-flex flex-row align-items-center">
+                                    <div class="p-2">
+                                        @if($equipement->image_path)
+                                            <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" class="img-fluid rounded shadow" style="max-height: 60px; max-width: 80px;">
+                                        @else
+                                            <i class='bx bx-cog' style="font-size: 2rem; color: var(--primary-color);"></i>
+                                        @endif
+                                    </div>
                                     <div class="card-body">
                                         <h6 class="card-title text-info">
                                             <a href="{{ route('laboratoires.admin.equipements.show', [$laboratoire->code_lab, $equipement->code_equip]) }}" class="text-decoration-underline">{{ $equipement->nom_equip }}</a>

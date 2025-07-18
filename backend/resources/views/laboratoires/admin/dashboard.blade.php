@@ -8,6 +8,11 @@
                 <i class="bi bi-graph-up"></i> Consulter le Dashboard
             </a>
         </div>
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ route('chat.index', $laboratoire->code_lab) }}" class="btn btn-outline-primary">
+                <i class='bx bx-chat'></i> Salon de discussion
+            </a>
+        </div>
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card text-center shadow-sm">

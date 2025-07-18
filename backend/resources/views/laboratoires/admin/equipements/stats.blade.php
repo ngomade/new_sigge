@@ -94,7 +94,14 @@
                                 <tbody>
                                     @foreach($equipementsPopulaires as $equipement)
                                     <tr>
-                                        <td>{{ $equipement->nom_equip }}</td>
+                                        <td class="d-flex align-items-center gap-2">
+                                            @if($equipement->image_path)
+                                                <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" style="max-height: 30px; max-width: 40px;" class="rounded shadow">
+                                            @else
+                                                <i class='bx bx-cog' style="font-size: 1.2rem; color: var(--primary-color);"></i>
+                                            @endif
+                                            <span>{{ $equipement->nom_equip }}</span>
+                                        </td>
                                         <td>
                                             <span class="badge bg-primary">{{ $equipement->reservations_count }}</span>
                                         </td>
@@ -162,7 +169,14 @@
                                 <tbody>
                                     @foreach($equipementsSousUtilises->take(10) as $equipement)
                                     <tr>
-                                        <td>{{ $equipement->nom_equip }}</td>
+                                        <td class="d-flex align-items-center gap-2">
+                                            @if($equipement->image_path)
+                                                <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" style="max-height: 30px; max-width: 40px;" class="rounded shadow">
+                                            @else
+                                                <i class='bx bx-cog' style="font-size: 1.2rem; color: var(--primary-color);"></i>
+                                            @endif
+                                            <span>{{ $equipement->nom_equip }}</span>
+                                        </td>
                                         <td>
                                             @switch($equipement->etat)
                                                 @case('disponible')
@@ -233,7 +247,14 @@
                                     @endphp
                                     @if($equipement)
                                     <tr>
-                                        <td>{{ $equipement->nom_equip }}</td>
+                                        <td class="d-flex align-items-center gap-2">
+                                            @if($equipement->image_path)
+                                                <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" style="max-height: 30px; max-width: 40px;" class="rounded shadow">
+                                            @else
+                                                <i class='bx bx-cog' style="font-size: 1.2rem; color: var(--primary-color);"></i>
+                                            @endif
+                                            <span>{{ $equipement->nom_equip }}</span>
+                                        </td>
                                         <td>
                                             <span class="badge bg-primary">{{ $stats['nombre_reservations'] }}</span>
                                         </td>

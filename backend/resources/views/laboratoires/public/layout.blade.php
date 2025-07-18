@@ -244,6 +244,11 @@
                                         <i class='bx bx-edit'></i> Mon profil
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('chat.index', $laboratoire->code_lab) }}" class="dropdown-item">
+                                        <i class='bx bx-chat'></i> Salon de discussion
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('laboratoires.logout', $laboratoire->code_lab) }}" method="POST" class="d-inline">
@@ -297,6 +302,17 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Empêche la soumission de tout formulaire quand on clique sur un bouton qui ouvre une modal de rejet
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('button[data-bs-toggle="modal"]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+        });
+    </script>
 
     @stack('scripts')
 </body>

@@ -17,6 +17,8 @@ use App\Models\laboratoires\LabNotif;
 use App\Services\LaboratoireAlertService;
 use App\Mail\ExterneConfirmationMail;
 use App\Mail\ExternePasswordResetMail;
+use App\Mail\CandidatureApprovedMail;
+use App\Mail\CandidatureRejectedMail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
@@ -1067,6 +1069,7 @@ class AdminLaboratoireController extends Controller
             'nom_equip' => 'required|string|max:150',
             'ref_equip' => 'nullable|string|max:100',
             'desc_equip' => 'nullable|string',
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'etat' => 'required|in:disponible,en maintenance,hors service',
             'date_achat' => 'nullable|date',
             'valeur' => 'nullable|numeric|min:0',
@@ -1074,7 +1077,7 @@ class AdminLaboratoireController extends Controller
         ]);
 
         try {
-            Equipements::create([
+            $data = [
                 'nom_equip' => $request->nom_equip,
                 'ref_equip' => $request->ref_equip,
                 'desc_equip' => $request->desc_equip,
@@ -1083,7 +1086,11 @@ class AdminLaboratoireController extends Controller
                 'valeur' => $request->valeur,
                 'localisation' => $request->localisation,
                 'code_lab' => $code_lab
-            ]);
+            ];
+            if ($request->hasFile('image')) {
+                $data['image_path'] = $request->file('image')->store('equipements', 'public');
+            }
+            Equipements::create($data);
 
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement ajouté avec succès.');
@@ -1124,6 +1131,7 @@ class AdminLaboratoireController extends Controller
             'nom_equip' => 'required|string|max:150',
             'ref_equip' => 'nullable|string|max:100',
             'desc_equip' => 'nullable|string',
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'etat' => 'required|in:disponible,en maintenance,hors service',
             'date_achat' => 'nullable|date',
             'valeur' => 'nullable|numeric|min:0',
@@ -1131,7 +1139,7 @@ class AdminLaboratoireController extends Controller
         ]);
 
         try {
-            $equipement->update([
+            $data = [
                 'nom_equip' => $request->nom_equip,
                 'ref_equip' => $request->ref_equip,
                 'desc_equip' => $request->desc_equip,
@@ -1139,7 +1147,11 @@ class AdminLaboratoireController extends Controller
                 'date_achat' => $request->date_achat,
                 'valeur' => $request->valeur,
                 'localisation' => $request->localisation
-            ]);
+            ];
+            if ($request->hasFile('image')) {
+                $data['image_path'] = $request->file('image')->store('equipements', 'public');
+            }
+            $equipement->update($data);
 
             return redirect()->route('laboratoires.admin.equipements.show', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Équipement mis à jour avec succès.');
@@ -1556,18 +1568,31 @@ class AdminLaboratoireController extends Controller
                 'pwd' => \Illuminate\Support\Facades\Hash::make($tempPassword)
             ]);
 
-            // Mettre à jour l'affectation
-            LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
-                ->update(['statut' => 'actif']);
+            // Récupérer l'id du rôle "membre"
+            $roleMembre = \App\Models\laboratoires\RoleLabo::whereRaw('LOWER(lib_rl) = ?', ['membre'])->first();
+            $idRoleMembre = $roleMembre ? $roleMembre->id_rl : null;
 
-            // Mettre à jour pers_lab uniquement si un enregistrement existe
-            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $candidature->id_user_ext)->first();
-            if ($persLab) {
-                $persLab->update(['statut' => 'actif']);
+            // Créer l'affectation dans laboratoire_pers_lab si elle n'existe pas déjà
+            $affectation = LaboratoirePersLab::where('code_lab', $candidature->code_lab)
+                ->where('id_user_externe', $candidature->id_user_ext)
+                ->first();
+            if (!$affectation) {
+                LaboratoirePersLab::create([
+                    'code_lab' => $candidature->code_lab,
+                    'id_user_externe' => $candidature->id_user_ext,
+                    'date_affectation' => now(),
+                    'statut' => 'actif',
+                    'id_rl' => $idRoleMembre,
+                ]);
+            } else {
+                $affectation->update([
+                    'statut' => 'actif',
+                    'id_rl' => $idRoleMembre,
+                ]);
             }
 
-            // TODO: Envoyer un email avec les identifiants
-            // Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
+            // Envoyer un email avec les identifiants
+            \Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
 
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature approuvée avec succès. Un email a été envoyé au candidat.');
@@ -1583,21 +1608,16 @@ class AdminLaboratoireController extends Controller
             ->where('id_user_ext', $candidature)
             ->firstOrFail();
 
+        $request->validate([
+            'motif_rejet' => 'required|string|max:500',
+        ]);
+
         try {
             // Mettre à jour le statut
             $candidature->update(['statut' => 'rejeté']);
 
-            // Mettre à jour l'affectation
-            LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
-                ->update(['statut' => 'rejeté']);
-
-            // Mettre à jour pers_lab
-            $persLab = \App\Models\laboratoires\PersLab::where('id_pers_lab', $candidature->id_user_ext)->first();
-            if ($persLab) {
-                $persLab->update(['statut' => 'rejeté']);
-            }
-            // TODO: Envoyer un email de rejet
-            // Mail::to($candidature->email_user_ext)->send(new CandidatureRejectedMail($candidature));
+            // Envoyer un email de rejet avec le motif
+            \Mail::to($candidature->email_user_ext)->send(new CandidatureRejectedMail($candidature, $request->motif_rejet));
 
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature rejetée avec succès. Un email a été envoyé au candidat.');

@@ -105,12 +105,9 @@
                                                     <i class='bx bx-check'></i> Approuver
                                                 </button>
                                             </form>
-                                            <form method="POST" action="{{ route('laboratoires.admin.candidatures.reject', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Rejeter cette candidature ?')">
-                                                    <i class='bx bx-x'></i> Rejeter
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="openRejectModal('{{ $candidature->id_user_ext }}')">
+                                                <i class='bx bx-x'></i> Rejeter
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -132,4 +129,45 @@
         </div>
     </div>
 </div>
+
+<!-- Modal globale pour saisir le motif du rejet -->
+<div class="modal fade" id="modalMotifRejetGlobal" tabindex="-1" aria-labelledby="modalMotifRejetLabelGlobal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalMotifRejetLabelGlobal">Motif du rejet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <form id="formRejetGlobal" method="POST">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="motif_rejet_global" class="form-label">Veuillez indiquer le motif du rejet <span class="text-danger">*</span></label>
+            <textarea name="motif_rejet" id="motif_rejet_global" class="form-control" rows="4" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-danger">Confirmer le rejet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@push('scripts')
+<script>
+    function openRejectModal(idUserExt) {
+        if(confirm('Rejeter cette candidature ?')) {
+            var modal = new bootstrap.Modal(document.getElementById('modalMotifRejetGlobal'));
+            var form = document.getElementById('formRejetGlobal');
+            // Met à jour dynamiquement l'action du formulaire
+            form.action = "{{ route('laboratoires.admin.candidatures.reject', [$laboratoire->code_lab, 'IDUSER']) }}".replace('IDUSER', idUserExt);
+            // Vide le champ motif
+            document.getElementById('motif_rejet_global').value = '';
+            modal.show();
+        }
+    }
+</script>
+@endpush
 @endsection

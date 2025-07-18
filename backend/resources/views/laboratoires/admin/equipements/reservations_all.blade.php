@@ -37,7 +37,14 @@
                     <tbody>
                     @foreach($reservations as $reservation)
                         <tr>
-                            <td>{{ $reservation->equipement->nom_equip ?? '-' }}</td>
+                            <td class="d-flex align-items-center gap-2">
+                                @if($reservation->equipement && $reservation->equipement->image_path)
+                                    <img src="{{ asset('storage/' . $reservation->equipement->image_path) }}" alt="Image de l'équipement" style="max-height: 30px; max-width: 40px;" class="rounded shadow">
+                                @else
+                                    <i class='bx bx-cog' style="font-size: 1.2rem; color: var(--primary-color);"></i>
+                                @endif
+                                <span>{{ $reservation->equipement->nom_equip ?? '-' }}</span>
+                            </td>
                             <td>
                                 @if($reservation->personnel)
                                     {{ $reservation->personnel->nom_complet ?? 'Membre interne' }}

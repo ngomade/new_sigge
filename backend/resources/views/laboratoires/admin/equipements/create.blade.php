@@ -44,7 +44,7 @@
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Informations de l'Équipement</h4>
-            <form action="{{ route('laboratoires.admin.equipements.store', $laboratoire->code_lab) }}" method="POST">
+            <form method="POST" action="{{ route('laboratoires.admin.equipements.store', $laboratoire->code_lab) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-md-6">
@@ -123,6 +123,13 @@
                            placeholder="Ex: Salle A12, Étage 2">
                     @error('localisation')
                         <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group">
+                    <label for="image">Image de l’équipement <span class="text-danger">*</span></label>
+                    <input type="file" name="image" id="image" class="form-control" accept="image/*" required>
+                    @error('image')
+                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="d-flex justify-content-end gap-2">

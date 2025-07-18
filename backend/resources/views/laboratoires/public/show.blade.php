@@ -108,7 +108,11 @@
                         <div class="card text-center">
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <i class='bx bx-cog' style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    @if($equipement->image_path)
+                                        <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" class="img-fluid rounded shadow" style="max-height: 100px;">
+                                    @else
+                                        <i class='bx bx-cog' style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    @endif
                                 </div>
                                 <h6 class="card-title">{{ $equipement->nom_equip }}</h6>
                                 <div class="card-text small">{!! $equipement->desc_equip !!}</div>

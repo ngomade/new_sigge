@@ -119,13 +119,10 @@
                                     <i class='bx bx-check'></i> Approuver la candidature
                                 </button>
                             </form>
-                            <form action="{{ route('laboratoires.admin.candidatures.reject', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-danger w-100"
-                                        onclick="return confirm('Rejeter cette candidature ? Le candidat recevra un email de notification.')">
-                                    <i class='bx bx-x'></i> Rejeter la candidature
-                                </button>
-                            </form>
+                            <!-- Bouton pour ouvrir la modal de rejet -->
+                            <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#modalMotifRejet">
+                                <i class='bx bx-x'></i> Rejeter la candidature
+                            </button>
                         </div>
                     @elseif($candidature->statut == 'en_attente')
                         <div class="alert alert-warning">
@@ -153,5 +150,33 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal pour saisir le motif du rejet -->
+<div class="modal fade" id="modalMotifRejet" tabindex="-1" aria-labelledby="modalMotifRejetLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalMotifRejetLabel">Motif du rejet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <form action="{{ route('laboratoires.admin.candidatures.reject', [$laboratoire->code_lab, $candidature->id_user_ext]) }}" method="POST">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="motif_rejet" class="form-label">Veuillez indiquer le motif du rejet <span class="text-danger">*</span></label>
+            <textarea name="motif_rejet" id="motif_rejet" class="form-control @error('motif_rejet') is-invalid @enderror" rows="4" required>{{ old('motif_rejet') }}</textarea>
+            @error('motif_rejet')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-danger">Confirmer le rejet</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 @endsection

@@ -38,7 +38,14 @@
                     <tbody>
                     @foreach($entretiens as $entretien)
                         <tr>
-                            <td>{{ $entretien->equipement->nom_equip ?? '-' }}</td>
+                            <td class="d-flex align-items-center gap-2">
+                                @if($entretien->equipement && $entretien->equipement->image_path)
+                                    <img src="{{ asset('storage/' . $entretien->equipement->image_path) }}" alt="Image de l'équipement" style="max-height: 30px; max-width: 40px;" class="rounded shadow">
+                                @else
+                                    <i class='bx bx-cog' style="font-size: 1.2rem; color: var(--primary-color);"></i>
+                                @endif
+                                <span>{{ $entretien->equipement->nom_equip ?? '-' }}</span>
+                            </td>
                             <td><span class="badge bg-{{ $entretien->type_badge }}">{{ $entretien->type_label }}</span></td>
                             <td>
                                 @if($entretien->personnel && $entretien->persLab)

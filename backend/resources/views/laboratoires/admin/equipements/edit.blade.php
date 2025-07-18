@@ -44,7 +44,7 @@
     <div class="card">
         <div class="card-body">
             <h4 class="card-title mb-4">Modifier les informations de l'équipement</h4>
-            <form action="{{ route('laboratoires.admin.equipements.update', [$laboratoire->code_lab, $equipement->code_equip]) }}" method="POST">
+            <form method="POST" action="{{ route('laboratoires.admin.equipements.update', [$laboratoire->code_lab, $equipement->code_equip]) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="row">
@@ -127,6 +127,18 @@
                            placeholder="Ex: Salle A12, Étage 2">
                     @error('localisation')
                         <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group">
+                    <label for="image">Image de l’équipement <span class="text-danger">*</span></label>
+                    @if($equipement->image_path)
+                        <div class="mb-2">
+                            <img src="{{ asset('storage/'.$equipement->image_path) }}" alt="Image actuelle" style="max-width:150px;max-height:150px;">
+                        </div>
+                    @endif
+                    <input type="file" name="image" id="image" class="form-control" accept="image/*" required>
+                    @error('image')
+                        <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="d-flex justify-content-end gap-2">

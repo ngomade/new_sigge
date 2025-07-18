@@ -102,6 +102,13 @@
 
                                         <form action="{{ route('labo.candidatures.reject', $candidature->id_user_ext) }}" method="POST">
                                             @csrf
+                                            <div class="mb-2">
+                                                <label for="motif_rejet" class="form-label">Motif du rejet <span class="text-danger">*</span></label>
+                                                <textarea name="motif_rejet" id="motif_rejet" class="form-control @error('motif_rejet') is-invalid @enderror" rows="3" required>{{ old('motif_rejet') }}</textarea>
+                                                @error('motif_rejet')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                             <button type="submit" class="btn btn-danger w-100"
                                                     onclick="return confirm('Rejeter cette candidature ? Le candidat recevra un email de notification.')">
                                                 <i class='bx bx-x'></i> Rejeter la candidature

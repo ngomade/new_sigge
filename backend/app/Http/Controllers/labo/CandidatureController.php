@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Mail\ExterneConfirmationMail;
 use App\Mail\ExternePasswordResetMail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\CandidatureApprovedMail;
 
 class CandidatureController extends Controller
 {
@@ -66,14 +67,6 @@ class CandidatureController extends Controller
                 $userExterne->update(['cv_path' => $cvPath]);
             }
 
-            // Créer l'affectation en attente (sans pers_lab pour les externes)
-            LaboratoirePersLab::create([
-                'code_lab' => $code_lab,
-                'id_user_externe' => $userExterne->id_user_ext,
-                'date_affectation' => now(),
-                'statut' => 'actif'
-            ]);
-
             // Envoyer l'email de confirmation
             $emailSent = true;
             $emailErrorMessage = '';
@@ -94,7 +87,7 @@ class CandidatureController extends Controller
                 $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : ' . $emailErrorMessage;
             }
 
-            
+
 
             return redirect()->route('laboratoires.show', $code_lab)
                 ->with('success', $successMessage);
@@ -146,12 +139,22 @@ class CandidatureController extends Controller
                 'pwd' => Hash::make($tempPassword)
             ]);
 
-            // Mettre à jour l'affectation
-            LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
-                ->update(['statut' => 'actif']);
+            // Récupérer l'id du rôle "membre"
+            $roleMembre = \App\Models\laboratoires\RoleLabo::whereRaw('LOWER(lib_rl) = ?', ['membre'])->first();
+            $idRoleMembre = $roleMembre ? $roleMembre->id_rl : null;
+
+            // Créer l'affectation dans laboratoire_pers_lab
+            LaboratoirePersLab::create([
+                'code_lab' => $candidature->code_lab,
+                'id_user_externe' => $candidature->id_user_ext,
+                'date_affectation' => now(),
+                'statut' => 'actif',
+                'id_rl' => $idRoleMembre,
+            ]);
+
 
             // TODO: Envoyer un email avec les identifiants
-            // Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
+            Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
 
             return redirect()->route('labo.candidatures.index')
                 ->with('success', 'Candidature approuvée avec succès. Un email a été envoyé au candidat.');
@@ -164,20 +167,19 @@ class CandidatureController extends Controller
     /**
      * Rejette une candidature (admin)
      */
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
+        $request->validate([
+            'motif_rejet' => 'required|string|max:500',
+        ]);
         $candidature = UserExterne::findOrFail($id);
 
         try {
-            // Mettre à jour le statut
+            // Mettre à jour le statut dans user_externe seulement
             $candidature->update(['statut' => 'rejeté']);
 
-            // Mettre à jour l'affectation
-            LaboratoirePersLab::where('id_user_externe', $candidature->id_user_ext)
-                ->update(['statut' => 'rejeté']);
-
-            // TODO: Envoyer un email de rejet
-            // Mail::to($candidature->email_user_ext)->send(new CandidatureRejectedMail($candidature));
+            // Envoyer un email de rejet avec le motif
+            \Mail::to($candidature->email_user_ext)->send(new \App\Mail\CandidatureRejectedMail($candidature, $request->motif_rejet));
 
             return redirect()->route('labo.candidatures.index')
                 ->with('success', 'Candidature rejetée avec succès. Un email a été envoyé au candidat.');

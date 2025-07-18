@@ -113,6 +113,7 @@
                 <table class="table table-centered table-nowrap">
                     <thead class="table-light">
                         <tr>
+                            <th>Image</th>
                             <th>Code</th>
                             <th>Nom</th>
                             <th>Référence</th>
@@ -125,6 +126,13 @@
                     <tbody>
                         @forelse($equipements as $equipement)
                         <tr>
+                            <td>
+                                @if($equipement->image_path)
+                                    <img src="{{ asset('storage/' . $equipement->image_path) }}" alt="Image de l'équipement" style="max-height: 60px; max-width: 80px;" class="img-thumbnail">
+                                @else
+                                    <i class='bx bx-cog' style="font-size: 2rem; color: var(--primary-color);"></i>
+                                @endif
+                            </td>
                             <td>
                                 <span class="badge bg-primary">{{ $equipement->code_equip }}</span>
                             </td>
