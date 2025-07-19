@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Labo;
+namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
 use App\Models\laboratoires\Laboratoire;
@@ -141,7 +141,7 @@ class CandidatureController extends Controller
 
             // Récupérer l'id du rôle "membre"
             $roleMembre = \App\Models\laboratoires\RoleLabo::whereRaw('LOWER(lib_rl) = ?', ['membre'])->first();
-            $idRoleMembre = $roleMembre ? $roleMembre->id_rl : null;
+            $idRoleMembre = $roleMembre?->id_rl;
 
             // Créer l'affectation dans laboratoire_pers_lab
             LaboratoirePersLab::create([
