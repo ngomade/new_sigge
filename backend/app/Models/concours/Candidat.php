@@ -113,4 +113,5 @@ class Candidat extends Model
             ->withPivot('pk_mail_candidat')
             ->withTimestamps();
     }
+    
 }

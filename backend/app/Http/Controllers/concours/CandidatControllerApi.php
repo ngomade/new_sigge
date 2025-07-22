@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\concours;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\concours\CandidatRequest;
-use App\Http\Requests\concours\UpdateCandidatRequest;
-use App\Models\CentreDepot;
-use App\Models\concours\Candidat;
-use App\Models\concours\CentreExamen;
-use App\Models\concours\Compte;
-use App\Models\Diplome;
-use App\Models\Serie;
-use App\Notifications\concours\GeneralNotifForCandidat;
 use Exception;
+use Throwable;
+use App\Models\Serie;
+use App\Models\Diplome;
+use App\Models\Filiere;
+use App\Models\CentreDepot;
 use Illuminate\Http\Request;
+use App\Models\concours\Compte;
+use App\Models\concours\Candidat;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Throwable;
+use App\Http\Controllers\Controller;
+use App\Models\concours\CentreExamen;
+use App\Http\Requests\concours\CandidatRequest;
+use App\Http\Requests\concours\UpdateCandidatRequest;
+use App\Notifications\concours\GeneralNotifForCandidat;
 
 class CandidatControllerApi extends Controller
 {
@@ -25,8 +26,8 @@ class CandidatControllerApi extends Controller
      */
     public function index()
     {
-        $candidats = Candidat::with(['site_etude', 'filiere', 'sessionconcour', 'ecoles'])->get();
-        return response()->json($candidats);
+        $candidat = Candidat::with(['site_etude', 'filiere', 'sessionconcour', 'ecoles'])->get();
+        return response()->json($candidat);
     }
 
     /**
@@ -58,7 +59,6 @@ class CandidatControllerApi extends Controller
                 $candidat->ecoles()->attach($validatedData['ecoles']); // Synchroniser les écoles si fournies
             }
             DB::commit();
-
             return response()->json([
                 "message" => "Candidat enregistré avec succès",
                 "data" => $candidat
@@ -80,7 +80,17 @@ class CandidatControllerApi extends Controller
         if (!$candidat) {
             return response()->json(['erreur' => 'Candidat non trouvé'], 404);
         }
-
+        $candidat = Candidat::where('ca_code',$candidat->ca_code)->first();
+        $filiere = Filiere::find($candidat->filiere_code);
+        $diplome = Diplome::find($candidat->ca_diplome_admission);
+        $serie = Serie::find($candidat->ca_serie_diplome);
+        $centre_examen = CentreExamen::find($candidat->ca_centre_examen);
+        $centre_depot = CentreDepot::find($candidat->ca_centre_depot);
+        $candidat->filiere_code = $filiere;
+        $candidat->ca_diplome_admission = $diplome;
+        $candidat->ca_serie_diplome = $serie;
+        $candidat->ca_centre_examen = $centre_examen;
+        $candidat->ca_centre_depot = $centre_depot;
         return response()->json($candidat);
     }
     public function getCandidatsBycentre(string $id_centre)
@@ -330,6 +340,28 @@ class CandidatControllerApi extends Controller
         } catch (Exception $e) {
             Log::error('Error retrieving candidat stats: ' . $e->getMessage());
             return response()->json(['erreur' => 'Erreur lors de la récupération des statistiques'], 500);
+        }
+    }
+
+     public function getCandidatAllinfo($id)
+    {
+
+        try {
+            $candidat = Candidat::where('ca_code',$id)->first();
+            $filiere = Filiere::find($candidat->filiere_code);
+            $diplome = Diplome::find($candidat->ca_diplome_admission);
+            $serie = Serie::find($candidat->ca_serie_diplome);
+            $centre_examen = CentreExamen::find($candidat->ca_centre_examen);
+            $centre_depot = CentreDepot::find($candidat->ca_centre_depot);
+            $candidat->filiere_code = $filiere;
+            $candidat->ca_diplome_admission = $diplome;
+            $candidat->ca_serie_diplome = $serie;
+            $candidat->ca_centre_examen = $centre_examen;
+            $candidat->ca_centre_depot = $centre_depot;
+            return response()->json($candidat, 200);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(["error" => "Ce candidat n'existe pas"], 400);
         }
     }
 }

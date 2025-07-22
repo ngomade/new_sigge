@@ -129,9 +129,10 @@ const AfficheDonnee = () => {
                 </div>
                 <div className="info">
                     <h3 style={{marginTop: '-8px'}}><span>Informations Académique / Academic Informations</span></h3>
-                    <div className="item-info-3">Filière: <span style={{fontSize: '0.8em', marginTop: '5px'}}>TRONC COMMUN {ca.filiere_code?.filiere_code}</span>
+                    <div className="item-info-3">Filière: <span style={{fontSize: '0.8em', marginTop: '5px'}}> {ca.filiere_code?.code_filiere}</span>
                     </div>
                     <div className="item-info-2">Diplôme
+                        {console.log(ca)}
                         d'admission: <span>{ca.ca_diplome_admission?.label_dip} {ca.ca_serie_diplome?.label_serie}</span>
                     </div>
                     <div className="item-info-4"
@@ -143,7 +144,7 @@ const AfficheDonnee = () => {
                         style={{fontSize: '0.85em'}}>{ca.ca_centre_depot?.centre_depot_label}</span></div>
                 </div>
                 <div className="info">
-                    <h3 style={{marginTop: '-9px'}}><span>Autres Informations / Others Informations</span></h3>
+                    <h3 style={{marginTop: '-5px'}}><span>Autres Informations / Others Informations</span></h3>
                     <div className="item-info-2" style={{marginTop: '5px'}}>Nom du père: <span
                         style={{textTransform: 'uppercase'}}>{ca.ca_nom_pere}</span></div>
                     <div className="item-info-2">Téléphone du père: <span>{ca.ca_telephone_pere}</span></div>
@@ -152,8 +153,9 @@ const AfficheDonnee = () => {
                     <div className="item-info-2">Téléphone de la mère: <span>{ca.ca_telephone_mere}</span></div>
                 </div>
                 <div className="consigne">
-                    <h3 style={{marginTop: '-18px'}}>Documents Nécessaires / Necessary Documents</h3>
+                    <h3 style={{marginTop: '-15px'}}>Documents Nécessaires / Necessary Documents</h3>
                     <ol style={{marginTop: '5px', listStyleType: 'circle'}}>
+                        <br />
                         <li>Une photocopie certifiée d'acte de naissance datant de moins de trois (3) mois;/ 
                             <span className="english">A certified true photocopy of the birth certificate issued within the last three (03) months;</span>
                         </li>
@@ -166,12 +168,13 @@ const AfficheDonnee = () => {
                         <li>Quatre (04) photos d'identité 4x4 du candidat;
                             <span className="english">Four (04) 4x4 identity photos of the candidate;</span>
                         </li>
-                        <li>Un reçu de versement bancaire d'un montant de 20 000F pour les 1<sup>ière</sup> années  et de 25 000F pour les 3 <sup>ième années</sup>; /
+                        <li>Un reçu de versement bancaire d'un montant de 20 000F pour les 1<sup>ière</sup> années  et de 25 000F pour les 3 <sup>ième</sup>  années; /
                             <span className="english">A bank deposit receipt of 20,000F for first-year students and 25,000F for third-year students.</span>
                         </li>
                         <li>Une enveloppe A4 timbrée au tarif réglementaire et portant l'adresse exacte du candidat; / 
                             <span className="english">A 21 x 29.7 size self-addressed envelope bearing a 400 CFA francs postal stamp</span>
                         </li>
+                        <br />
                     </ol>
                 </div>
                 <footer>
