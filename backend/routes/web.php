@@ -175,3 +175,4 @@ Route::get("/projet_mairie", [MairieController::class ,'projet_mairie'])->name("
 
 require __DIR__."/requetes.php";
 require __DIR__."/laboratoire.php";
+require __DIR__."/notes.php";

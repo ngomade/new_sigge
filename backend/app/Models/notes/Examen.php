@@ -19,7 +19,7 @@ class Examen extends Model
 		'type_evaluation'
 	];
 
-	public function session_examan()
+	public function sessionExamen()
 	{
 		return $this->belongsTo(SessionExamen::class, 'code_session');
 	}

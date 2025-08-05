@@ -43,7 +43,7 @@ class AssignationController extends Controller
             $personnels = Personnel::orderBy('nom_pers')->get();
             $ecs = Ec::with('ue')->orderBy('intitule_ec')->get();
 
-            return view('assignations.index', compact('assignations', 'classes', 'personnels', 'ecs'));
+            return view('sige_app.backend.assignation.assignation_index', compact('assignations', 'classes', 'personnels', 'ecs'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage des assignations: ' . $e->getMessage(), [
@@ -63,10 +63,10 @@ class AssignationController extends Controller
     {
         try {
             $classes = Classe::orderBy('label_class')->get();
-            $personnels = Personnel::where('statut_pers', 1)->orderBy('nom_pers')->get();
+            $personnels = Personnel::orderBy('nom_pers')->get();
             $ecs = Ec::with(['ue.semestre'])->orderBy('intitule_ec')->get();
 
-            return view('assignations.create', compact('classes', 'personnels', 'ecs'));
+            return view('sige_app.backend.assignation.assignation_create', compact('classes', 'personnels', 'ecs'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de création d\'assignation: ' . $e->getMessage(), [
@@ -190,7 +190,7 @@ class AssignationController extends Controller
                     ->avg('note_eval') ?? 0,
             ];
 
-            return view('assignations.show', compact('assignation', 'stats'));
+            return view('sige_app.backend.assignation.assignation_show', compact('assignation', 'stats'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage de l\'assignation: ' . $e->getMessage(), [
@@ -215,7 +215,7 @@ class AssignationController extends Controller
             $personnels = Personnel::where('statut_pers', 1)->orderBy('nom_pers')->get();
             $ecs = Ec::with(['ue.semestre'])->orderBy('intitule_ec')->get();
 
-            return view('assignations.edit', compact('assignation', 'classes', 'personnels', 'ecs'));
+            return view('sige_app.backend.assignation.assignation_edit', compact('assignation', 'classes', 'personnels', 'ecs'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [

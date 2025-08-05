@@ -20,7 +20,7 @@ class AnneescolaireController extends Controller
     public function index()
     {
         $annees = Anneescolaire::orderBy('code_annee', 'desc')->paginate(10);
-        return view('annees.index', compact('annees'));
+        return view('sige_app.backend.annee.annee_index', compact('annees'));
     }
 
     /**
@@ -28,7 +28,7 @@ class AnneescolaireController extends Controller
      */
     public function create()
     {
-        return view('annees.create');
+        return view('sige_app.backend.annee.annee_create');
     }
 
     /**
@@ -37,10 +37,9 @@ class AnneescolaireController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'label_annee' => 'required|string|max:128',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after:date_debut',
-            'statut_annee' => 'required|integer|in:0,1'
+            'code_annee' => 'required|integer|unique:anneescolaire',
+            'debut_annee' => 'required|date',
+            'fin_annee' => 'required|date|after:debut_annee'
         ]);
 
         if ($validator->fails()) {
@@ -50,11 +49,10 @@ class AnneescolaireController extends Controller
         }
 
         try {
-            AnneeScolaire::create([
-                'label_annee' => $request->label_annee,
-                'date_debut' => $request->date_debut,
-                'date_fin' => $request->date_fin,
-                'statut_annee' => $request->statut_annee
+            Anneescolaire::create([
+                'code_annee' => $request->code_annee,
+                'debut_annee' => $request->debut_annee,
+                'fin_annee' => $request->fin_annee
             ]);
 
             return redirect()->route('annees.index')
@@ -72,7 +70,7 @@ class AnneescolaireController extends Controller
     public function show($code_annee)
     {
         $annee = Anneescolaire::findOrFail($code_annee);
-        return view('annees.show', compact('annee'));
+        return view('sige_app.backend.annee.annee_show', compact('annee'));
     }
 
     /**
@@ -80,8 +78,8 @@ class AnneescolaireController extends Controller
      */
     public function edit($code_annee)
     {
-        $annee = AnneeScolaire::findOrFail($code_annee);
-        return view('annees.edit', compact('annee'));
+        $annee = Anneescolaire::findOrFail($code_annee);
+        return view('sige_app.backend.annee.annee_edit', compact('annee'));
     }
 
     /**
@@ -90,10 +88,8 @@ class AnneescolaireController extends Controller
     public function update(Request $request, $code_annee)
     {
         $validator = Validator::make($request->all(), [
-            'label_annee' => 'required|string|max:128',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after:date_debut',
-            'statut_annee' => 'required|integer|in:0,1'
+            'debut_annee' => 'required|date',
+            'fin_annee' => 'required|date|after:debut_annee'
         ]);
 
         if ($validator->fails()) {
@@ -105,10 +101,8 @@ class AnneescolaireController extends Controller
         try {
             $annee = Anneescolaire::findOrFail($code_annee);
             $annee->update([
-                'label_annee' => $request->label_annee,
-                'date_debut' => $request->date_debut,
-                'date_fin' => $request->date_fin,
-                'statut_annee' => $request->statut_annee
+                'debut_annee' => $request->debut_annee,
+                'fin_annee' => $request->fin_annee
             ]);
 
             return redirect()->route('annees.index')

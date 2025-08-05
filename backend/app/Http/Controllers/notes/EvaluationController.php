@@ -7,7 +7,7 @@ use App\Models\notes\Evaluation;
 use App\Models\notes\Ec;
 use App\Models\notes\Examen;
 use App\Models\notes\SessionExamen;
-use App\Models\concours\User;
+use App\Models\Users;
 use App\Models\AnneeScolaire;
 use App\Models\Ue;
 use App\Models\Semestre;
@@ -60,9 +60,11 @@ class EvaluationController extends Controller
                 ->get();
             
             $ecs = Ec::with('ue')->orderBy('intitule_ec')->get();
-            
-            $etudiants = User::where('role', 'etudiant')
-                ->orderBy('name')
+            $etudiants = Users::role('etudiant')
+                ->orderBy('nom_user')
+                ->get();
+            $etudiants = Users::role('etudiant')
+                ->orderBy('nom_user')
                 ->get();
 
             // Statistiques rapides
@@ -78,7 +80,7 @@ class EvaluationController extends Controller
                 )
             ];
 
-            return view('evaluations.index', compact(
+            return view('sige_app.backend.gestion_notes.evaluation.index', compact(
                 'evaluations', 'sessions', 'ecs', 'etudiants', 'stats'
             ));
 
@@ -116,7 +118,7 @@ class EvaluationController extends Controller
                 $etudiants = $this->getEtudiantsByEc($request->ec);
             }
 
-            return view('evaluations.create', compact('ecs', 'examens', 'etudiants'));
+            return view('sige_app.backend.gestion_notes.evaluation.create', compact('ecs', 'examens', 'etudiants'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de création d\'évaluation: ' . $e->getMessage(), [
@@ -268,7 +270,7 @@ class EvaluationController extends Controller
                 ->orderBy('date_evaluation', 'desc')
                 ->get();
 
-            return view('evaluations.show', compact('evaluation', 'autresEvaluations'));
+            return view('sige_app.backend.gestion_notes.evaluation.show', compact('evaluation', 'autresEvaluations'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage de l\'évaluation: ' . $e->getMessage(), [
@@ -302,7 +304,7 @@ class EvaluationController extends Controller
             // Récupérer tous les étudiants inscrits à cet EC
             $etudiants = $this->getEtudiantsByEc($code_ec);
 
-            return view('evaluations.edit', compact('ec', 'examen', 'evaluations', 'etudiants'));
+            return view('sige_app.backend.gestion_notes.evaluation.edit', compact('ec', 'examen', 'evaluations', 'etudiants'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [

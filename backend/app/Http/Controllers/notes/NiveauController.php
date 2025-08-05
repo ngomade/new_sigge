@@ -16,8 +16,8 @@ class NiveauController extends Controller
      */
     public function index()
     {
-        $niveaux = Niveau::with('classe')->paginate(10);
-        return view('niveaux.index', compact('niveaux'));
+        $niveaux = Niveau::with('class')->paginate(10);
+        return view('sige_app.backend.niveau.niveau_index', compact('niveaux'));
     }
 
     /**
@@ -26,7 +26,7 @@ class NiveauController extends Controller
     public function create()
     {
         $classes = Classe::all();
-        return view('niveaux.create', compact('classes'));
+        return view('sige_app.backend.niveau.niveau_create', compact('classes'));
     }
 
     /**
@@ -66,8 +66,8 @@ class NiveauController extends Controller
      */
     public function show($code_niveau)
     {
-        $niveau = Niveau::with(['classe', 'semestres'])->findOrFail($code_niveau);
-        return view('niveaux.show', compact('niveau'));
+        $niveau = Niveau::with(['class', 'semestres'])->findOrFail($code_niveau);
+        return view('sige_app.backend.niveau.niveau_show', compact('niveau'));
     }
 
     /**
@@ -77,7 +77,7 @@ class NiveauController extends Controller
     {
         $niveau = Niveau::findOrFail($code_niveau);
         $classes = Classe::all();
-        return view('niveaux.edit', compact('niveau', 'classes'));
+        return view('sige_app.backend.niveau.niveau_edit', compact('niveau', 'classes'));
     }
 
     /**

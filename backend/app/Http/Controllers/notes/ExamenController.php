@@ -78,7 +78,7 @@ class ExamenController extends Controller
                 })
             ];
 
-            return view('examens.index', compact(
+            return view('sige_app.backend.gestion_notes.examen.index', compact(
                 'examens', 'sessions', 'typesEvaluation', 'stats'
             ));
 
@@ -114,7 +114,7 @@ class ExamenController extends Controller
                 'STAGE' => 'Stage'
             ];
 
-            return view('examens.create', compact('sessions', 'typesEvaluation'));
+            return view('sige_app.backend.gestion_notes.examen.create', compact('sessions', 'typesEvaluation'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de création d\'examen: ' . $e->getMessage(), [
@@ -228,7 +228,7 @@ class ExamenController extends Controller
                     ];
                 });
 
-            return view('examens.show', compact('examen', 'stats', 'repartitionEc'));
+            return view('sige_app.backend.gestion_notes.examen.show', compact('examen', 'stats', 'repartitionEc'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage de l\'examen: ' . $e->getMessage(), [
@@ -264,7 +264,7 @@ class ExamenController extends Controller
                 'STAGE' => 'Stage'
             ];
 
-            return view('examens.edit', compact('examen', 'sessions', 'typesEvaluation'));
+            return view('sige_app.backend.gestion_notes.examen.edit', compact('examen', 'sessions', 'typesEvaluation'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
@@ -421,7 +421,7 @@ class ExamenController extends Controller
                 ->with(['salle', 'ec'])
                 ->get();
 
-            return view('examens.planifier', compact('examen', 'salles', 'ecs', 'periodesTourning'));
+            return view('sige_app.backend.gestion_notes.examen.planifier', compact('examen', 'salles', 'ecs', 'periodesTourning'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de planification: ' . $e->getMessage(), [

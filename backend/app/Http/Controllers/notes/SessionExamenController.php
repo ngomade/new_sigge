@@ -36,7 +36,7 @@ class SessionExamenController extends Controller
                 'examens_total' => Examen::count()
             ];
 
-            return view('sessionsExamen.index', compact('sessions', 'stats'));
+            return view('sige_app.backend.gestion_notes.session_examen.index', compact('sessions', 'stats'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage des sessions d\'examen: ' . $e->getMessage(), [
@@ -54,11 +54,10 @@ class SessionExamenController extends Controller
     public function create()
     {
         try {
-            $annees = Anneescolaire::where('statut_annee', 1)
-                ->orderBy('code_annee', 'desc')
+            $annees = Anneescolaire::orderBy('code_annee', 'desc')
                 ->get();
 
-            return view('sessions.create', compact('annees'));
+            return view('sige_app.backend.gestion_notes.session_examen.create', compact('annees'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de création de session: ' . $e->getMessage(), [
@@ -184,7 +183,7 @@ class SessionExamenController extends Controller
                 'taux_reussite' => $this->calculateTauxReussite($session->examens->flatMap->evaluations)
             ];
 
-            return view('sessions.show', compact('session', 'stats'));
+            return view('sige_app.backend.gestion_notes.session_examen.show', compact('session', 'stats'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage de la session d\'examen: ' . $e->getMessage(), [
@@ -208,7 +207,7 @@ class SessionExamenController extends Controller
                 ->orderBy('code_annee', 'desc')
                 ->get();
 
-            return view('sessions.edit', compact('session', 'annees'));
+            return view('sige_app.backend.gestion_notes.session_examen.edit', compact('session', 'annees'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
@@ -527,7 +526,7 @@ class SessionExamenController extends Controller
                 'user_id' => auth()->id()
             ]);
 
-            return redirect()->route('sessions.edit', $newSession->code_session)
+            return redirect()->route('sige_app.backend.gestion_notes.session_examen.edit', $newSession->code_session)
                 ->with('success', 'Session dupliquée avec succès. Vous pouvez maintenant la modifier.');
 
         } catch (Throwable $e) {

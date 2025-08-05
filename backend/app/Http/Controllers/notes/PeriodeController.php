@@ -75,7 +75,7 @@ class PeriodeController extends Controller
             // Statistiques
             $stats = $this->getStatisticsPeriodes($periodes);
 
-            return view('periodes.index', compact(
+            return view('sige_app.backend.gestion_notes.periode.index', compact(
                 'periodes', 'salles', 'ecs', 'evenements', 'stats'
             ));
 
@@ -101,7 +101,7 @@ class PeriodeController extends Controller
                 ->orderBy('intitule_ec')
                 ->get();
 
-            return view('periodes.create', compact('salles', 'ecs'));
+            return view('sige_app.backend.gestion_notes.periode.create', compact('salles', 'ecs'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de création de période: ' . $e->getMessage(), [
@@ -253,7 +253,7 @@ class PeriodeController extends Controller
                 ->orderBy('debut_periode')
                 ->get();
 
-            return view('periodes.show', compact('periode', 'stats', 'autresPeriodesSalle'));
+            return view('sige_app.backend.gestion_notes.periode.show', compact('periode', 'stats', 'autresPeriodesSalle'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage de la période: ' . $e->getMessage(), [
@@ -281,7 +281,7 @@ class PeriodeController extends Controller
             $salles = Salle::where('etat_salle', true)->orderBy('code_salle')->get();
             $ecs = Ec::with(['ue.semestre'])->orderBy('intitule_ec')->get();
 
-            return view('periodes.edit', compact('periode', 'salles', 'ecs'));
+            return view('sige_app.backend.gestion_notes.periode.edit', compact('periode', 'salles', 'ecs'));
 
         } catch (Throwable $e) {
             Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [

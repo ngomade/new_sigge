@@ -19,413 +19,333 @@
                 <div data-i18n="Analytics">Tableau de Bord</div>
             </a>
         </li>
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bxs-user-circle"></i>
-                <div data-i18n="Layouts">Etudiants</div>
-            </a>
 
-            <ul class="menu-sub">
-                @if ($personnel->hasRole('ADMIN'))
-                    <li class="menu-item">
-                        <a href="/show_candidat_list" class="menu-link">
-                            <div data-i18n="Without menu">Inscription</div>
-                        </a>
-                    </li>
-                @endif
-                @if ($personnel && ($personnel->hasRole('ADMIN') || $personnel->hasRole('PERSONNEL_APPUI')))
-                    <li class="menu-item">
-                        <a href="/liste_etudiant/0" class="menu-link">
-                            <div data-i18n="Without menu">Production de liste</div>
-                        </a>
-                    </li>
-                @endif
-                @if ($personnel && $personnel->hasRole('ADMIN'))
-                    <li class="menu-item">
-                        <a href="/liste_etudiant/0" class="menu-link">
-                            <div data-i18n="Without navbar">Changement de filière</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/liste_site_formation" class="menu-link">
-                            <div data-i18n="Without navbar">Changement de Site</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/valider_paiement_index" class="menu-link">
-                            <div data-i18n="Container">Valider Paiement</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/certificat_index" class="menu-link">
-                            <div data-i18n="Fluid">Certificat de scolarité</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/carte_index" class="menu-link">
-                            <div data-i18n="Fluid">Carte scolaire</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <div data-i18n="Blank">Statistiques</div>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </li>
+        @php
+            $personnel = session('pers');
+            // Si la session n'est pas définie, essayer de la récupérer depuis Auth
+            if (!$personnel && Auth::guard('personnel')->check()) {
+                $personnel = Auth::guard('personnel')->user();
+                session(['pers' => $personnel]);
+            }
+        @endphp
 
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bxs-user-circle"></i>
-                <div data-i18n="Layouts">Personnels</div>
-            </a>
-
-            <ul class="menu-sub">
-                @if ($personnel->hasRole('ADMIN'))
-                    <li class="menu-item">
-                        <a href="/insription_personnel" class="menu-link">
-                            <div data-i18n="Without menu">Inscription</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/liste_etudiant/0" class="menu-link">
-                            <div data-i18n="Without navbar">Listing</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="" class="menu-link">
-                            <div data-i18n="Blank">Statistiques</div>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </li>
-
-        <li class="menu-header small text-uppercase">
-            <span class="menu-header-text">Académie</span>
-        </li>
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                <div data-i18n="Account Settings">Académie</div>
-            </a>
-            <ul class="menu-sub">
-                @if ($personnel->hasRole('ADMIN'))
-                    <li class="menu-item">
-                        <a href="/gestion_semestre" class="menu-link">
-                            <div data-i18n="Account">Gestion des semestres</div>
-                        </a>
-                    </li>
-                    {{-- <li class="menu-item">
-            <a href="/gestion_grille" class="menu-link">
-              <div data-i18n="Account">Gestion des grilles UE</div>
-            </a>
-          </li> --}}
-                    <li class="menu-item">
-                        <a href="/gestion_ue" class="menu-link">
-                            <div data-i18n="Notifications">Gestion des UEs</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/gestion_ec" class="menu-link">
-                            <div data-i18n="Connections">Gestion des ECs</div>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </li>
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
-                <div data-i18n="Authentications">Authentications</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="auth-login-basic.html" class="menu-link" target="_blank">
-                        <div data-i18n="Basic">Login</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="auth-register-basic.html" class="menu-link" target="_blank">
-                        <div data-i18n="Basic">Register</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="auth-forgot-password-basic.html" class="menu-link" target="_blank">
-                        <div data-i18n="Basic">Forgot Password</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-cube-alt"></i>
-                <div data-i18n="Misc">Misc</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="pages-misc-error.html" class="menu-link">
-                        <div data-i18n="Error">Error</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="pages-misc-under-maintenance.html" class="menu-link">
-                        <div data-i18n="Under Maintenance">Under Maintenance</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        @if ($personnel->hasRole('ENSEIGNANT'))
+        @if($personnel)
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                    <div data-i18n="Account Settings">Académie</div>
+                    <i class="menu-icon tf-icons bx bxs-user-circle"></i>
+                    <div data-i18n="Layouts">Etudiants</div>
                 </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="/gestion_semestre" class="menu-link">
-                            <div data-i18n="Account">Gestion des semestres</div>
-                        </a>
-                    </li>
-                    {{-- <li class="menu-item">
-                  <a href="/gestion_grille" class="menu-link">
-                    <div data-i18n="Account">Gestion des grilles UE</div>
-                  </a>
-                </li> --}}
-                    <li class="menu-item">
-                        <a href="/gestion_ue" class="menu-link">
-                            <div data-i18n="Notifications">Gestion des UEs</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/gestion_ec" class="menu-link">
-                            <div data-i18n="Connections">Gestion des ECs</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        @endif
 
-        @if ($personnel->hasRole('CHEF_SERV') || $personnel->hasRole('ADMIN'))
-            <!-- Components -->
-            <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Actualités</span>
-            </li>
-            <!-- Cards -->
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-news"></i>
-                    <div data-i18n="User interface">Actualités</div>
-                </a>
                 <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="/index_actualite" class="menu-link">
-                            <div data-i18n="PubActu">Publier un article</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/list_actu" class="menu-link">
-                            <div data-i18n="listActu">Listing et Modification</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <div data-i18n="StatActu">Statisques</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-box"></i>
-                    <div data-i18n="User interface">Caroussel</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="/index_caroussel" class="menu-link">
-                            <div data-i18n="Accordion">Ajouter</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/list_slide" class="menu-link">
-                            <div data-i18n="Alerts">Listing et Modification</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        @endif
-        @if ($personnel && $personnel->hasRole('ADMIN'))
-            <!-- Components -->
-            <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des
-                    Laboratoires</span>
-            </li>
-            <!-- Cards -->
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-building-house"></i>
-                    <div data-i18n="User interface">Laboratoires</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="/labo/laboratoires/create" class="menu-link">
-                            <div data-i18n="PubActu">Ajouter un laboratoire</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/labo/laboratoires" class="menu-link">
-                            <div data-i18n="listActu">Listing et Modification</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/labo/roles" class="menu-link">
-                            <div data-i18n="roles">Gestion des rôles</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        @endif
-
-        @if ($personnel && !$personnel->hasRole('etudiant') && !$personnel->hasRole('candidat'))
-            <!-- Components -->
-            <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Requetes</span>
-            </li>
-            <!-- Cards -->
-            <li class="menu-item">
-                <a href="javascript:void(0)" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-news"></i>
-                    <div data-i18n="User interface">Requetes</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="{{ route('admin.requetes.index') }}" class="menu-link">
-                            <div data-i18n="PubActu">Gerer les requetes</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item">
-                        <a href="{{ route('admin.requetes.statistiques') }}" class="menu-link">
-                            <div data-i18n="StatActu">Statistiques</div>
-                        </a>
-                    </li>
                     @if ($personnel->hasRole('ADMIN'))
                         <li class="menu-item">
-                            <a href="{{ route('admin.requetes.categories.index') }}" class="menu-link">
-                                <div data-i18n="StatActu">categories</div>
+                            <a href="/show_candidat_list" class="menu-link">
+                                <div data-i18n="Without menu">Inscription</div>
+                            </a>
+                        </li>
+                    @endif
+                    @if ($personnel->hasRole('ADMIN') || $personnel->hasRole('PERSONNEL_APPUI'))
+                        <li class="menu-item">
+                            <a href="/liste_etudiant/0" class="menu-link">
+                                <div data-i18n="Without menu">Production de liste</div>
+                            </a>
+                        </li>
+                    @endif
+                    @if ($personnel->hasRole('ADMIN'))
+                        <li class="menu-item">
+                            <a href="/liste_etudiant/0" class="menu-link">
+                                <div data-i18n="Without navbar">Changement de filière</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/liste_site_formation" class="menu-link">
+                                <div data-i18n="Without navbar">Changement de Site</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/valider_paiement_index" class="menu-link">
+                                <div data-i18n="Container">Valider Paiement</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/certificat_index" class="menu-link">
+                                <div data-i18n="Fluid">Certificat de scolarité</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/carte_index" class="menu-link">
+                                <div data-i18n="Fluid">Carte scolaire</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">
+                                <div data-i18n="Blank">Statistiques</div>
                             </a>
                         </li>
                     @endif
                 </ul>
             </li>
 
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bxs-user-circle"></i>
+                    <div data-i18n="Layouts">Personnels</div>
+                </a>
+
+                <ul class="menu-sub">
+                    @if ($personnel->hasRole('ADMIN'))
+                        <li class="menu-item">
+                            <a href="/insription_personnel" class="menu-link">
+                                <div data-i18n="Without menu">Inscription</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/liste_etudiant/0" class="menu-link">
+                                <div data-i18n="Without navbar">Listing</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="" class="menu-link">
+                                <div data-i18n="Blank">Statistiques</div>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Académie</span>
+            </li>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-dock-top"></i>
+                    <div data-i18n="Account Settings">Académie</div>
+                </a>
+                <ul class="menu-sub">
+                    @if ($personnel->hasRole('ADMIN') || $personnel->hasRole('ENSEIGNANT'))
+                        <li class="menu-item">
+                            <a href="/gestion_semestre" class="menu-link">
+                                <div data-i18n="Account">Gestion des semestres</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/gestion_ue" class="menu-link">
+                                <div data-i18n="Notifications">Gestion des UEs</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/gestion_ec" class="menu-link">
+                                <div data-i18n="Connections">Gestion des ECs</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('annees.index') }}" class="menu-link">
+                                <div data-i18n="Connections">Gestion des Annees</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('classes.index') }}" class="menu-link">
+                                <div data-i18n="Connections">Gestion des Classes</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('niveaux.index') }}" class="menu-link">
+                                <div data-i18n="Connections">Gestion des Niveaux</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('assignations.index') }}" class="menu-link">
+                                <div data-i18n="Connections">Gestion des Assignations</div>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+
+            @if ($personnel->hasRole('CHEF_SERV') || $personnel->hasRole('ADMIN'))
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Actualités</span>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0)" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-news"></i>
+                        <div data-i18n="User interface">Actualités</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="/index_actualite" class="menu-link">
+                                <div data-i18n="PubActu">Publier un article</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/list_actu" class="menu-link">
+                                <div data-i18n="listActu">Listing et Modification</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">
+                                <div data-i18n="StatActu">Statistiques</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+
+            @if ($personnel->hasRole('ADMIN'))
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Laboratoires</span>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0)" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-building-house"></i>
+                        <div data-i18n="User interface">Laboratoires</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="/labo/laboratoires/create" class="menu-link">
+                                <div data-i18n="PubActu">Ajouter un laboratoire</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/labo/laboratoires" class="menu-link">
+                                <div data-i18n="listActu">Listing et Modification</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/labo/roles" class="menu-link">
+                                <div data-i18n="roles">Gestion des rôles</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+
+            @if ($personnel && !$personnel->hasRole('etudiant') && !$personnel->hasRole('candidat'))
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Requetes</span>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0)" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-news"></i>
+                        <div data-i18n="User interface">Requetes</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="{{ route('admin.requetes.index') }}" class="menu-link">
+                                <div data-i18n="PubActu">Gerer les requetes</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.requetes.statistiques') }}" class="menu-link">
+                                <div data-i18n="StatActu">Statistiques</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+
+            @if ($personnel->hasRole('ADMIN') || $personnel->hasRole('ENSEIGNANT'))
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Notes</span></li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-detail"></i>
+                        <div data-i18n="Form Elements">Planification</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="{{ route('examens.index') }}" class="menu-link">
+                                <div data-i18n="Basic Inputs">Examen</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('evaluations.index') }}" class="menu-link">
+                                <div data-i18n="Input groups">Evaluations</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('sessionsExamen.index') }}" class="menu-link">
+                                <div data-i18n="Input groups">Session_Examen</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('periodes.index') }}" class="menu-link">
+                                <div data-i18n="Input groups">Periode</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('ressources.documents.index') }}" class="menu-link">
+                                <div data-i18n="Ressources">Ressources</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('ressources.salles.index') }}" class="menu-link">
+                                <div data-i18n="Salles">Salles</div>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+            @endif
+
+            @if ($personnel->hasRole('ADMIN'))
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Administration</span></li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-detail"></i>
+                        <div data-i18n="Admin">ESTLC</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="/basculement_index" class="menu-link">
+                                <div data-i18n="Ecole">Basculement</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/bureau/Cellule" class="menu-link">
+                                <div data-i18n="Cellule">Cellule</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/bureau/Division" class="menu-link">
+                                <div data-i18n="Division">Division</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/bureau/Departement" class="menu-link">
+                                <div data-i18n="Departement">Département</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/bureau/Service" class="menu-link">
+                                <div data-i18n="Service">Service</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-detail"></i>
+                        <div data-i18n="Admin">Rôles & Permissions</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="/gestion_role_perm" class="menu-link">
+                                <div data-i18n="roles">Rôles & Permissions </div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/assignation_index" class="menu-link">
+                                <div data-i18n="assignations">Assignations</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endif
+        @else
+        <!-- Show login prompt when not authenticated -->
+        <li class="menu-item">
+            <a href="/login" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-log-in"></i>
+                <div data-i18n="Login">Se connecter</div>
+            </a>
+        </li>
         @endif
-        @if ($personnel->hasRole('ADMIN'))
-            <li class="menu-header small text-uppercase"><span class="menu-header-text">Gestions des Notes</span></li>
-
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-detail"></i>
-                    <div data-i18n="Form Elements">Form Elements</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="forms-basic-inputs.html" class="menu-link">
-                            <div data-i18n="Basic Inputs">Basic Inputs</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="forms-input-groups.html" class="menu-link">
-                            <div data-i18n="Input groups">Input groups</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-detail"></i>
-                    <div data-i18n="Form Layouts">Form Layouts</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="form-layouts-vertical.html" class="menu-link">
-                            <div data-i18n="Vertical Form">Vertical Form</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="form-layouts-horizontal.html" class="menu-link">
-                            <div data-i18n="Horizontal Form">Horizontal Form</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <!-- Tables -->
-            <li class="menu-item">
-                <a href="tables-basic.html" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-table"></i>
-                    <div data-i18n="Tables">Tables</div>
-                </a>
-            </li>
-
-            <li class="menu-header small text-uppercase"><span class="menu-header-text">Administration</span></li>
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-detail"></i>
-                    <div data-i18n="Admin">ESTLC</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <div data-i18n="Ecole">Ecole</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/basculement_index" class="menu-link">
-                            <div data-i18n="Ecole">Basculement</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/bureau/Cellule" class="menu-link">
-                            <div data-i18n="Cellule">Cellule</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/bureau/Division" class="menu-link">
-                            <div data-i18n="Division">Division</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/bureau/Departement" class="menu-link">
-                            <div data-i18n="Departement">Département</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/bureau/Service" class="menu-link">
-                            <div data-i18n="Service">Service</div>
-                        </a>
-                    </li>
-                    {{-- <li class="menu-item">
-            <a href="{{ route('admin.requetes.index') }}" class="menu-link"><div data-i18n="Requete">Requete</div></a>
-          </li> --}}
-                </ul>
-            </li>
-            <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons bx bx-detail"></i>
-                    <div data-i18n="Admin">Rôles &amp; Permissions</div>
-                </a>
-                <ul class="menu-sub">
-                    <li class="menu-item">
-                        <a href="/gestion_role_perm" class="menu-link">
-                            <div data-i18n="roles">Rôles &amp; Permissions </div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/assignation_index" class="menu-link">
-                            <div data-i18n="assignations">Assignations</div>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        @endif
-
     </ul>
 </aside>

@@ -8,9 +8,13 @@ use App\Models\notes\Salle;
 use App\Models\notes\SessionExamen;
 use App\Models\Bureau;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Throwable;
 
 class RessourceController extends Controller
 {
@@ -19,52 +23,98 @@ class RessourceController extends Controller
      */
     
     /**
-     * Afficher la liste des documents
+     * Afficher la liste des documents avec vue calendrier
      */
-    public function indexDocuments()
+    public function indexDocuments(Request $request)
     {
         try {
-            $documents = Document::with(['sessionExamen', 'bureau'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(15);
+            $query = Document::with(['sessionExamen', 'bureau']);
 
-            return response()->json([
-                'success' => true,
-                'data' => $documents,
-                'message' => 'Liste des documents récupérée avec succès'
+            // Filtres
+            if ($request->filled('session')) {
+                $query->where('code_session', $request->session);
+            }
+
+            if ($request->filled('bureau')) {
+                $query->where('code_bureau', $request->bureau);
+            }
+
+            if ($request->filled('date_debut') && $request->filled('date_fin')) {
+                $query->whereBetween('created_at', [
+                    $request->date_debut,
+                    $request->date_fin
+                ]);
+            }
+
+            $documents = $query->orderBy('created_at', 'desc')->paginate(15);
+
+            // Données pour les filtres
+            $sessions = SessionExamen::orderBy('code_session')->get();
+            $bureaux = Bureau::orderBy('code_bureau')->get();
+
+            return view('sige_app.backend.gestion_notes.ressource.documents.index', compact('documents', 'sessions', 'bureaux'));
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de l\'affichage des documents: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la récupération des documents',
-                'error' => $e->getMessage()
-            ], 500);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors du chargement des documents.');
         }
     }
 
     /**
-     * Créer un nouveau document
+     * Show the form for creating a new document
+     */
+    public function createDocument()
+    {
+        try {
+            $sessions = SessionExamen::orderBy('code_session')->get();
+            $bureaux = Bureau::orderBy('code_bureau')->get();
+
+            return view('sige_app.backend.gestion_notes.ressource.documents.create', compact('sessions', 'bureaux'));
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de l\'affichage du formulaire de création de document: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->route('ressources.documents.index')
+                ->with('error', 'Une erreur est survenue lors du chargement du formulaire.');
+        }
+    }
+
+    /**
+     * Store a newly created document
      */
     public function storeDocument(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'label_doc' => 'required|string|max:128',
             'type_doc' => 'required|string|max:128',
-            'fichier' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240', // 10MB max
+            'fichier' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
             'code_session' => 'nullable|string|exists:session_examen,code_session',
             'code_bureau' => 'nullable|string|exists:bureau,code_bureau',
             'description_doc' => 'nullable|string'
+        ], [
+            'label_doc.required' => 'Le libellé du document est obligatoire.',
+            'type_doc.required' => 'Le type de document est obligatoire.',
+            'fichier.required' => 'Le fichier est obligatoire.',
+            'fichier.mimes' => 'Le fichier doit être au format PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG ou PNG.',
+            'fichier.max' => 'Le fichier ne doit pas dépasser 10MB.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         try {
+            DB::beginTransaction();
+
             // Upload du fichier
             $file = $request->file('fichier');
             $nomFichier = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
@@ -79,50 +129,83 @@ class RessourceController extends Controller
                 'nom_fichier' => $nomFichier
             ]);
 
-            return response()->json([
-                'success' => true,
-                'data' => $document->load(['sessionExamen', 'bureau']),
-                'message' => 'Document créé avec succès'
-            ], 201);
+            DB::commit();
 
-        } catch (\Exception $e) {
+            Log::info('Document créé avec succès', [
+                'document_id' => $document->id,
+                'user_id' => auth()->id(),
+                'data' => $request->all()
+            ]);
+
+            return redirect()->route('ressources.documents.index')
+                ->with('success', 'Document créé avec succès.');
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            
             // Supprimer le fichier en cas d'erreur
             if (isset($cheminFichier)) {
                 Storage::disk('public')->delete($cheminFichier);
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la création du document',
-                'error' => $e->getMessage()
-            ], 500);
+            Log::error('Erreur lors de la création du document: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la création du document.')
+                ->withInput();
         }
     }
 
     /**
-     * Afficher un document spécifique
+     * Display the specified document
      */
     public function showDocument($id)
     {
         try {
             $document = Document::with(['sessionExamen', 'bureau'])->findOrFail($id);
 
-            return response()->json([
-                'success' => true,
-                'data' => $document,
-                'message' => 'Document récupéré avec succès'
+            return view('sige_app.backend.gestion_notes.ressource.documents.show', compact('document'));
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de l\'affichage du document: ' . $e->getMessage(), [
+                'document_id' => $id,
+                'trace' => $e->getTraceAsString()
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Document non trouvé',
-                'error' => $e->getMessage()
-            ], 404);
+
+            return redirect()->route('ressources.documents.index')
+                ->with('error', 'Document introuvable ou erreur lors du chargement.');
         }
     }
 
     /**
-     * Mettre à jour un document
+     * Show the form for editing the specified document
+     */
+    public function editDocument($id)
+    {
+        try {
+            $document = Document::findOrFail($id);
+            $sessions = SessionExamen::orderBy('code_session')->get();
+            $bureaux = Bureau::orderBy('code_bureau')->get();
+
+            return view('sige_app.backend.gestion_notes.ressource.documents.edit', compact('document', 'sessions', 'bureaux'));
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de l\'affichage du formulaire de modification de document: ' . $e->getMessage(), [
+                'document_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->route('ressources.documents.index')
+                ->with('error', 'Une erreur est survenue lors du chargement du formulaire.');
+        }
+    }
+
+    /**
+     * Update the specified document
      */
     public function updateDocument(Request $request, $id)
     {
@@ -133,17 +216,22 @@ class RessourceController extends Controller
             'code_session' => 'nullable|string|exists:session_examen,code_session',
             'code_bureau' => 'nullable|string|exists:bureau,code_bureau',
             'description_doc' => 'nullable|string'
+        ], [
+            'label_doc.required' => 'Le libellé du document est obligatoire.',
+            'type_doc.required' => 'Le type de document est obligatoire.',
+            'fichier.mimes' => 'Le fichier doit être au format PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG ou PNG.',
+            'fichier.max' => 'Le fichier ne doit pas dépasser 10MB.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         try {
+            DB::beginTransaction();
+
             $document = Document::findOrFail($id);
             $ancienFichier = $document->nom_fichier;
 
@@ -151,7 +239,7 @@ class RessourceController extends Controller
             if ($request->hasFile('fichier')) {
                 $file = $request->file('fichier');
                 $nomFichier = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('documents', $nomFichier, 'public');
+                $cheminFichier = $file->storeAs('documents', $nomFichier, 'public');
 
                 // Supprimer l'ancien fichier
                 if ($ancienFichier && Storage::disk('public')->exists('documents/' . $ancienFichier)) {
@@ -170,27 +258,45 @@ class RessourceController extends Controller
                 'nom_fichier' => $document->nom_fichier
             ]);
 
-            return response()->json([
-                'success' => true,
-                'data' => $document->load(['sessionExamen', 'bureau']),
-                'message' => 'Document mis à jour avec succès'
+            DB::commit();
+
+            Log::info('Document modifié avec succès', [
+                'document_id' => $document->id,
+                'user_id' => auth()->id(),
+                'data' => $request->all()
             ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la mise à jour du document',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->route('ressources.documents.index')
+                ->with('success', 'Document modifié avec succès.');
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            
+            // Supprimer le nouveau fichier en cas d'erreur
+            if (isset($cheminFichier)) {
+                Storage::disk('public')->delete($cheminFichier);
+            }
+
+            Log::error('Erreur lors de la modification du document: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la modification du document.')
+                ->withInput();
         }
     }
 
     /**
-     * Supprimer un document
+     * Remove the specified document
      */
     public function destroyDocument($id)
     {
         try {
+            DB::beginTransaction();
+
             $document = Document::findOrFail($id);
             $nomFichier = $document->nom_fichier;
 
@@ -201,69 +307,27 @@ class RessourceController extends Controller
                 Storage::disk('public')->delete('documents/' . $nomFichier);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Document supprimé avec succès'
+            DB::commit();
+
+            Log::info('Document supprimé avec succès', [
+                'document_id' => $id,
+                'user_id' => auth()->id()
             ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la suppression du document',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+            return redirect()->route('ressources.documents.index')
+                ->with('success', 'Document supprimé avec succès.');
 
-    /**
-     * Télécharger un document
-     */
-    public function downloadDocument($id)
-    {
-        try {
-            $document = Document::findOrFail($id);
-            $cheminFichier = 'documents/' . $document->nom_fichier;
+        } catch (Throwable $e) {
+            DB::rollBack();
 
-            if (!Storage::disk('public')->exists($cheminFichier)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Fichier non trouvé'
-                ], 404);
-            }
-
-            return Storage::disk('public')->download($cheminFichier, $document->label_doc . '.' . pathinfo($document->nom_fichier, PATHINFO_EXTENSION));
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors du téléchargement',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Obtenir les documents par session
-     */
-    public function getDocumentsBySession($codeSession)
-    {
-        try {
-            $documents = Document::where('code_session', $codeSession)
-                ->with(['sessionExamen', 'bureau'])
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-            return response()->json([
-                'success' => true,
-                'data' => $documents,
-                'message' => 'Documents de la session récupérés avec succès'
+            Log::error('Erreur lors de la suppression du document: ' . $e->getMessage(), [
+                'document_id' => $id,
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la récupération des documents',
-                'error' => $e->getMessage()
-            ], 500);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la suppression du document.');
         }
     }
 
@@ -277,24 +341,49 @@ class RessourceController extends Controller
     public function indexSalles()
     {
         try {
-            $salles = Salle::orderBy('code_salle')->get();
+            $salles = Salle::orderBy('code_salle')->paginate(15);
 
-            return response()->json([
-                'success' => true,
-                'data' => $salles,
-                'message' => 'Liste des salles récupérée avec succès'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la récupération des salles',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+            return view('sige_app.backend.gestion_notes.ressource.salles.index', compact('salles'));
+
+        } catch (Throwable $e) {
+            Log::error<|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|>I have gathered the relevant information from the RessourceController.php file.
+
+Information Gathered:
+- The method indexSalles() fetches all Salle records using `Salle::orderBy('code_salle')->get()` and passes them to the view.
+- The view expects a paginated result because it calls `$salles->links()` for pagination.
+- The current code fetches all records as a Collection, which does not have the links() method, causing the error.
+
+Plan:
+- Modify the indexSalles() method in RessourceController.php to use pagination instead of get().
+  Change:
+  ```php
+  $salles = Salle::orderBy('code_salle')->get();
+  ```
+  To:
+  ```php
+  $salles = Salle::orderBy('code_salle')->paginate(15);
+  ```
+- This will return a LengthAwarePaginator instance that supports the links() method.
+- No other dependent files need editing as the view and route are already set up.
+
+Followup steps:
+- Test the /ressources/salles page to confirm pagination works and the error is resolved.
+
+Please confirm if I can proceed with this plan. 
+
+<ask_followup_question>
+<question>May I proceed to update the indexSalles() method to use pagination?</question>
+
+    /**
+     * Show the form for creating a new salle
+     */
+    public function createSalle()
+    {
+        return view('sige_app.backend.gestion_notes.ressource.salles.create');
     }
 
     /**
-     * Créer une nouvelle salle
+     * Store a newly created salle
      */
     public function storeSalle(Request $request)
     {
@@ -303,58 +392,66 @@ class RessourceController extends Controller
             'nb_place_salle' => 'required|integer|min:1',
             'etat_salle' => 'required|boolean',
             'desc_salle' => 'nullable|string'
+        ], [
+            'code_salle.required' => 'Le code de la salle est obligatoire.',
+            'code_salle.unique' => 'Ce code de salle existe déjà.',
+            'nb_place_salle.required' => 'Le nombre de places est obligatoire.',
+            'nb_place_salle.min' => 'Le nombre de places doit être au moins 1.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         try {
-            $salle = Salle::create($request->all());
+            Salle::create($request->all());
 
-            return response()->json([
-                'success' => true,
-                'data' => $salle,
-                'message' => 'Salle créée avec succès'
-            ], 201);
+            Log::info('Salle créée avec succès', [
+                'code_salle' => $request->code_salle,
+                'user_id' => auth()->id()
+            ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la création de la salle',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->route('ressources.salles.index')
+                ->with('success', 'Salle créée avec succès.');
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de la création de la salle: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la création de la salle.')
+                ->withInput();
         }
     }
 
     /**
-     * Afficher une salle spécifique
+     * Show the form for editing the specified salle
      */
-    public function showSalle($codeSalle)
+    public function editSalle($codeSalle)
     {
         try {
             $salle = Salle::findOrFail($codeSalle);
 
-            return response()->json([
-                'success' => true,
-                'data' => $salle,
-                'message' => 'Salle récupérée avec succès'
+            return view('sige_app.backend.gestion_notes.ressource.salles.edit', compact('salle'));
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de l\'affichage du formulaire de modification de salle: ' . $e->getMessage(), [
+                'code_salle' => $codeSalle,
+                'trace' => $e->getTraceAsString()
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Salle non trouvée',
-                'error' => $e->getMessage()
-            ], 404);
+
+            return redirect()->route('ressources.salles.index')
+                ->with('error', 'Une erreur est survenue lors du chargement du formulaire.');
         }
     }
 
     /**
-     * Mettre à jour une salle
+     * Update the specified salle
      */
     public function updateSalle(Request $request, $codeSalle)
     {
@@ -363,182 +460,111 @@ class RessourceController extends Controller
             'nb_place_salle' => 'required|integer|min:1',
             'etat_salle' => 'required|boolean',
             'desc_salle' => 'nullable|string'
+        ], [
+            'code_salle.required' => 'Le code de la salle est obligatoire.',
+            'code_salle.unique' => 'Ce code de salle existe déjà.',
+            'nb_place_salle.required' => 'Le nombre de places est obligatoire.',
+            'nb_place_salle.min' => 'Le nombre de places doit être au moins 1.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         try {
             $salle = Salle::findOrFail($codeSalle);
             $salle->update($request->all());
 
-            return response()->json([
-                'success' => true,
-                'data' => $salle,
-                'message' => 'Salle mise à jour avec succès'
+            Log::info('Salle modifiée avec succès', [
+                'code_salle' => $codeSalle,
+                'user_id' => auth()->id()
             ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la mise à jour de la salle',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->route('ressources.salles.index')
+                ->with('success', 'Salle modifiée avec succès.');
+
+        } catch (Throwable $e) {
+            Log::error('Erreur lors de la modification de la salle: ' . $e->getMessage(), [
+                'code_salle' => $codeSalle,
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la modification de la salle.')
+                ->withInput();
         }
     }
 
     /**
-     * Supprimer une salle
+     * Remove the specified salle
      */
     public function destroySalle($codeSalle)
     {
         try {
+            DB::beginTransaction();
+
             $salle = Salle::findOrFail($codeSalle);
             
-            // Vérifier si la salle est utilisée dans des périodes
+            // Vérifier si la salle est utilisée
             if ($salle->periodes()->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Impossible de supprimer cette salle car elle est utilisée dans des planifications'
-                ], 400);
+                return redirect()->back()
+                    ->with('error', 'Impossible de supprimer cette salle car elle est utilisée dans des planifications.');
             }
 
             $salle->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Salle supprimée avec succès'
+            DB::commit();
+
+            Log::info('Salle supprimée avec succès', [
+                'code_salle' => $codeSalle,
+                'user_id' => auth()->id()
             ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la suppression de la salle',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->route('ressources.salles.index')
+                ->with('success', 'Salle supprimée avec succès.');
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            Log::error('Erreur lors de la suppression de la salle: ' . $e->getMessage(), [
+                'code_salle' => $codeSalle,
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de la suppression de la salle.');
         }
     }
 
     /**
-     * Obtenir les salles disponibles
+     * Télécharger un document
      */
-    public function getSallesDisponibles()
+    public function downloadDocument($id)
     {
         try {
-            $salles = Salle::where('etat_salle', true)
-                ->orderBy('code_salle')
-                ->get();
+            $document = Document::findOrFail($id);
+            $cheminFichier = 'documents/' . $document->nom_fichier;
 
-            return response()->json([
-                'success' => true,
-                'data' => $salles,
-                'message' => 'Salles disponibles récupérées avec succès'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la récupération des salles disponibles',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Vérifier la disponibilité d'une salle pour une période donnée
-     */
-    public function verifierDisponibiliteSalle(Request $request, $codeSalle)
-    {
-        $validator = Validator::make($request->all(), [
-            'debut_periode' => 'required|date',
-            'fin_periode' => 'required|date|after:debut_periode',
-            'jour_periode' => 'required|integer|between:1,7'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Données invalides',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        try {
-            $salle = Salle::findOrFail($codeSalle);
-
-            if (!$salle->etat_salle) {
-                return response()->json([
-                    'success' => false,
-                    'disponible' => false,
-                    'message' => 'La salle n\'est pas disponible (état désactivé)'
-                ]);
+            if (!Storage::disk('public')->exists($cheminFichier)) {
+                return redirect()->back()
+                    ->with('error', 'Fichier non trouvé.');
             }
 
-            // Vérifier les conflits avec les périodes existantes
-            $conflits = $salle->periodes()
-                ->where('jour_periode', $request->jour_periode)
-                ->where(function($query) use ($request) {
-                    $query->whereBetween('debut_periode', [$request->debut_periode, $request->fin_periode])
-                          ->orWhereBetween('fin_periode', [$request->debut_periode, $request->fin_periode])
-                          ->orWhere(function($q) use ($request) {
-                              $q->where('debut_periode', '<=', $request->debut_periode)
-                                ->where('fin_periode', '>=', $request->fin_periode);
-                          });
-                })
-                ->exists();
+            return Storage::disk('public')->download($cheminFichier, $document->label_doc . '.' . pathinfo($document->nom_fichier, PATHINFO_EXTENSION));
 
-            return response()->json([
-                'success' => true,
-                'disponible' => !$conflits,
-                'message' => $conflits ? 'Salle non disponible pour cette période' : 'Salle disponible'
+        } catch (Throwable $e) {
+            Log::error('Erreur lors du téléchargement du document: ' . $e->getMessage(), [
+                'document_id' => $id,
+                'trace' => $e->getTraceAsString()
             ]);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la vérification de disponibilité',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Obtenir les statistiques des ressources
-     */
-    public function getStatistiquesRessources()
-    {
-        try {
-            $stats = [
-                'total_documents' => Document::count(),
-                'documents_par_type' => Document::selectRaw('type_doc, COUNT(*) as total')
-                    ->groupBy('type_doc')
-                    ->get(),
-                'total_salles' => Salle::count(),
-                'salles_disponibles' => Salle::where('etat_salle', true)->count(),
-                'salles_indisponibles' => Salle::where('etat_salle', false)->count(),
-                'capacite_totale' => Salle::where('etat_salle', true)->sum('nb_place_salle'),
-                'documents_recents' => Document::with(['sessionExamen', 'bureau'])
-                    ->orderBy('created_at', 'desc')
-                    ->limit(5)
-                    ->get()
-            ];
-
-            return response()->json([
-                'success' => true,
-                'data' => $stats,
-                'message' => 'Statistiques des ressources récupérées avec succès'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de la récupération des statistiques',
-                'error' => $e->getMessage()
-            ], 500);
+            return redirect()->back()
+                ->with('error', 'Erreur lors du téléchargement du fichier.');
         }
     }
 }

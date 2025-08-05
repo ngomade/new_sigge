@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use App\Models\notes\Inscription;
@@ -15,6 +14,8 @@ class Anneescolaire extends Model
 
 	protected $casts = [
 		'code_annee' => 'int',
+		'debut_annee' => 'date',
+		'fin_annee' => 'date',
 	];
 
 	protected $fillable = [
@@ -33,3 +34,4 @@ class Anneescolaire extends Model
 		return $this->hasMany(SessionExamen::class, 'code_annee');
 	}
 }
+
