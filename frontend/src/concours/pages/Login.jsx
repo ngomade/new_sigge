@@ -31,6 +31,7 @@ function LoginPage() {
                     localStorage.setItem('user', JSON.stringify(user))
                     localStorage.setItem('user_type', user_type)
                     if (user_type === 'candidat') {
+                        console.log(candidat)
                         localStorage.setItem("candidat", candidat)
                         window.location.href = location.state?.from?.pathname || '/success'
                         // return navigate('/success')

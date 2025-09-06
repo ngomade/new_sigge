@@ -6,7 +6,7 @@ import PersonnalInfo from './stepModal/PersonnalInfo';
 import AcademiqueInfo from './stepModal/AcademiqueInfo';
 import ConcourInfo from './stepModal/ConcourInfo';
 import OtherInfo from './stepModal/OtherInfo';
-import Confirmation from './stepModal/Confirmation';
+import Confirmation from './stepItem/Confirmation';
 import Modal from './Modal';
 import { useNavigate } from 'react-router-dom';
 import { driver } from 'driver.js';

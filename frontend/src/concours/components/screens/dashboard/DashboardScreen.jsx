@@ -19,6 +19,7 @@ function Dashboard() {
       })
       .then((data) => {
         setData(data);
+        console.log(data.candidats[1].filiere_code === data.filiere[0].code_filiere)
         setLoading(false);
       })
       .catch((error) => {
@@ -44,11 +45,11 @@ function Dashboard() {
      <div className='grid items-top grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5'>
      <div className="flex flex-col items-center justify-center  rounded-3xl mr-5 border-2 border-gray-300 p-1">
         <div className="text-lg text-gray-700 mb-2">Nombre Total de Candidat </div>
-        <div>
+        <div className='items-center'>
           <div className='text-2xl shadow-green-800 font-bold text-green-800'>{data['total']}</div>
         </div>
       </div>
-      <div className='col-span-2'>
+      <div className='col-span-4'>
           <div className="flex flex-col items-center justify-center flex-initial w-30  mr-5 border-2 border-gray-300 p-1">
             <div className="text-lg text-gray-700 mb-1">Candidat - ESTLC</div>
             <div>
@@ -81,7 +82,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
-      <div className='col-span-2'>
+      {/* <div className='col-span-2'>
           <div className="flex flex-col items-center justify-center flex-initial w-30  mr-5 border-2 border-gray-300 p-1">
             <div className="text-lg text-gray-700 mb-1">Candidat - ISLAPE</div>
             <div>
@@ -114,10 +115,49 @@ function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
     <hr />
     <div className='grid items-top grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-2 text-center mt-1 text-center'>
+      <div className='flex-initial items-center justify-center text-center'>
+        <h1 className='text-xl text-center text-gray-900 mb-5'>Répartition par Filière</h1>
+        <table className="text-center border-collapse border border-slate-400 min-w-full overflow-x-auto">
+        <thead className="text-xs text-gray-700 uppercase dark:text-gray-400">
+          <tr>
+            <th scope="col" className="px-3 py-3 border border-slate-300">N° </th>
+            <th scope="col" className="px-3 py-3 border border-slate-300">Filiere</th>
+            <th scope="col" className="px-3 py-3 border border-slate-300">F</th>
+            <th scope="col" className="px-3 py-3 border border-slate-300"> G</th>
+            <th scope="col" className="px-3 py-3 border border-slate-300">T</th>
+            <th scope="col" className="px-3 py-3 border border-slate-300">%</th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+            data.filiere.map((fil, k) => (
+              
+              <tr key={k} className="bg-white border dark:bg-gray-800 dark:border-gray-700 text-xs">
+                <td className="px-3 py-3 border border-slate-300" key={k}>{k+1}</td>
+                <td className="px-3 py-3 border border-slate-300 text-left"> {fil["label_filiere"]} </td>
+                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"] && candidat.ca_sexe ==="Féminin").length}</td>
+                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"] && candidat.ca_sexe ==="Masculin").length}</td>
+                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"]).length}</td>
+                <td className="px-3 py-3 border border-slate-300">{(data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"]).length/data['total']*100).toFixed(2)}</td>
+                
+              </tr>
+              
+            ))
+        }
+        <tr>
+          <td colSpan={2} className="px-3 py-3 border border-slate-300 font-bold text-xl">Total</td>
+          <td>{data['nb_f_estlc'] + data['nb_f_islape']}</td>
+          <td>{data['nb_g_estlc'] + data['nb_g_islape']}</td>
+          <td>{data['total']}</td>
+        </tr>
+        </tbody>
+      </table>
+      </div>
+      
       <div className='flex-initial items-center justify-center text-center'>
         <h1 className='text-xl text-center text-gray-900 mb-5'>Répartition par centre d'examen</h1>
         <table className="text-center border-collapse border border-slate-400 min-w-full overflow-x-auto">

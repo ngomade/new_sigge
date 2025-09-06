@@ -333,7 +333,8 @@ class CandidatControllerApi extends Controller
                 'centre_depot' => CentreDepot::all(),
                 'candidats' => $candidats,
                 'diplomes' => Diplome::all(),
-                'series' => Serie::all()
+                'series' => Serie::all(),
+                'filiere'=>Filiere::all()
             ];
 
             return response()->json($stats);

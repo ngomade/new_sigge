@@ -27,7 +27,6 @@ class Candidat extends Model
     protected $casts = [
         'id' => 'int',
         'code_site' => 'int',
-        'ca_date_naiss' => 'datetime',
     ];
 
     protected $fillable = [
@@ -113,5 +112,5 @@ class Candidat extends Model
             ->withPivot('pk_mail_candidat')
             ->withTimestamps();
     }
-    
+
 }
