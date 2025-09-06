@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\concours;
 
+use App\Http\Requests\concours\CandidatRequest;
 use App\Models\concours\Candidat;
 use App\Models\concours\SessionConcours;
 use DateTime;
@@ -52,13 +53,14 @@ class InscriptionController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(Request $request)
+    public function store(CandidatRequest $request)
     {
         try {
-        DB::beginTransaction();
+            $currentDate = new DateTime();
+            $request->merge(['id' => SessionConcours::where("annee", $currentDate->format("Y"))->first()->id]);
+            DB::beginTransaction();
             $ca_code = $this->generateId($request->cursus_code);
             $pictfile = $request->file('ca_photo');
-            $currentDate = new DateTime();
             $exist = Candidat::where('ca_telephone', $request->ca_telephone)
                     ->orWhere("ca_num_cni", $request->ca_num_cni)
                     ->count();
@@ -69,7 +71,6 @@ class InscriptionController extends Controller
                 'ca_handicap'   => $request->ca_handicap.$request->ca_handicap_pre,
                 'ca_photo'      => $ca_code.".".$pictfile->extension(),
                 'ca_pwd'        => Str::lower(Str::random(7)),
-                'id'            =>SessionConcours::where("annee", $currentDate->format("Y"))->first()->id,
                 'ca_nationalite'=>$pays
             ]));
             $image_extension = ["png", "jpg"];

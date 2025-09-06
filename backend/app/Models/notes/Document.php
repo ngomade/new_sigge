@@ -4,7 +4,7 @@
 namespace App\Models\notes;
 
 use App\Models\Bureau;
-use App\Models\SessionExaman;
+use App\Models\notes\SessionExamen;
 use Illuminate\Database\Eloquent\Model;
 
 class Document extends Model
@@ -26,7 +26,7 @@ class Document extends Model
 		return $this->belongsTo(Bureau::class, 'code_bureau');
 	}
 
-	public function session_examan()
+	public function sessionExamen()
 	{
 		return $this->belongsTo(SessionExamen::class, 'code_session');
 	}
