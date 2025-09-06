@@ -138,7 +138,7 @@ function Dashboard() {
               
               <tr key={k} className="bg-white border dark:bg-gray-800 dark:border-gray-700 text-xs">
                 <td className="px-3 py-3 border border-slate-300" key={k}>{k+1}</td>
-                <td className="px-3 py-3 border border-slate-300 text-left">{fil["code_filiere"]} {fil["label_filiere"]} </td>
+                <td className="px-3 py-3 border border-slate-300 text-left">{fil["code_filiere"]} - {fil["label_filiere"]} </td>
                 <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"] && candidat.ca_sexe ==="Féminin").length}</td>
                 <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"] && candidat.ca_sexe ==="Masculin").length}</td>
                 <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>candidat.filiere_code === fil["code_filiere"]).length}</td>
