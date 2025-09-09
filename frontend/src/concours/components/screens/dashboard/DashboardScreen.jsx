@@ -178,7 +178,7 @@ function Dashboard() {
               <tr key={k} className="bg-white border dark:bg-gray-800 dark:border-gray-700 text-xs">
                 <td className="px-3 py-3 border border-slate-300" key={k}>{k+1}</td>
                 <td className="px-3 py-3 border border-slate-300 text-left">{sE["centre_exam_label"]}</td>
-                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>parseInt(candidat.ca_centre_examen) === sE["centre_exam_code"] && candidat.ca_sexe ==="Féminin").length}</td>
+                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>parseInt(candidat.ca_centre_examen) === sE["centre_exam_code"] && candidat.ca_sexe ==="Feminin").length}</td>
                 <td className="px-3 py-3 border border-slate-300">{data["candidats"].filter(candidat=>parseInt(candidat.ca_centre_examen) === sE['centre_exam_code'] && candidat.ca_sexe ==="Masculin").length}</td>
                 <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>parseInt(candidat.ca_centre_examen) === sE["centre_exam_code"]).length}</td>
                 <td className="px-3 py-3 border border-slate-300">{(data.candidats.filter(candidat=>parseInt(candidat.ca_centre_examen) === sE["centre_exam_code"]).length/data['total']*100).toFixed(2)}</td>
@@ -217,7 +217,7 @@ function Dashboard() {
               <tr key={k} className="bg-white border dark:bg-gray-800 dark:border-gray-700 text-xs">
                 <td className="px-3 py-3 border border-slate-300" key={k}>{k+1}</td>
                 <td className="px-3 py-3 border border-slate-300 text-left">{sE["centre_depot_label"]}</td>
-                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>parseInt(candidat.ca_centre_depot) === sE["centre_depot_code"] && candidat.ca_sexe ==="Féminin").length}</td>
+                <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>parseInt(candidat.ca_centre_depot) === sE["centre_depot_code"] && candidat.ca_sexe ==="Feminin").length}</td>
                 <td className="px-3 py-3 border border-slate-300">{data["candidats"].filter(candidat=>parseInt(candidat.ca_centre_depot) === sE['centre_depot_code'] && candidat.ca_sexe ==="Masculin").length}</td>
                 <td className="px-3 py-3 border border-slate-300">{data.candidats.filter(candidat=>parseInt(candidat.ca_centre_depot) === sE["centre_depot_code"]).length}</td>
                 <td className="px-3 py-3 border border-slate-300">{(data.candidats.filter(candidat=>parseInt(candidat.ca_centre_depot) === sE["centre_depot_code"]).length/data['total']*100).toFixed(2)}</td>
