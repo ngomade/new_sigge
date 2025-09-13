@@ -255,8 +255,8 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                             className="p-2 border border-teal-600 rounded-md outline-none focus:ring focus:ring-teal-600/50 indent-1"
                             onChange={onChange}
                             value={formData.ca_num_recu || ''}
-                            maxLength={6}
-                            minLength={6}
+                            // maxLength={6}
+                            // minLength={6}
                         />
                     </div>
                     <div className="flex flex-col gap-3 mb-3">

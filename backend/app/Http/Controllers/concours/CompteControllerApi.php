@@ -78,7 +78,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
     {
         try {
             $validateData = $request->validate([
-                'ca_num_recu' => 'required|string|unique:compte,ca_num_recu|min:6|max:6',
+                'ca_num_recu' => 'required|string|unique:compte,ca_num_recu',
                 'ca_code' => 'nullable|string|exists:candidat,ca_code',
                 'ca_pwd' => 'required|string|min:8',
                 'ca_recu' => 'required|file|max:2048|mimes:pdf,jpg,png,jpeg',
