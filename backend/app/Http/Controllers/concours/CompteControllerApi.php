@@ -81,7 +81,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 'ca_num_recu' => 'required|string|unique:compte,ca_num_recu',
                 'ca_code' => 'nullable|string|exists:candidat,ca_code',
                 'ca_pwd' => 'required|string|min:8',
-                'ca_recu' => 'required|file|max:2048|mimes:pdf,jpg,png,jpeg',
+                'ca_recu' => 'required|file|max:4048|mimes:pdf,jpg,png,jpeg',
                 'ca_nom' => 'required|string|max:255',
                 'ca_email' => 'nullable|email|max:255',
                 'ca_prenom' => 'required|string|max:255',

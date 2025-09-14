@@ -152,7 +152,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
             setSelectedFile(file);
 
             // Lancer automatiquement l'extraction OCR
-            await extractDataWithOCR(file);
+            //await extractDataWithOCR(file);
         } catch (error) {
             console.error(error);
         }
@@ -302,9 +302,9 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
                         <button
                             type="submit"
                             className="w-1/2 p-2 text-white bg-teal-600 rounded-md"
-                            disabled={isSubmitting || isExtracting}
+                            disabled={isSubmitting }
                         >
-                            {isSubmitting ? "Verification du recu..." : "Soumettre"}
+                            Soumettre
                         </button>
                     </div>
                 </form>
