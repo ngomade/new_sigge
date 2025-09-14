@@ -66,7 +66,7 @@ class CandidatControllerApi extends Controller
         } catch (Throwable $th) {
             DB::rollBack();
             Log::error('Error creating candidat: ' . $th->getMessage());
-            return response()->json(['erreur' => 'Erreur lors de l\'enregistrement du candidat'], 500);
+            return response()->json(['erreur' => 'Erreur lors de l\'enregistrement du candidat'.$th->getMessage()], 500);
         }
     }
 
