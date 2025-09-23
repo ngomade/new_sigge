@@ -1,16 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Labo\LaboratoireController;
-use App\Http\Controllers\Labo\ProjetLaboController;
-use App\Http\Controllers\Labo\PersLabController;
-use App\Http\Controllers\Labo\EquipementsController;
-use App\Http\Controllers\Labo\PublicationController;
-use App\Http\Controllers\Labo\UserExterneController;
-use App\Http\Controllers\Labo\RoleLaboController;
-use App\Http\Controllers\Labo\PublicLaboratoireController;
-use App\Http\Controllers\Labo\CandidatureController;
-use App\Http\Controllers\Labo\AdminLaboratoireController;
+use App\Http\Controllers\labo\LaboratoireController;
+use App\Http\Controllers\labo\ProjetLaboController;
+use App\Http\Controllers\labo\PersLabController;
+use App\Http\Controllers\labo\EquipementsController;
+use App\Http\Controllers\labo\PublicationController;
+use App\Http\Controllers\labo\UserExterneController;
+use App\Http\Controllers\labo\RoleLaboController;
+use App\Http\Controllers\labo\PublicLaboratoireController;
+use App\Http\Controllers\labo\CandidatureController;
+use App\Http\Controllers\labo\AdminLaboratoireController;
 
 // Routes publiques pour les laboratoires
 Route::prefix('laboratoires')->name('laboratoires.')->group(function () {

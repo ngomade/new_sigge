@@ -102,7 +102,6 @@ class SessionconcourControllerApi extends Controller
         if (!$session) {
             return response()->json(['message' => 'Aucune session active'], 404);
         }
-
         return response()->json($session);
     }
 
