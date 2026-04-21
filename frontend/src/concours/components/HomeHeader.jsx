@@ -91,11 +91,11 @@ function HomeHeader() {
                             LA DATE LIMITE DE DOSSIER QUANT À ELLE EST PROROGÉE AU MERCREDI 16 OCTOBRE À 15H30. */}
                         </p>
                         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_estlc_premiere_annee_2025.pdf' target='_blank'
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_1ere_annee.pdf' target='_blank'
                             rel="noopener noreferrer">
                                 Première Année <IoDownload size={25} />
                             </a>
-                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_estlc_troisieme_annee_2025.pdf' target='_blank'
+                            <a className="px-4 py-3 rounded-lg bg-teal-500 flex items-center gap-3 text-white" href='/concours/arrete_3ieme_annee.pdf' target='_blank'
                             rel="noopener noreferrer">
                                 Troisième Année <IoDownload size={25} />
                             </a>

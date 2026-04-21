@@ -21,7 +21,7 @@ class CandidatRequest extends FormRequest
      * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
-    {
+    { 
         return [
             //'id' => 'integer|exists:session_concours,id',
             'filiere_code' => 'required|string|exists:filiere,code_filiere',
