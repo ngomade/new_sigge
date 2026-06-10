@@ -19,9 +19,9 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
     });
     const [showPassword, setPasswordShow] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isExtracting, setIsExtracting] = useState(false);
+    //const [isExtracting, setIsExtracting] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
-    const [ocrData, setOcrData] = useState(null);
+    //const [ocrData, setOcrData] = useState(null);
 
     const dispatch = useDispatch();
 
@@ -32,7 +32,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
         };
     }, []);
 
-    // Fonction pour extraire les données avec OCR
+    /* Fonction pour extraire les données avec OCR
     async function extractDataWithOCR(file) {
         setIsExtracting(true);
         const formData = new FormData();
@@ -74,7 +74,7 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
         } finally {
             setIsExtracting(false);
         }
-    }
+    }*/
 
     function onChange(e) {
         setFormData(prevData => ({
@@ -163,14 +163,14 @@ function PaymentInfo({onClose, isLoad, setLoadingState}) {
             <div className="flex-1">
                 <form onSubmit={onSubmit}>
                     {/* Afficher l'état de l'extraction OCR */}
-                    {isExtracting && (
+                    {(
                         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md flex items-center gap-2">
                             <Loader2 className="animate-spin text-blue-600" size={20} />
                             <span className="text-blue-700">Extraction des données en cours...</span>
                         </div>
                     )}
 
-                    {ocrData && (
+                    {(
                         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
                             <div className="flex items-center gap-2 mb-2">
                                 <ScanLine className="text-green-600" size={20} />

@@ -15,6 +15,7 @@ const AfficheDonnee = () => {
     const [boot, setBoot] = useState(false)
 
     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     function getCandidate() {
         try {
             getCandidateInfo(ca_store?.ca_code).then(res => {
@@ -45,7 +46,7 @@ const AfficheDonnee = () => {
 
     }, [boot, ca, downloadPdf, navigate]);
 
-    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     function downloadPdf() {
         const element = docRef.current;
         const opt = {
