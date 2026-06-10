@@ -15,7 +15,7 @@ function Compte() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('');
   const [ca_num_recu, setCaNumRecu] = useState('');
-  const [filter_false, setFilterFalse] = useState('');
+  //const [filter_false, setFilterFalse] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
 
@@ -50,13 +50,13 @@ function Compte() {
     compte.ca_email.toLowerCase().includes(filter.toLowerCase())) &&
     (compte.ca_code !== null)
     );
-    const candidatsFiltrerFalse = data.comptes.filter(compte =>
+    /*const candidatsFiltrerFalse = data.comptes.filter(compte =>
       ( compte.ca_code === null || compte.ca_num_recu.length !== 6) &&
       (compte.ca_num_recu.toLowerCase().includes(filter_false.toLowerCase()) ||
       compte.ca_nom.toLowerCase().includes(filter_false.toLowerCase()) ||
       compte.ca_prenom.toLowerCase().includes(filter_false.toLowerCase())||
       compte.ca_email.toLowerCase().includes(filter_false.toLowerCase()))
-      );
+      );*/
   function callShowRecu(ca_num_recu){
     showRecu(ca_num_recu).then(response => response.json())
     .then(data => {

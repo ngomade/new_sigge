@@ -3,7 +3,7 @@ import {LuFileDown, LuUserCheck} from 'react-icons/lu'
 import {Link} from 'react-router-dom'
 
 function SuccessPage() {
-    const ca_store = JSON.stringify(sessionStorage.getItem("user"))
+    //const ca_store = JSON.stringify(sessionStorage.getItem("user"))
     const candidat = localStorage.getItem('candidat');
     return (
         <div className='flex items-center py-12 justify-center flex-col'>

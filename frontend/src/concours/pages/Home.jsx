@@ -33,7 +33,7 @@ function Home() {
       fetchSessionConcours()
       dispatch(setCurrentSession(sessionConcours))
     }
-  }, [])
+  }, [dispatch, sessionConcours])
   
   return  (
     <div>

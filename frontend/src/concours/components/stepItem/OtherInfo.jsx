@@ -44,7 +44,7 @@ function OtherInfo({ setLoadingState }) {
             setLoadingState(false)
             fieldSet('#form_other_info', setFormData, {})
         };
-    }, []);
+    }, [setLoadingState, userData]);
 
     const dispatch = useDispatch();
 

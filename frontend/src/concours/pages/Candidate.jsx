@@ -37,7 +37,7 @@ function Candidate() {
       fetchSessionConcours()
       dispatch(setCurrentSession(sessionConcours))
     }
-  }, [])
+  }, [dispatch, sessionConcours])
 
   const steppers = [
     <PersonalInfo setLoadingState={setLoadingState} />,

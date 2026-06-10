@@ -8,11 +8,11 @@ import { toast } from 'react-toastify';
 
 function ConcourInfo({ onClose, isLoad, setLoadingState }) {
   const [formData, setFormData] = useState({});
-  const [centreDepot,setCentreDepot] = useState({})
+  /*const [centreDepot,setCentreDepot] = useState({})
   const [centreExamen,setCentreExamen] = useState({})
   function fetchCentreExamen(){
     
-  }
+  }*/
   React.useEffect(() => {
     fieldSet('#form_concours', setFormData, {})
     return () => {

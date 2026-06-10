@@ -41,7 +41,7 @@ function PersonnalInfo({ setLoadingState }) {
         return () => {
             setLoadingState(false);
         };
-    }, []);
+    }, [setLoadingState, user, userData]);
 
     function onChange(e) {
         setFormData(prevData => {

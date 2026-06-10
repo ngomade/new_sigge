@@ -14,6 +14,7 @@ const AfficheDonnee = () => {
     const navigate = useNavigate()
     const [boot, setBoot] = useState(false)
 
+    
     function getCandidate() {
         try {
             getCandidateInfo(ca_store?.ca_code).then(res => {
@@ -31,7 +32,7 @@ const AfficheDonnee = () => {
 
     useEffect(() => {
         getCandidate();
-    }, []);
+    }, [getCandidate]);
 
     useEffect(() => {
         if (boot && Object.keys(ca).length !== 0) {
@@ -42,8 +43,9 @@ const AfficheDonnee = () => {
             }
         }
 
-    }, [ca]);
+    }, [boot, ca, downloadPdf, navigate]);
 
+    
     function downloadPdf() {
         const element = docRef.current;
         const opt = {
@@ -78,7 +80,7 @@ const AfficheDonnee = () => {
                         <tr>
                             <td rowSpan="2" style={{width: '15%'}}>
                                 <img src={`/storage/app/public/cartes/${new Date().getFullYear()}/${ca.ca_photo}`}
-                                     alt="Photo du Candidat"/>
+                                     alt="description du Candidat"/>
                             </td>
                             <td colSpan="2" className="titre" style={{paddingBottom: 0}}>
                                 FICHE D'INSCRIPTION AU CONCOURS D'ENTREE à L'ESTLC SESSION {new Date().getFullYear()}

@@ -75,7 +75,7 @@ function ConcourInfo({setLoadingState}) {
             fetchSiteFormation();
             setLoadingState(false)
         };
-    }, []);
+    }, [setLoadingState, userData]);
 
     function onChange(e) {
         setFormData(prevData => {
@@ -154,7 +154,7 @@ function ConcourInfo({setLoadingState}) {
                                 onChange={function (e) {
                                     onChange(e)
                                     setTimeout(() => {
-                                        let siteFor = siteFormation.find(site => site.code_site == e.target.value)
+                                        let siteFor = siteFormation.find(site => site.code_site === e.target.value)
                                         siteFor != null ? onSiteCompoDescription(siteFor) : onSiteCompoDescription({})
                                     }, 50);
                                 }}>

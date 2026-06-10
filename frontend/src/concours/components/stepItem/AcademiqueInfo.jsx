@@ -74,7 +74,7 @@ function AcademiqueInfo({setLoadingState}) {
             fetchFiliere()
             setLoadingState(false)
         };
-    }, [])
+    }, [setLoadingState, userData]);
 
     function onChange(e) {
         setFormData(prevData => {
