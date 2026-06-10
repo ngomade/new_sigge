@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*', 'https://inscriptionestlcunv-ebolowa.vercel.app/', 'https://sigge.vercel.app/'],
+    'allowed_origins' => ['https://inscriptionestlcunv-ebolowa.vercel.app/', 'https://sigge.vercel.app/'],
 
     'allowed_origins_patterns' => [],
 
