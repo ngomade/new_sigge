@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://backend.estlc-unv-ebolowa.com/api/concours' : 'http://localhost:8000/api/concours';
+const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://backend.progsa2026.com/api/concours' : 'http://localhost:8000/api/concours';
 
 const getToken = () => localStorage.getItem('token');
 
