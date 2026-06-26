@@ -77,6 +77,7 @@ function AcademiqueInfo({setLoadingState}) {
         return () => {
             setLoadingState(false);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function onChange(e) {
