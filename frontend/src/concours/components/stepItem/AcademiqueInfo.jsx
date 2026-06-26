@@ -58,8 +58,12 @@ function AcademiqueInfo({setLoadingState}) {
         })
     }
 
+    const initialized = React.useRef(false);
+
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
+        if (initialized.current) return; // ← bloque les re-runs
+        initialized.current = true;
+
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -69,11 +73,11 @@ function AcademiqueInfo({setLoadingState}) {
             fieldSet('#form_aca', setFormData, {});
         }
         fetchFiliere();
+
         return () => {
-            setLoadingState(false); 
+            setLoadingState(false);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // ← tableau vide
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {
