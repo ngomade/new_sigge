@@ -34,7 +34,7 @@ function onSubmit(e) {
           }, 2000);
       } else {
           // Handle empty form error
-          toast.error("Veuillew remplir tous les champs...")
+          toast.error("Veuillez remplir tous les champs...")
       }
   } catch (error) {
       console.error(error);

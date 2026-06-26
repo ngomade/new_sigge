@@ -66,15 +66,14 @@ function AcademiqueInfo({setLoadingState}) {
         } else if (userData && Object.keys(userData).length > 0) {
             setFormData(userData);
         } else {
-            fieldSet('#form_aca', setFormData, {})
+            fieldSet('#form_aca', setFormData, {});
         }
-        fetchFiliere()
+        fetchFiliere();
         return () => {
-            fieldSet('#form_aca', setFormData, {})
-            fetchFiliere()
-            setLoadingState(false)
+            setLoadingState(false); 
         };
-    }, [setLoadingState, userData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // ← tableau vide
 
     function onChange(e) {
         setFormData(prevData => {
