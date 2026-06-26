@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Candidate from "../components/Candidate"
 import HomeHeader from "../components/HomeHeader"
 import Loading from "../components/stepModal/Loading"
@@ -10,7 +10,6 @@ function Home() {
     const [isLoad, setLoadingState] = useState(false)
     const [sessionConcours, setSessionCouncours] = useState(null) // ← null au lieu de {}
     const dispatch = useDispatch()
-    // eslint-disable-next-line no-undef
     const hasFetched = useRef(false) // ← garde-fou
 
     function fetchSessionConcours() {
