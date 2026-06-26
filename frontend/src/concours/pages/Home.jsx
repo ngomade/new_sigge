@@ -27,13 +27,15 @@ function Home() {
     }
   }
   useEffect(() => {
-    fetchSessionConcours()
-    dispatch(setCurrentSession(sessionConcours))
-    return () => {
       fetchSessionConcours()
-      dispatch(setCurrentSession(sessionConcours))
-    }
-  }, [dispatch, sessionConcours])
+  }, [])
+
+  // Dispatch séparé quand sessionConcours est disponible
+  useEffect(() => {
+      if (sessionConcours) {
+          dispatch(setCurrentSession(sessionConcours))
+      }
+  }, [sessionConcours, dispatch])
   
   return  (
     <div>

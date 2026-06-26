@@ -5,15 +5,13 @@
 
     RewriteEngine On
 
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+     # Handle Authorization Header
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    #RewriteCond %{HTTP:Authorization} .
+    #RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
-
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirect Trailing Slashes If Not A Folder..
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
@@ -22,4 +20,16 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+    php_value post_max_size 200M
+    php_value upload_max_filesize 200M
+    php_value memory_limit 300M
+    php_value max_execution_time 259200
+    php_value max_input_time 259200
+    php_value session.gc_maxlifetime 1200
+    <IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "https://inscriptionestlcunv-ebolowa.vercel.app"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, X-CSRF-TOKEN"
+    Header always set Access-Control-Allow-Credentials "true"
+</IfModule>
 </IfModule>
