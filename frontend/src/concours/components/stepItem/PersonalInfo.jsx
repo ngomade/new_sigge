@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { fieldSet, notEmpty } from '../../utils/validation';
 import data from '../../../data.json'
 import { useDispatch, useSelector } from "react-redux"
@@ -16,11 +16,15 @@ function PersonnalInfo({ setLoadingState }) {
     const totalSteps = useSelector((state) => state.stepper.totalSteps);
     const dispatch = useDispatch();
     const { finish, ...userData } = useSelector((state) => state.candidate.candidate_state);
+    const hasInitialized = useRef(false);
 
     const user = JSON.parse(localStorage.getItem("user"));
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
+        // Ne s'exécute qu'une fois au montage (voir explication dans AcademiqueInfo.jsx)
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
+
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -41,7 +45,8 @@ function PersonnalInfo({ setLoadingState }) {
         return () => {
             setLoadingState(false);
         };
-    }, [setLoadingState, user, userData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {

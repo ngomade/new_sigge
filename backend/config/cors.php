@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://inscriptionestlcunv-ebolowa.vercel.app'],
+    'allowed_origins' => ['https://inscriptionestlcunv-ebolowa.vercel.app', 'http://localhost:3000'],
 
     'allowed_origins_patterns' => [],
 

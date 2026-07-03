@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {LuArrowRight} from 'react-icons/lu';
 import {LuArrowLeft} from 'react-icons/lu';
 import {fieldSet, notEmpty} from '../../utils/validation';
@@ -18,6 +18,7 @@ function ConcourInfo({setLoadingState}) {
     const [centreExamen, setCentreExamen] = useState([])
     const [siteFormation, setSiteFormation] = useState([])
     const {finish, ...userData} = useSelector((state) => state.candidate.candidate_state)
+    const hasInitialized = useRef(false)
 
     function fetchCentreExamen() {
         getCentreExamen().then(async (res) => {
@@ -56,7 +57,12 @@ function ConcourInfo({setLoadingState}) {
     }
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
+        // Ne s'exécute qu'une fois au montage (voir explication dans AcademiqueInfo.jsx).
+        // La version précédente relançait aussi les 3 fetch dans le cleanup,
+        // doublant chaque appel réseau à chaque re-render.
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
+
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -69,13 +75,10 @@ function ConcourInfo({setLoadingState}) {
         fetchCentreExamen();
         fetchSiteFormation();
         return () => {
-            fieldSet('#form_concours', setFormData, {})
-            fetchCentreDepot();
-            fetchCentreExamen();
-            fetchSiteFormation();
             setLoadingState(false)
         };
-    }, [setLoadingState, userData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {

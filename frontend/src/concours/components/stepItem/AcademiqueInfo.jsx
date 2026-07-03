@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {LuArrowRight} from 'react-icons/lu';
 import {LuArrowLeft} from 'react-icons/lu';
 import {fieldSet, notEmpty} from '../../utils/validation';
@@ -19,6 +19,7 @@ function AcademiqueInfo({setLoadingState}) {
     const totalSteps = useSelector((state) => state.stepper.totalSteps);
     const [formData, setFormData] = useState({});
     const {finish, ...userData} = useSelector((state) => state.candidate.candidate_state)
+    const hasInitialized = useRef(false)
 
     function fetchFiliere() {
         getFiliere().then(async (res) => {
@@ -59,7 +60,13 @@ function AcademiqueInfo({setLoadingState}) {
     }
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
+        // Ne s'exécute qu'une fois au montage : `userData` est un nouvel objet
+        // à chaque rendu (spread de useSelector), donc l'inclure dans les deps
+        // provoquait une boucle infinie de re-render (setFormData -> re-render
+        // -> nouvelle référence userData -> effet relancé -> ...).
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
+
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -70,9 +77,10 @@ function AcademiqueInfo({setLoadingState}) {
         }
         fetchFiliere();
         return () => {
-            setLoadingState(false); 
+            setLoadingState(false);
         };
-    }, [setLoadingState, userData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {

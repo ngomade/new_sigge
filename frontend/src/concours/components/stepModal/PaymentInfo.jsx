@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux';
 import {push_candidate_info} from '../../app/modules/candidate';
 
 function PaymentInfo({onClose, isLoad, setLoadingState}) {
-    const [setImageObject] = useState("");
+    const [, setImageObject] = useState("");
     const [formData, setFormData] = useState({
         ca_nom: '',
         ca_prenom: '',

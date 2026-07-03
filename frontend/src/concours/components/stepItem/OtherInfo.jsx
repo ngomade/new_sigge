@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { fieldSet, notEmpty } from '../../utils/validation';
 import { LuArrowRight } from 'react-icons/lu';
 import { LuArrowLeft } from 'react-icons/lu';
@@ -12,6 +12,7 @@ function OtherInfo({ setLoadingState }) {
     const totalSteps = useSelector((state) => state.stepper.totalSteps);
     const [formData, setFormData] = useState({});
     const { finish, ...userData } = useSelector((state) => state.candidate.candidate_state);
+    const hasInitialized = useRef(false);
 
     function onChange(e) {
         setFormData(prevData => {
@@ -31,7 +32,10 @@ function OtherInfo({ setLoadingState }) {
     }
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
+        // Ne s'exécute qu'une fois au montage (voir explication dans AcademiqueInfo.jsx)
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
+
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -42,9 +46,9 @@ function OtherInfo({ setLoadingState }) {
         }
         return () => {
             setLoadingState(false)
-            fieldSet('#form_other_info', setFormData, {})
         };
-    }, [setLoadingState, userData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const dispatch = useDispatch();
 
