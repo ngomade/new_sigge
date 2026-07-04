@@ -56,7 +56,6 @@ function ConcourInfo({setLoadingState}) {
     }
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -68,14 +67,8 @@ function ConcourInfo({setLoadingState}) {
         fetchCentreDepot();
         fetchCentreExamen();
         fetchSiteFormation();
-        return () => {
-            fieldSet('#form_concours', setFormData, {})
-            fetchCentreDepot();
-            fetchCentreExamen();
-            fetchSiteFormation();
-            setLoadingState(false)
-        };
-    }, [setLoadingState, userData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {

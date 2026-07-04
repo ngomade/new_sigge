@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/concours/:path*",
+      "destination": "https://backend.estlc-unv-ebolowa.com/api/concours/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://backend.estlc-unv-ebolowa.com/api/:path*"
+    }
+  ]
+}

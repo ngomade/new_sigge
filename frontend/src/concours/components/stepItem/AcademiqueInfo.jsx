@@ -59,7 +59,6 @@ function AcademiqueInfo({setLoadingState}) {
     }
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -69,10 +68,8 @@ function AcademiqueInfo({setLoadingState}) {
             fieldSet('#form_aca', setFormData, {});
         }
         fetchFiliere();
-        return () => {
-            setLoadingState(false); 
-        };
-    }, [setLoadingState, userData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {

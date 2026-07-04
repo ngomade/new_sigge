@@ -31,7 +31,6 @@ function OtherInfo({ setLoadingState }) {
     }
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -40,11 +39,8 @@ function OtherInfo({ setLoadingState }) {
         } else {
             fieldSet('#form_other_info', setFormData, {})
         }
-        return () => {
-            setLoadingState(false)
-            fieldSet('#form_other_info', setFormData, {})
-        };
-    }, [setLoadingState, userData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const dispatch = useDispatch();
 

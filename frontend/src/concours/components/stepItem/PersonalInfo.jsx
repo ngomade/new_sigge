@@ -20,7 +20,6 @@ function PersonnalInfo({ setLoadingState }) {
     const user = JSON.parse(localStorage.getItem("user"));
 
     React.useEffect(() => {
-        // Initialisation depuis localStorage si dispo
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -38,10 +37,8 @@ function PersonnalInfo({ setLoadingState }) {
         } else {
             fieldSet('#form', setFormData, { ca_statut_mat: 'Célibataire', ca_handicap: "Non" });
         }
-        return () => {
-            setLoadingState(false);
-        };
-    }, [setLoadingState, user, userData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function onChange(e) {
         setFormData(prevData => {

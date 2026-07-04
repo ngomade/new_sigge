@@ -13,22 +13,18 @@ function Home() {
     const hasFetched = useRef(false) // ← garde-fou
 
     function fetchSessionConcours() {
-        try {
-            setLoadingState(true)
-            getSessionConcours().then(async function (res) {
+        setLoadingState(true)
+        getSessionConcours()
+            .then(async function (res) {
                 if (res.status === 200) {
                     const data = await res.json()
                     const {created_at, updated_at, ...session} = data
-                    setLoadingState(false)
                     sessionStorage.setItem("session", JSON.stringify(data))
                     setSessionCouncours(session ?? JSON.parse(sessionStorage.getItem('session')))
-                } else {
-                    setLoadingState(false)
                 }
             })
-        } catch (error) {
-            setLoadingState(false)
-        }
+            .catch(() => {})
+            .finally(() => setLoadingState(false))
     }
 
     // Fetch unique au montage

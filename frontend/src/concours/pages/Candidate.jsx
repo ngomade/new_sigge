@@ -24,15 +24,11 @@ function Candidate() {
         if (res.status === 200) {
           const data = await res.json()
           const { created_at, updated_at, ...session } = data
-          setLoadingState(false)
           setSessionCouncours(session)
-        } else {
-          setLoadingState(false)
         }
       })
-      .catch(() => {
-        setLoadingState(false)
-      })
+      .catch(() => {})
+      .finally(() => setLoadingState(false))
   }
 
   // Fetch une seule fois au montage
