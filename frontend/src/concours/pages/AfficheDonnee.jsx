@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import headerImg from '../img/header.png';
 import "./pdf.css"
@@ -9,61 +9,39 @@ import {useNavigate} from 'react-router-dom';
 const AfficheDonnee = () => {
     const {finish, ...candidate} = useSelector((state) => state.candidate.candidate_state);
     const [ca, setCandidate] = useState(candidate ?? {});
-    const caRef = useRef(ca);
     const docRef = useRef();
     const ca_store = JSON.parse(localStorage.getItem("candidat"));
     const navigate = useNavigate()
-    const [boot, setBoot] = useState(false)
+    const [ready, setReady] = useState(false)
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const getCandidate = useCallback(() => {
+    useEffect(() => {
         getCandidateInfo(ca_store?.ca_code).then(res => {
             if (res.status === 200) {
                 res.json().then(data => {
                     setCandidate(data);
-                    caRef.current = data;
+                    setReady(true);
                 });
-                setBoot(true)
             }
         }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        getCandidate();
-    }, [getCandidate]);
+        if (!ready) return;
+        if (Object.keys(ca).length === 0) return;
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const downloadPdf = useCallback(() => {
         const element = docRef.current;
-        const current = caRef.current;
         const opt = {
             margin: 0.2,
-            filename: 'Fiche_Inscription_' + current.ca_nom + '.pdf',
-            image: {
-                type: 'jpeg',
-                quality: 0.98,
-            },
-            html2canvas: {
-                scale: 2,
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'portrait',
-            },
+            filename: 'Fiche_Inscription_' + ca.ca_nom + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         };
-        return !!html2pdf().set(opt).from(element).save();
-    }, []);
-
-    useEffect(() => {
-        if (boot && Object.keys(ca).length !== 0) {
-            if (downloadPdf()) {
-                navigate('/success')
-            } else {
-                navigate('/candidate')
-            }
-        }
-    }, [boot, ca, downloadPdf, navigate]);
+        html2pdf().set(opt).from(element).save().then(() => {
+            navigate('/success');
+        });
+    }, [ready, ca, navigate]);
 
     return (
         <div>
