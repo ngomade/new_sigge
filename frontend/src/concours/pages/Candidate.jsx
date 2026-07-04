@@ -13,35 +13,38 @@ import { setCurrentSession } from '../app/modules/candidate'
 function Candidate() {
   const step = useSelector((state) => state.stepper.step);
   const [isLoad, setLoadingState] = useState(false)
+  const [sessionConcours, setSessionCouncours] = useState(null)
   const dispatch = useDispatch()
-  // Garde-fou : évite que l'effet ne se redéclenche à l'infini.
-  // Avant : l'effet dépendait de `sessionConcours`, qui était lui-même
-  // réécrit (nouvelle référence d'objet) à chaque appel réseau -> boucle
-  // infinie de requêtes vers l'API (cause probable des bannissements d'IP).
   const hasFetched = useRef(false)
 
-  useEffect(() => {
-    if (hasFetched.current) return
-    hasFetched.current = true
-
-    async function fetchSessionConcours() {
-      try {
-        setLoadingState(true)
-        const res = await getSessionConcours()
+  function fetchSessionConcours() {
+    setLoadingState(true)
+    getSessionConcours()
+      .then(async function (res) {
         if (res.status === 200) {
           const data = await res.json()
           const { created_at, updated_at, ...session } = data
-          dispatch(setCurrentSession(session))
+          setSessionCouncours(session)
         }
-      } catch (error) {
-        // Erreur réseau ou API : on n'affiche pas de session, mais on ne boucle pas
-      } finally {
-        setLoadingState(false)
-      }
-    }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingState(false))
+  }
 
+  // Fetch une seule fois au montage
+  useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
     fetchSessionConcours()
-  }, [dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Dispatch uniquement quand la session est disponible
+  useEffect(() => {
+    if (sessionConcours && Object.keys(sessionConcours).length > 0) {
+      dispatch(setCurrentSession(sessionConcours))
+    }
+  }, [sessionConcours, dispatch])
 
   const steppers = [
     <PersonalInfo setLoadingState={setLoadingState} />,

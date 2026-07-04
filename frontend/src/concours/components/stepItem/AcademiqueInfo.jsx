@@ -60,13 +60,6 @@ function AcademiqueInfo({setLoadingState}) {
     }
 
     React.useEffect(() => {
-        // Ne s'exécute qu'une fois au montage : `userData` est un nouvel objet
-        // à chaque rendu (spread de useSelector), donc l'inclure dans les deps
-        // provoquait une boucle infinie de re-render (setFormData -> re-render
-        // -> nouvelle référence userData -> effet relancé -> ...).
-        if (hasInitialized.current) return;
-        hasInitialized.current = true;
-
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -76,10 +69,7 @@ function AcademiqueInfo({setLoadingState}) {
             fieldSet('#form_aca', setFormData, {});
         }
         fetchFiliere();
-        return () => {
-            setLoadingState(false);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function onChange(e) {

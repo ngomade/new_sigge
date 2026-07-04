@@ -57,12 +57,6 @@ function ConcourInfo({setLoadingState}) {
     }
 
     React.useEffect(() => {
-        // Ne s'exécute qu'une fois au montage (voir explication dans AcademiqueInfo.jsx).
-        // La version précédente relançait aussi les 3 fetch dans le cleanup,
-        // doublant chaque appel réseau à chaque re-render.
-        if (hasInitialized.current) return;
-        hasInitialized.current = true;
-
         const localData = localStorage.getItem('candidate_step_data');
         if (localData) {
             setFormData(JSON.parse(localData));
@@ -74,10 +68,7 @@ function ConcourInfo({setLoadingState}) {
         fetchCentreDepot();
         fetchCentreExamen();
         fetchSiteFormation();
-        return () => {
-            setLoadingState(false)
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function onChange(e) {

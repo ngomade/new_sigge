@@ -39,9 +39,7 @@ function App() {
                             <Route index element={<LoginPage/>}/>
                         </Route>
                         <Route path="site-exam" element={<SiteExam/>} errorElement={<Page500/>}/>
-                        <Route path="candidate" element={<PrivateRoute/>}>
-                            <Route index element={<Candidate/>} errorElement={<Page500/>}/>
-                        </Route>
+                        <Route path="candidate" element={<Candidate/>} errorElement={<Page500/>}/>
                         <Route path="affiche-data" element={<PrivateRoute/>}>
                             <Route index element={<AfficheDonnee/>} errorElement={<Page500/>}/>
                         </Route>
