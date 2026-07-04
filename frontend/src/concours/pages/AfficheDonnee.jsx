@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import headerImg from '../img/header.png';
 import "./pdf.css"
@@ -9,49 +9,36 @@ import {useNavigate} from 'react-router-dom';
 const AfficheDonnee = () => {
     const {finish, ...candidate} = useSelector((state) => state.candidate.candidate_state);
     const [ca, setCandidate] = useState(candidate ?? {});
+    const caRef = useRef(ca);
     const docRef = useRef();
     const ca_store = JSON.parse(localStorage.getItem("candidat"));
     const navigate = useNavigate()
     const [boot, setBoot] = useState(false)
 
-    
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    function getCandidate() {
-        try {
-            getCandidateInfo(ca_store?.ca_code).then(res => {
-                if (res.status === 200) {
-                    res.json().then(data => setCandidate(data));
-                    setBoot(true)
-                } else {
-                    setBoot(false)
-                }
-            });
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    const getCandidate = useCallback(() => {
+        getCandidateInfo(ca_store?.ca_code).then(res => {
+            if (res.status === 200) {
+                res.json().then(data => {
+                    setCandidate(data);
+                    caRef.current = data;
+                });
+                setBoot(true)
+            }
+        }).catch(() => {});
+    }, []);
 
     useEffect(() => {
         getCandidate();
     }, [getCandidate]);
 
-    useEffect(() => {
-        if (boot && Object.keys(ca).length !== 0) {
-            if (downloadPdf()) {
-                navigate('/success')
-            } else {
-                navigate('/candidate')
-            }
-        }
-
-    }, [boot, ca, downloadPdf, navigate]);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    function downloadPdf() {
+    const downloadPdf = useCallback(() => {
         const element = docRef.current;
+        const current = caRef.current;
         const opt = {
             margin: 0.2,
-            filename: 'Fiche_Inscription_' + ca.ca_nom + '.pdf',
+            filename: 'Fiche_Inscription_' + current.ca_nom + '.pdf',
             image: {
                 type: 'jpeg',
                 quality: 0.98,
@@ -66,8 +53,17 @@ const AfficheDonnee = () => {
             },
         };
         return !!html2pdf().set(opt).from(element).save();
+    }, []);
 
-    }
+    useEffect(() => {
+        if (boot && Object.keys(ca).length !== 0) {
+            if (downloadPdf()) {
+                navigate('/success')
+            } else {
+                navigate('/candidate')
+            }
+        }
+    }, [boot, ca, downloadPdf, navigate]);
 
     return (
         <div>
@@ -132,10 +128,9 @@ const AfficheDonnee = () => {
                 </div>
                 <div className="info">
                     <h3 style={{marginTop: '-8px'}}><span>Informations Académique / Academic Informations</span></h3>
-                    <div className="item-info-3">Filière: <span style={{fontSize: '0.8em', marginTop: '5px'}}> {ca.filiere_code?.code_filiere}</span>
+                    <div className="item-info-3">Filière: <span style={{fontSize: '0.8em', marginTop: '5px'}}> {ca.filiere_code?.label_filiere || ca.filiere_code?.code_filiere}</span>
                     </div>
                     <div className="item-info-2">Diplôme
-                        {console.log(ca)}
                         d'admission: <span>{ca.ca_diplome_admission?.label_dip} {ca.ca_serie_diplome?.label_serie}</span>
                     </div>
                     <div className="item-info-4"
@@ -159,13 +154,13 @@ const AfficheDonnee = () => {
                     <h3 style={{marginTop: '-15px'}}>Documents Nécessaires / Necessary Documents</h3>
                     <ol style={{marginTop: '5px', listStyleType: 'circle'}}>
                         <br />
-                        <li>Une photocopie certifiée d'acte de naissance datant de moins de trois (3) mois;/ 
+                        <li>Une photocopie certifiée d'acte de naissance datant de moins de trois (3) mois;/
                             <span className="english">A certified true photocopy of the birth certificate issued within the last three (03) months;</span>
                         </li>
                         <li>Une photocopie certifiée conforme du diplôme/attestation requis;/ <span className="english">A certified true copy of the required diploma;</span>
                         </li>
                         <li>Un certificat médical délivré par un médecin fonctionnaire, datant de moins de trois (03)
-                            mois et certifiant que le candidat est apte à poursuivre des études supérieures;/ 
+                            mois et certifiant que le candidat est apte à poursuivre des études supérieures;/
                             <span className="english">A medical certificate issued within the last three (03) months by a state medical practitioner, and testifying that the candidate is fit for higher education;</span>
                         </li>
                         <li>Quatre (04) photos d'identité 4x4 du candidat;
@@ -174,7 +169,7 @@ const AfficheDonnee = () => {
                         <li>Un reçu de versement bancaire d'un montant de 20 000F pour les 1<sup>ière</sup> années  et de 25 000F pour les 3 <sup>ième</sup>  années; /
                             <span className="english">A bank deposit receipt of 20,000F for first-year students and 25,000F for third-year students.</span>
                         </li>
-                        <li>Une enveloppe A4 timbrée au tarif réglementaire et portant l'adresse exacte du candidat; / 
+                        <li>Une enveloppe A4 timbrée au tarif réglementaire et portant l'adresse exacte du candidat; /
                             <span className="english">A 21 x 29.7 size self-addressed envelope bearing a 400 CFA francs postal stamp</span>
                         </li>
                         <br />
