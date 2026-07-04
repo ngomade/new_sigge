@@ -2,56 +2,34 @@ import React, {useEffect, useRef, useState} from 'react';
 import headerImg from '../img/header.png';
 import "./pdf.css"
 import html2pdf from 'html2pdf.js';
+import {getCandidateInfo} from '../api/routes/candidate';
 import {useNavigate} from 'react-router-dom';
 import Loading from '../components/stepModal/Loading';
 
-const BASE_URL = process.env.NODE_ENV === 'production'
-    ? '/api/concours'
-    : 'http://localhost:8000/api/concours';
-
 const AfficheDonnee = () => {
     const [ca, setCa] = useState(null);
-    const [error, setError] = useState(null);
     const docRef = useRef();
+    const ca_store = JSON.parse(localStorage.getItem("candidat"));
     const navigate = useNavigate();
 
     useEffect(() => {
-        const candidat = JSON.parse(localStorage.getItem("candidat"));
-        const code = candidat?.ca_code;
-
-        if (!code) {
-            setError("Aucun code candidat trouvé");
-            return;
-        }
-
-        fetch(`${BASE_URL}/candidat/${code}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                "Accept": "application/json",
-            },
-            credentials: "include"
-        })
-            .then(res => {
-                console.log("API status:", res.status);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
+        getCandidateInfo(ca_store?.ca_code)
+            .then(res => res.ok ? res.json() : null)
             .then(data => {
-                console.log("API data:", data);
-                setCa(data);
+                if (data) setCa(data);
+                else navigate('/candidate');
             })
-            .catch(err => {
-                console.error("API error:", err);
-                setError(err.message);
-            });
+            .catch(() => navigate('/candidate'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         if (!ca) return;
-        if (!docRef.current) return;
 
         const timer = setTimeout(() => {
+            const element = docRef.current;
+            if (!element) return;
+
             html2pdf()
                 .set({
                     margin: 0.2,
@@ -60,15 +38,14 @@ const AfficheDonnee = () => {
                     html2canvas: { scale: 2, useCORS: true },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 })
-                .from(docRef.current)
+                .from(element)
                 .save()
                 .then(() => navigate('/success'));
-        }, 500);
+        }, 300);
 
         return () => clearTimeout(timer);
     }, [ca, navigate]);
 
-    if (error) return <div style={{padding: 40, textAlign: 'center', color: 'red'}}><p>Erreur: {error}</p></div>;
     if (!ca) return <Loading />;
 
     return (
