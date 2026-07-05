@@ -12,7 +12,7 @@ function OtherInfo({ setLoadingState }) {
     const totalSteps = useSelector((state) => state.stepper.totalSteps);
     const [formData, setFormData] = useState({});
     const { finish, ...userData } = useSelector((state) => state.candidate.candidate_state);
-    const hasInitialized = useRef(false);
+    //const hasInitialized = useRef(false);
 
     function onChange(e) {
         setFormData(prevData => {
