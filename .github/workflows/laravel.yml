@@ -45,7 +45,7 @@ jobs:
           echo "✅ Dépendances installées."
 
       - name: "✨ Vérification Clean Code (Pint)"
-        working-directory: ./Backend
+        working-directory: ./backend
         run: |
           echo "🧐 Analyse du style de code avec Laravel Pint..."
           ./vendor/bin/pint --test
@@ -99,7 +99,7 @@ jobs:
           name: frontend-dist
           path: frontend/dist/
 
-  # --- PARTIE 3 : DOCKER HUB (Optionnel pour o2switch) ---
+  # --- PARTIE 3 : DOCKER HUB ---
   docker-hub:
     name: "🐳 Build & Push Docker"
     needs: laravel-tests
@@ -116,8 +116,8 @@ jobs:
       - name: "🚀 Build & Push"
         uses: docker/build-push-action@v5
         with:
-          context: ./Backend
-          file: ./Backend/Dockerfile
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/estlc-backend:latest
@@ -148,7 +148,6 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # On déploie directement dans les sous-dossiers du compte estlc
           local-dir: ./backend/
           server-dir: Backend_Code/
           exclude: |
@@ -171,6 +170,3 @@ jobs:
           echo "🔗 URL :https://estlc.cdwfs.net/"
           echo "🕒 Heure : $(date)"
           echo "🆔 Commit : ${{ github.sha }}"
-
-
-# 
