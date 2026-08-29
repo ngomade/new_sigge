@@ -30,7 +30,7 @@
 //             ->assertJsonStructure(['id', 'annee', 'debut', 'cloture']);
 //     }
 
-//     /** @test */
+//     /** @test **/
 //     public function can_get_active_session()
 //     {
 //         $activeSession = SessionConcours::factory()->create([
