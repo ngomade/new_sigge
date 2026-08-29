@@ -62,7 +62,7 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          echo "🏃 Lancement des tests unitaires et feature..
+          echo "🏃 Lancement des tests unitaires et feature..."
           php artisan test
           echo "✅ Tests terminés."
 
