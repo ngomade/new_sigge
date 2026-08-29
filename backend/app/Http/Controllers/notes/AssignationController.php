@@ -4,13 +4,13 @@ namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
 use App\Models\notes\Assignation;
-use App\Models\notes\Ec;
 use App\Models\notes\Classe;
+use App\Models\notes\Ec;
 use App\Models\Personnel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class AssignationController extends Controller
@@ -37,7 +37,7 @@ class AssignationController extends Controller
             }
 
             $assignations = $query->paginate(15);
-            
+
             // Données pour les filtres
             $classes = Classe::orderBy('label_class')->get();
             $personnels = Personnel::orderBy('nom_pers')->get();
@@ -46,9 +46,9 @@ class AssignationController extends Controller
             return view('sige_app.backend.assignation.assignation_index', compact('assignations', 'classes', 'personnels', 'ecs'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des assignations: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage des assignations: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
 
             return redirect()->back()
@@ -69,8 +69,8 @@ class AssignationController extends Controller
             return view('sige_app.backend.assignation.assignation_create', compact('classes', 'personnels', 'ecs'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de création d\'assignation: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage du formulaire de création d\'assignation: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('assignations.index')
@@ -114,6 +114,7 @@ class AssignationController extends Controller
 
             if ($existingAssignation) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Cette assignation existe déjà.')
                     ->withInput();
@@ -127,7 +128,7 @@ class AssignationController extends Controller
 
             // Récupérer le semestre de l'EC à assigner
             $newEc = Ec::with('ue.semestre')->findOrFail($request->code_ec);
-            
+
             foreach ($conflictingAssignations as $assignation) {
                 if ($assignation->ec->ue->semestre->code_sem === $newEc->ue->semestre->code_sem) {
                     // Permettre l'assignation dans le même semestre
@@ -146,7 +147,7 @@ class AssignationController extends Controller
             Log::info('Assignation créée avec succès', [
                 'assignation_id' => $assignation->code_ass,
                 'user_id' => auth()->id(),
-                'data' => $request->only(['code_ec', 'code_pers', 'code_class'])
+                'data' => $request->only(['code_ec', 'code_pers', 'code_class']),
             ]);
 
             return redirect()->route('assignations.index')
@@ -154,11 +155,11 @@ class AssignationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la création de l\'assignation: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la création de l\'assignation: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -177,7 +178,7 @@ class AssignationController extends Controller
                 'ec.ue.semestre',
                 'classe',
                 'personnel',
-                'ec.evaluations.examen.sessionExamen'
+                'ec.evaluations.examen.sessionExamen',
             ])->findOrFail($code_ass);
 
             // Statistiques pour cette assignation
@@ -193,9 +194,9 @@ class AssignationController extends Controller
             return view('sige_app.backend.assignation.assignation_show', compact('assignation', 'stats'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage de l\'assignation: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage de l\'assignation: '.$e->getMessage(), [
                 'assignation_id' => $code_ass,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('assignations.index')
@@ -210,7 +211,7 @@ class AssignationController extends Controller
     {
         try {
             $assignation = Assignation::with(['ec', 'classe', 'personnel'])->findOrFail($code_ass);
-            
+
             $classes = Classe::orderBy('label_class')->get();
             $personnels = Personnel::where('statut_pers', 1)->orderBy('nom_pers')->get();
             $ecs = Ec::with(['ue.semestre'])->orderBy('intitule_ec')->get();
@@ -218,9 +219,9 @@ class AssignationController extends Controller
             return view('sige_app.backend.assignation.assignation_edit', compact('assignation', 'classes', 'personnels', 'ecs'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification: '.$e->getMessage(), [
                 'assignation_id' => $code_ass,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('assignations.index')
@@ -266,6 +267,7 @@ class AssignationController extends Controller
 
             if ($existingAssignation) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Une assignation avec ces paramètres existe déjà.')
                     ->withInput();
@@ -286,7 +288,7 @@ class AssignationController extends Controller
                 'assignation_id' => $code_ass,
                 'user_id' => auth()->id(),
                 'old_data' => $oldData,
-                'new_data' => $request->only(['code_ec', 'code_pers', 'code_class'])
+                'new_data' => $request->only(['code_ec', 'code_pers', 'code_class']),
             ]);
 
             return redirect()->route('assignations.index')
@@ -294,12 +296,12 @@ class AssignationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la modification de l\'assignation: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la modification de l\'assignation: '.$e->getMessage(), [
                 'assignation_id' => $code_ass,
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -323,6 +325,7 @@ class AssignationController extends Controller
 
             if ($hasEvaluations) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Impossible de supprimer cette assignation car des évaluations y sont liées.');
             }
@@ -337,7 +340,7 @@ class AssignationController extends Controller
             Log::info('Assignation supprimée avec succès', [
                 'assignation_id' => $code_ass,
                 'user_id' => auth()->id(),
-                'deleted_data' => $assignationData
+                'deleted_data' => $assignationData,
             ]);
 
             return redirect()->route('assignations.index')
@@ -345,11 +348,11 @@ class AssignationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la suppression de l\'assignation: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la suppression de l\'assignation: '.$e->getMessage(), [
                 'assignation_id' => $code_ass,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -398,6 +401,7 @@ class AssignationController extends Controller
 
                     if ($exists) {
                         $duplicateCount++;
+
                         continue;
                     }
 
@@ -411,12 +415,12 @@ class AssignationController extends Controller
 
                 } catch (Throwable $e) {
                     $ec = Ec::find($code_ec);
-                    $errors[] = "Erreur pour l'EC " . ($ec ? $ec->intitule_ec : $code_ec);
-                    
-                    Log::error('Erreur lors de l\'assignation en masse pour EC: ' . $code_ec, [
+                    $errors[] = "Erreur pour l'EC ".($ec ? $ec->intitule_ec : $code_ec);
+
+                    Log::error('Erreur lors de l\'assignation en masse pour EC: '.$code_ec, [
                         'error' => $e->getMessage(),
                         'code_pers' => $request->code_pers,
-                        'code_class' => $request->code_class
+                        'code_class' => $request->code_class,
                     ]);
                 }
             }
@@ -428,7 +432,7 @@ class AssignationController extends Controller
                 $message .= ", {$duplicateCount} existait(ent) déjà";
             }
             if (count($errors) > 0) {
-                $message .= ", " . count($errors) . " erreur(s)";
+                $message .= ', '.count($errors).' erreur(s)';
             }
 
             Log::info('Assignation en masse effectuée', [
@@ -437,7 +441,7 @@ class AssignationController extends Controller
                 'code_class' => $request->code_class,
                 'success_count' => $successCount,
                 'duplicate_count' => $duplicateCount,
-                'error_count' => count($errors)
+                'error_count' => count($errors),
             ]);
 
             $alertType = count($errors) > 0 ? 'warning' : 'success';
@@ -447,11 +451,11 @@ class AssignationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de l\'assignation en masse: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de l\'assignation en masse: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -467,10 +471,10 @@ class AssignationController extends Controller
     {
         try {
             $classe = Classe::findOrFail($code_class);
-            
+
             // Récupérer les niveaux de la classe
             $niveaux = $classe->niveaux()->with('semestres.ues.ecs')->get();
-            
+
             $ecs = collect();
             foreach ($niveaux as $niveau) {
                 foreach ($niveau->semestres as $semestre) {
@@ -489,18 +493,18 @@ class AssignationController extends Controller
                         'ue_intitule' => $ec->ue->intitule_ue ?? '',
                         'semestre_label' => $ec->ue->semestre->label_sem ?? '',
                     ];
-                })
+                }),
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des EC par classe: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la récupération des EC par classe: '.$e->getMessage(), [
                 'code_class' => $code_class,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des EC'
+                'message' => 'Erreur lors de la récupération des EC',
             ], 500);
         }
     }
@@ -521,24 +525,24 @@ class AssignationController extends Controller
                         'ue_intitule' => $assignation->ec->ue->intitule_ue ?? '',
                         'semestre_label' => $assignation->ec->ue->semestre->label_sem ?? '',
                         'classe_label' => $assignation->classe->label_class,
-                        'created_at' => $assignation->created_at->format('d/m/Y')
+                        'created_at' => $assignation->created_at->format('d/m/Y'),
                     ];
                 });
 
             return response()->json([
                 'success' => true,
-                'assignations' => $assignations
+                'assignations' => $assignations,
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des assignations par personnel: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la récupération des assignations par personnel: '.$e->getMessage(), [
                 'code_pers' => $code_pers,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des assignations'
+                'message' => 'Erreur lors de la récupération des assignations',
             ], 500);
         }
     }

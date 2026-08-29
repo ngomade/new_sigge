@@ -19,12 +19,14 @@ class EcoleControllerApi extends Controller
     {
         //
         $ecole = Ecole::all();
-        //with(["candidat", "centre_depot", "centre_examen", 'ecole_element', 'site_composition'])->get();
+
+        // with(["candidat", "centre_depot", "centre_examen", 'ecole_element', 'site_composition'])->get();
         return response()->json($ecole);
     }
 
     /**
      * Store a newly created resource in storage.
+     *
      * @throws Throwable
      */
     public function store(Request $request)
@@ -40,16 +42,16 @@ class EcoleControllerApi extends Controller
             'bp_ecole' => 'required|string|max:128',
             'centre_depot' => 'required|exists:centre_depot,centre_depot_code',
             'sites_composition' => 'sometimes|array',
-            'sites_composition.*' => "required|exists:site_composition,code_site",
+            'sites_composition.*' => 'required|exists:site_composition,code_site',
             'dossier_element' => 'sometimes|array',
-            'dossier_element.*' => "required|exists:dossier,code_el",
+            'dossier_element.*' => 'required|exists:dossier,code_el',
             'candidat' => 'sometimes|array',
-            'candidat.*' => "required|exists:candidat,ca_code",
+            'candidat.*' => 'required|exists:candidat,ca_code',
         ]);
 
         try {
             DB::beginTransaction();
-            $validatedData["logo_ecole"] = $this->storageLogo($request, $validatedData["label_ecole"]);
+            $validatedData['logo_ecole'] = $this->storageLogo($request, $validatedData['label_ecole']);
 
             $res = Ecole::create($validatedData);
             if ($request->has('sites_composition')) {
@@ -57,10 +59,12 @@ class EcoleControllerApi extends Controller
             }
 
             DB::commit();
+
             return response()->json($res);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error creating ecole : ' . $th->getMessage());
+            Log::error('Error creating ecole : '.$th->getMessage());
+
             return response()->json(['error' => 'Erreur lors de l\'enregistrement de l\'ecole '], 500);
         }
     }
@@ -77,6 +81,7 @@ class EcoleControllerApi extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
      * @throws Throwable
      */
     public function update(Request $request, string $code_ecole)
@@ -92,11 +97,11 @@ class EcoleControllerApi extends Controller
             'bp_ecole' => 'sometimes|string|max:128',
             'centre_depot' => 'sometimes|exists:centre_depot,centre_depot_code',
             'sites_composition' => 'sometimes|array',
-            'sites_composition.*' => "required|exists:site_composition,code_site",
+            'sites_composition.*' => 'required|exists:site_composition,code_site',
             'dossier_element' => 'sometimes|array',
-            'dossier_element.*' => "required|exists:dossier,code_el",
+            'dossier_element.*' => 'required|exists:dossier,code_el',
             'candidat' => 'sometimes|array',
-            'candidat.*' => "required|exists:candidat,ca_code",
+            'candidat.*' => 'required|exists:candidat,ca_code',
         ]);
         $ecole = Ecole::findOrfail($code_ecole);
         try {
@@ -104,7 +109,7 @@ class EcoleControllerApi extends Controller
 
             if ($request->hasFile('logo_ecole')) {
                 Storage::delete($ecole->logo_ecole);
-                $validatedData["logo_ecole"] = $this->storageLogo($request, $ecole->label_ecole);
+                $validatedData['logo_ecole'] = $this->storageLogo($request, $ecole->label_ecole);
             }
             $ecole->update($validatedData);
             if ($request->has('sites_composition')) {
@@ -116,17 +121,18 @@ class EcoleControllerApi extends Controller
 
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error updating ecole : ' . $th->getMessage());
+            Log::error('Error updating ecole : '.$th->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la mise a jour de l\'ecole'], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
+     *
      * @throws Throwable
      */
     public function destroy(string $code_ecole)
-
     {
         //
         $ecole = Ecole::findOrfail($code_ecole);
@@ -140,25 +146,22 @@ class EcoleControllerApi extends Controller
             }
             $ecole->delete();
             DB::commit();
+
             return response()->noContent();
 
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error deleting ecole : ' . $th->getMessage());
+            Log::error('Error deleting ecole : '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la suppression'], 500);
         }
     }
 
-    /**
-     * @param Request $request
-     * @param $label_ecole
-     * @return string
-     */
     private function storageLogo(Request $request, $label_ecole): string
     {
         $logo_ecole = $request->file('logo_ecole');
-        $filename = "logo_" . $label_ecole . "_" . now()->format("Y-m-d_H_i_s") . '.' . $logo_ecole->extension();
+        $filename = 'logo_'.$label_ecole.'_'.now()->format('Y-m-d_H_i_s').'.'.$logo_ecole->extension();
+
         return $logo_ecole->storeAs('logos', $filename);
     }
-
 }

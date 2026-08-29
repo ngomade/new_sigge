@@ -1,6 +1,7 @@
 <?php
 
 // DiplomeFactory.php
+
 namespace Database\Factories;
 
 use App\Models\Diplome;
@@ -22,11 +23,11 @@ class DiplomeFactory extends Factory
             'CAP',
             'BEP',
             'DEUG',
-            'DESS'
+            'DESS',
         ];
 
         return [
-            'label_dip' => $this->faker->randomElement($diplomes)
+            'label_dip' => $this->faker->randomElement($diplomes),
         ];
     }
 }

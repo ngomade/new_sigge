@@ -3,18 +3,20 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LaboratoireReportExport implements WithMultipleSheets, ShouldAutoSize
+class LaboratoireReportExport implements ShouldAutoSize, WithMultipleSheets
 {
     protected $laboratoire;
+
     protected $data;
+
     protected $type;
 
     public function __construct($laboratoire, $data, $type)
@@ -50,9 +52,10 @@ class LaboratoireReportExport implements WithMultipleSheets, ShouldAutoSize
     }
 }
 
-class GeneralReportSheet implements FromCollection, WithHeadings, WithTitle, WithStyles
+class GeneralReportSheet implements FromCollection, WithHeadings, WithStyles, WithTitle
 {
     protected $laboratoire;
+
     protected $data;
 
     public function __construct($laboratoire, $data)
@@ -92,9 +95,10 @@ class GeneralReportSheet implements FromCollection, WithHeadings, WithTitle, Wit
     }
 }
 
-class MembresReportSheet implements FromCollection, WithHeadings, WithMapping, WithTitle, WithStyles
+class MembresReportSheet implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     protected $laboratoire;
+
     protected $data;
 
     public function __construct($laboratoire, $data)
@@ -116,7 +120,7 @@ class MembresReportSheet implements FromCollection, WithHeadings, WithMapping, W
             'Rôle',
             'Date d\'affectation',
             'Date de fin',
-            'Statut'
+            'Statut',
         ];
     }
 
@@ -128,7 +132,7 @@ class MembresReportSheet implements FromCollection, WithHeadings, WithMapping, W
             $membre->roleLabo->nom_role ?? 'N/A',
             $membre->date_affectation,
             $membre->date_fin_affectation ?? 'En cours',
-            $membre->statut
+            $membre->statut,
         ];
     }
 
@@ -145,9 +149,10 @@ class MembresReportSheet implements FromCollection, WithHeadings, WithMapping, W
     }
 }
 
-class ProjetsReportSheet implements FromCollection, WithHeadings, WithMapping, WithTitle, WithStyles
+class ProjetsReportSheet implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     protected $laboratoire;
+
     protected $data;
 
     public function __construct($laboratoire, $data)
@@ -170,7 +175,7 @@ class ProjetsReportSheet implements FromCollection, WithHeadings, WithMapping, W
             'Date de fin',
             'Statut',
             'Budget',
-            'Nombre de participants'
+            'Nombre de participants',
         ];
     }
 
@@ -183,7 +188,7 @@ class ProjetsReportSheet implements FromCollection, WithHeadings, WithMapping, W
             $projet->fin_projet,
             $projet->statut_projet,
             $projet->budget ?? 'N/A',
-            $projet->participants->count()
+            $projet->participants->count(),
         ];
     }
 
@@ -200,9 +205,10 @@ class ProjetsReportSheet implements FromCollection, WithHeadings, WithMapping, W
     }
 }
 
-class EquipementsReportSheet implements FromCollection, WithHeadings, WithMapping, WithTitle, WithStyles
+class EquipementsReportSheet implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     protected $laboratoire;
+
     protected $data;
 
     public function __construct($laboratoire, $data)
@@ -226,7 +232,7 @@ class EquipementsReportSheet implements FromCollection, WithHeadings, WithMappin
             'Date d\'acquisition',
             'Prix d\'acquisition',
             'Nombre d\'entretiens',
-            'Nombre de réservations'
+            'Nombre de réservations',
         ];
     }
 
@@ -240,7 +246,7 @@ class EquipementsReportSheet implements FromCollection, WithHeadings, WithMappin
             $equipement->date_achat,
             $equipement->valeur ?? 'N/A',
             $equipement->entretiens->count(),
-            $equipement->reservations->count()
+            $equipement->reservations->count(),
         ];
     }
 
@@ -257,9 +263,10 @@ class EquipementsReportSheet implements FromCollection, WithHeadings, WithMappin
     }
 }
 
-class UtilisationsReportSheet implements FromCollection, WithHeadings, WithMapping, WithTitle, WithStyles
+class UtilisationsReportSheet implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     protected $laboratoire;
+
     protected $data;
 
     public function __construct($laboratoire, $data)
@@ -282,7 +289,7 @@ class UtilisationsReportSheet implements FromCollection, WithHeadings, WithMappi
             'Date de fin',
             'Durée (heures)',
             'Statut',
-            'Motif'
+            'Motif',
         ];
     }
 
@@ -299,7 +306,7 @@ class UtilisationsReportSheet implements FromCollection, WithHeadings, WithMappi
             $reservation->fin_reserv,
             $duree,
             $reservation->statut,
-            $reservation->motif ?? 'N/A'
+            $reservation->motif ?? 'N/A',
         ];
     }
 

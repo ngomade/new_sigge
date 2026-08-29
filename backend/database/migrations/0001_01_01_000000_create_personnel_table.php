@@ -40,8 +40,6 @@ return new class extends Migration
             $table->string('arrond_pers', 128)->nullable();
             $table->text('bibliographie_pers')->nullable();
             $table->smallInteger('nb_enfant_pers')->nullable();
-            
-
 
             $table->timestamps();
         });

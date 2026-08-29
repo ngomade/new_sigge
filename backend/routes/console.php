@@ -9,4 +9,3 @@ Artisan::command('inspire', function () {
 
 // Programme de nettoyage des jetons Sanctum expirés
 \Illuminate\Support\Facades\Schedule::command('sanctum:prune-expired --hours=24')->daily();
-

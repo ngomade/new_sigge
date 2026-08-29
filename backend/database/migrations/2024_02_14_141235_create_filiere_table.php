@@ -12,8 +12,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('filiere', function (Blueprint $table) {
-            $table->string('code_filiere',20)->primary();
-            $table->string('code_bureau', 128)->constrained("bureau", "code_bureau");
+            $table->string('code_filiere', 20)->primary();
+            $table->string('code_bureau', 128)->constrained('bureau', 'code_bureau');
             $table->string('label_filiere');
             $table->text('desc_filiere')->nullable();
             $table->timestamps();

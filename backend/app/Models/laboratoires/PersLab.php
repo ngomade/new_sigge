@@ -7,18 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 class PersLab extends Model
 {
     protected $table = 'pers_lab';
+
     protected $primaryKey = 'id_pers_lab';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $fillable = [
-        'id_pers_lab', 'type_pers_lab', 'date_entree', 'date_sortie', 'statut'
+        'id_pers_lab', 'type_pers_lab', 'date_entree', 'date_sortie', 'statut',
     ];
 
     protected $casts = [
         'date_entree' => 'date',
         'date_sortie' => 'date',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     public function labos()
@@ -29,8 +33,8 @@ class PersLab extends Model
     public function laboratoires()
     {
         return $this->belongsToMany(Laboratoire::class, 'laboratoire_pers_lab', 'id_pers_lab', 'code_lab')
-                    ->withPivot('id_rl', 'date_affectation', 'date_fin_affectation', 'statut')
-                    ->withTimestamps();
+            ->withPivot('id_rl', 'date_affectation', 'date_fin_affectation', 'statut')
+            ->withTimestamps();
     }
 
     public function affectations()
@@ -78,14 +82,16 @@ class PersLab extends Model
     public function getNomCompletAttribute(): string
     {
         if ($this->type_pers_lab === 'personnel' && $this->personnel) {
-            return $this->personnel->nom_pers . ' ' . $this->personnel->prenom_pers;
+            return $this->personnel->nom_pers.' '.$this->personnel->prenom_pers;
         } elseif ($this->type_pers_lab === 'users' && $this->user) {
-            return $this->user->nom_user . ' ' . $this->user->prenom_user;
+            return $this->user->nom_user.' '.$this->user->prenom_user;
         } elseif ($this->type_pers_lab === 'user_externe') {
             // Pour les utilisateurs externes, on peut récupérer depuis UserExterne
             $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $this->id_pers_lab)->first();
-            return $userExterne ? $userExterne->nom_user_ext . ' ' . $userExterne->prenom_user_ext : 'N/A';
+
+            return $userExterne ? $userExterne->nom_user_ext.' '.$userExterne->prenom_user_ext : 'N/A';
         }
+
         return 'N/A';
     }
 
@@ -98,8 +104,10 @@ class PersLab extends Model
             return $this->user->nom_user;
         } elseif ($this->type_pers_lab === 'user_externe') {
             $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $this->id_pers_lab)->first();
+
             return $userExterne ? $userExterne->nom_user_ext : 'N/A';
         }
+
         return 'N/A';
     }
 
@@ -111,8 +119,10 @@ class PersLab extends Model
             return $this->user->prenom_user;
         } elseif ($this->type_pers_lab === 'user_externe') {
             $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $this->id_pers_lab)->first();
+
             return $userExterne ? $userExterne->prenom_user_ext : '';
         }
+
         return '';
     }
 
@@ -124,8 +134,10 @@ class PersLab extends Model
             return $this->user->email_user ?? null;
         } elseif ($this->type_pers_lab === 'user_externe') {
             $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $this->id_pers_lab)->first();
+
             return $userExterne?->email_user_ext;
         }
+
         return null;
     }
 
@@ -137,8 +149,10 @@ class PersLab extends Model
             return $this->user->first_phone_user ?? null;
         } elseif ($this->type_pers_lab === 'user_externe') {
             $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $this->id_pers_lab)->first();
+
             return $userExterne ? $userExterne->tel_user_ext : null;
         }
+
         return null;
     }
 
@@ -189,7 +203,7 @@ class PersLab extends Model
      */
     public function getTypeLabelAttribute()
     {
-        return match($this->type_pers_lab) {
+        return match ($this->type_pers_lab) {
             'personnel' => 'Personnel',
             'users' => 'Utilisateur',
             'user_externe' => 'Utilisateur externe',
@@ -202,7 +216,7 @@ class PersLab extends Model
      */
     public function getStatutBadgeAttribute()
     {
-        return match($this->statut) {
+        return match ($this->statut) {
             'actif' => 'success',
             'inactif' => 'danger',
             default => 'secondary'

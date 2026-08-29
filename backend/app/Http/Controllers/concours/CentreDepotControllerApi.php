@@ -16,6 +16,7 @@ class CentreDepotControllerApi extends Controller
     public function index()
     {
         $centre = CentreDepot::all();
+
         return response()->json($centre);
     }
 
@@ -25,17 +26,19 @@ class CentreDepotControllerApi extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            'centre_depot_label' => 'required|string|max:255'
+            'centre_depot_label' => 'required|string|max:255',
         ]);
         try {
             $res = CentreDepot::create($validateData);
+
             return response()->json([
                 'message' => 'centre de depot cree avec succes',
-                'data' => $res
+                'data' => $res,
             ]);
 
         } catch (Exception $e) {
-            Log::error('Error creating centre depot: ' . $e->getMessage());
+            Log::error('Error creating centre depot: '.$e->getMessage());
+
             return response()->json(['erreur ' => 'erreur lors de l\'enregistrement du centre'], 500);
         }
     }
@@ -46,6 +49,7 @@ class CentreDepotControllerApi extends Controller
     public function show(string $id)
     {
         $centre = CentreDepot::findOrfail($id);
+
         return response()->json($centre);
     }
 
@@ -55,15 +59,17 @@ class CentreDepotControllerApi extends Controller
     public function update(Request $request, string $centre_depot_code)
     {
         $validateData = $request->validate([
-            'centre_depot_label' => 'required|string|max:255'
+            'centre_depot_label' => 'required|string|max:255',
         ]);
         $centre = CentreDepot::findOrfail($centre_depot_code);
         try {
             $centre->update($validateData);
+
             return response()->json($centre);
 
         } catch (Exception $e) {
-            Log::error('Error updating centre depot: ' . $e->getMessage());
+            Log::error('Error updating centre depot: '.$e->getMessage());
+
             return response()->json(['error ' => 'erreur de la mise à jour du centre.'], 500);
         }
     }
@@ -76,9 +82,11 @@ class CentreDepotControllerApi extends Controller
         $centre = CentreDepot::findOrfail($centre_depot_code);
         try {
             $centre->delete();
+
             return response()->json(['message' => 'CentreDepot supprimé avec succès.']);
         } catch (Exception $e) {
-            Log::error('Error deleting centre depot: ' . $e->getMessage());
+            Log::error('Error deleting centre depot: '.$e->getMessage());
+
             return response()->json(['error' => 'Erreur de suppression.'], 500);
         }
     }

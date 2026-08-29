@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
-use App\Models\laboratoires\UserExterne;
 use App\Models\laboratoires\Laboratoire;
+use App\Models\laboratoires\UserExterne;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -38,6 +38,7 @@ class UserExterneController extends Controller
     public function create()
     {
         $laboratoires = Laboratoire::all();
+
         return view('laboratoires.admin.externes.create', compact('laboratoires'));
     }
 
@@ -56,7 +57,7 @@ class UserExterneController extends Controller
             'pwd' => 'required|min:6',
             'logo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'date_debut' => 'required|date',
-            'date_fin' => 'nullable|date|after:date_debut'
+            'date_fin' => 'nullable|date|after:date_debut',
         ]);
 
         $validated['pwd'] = Hash::make($validated['pwd']);
@@ -104,13 +105,13 @@ class UserExterneController extends Controller
             'code_lab' => 'required|exists:laboratoire,code_lab',
             'nom_user_ext' => 'required|max:100',
             'prenom_user_ext' => 'required|max:100',
-            'email_user_ext' => 'required|email|unique:user_externe,email_user_ext,' . $id . ',id_user_ext',
+            'email_user_ext' => 'required|email|unique:user_externe,email_user_ext,'.$id.',id_user_ext',
             'tel_user_ext' => 'required|max:20',
             'statut' => 'required|in:actif,inactif',
             'pwd' => 'nullable|min:6',
             'logo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'date_debut' => 'required|date',
-            'date_fin' => 'nullable|date|after:date_debut'
+            'date_fin' => 'nullable|date|after:date_debut',
         ]);
 
         if ($request->filled('pwd')) {

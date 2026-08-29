@@ -13,7 +13,7 @@ return new class extends Migration
     {
         // Table entretien_reparation
         Schema::table('entretien_reparation', function (Blueprint $table) {
-            if (!Schema::hasColumn('entretien_reparation', 'id_user_ext')) {
+            if (! Schema::hasColumn('entretien_reparation', 'id_user_ext')) {
                 $table->unsignedBigInteger('id_user_ext')->nullable()->after('id_pers_lab');
                 $table->foreign('id_user_ext')->references('id_user_ext')->on('user_externe')->onDelete('set null');
             }
@@ -22,7 +22,7 @@ return new class extends Migration
 
         // Table reservation_agent
         Schema::table('reservation_agent', function (Blueprint $table) {
-            if (!Schema::hasColumn('reservation_agent', 'id_user_ext')) {
+            if (! Schema::hasColumn('reservation_agent', 'id_user_ext')) {
                 $table->unsignedBigInteger('id_user_ext')->nullable()->after('id_pers_lab');
                 $table->foreign('id_user_ext')->references('id_user_ext')->on('user_externe')->onDelete('set null');
             }

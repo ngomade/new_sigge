@@ -4,7 +4,6 @@ namespace App\Models\laboratoires;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
 
 class EntretienReparation extends Model
 {
@@ -12,6 +11,7 @@ class EntretienReparation extends Model
 
     // Utiliser 'id' comme clé primaire
     protected $primaryKey = 'id';
+
     public $incrementing = true;
 
     protected $fillable = [
@@ -23,7 +23,7 @@ class EntretienReparation extends Model
         'fin_entretien',
         'type_entretien',
         'desc_entretien',
-        'cout'
+        'cout',
     ];
 
     protected $casts = [
@@ -31,7 +31,7 @@ class EntretienReparation extends Model
         'fin_entretien' => 'date',
         'cout' => 'decimal:2',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     // Relations
@@ -87,29 +87,31 @@ class EntretienReparation extends Model
                     'nom' => $pers->personnel->nom_pers ?? 'Non défini',
                     'email' => $pers->personnel->email_pers ?? 'Non défini',
                     'telephone' => $pers->personnel->first_phone_pers ?? 'Non défini',
-                    'type' => 'personnel'
+                    'type' => 'personnel',
                 ];
             } elseif ($pers->type_pers_lab === 'users' && $pers->user) {
                 return [
                     'nom' => $pers->user->nom_user ?? 'Non défini',
                     'email' => $pers->user->email_user ?? 'Non défini',
                     'telephone' => $pers->user->first_phone_user ?? 'Non défini',
-                    'type' => 'users'
+                    'type' => 'users',
                 ];
             } elseif ($pers->type_pers_lab === 'user_externe') {
                 $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $pers->id_pers_lab)->first();
+
                 return [
                     'nom' => $userExterne->nom_user_ext ?? 'Non défini',
                     'email' => $userExterne->email_user_ext ?? 'Non défini',
                     'telephone' => $userExterne->tel_user_ext ?? 'Non défini',
-                    'type' => 'user_externe'
+                    'type' => 'user_externe',
                 ];
             }
+
             return [
                 'nom' => 'Membre interne',
                 'email' => 'Non défini',
                 'telephone' => 'Non défini',
-                'type' => $pers->type_pers_lab ?? 'personnel'
+                'type' => $pers->type_pers_lab ?? 'personnel',
             ];
         }
         if ($this->id_user_ext && $this->userExterne) {
@@ -117,20 +119,21 @@ class EntretienReparation extends Model
                 'nom' => $this->userExterne->nom_user_ext ?? 'Non défini',
                 'email' => $this->userExterne->email_user_ext ?? 'Non défini',
                 'telephone' => $this->userExterne->tel_user_ext ?? 'Non défini',
-                'type' => 'externe'
+                'type' => 'externe',
             ];
         }
+
         return [
             'nom' => 'Non défini',
             'email' => 'Non défini',
             'telephone' => 'Non défini',
-            'type' => 'inconnu'
+            'type' => 'inconnu',
         ];
     }
 
     public function getStatutBadgeAttribute()
     {
-        return match($this->statut_entretien) {
+        return match ($this->statut_entretien) {
             'En cours' => 'warning',
             'Terminé' => 'success',
             'En pause' => 'info',
@@ -141,7 +144,7 @@ class EntretienReparation extends Model
 
     public function getTypeBadgeAttribute()
     {
-        return match($this->type_entretien) {
+        return match ($this->type_entretien) {
             'entretien' => 'primary',
             'reparation' => 'danger',
             default => 'secondary'
@@ -150,7 +153,7 @@ class EntretienReparation extends Model
 
     public function getTypeLabelAttribute()
     {
-        return match($this->type_entretien) {
+        return match ($this->type_entretien) {
             'entretien' => 'Entretien',
             'reparation' => 'Réparation',
             default => ucfirst($this->type_entretien)
@@ -172,7 +175,8 @@ class EntretienReparation extends Model
         if ($this->cout === null || $this->cout == 0) {
             return 'Non défini';
         }
-        return number_format($this->cout, 0, ',', ' ') . ' FCFA';
+
+        return number_format($this->cout, 0, ',', ' ').' FCFA';
     }
 
     // Méthodes
@@ -198,7 +202,7 @@ class EntretienReparation extends Model
 
     public function getDuree()
     {
-        if (!$this->debut_entretien || !$this->fin_entretien) {
+        if (! $this->debut_entretien || ! $this->fin_entretien) {
             return null;
         }
 
@@ -216,12 +220,12 @@ class EntretienReparation extends Model
             return '1 jour';
         }
 
-        return ($duree + 1) . ' jour' . ($duree > 0 ? 's' : '');
+        return ($duree + 1).' jour'.($duree > 0 ? 's' : '');
     }
 
     public function getJoursRestants()
     {
-        if (!$this->isEnCours() || !$this->fin_entretien) {
+        if (! $this->isEnCours() || ! $this->fin_entretien) {
             return null;
         }
 
@@ -238,9 +242,9 @@ class EntretienReparation extends Model
         if ($jours === 0) {
             return 'Se termine aujourd\'hui';
         } elseif ($jours < 0) {
-            return 'En retard de ' . abs($jours) . ' jour' . (abs($jours) > 1 ? 's' : '');
+            return 'En retard de '.abs($jours).' jour'.(abs($jours) > 1 ? 's' : '');
         }
 
-        return $jours . ' jour' . ($jours > 1 ? 's' : '') . ' restant' . ($jours > 1 ? 's' : '');
+        return $jours.' jour'.($jours > 1 ? 's' : '').' restant'.($jours > 1 ? 's' : '');
     }
 }

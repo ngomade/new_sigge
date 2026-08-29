@@ -2,21 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\laboratoires\Laboratoire;
-use App\Models\laboratoires\ProjetLabo;
-use App\Models\laboratoires\Equipements;
 use App\Models\laboratoires\EntretienReparation;
-use App\Models\laboratoires\ReservationEquipement;
-use App\Models\laboratoires\Publication;
-use App\Models\laboratoires\UserExterne;
-use App\Models\laboratoires\PersLab;
+use App\Models\laboratoires\Equipements;
+use App\Models\laboratoires\Laboratoire;
 use App\Models\laboratoires\LaboratoirePersLab;
+use App\Models\laboratoires\PersLab;
+use App\Models\laboratoires\ProjetLabo;
+use App\Models\laboratoires\Publication;
+use App\Models\laboratoires\ReservationEquipement;
 use App\Models\laboratoires\RoleLabo;
+use App\Models\laboratoires\UserExterne;
 use App\Models\Personnel;
 use App\Models\Users;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class LaboratoireDemoSeeder extends Seeder
 {
@@ -36,7 +35,7 @@ class LaboratoireDemoSeeder extends Seeder
             'tel_lab' => '+237 233 456 789',
             'adresse_lab' => 'Campus ESTLC, Bâtiment A, 2ème étage',
             'site_web' => 'https://labo-ia.estlc.cm',
-            'logo_path' => 'logos/labo-ia.png'
+            'logo_path' => 'logos/labo-ia.png',
         ]);
 
         // 2. Créer des rôles de laboratoire
@@ -64,7 +63,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'tel_pers' => '+237 233 111 111',
                 'login_pers' => 'mdubois',
                 'pwd_pers' => Hash::make('password123'),
-                'statut_pers' => 'actif'
+                'statut_pers' => 'actif',
             ],
             [
                 'code_pers' => 'PERS002',
@@ -74,7 +73,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'tel_pers' => '+237 233 222 222',
                 'login_pers' => 'jmartin',
                 'pwd_pers' => Hash::make('password123'),
-                'statut_pers' => 'actif'
+                'statut_pers' => 'actif',
             ],
             [
                 'code_pers' => 'PERS003',
@@ -84,8 +83,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'tel_pers' => '+237 233 333 333',
                 'login_pers' => 'sbernard',
                 'pwd_pers' => Hash::make('password123'),
-                'statut_pers' => 'actif'
-            ]
+                'statut_pers' => 'actif',
+            ],
         ];
 
         foreach ($personnels as $pers) {
@@ -102,7 +101,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'tel_user' => '+237 233 444 444',
                 'login_user' => 'tnguyen',
                 'pwd_user' => Hash::make('password123'),
-                'statut_user' => 'actif'
+                'statut_user' => 'actif',
             ],
             [
                 'code_user' => 'ETU002',
@@ -112,8 +111,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'tel_user' => '+237 233 555 555',
                 'login_user' => 'cgarcia',
                 'pwd_user' => Hash::make('password123'),
-                'statut_user' => 'actif'
-            ]
+                'statut_user' => 'actif',
+            ],
         ];
 
         foreach ($etudiants as $etu) {
@@ -131,7 +130,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'statut' => 'actif',
                 'pwd' => Hash::make('password123'),
                 'date_debut' => '2024-01-15',
-                'motivation_path' => 'motivations/smith_motivation.pdf'
+                'motivation_path' => 'motivations/smith_motivation.pdf',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -142,8 +141,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'statut' => 'actif',
                 'pwd' => Hash::make('password123'),
                 'date_debut' => '2024-02-01',
-                'motivation_path' => 'motivations/johnson_motivation.pdf'
-            ]
+                'motivation_path' => 'motivations/johnson_motivation.pdf',
+            ],
         ];
 
         foreach ($externes as $ext) {
@@ -192,7 +191,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'cout_acquisition' => 150000,
                 'etat_equip' => 'Fonctionnel',
                 'statut_equip' => 'Disponible',
-                'localisation_equip' => 'Salle serveurs A201'
+                'localisation_equip' => 'Salle serveurs A201',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -206,7 +205,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'cout_acquisition' => 25000,
                 'etat_equip' => 'Fonctionnel',
                 'statut_equip' => 'Disponible',
-                'localisation_equip' => 'Salle serveurs A201'
+                'localisation_equip' => 'Salle serveurs A201',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -220,7 +219,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'cout_acquisition' => 35000,
                 'etat_equip' => 'Fonctionnel',
                 'statut_equip' => 'Disponible',
-                'localisation_equip' => 'Salle robotique A205'
+                'localisation_equip' => 'Salle robotique A205',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -234,8 +233,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'cout_acquisition' => 500,
                 'etat_equip' => 'Fonctionnel',
                 'statut_equip' => 'Disponible',
-                'localisation_equip' => 'Salle vision A203'
-            ]
+                'localisation_equip' => 'Salle vision A203',
+            ],
         ];
 
         foreach ($equipements as $equip) {
@@ -255,7 +254,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'budget_projet' => 500000,
                 'statut_projet' => 'En cours',
                 'chef_projet' => 'Dr. Marie Dubois',
-                'partenaires_projet' => 'Hôpital Central, Université de Yaoundé'
+                'partenaires_projet' => 'Hôpital Central, Université de Yaoundé',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -268,7 +267,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'budget_projet' => 200000,
                 'statut_projet' => 'En cours',
                 'chef_projet' => 'Dr. Jean Martin',
-                'partenaires_projet' => 'Ministère de la Défense, Police Nationale'
+                'partenaires_projet' => 'Ministère de la Défense, Police Nationale',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -281,8 +280,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'budget_projet' => 150000,
                 'statut_projet' => 'En cours',
                 'chef_projet' => 'Dr. Sophie Bernard',
-                'partenaires_projet' => 'ENEO, Ministère de l\'Énergie'
-            ]
+                'partenaires_projet' => 'ENEO, Ministère de l\'Énergie',
+            ],
         ];
 
         foreach ($projets as $projet) {
@@ -300,7 +299,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'doi_pub' => '10.1109/TMI.2024.001234',
                 'type_pub' => 'Article scientifique',
                 'statut_pub' => 'Publié',
-                'fichier_pub' => 'publications/deep_learning_medical_2024.pdf'
+                'fichier_pub' => 'publications/deep_learning_medical_2024.pdf',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -311,7 +310,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'doi_pub' => '10.1016/j.cviu.2024.123456',
                 'type_pub' => 'Article scientifique',
                 'statut_pub' => 'Soumis',
-                'fichier_pub' => 'publications/face_recognition_2024.pdf'
+                'fichier_pub' => 'publications/face_recognition_2024.pdf',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -322,8 +321,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'doi_pub' => '10.1016/j.apenergy.2024.789012',
                 'type_pub' => 'Article scientifique',
                 'statut_pub' => 'En révision',
-                'fichier_pub' => 'publications/energy_optimization_2024.pdf'
-            ]
+                'fichier_pub' => 'publications/energy_optimization_2024.pdf',
+            ],
         ];
 
         foreach ($publications as $pub) {
@@ -340,7 +339,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'date_entretien' => '2024-06-15',
                 'cout_entretien' => 500,
                 'technicien_entretien' => 'Technicien ESTLC',
-                'statut_entretien' => 'Terminé'
+                'statut_entretien' => 'Terminé',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -350,8 +349,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'date_entretien' => '2024-07-01',
                 'cout_entretien' => 200,
                 'technicien_entretien' => 'Technicien ESTLC',
-                'statut_entretien' => 'En cours'
-            ]
+                'statut_entretien' => 'En cours',
+            ],
         ];
 
         foreach ($entretiens as $entretien) {
@@ -367,7 +366,7 @@ class LaboratoireDemoSeeder extends Seeder
                 'date_debut_reservation' => '2024-07-20 09:00:00',
                 'date_fin_reservation' => '2024-07-20 17:00:00',
                 'motif_reservation' => 'Entraînement modèle IA pour projet cancer',
-                'statut_reservation' => 'Confirmée'
+                'statut_reservation' => 'Confirmée',
             ],
             [
                 'code_lab' => 'LABO_IA_2024',
@@ -376,8 +375,8 @@ class LaboratoireDemoSeeder extends Seeder
                 'date_debut_reservation' => '2024-07-21 14:00:00',
                 'date_fin_reservation' => '2024-07-21 18:00:00',
                 'motif_reservation' => 'Tests de contrôle robotique',
-                'statut_reservation' => 'En attente'
-            ]
+                'statut_reservation' => 'En attente',
+            ],
         ];
 
         foreach ($reservations as $reservation) {

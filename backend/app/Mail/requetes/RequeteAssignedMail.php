@@ -2,9 +2,8 @@
 
 namespace App\Mail\requetes;
 
-
-use App\Models\requetes\Requete;
 use App\Models\Bureau;
+use App\Models\requetes\Requete;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -16,6 +15,7 @@ class RequeteAssignedMail extends Mailable
     use Queueable, SerializesModels;
 
     public $requete;
+
     public $bureau;
 
     public function __construct(Requete $requete, string $codeBureau)
@@ -27,11 +27,9 @@ class RequeteAssignedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Votre requête a été transférée - ' . $this->requete->code_requete,
+            subject: 'Votre requête a été transférée - '.$this->requete->code_requete,
         );
     }
-    
-
 
     public function content(): Content
     {
@@ -44,5 +42,3 @@ class RequeteAssignedMail extends Mailable
         );
     }
 }
-
-   

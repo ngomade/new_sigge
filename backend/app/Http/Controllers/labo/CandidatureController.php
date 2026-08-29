@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CandidatureApprovedMail;
+use App\Mail\ExterneConfirmationMail;
 use App\Models\laboratoires\Laboratoire;
-use App\Models\laboratoires\UserExterne;
-use App\Models\laboratoires\PersLab;
 use App\Models\laboratoires\LaboratoirePersLab;
+use App\Models\laboratoires\UserExterne;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use App\Mail\ExterneConfirmationMail;
-use App\Mail\ExternePasswordResetMail;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\CandidatureApprovedMail;
+use Illuminate\Support\Str;
 
 class CandidatureController extends Controller
 {
@@ -23,6 +21,7 @@ class CandidatureController extends Controller
     public function create($code_lab)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
         return view('laboratoires.public.candidature', compact('laboratoire'));
     }
 
@@ -37,7 +36,7 @@ class CandidatureController extends Controller
             'email_user_ext' => 'required|email|unique:user_externe,email_user_ext',
             'tel_user_ext' => 'required|string|max:20',
             'motivation_path' => 'required|file|mimes:pdf,doc,docx|max:2048',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
+            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
@@ -58,7 +57,7 @@ class CandidatureController extends Controller
                 'statut' => 'en_attente', // En attente de validation par l'admin
                 'pwd' => Hash::make(Str::random(12)), // Mot de passe temporaire
                 'date_debut' => now(),
-                'motivation_path' => $motivationPath
+                'motivation_path' => $motivationPath,
             ]);
 
             // Gérer le CV si fourni
@@ -77,24 +76,22 @@ class CandidatureController extends Controller
                 $emailSent = false;
                 $emailErrorMessage = $e->getMessage();
                 // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
-                \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: ' . $emailErrorMessage);
+                \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: '.$emailErrorMessage);
             }
 
             $successMessage = 'Utilisateur externe créé avec succès.';
             if ($emailSent) {
-                $successMessage .= ' Un email de confirmation avec le mot de passe a été envoyé à ' . $userExterne->email_user_ext;
+                $successMessage .= ' Un email de confirmation avec le mot de passe a été envoyé à '.$userExterne->email_user_ext;
             } else {
-                $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : ' . $emailErrorMessage;
+                $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : '.$emailErrorMessage;
             }
-
-
 
             return redirect()->route('laboratoires.show', $code_lab)
                 ->with('success', $successMessage);
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Erreur lors de la soumission de votre candidature : ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la soumission de votre candidature : '.$e->getMessage());
         }
     }
 
@@ -136,7 +133,7 @@ class CandidatureController extends Controller
             // Mettre à jour le statut et le mot de passe
             $candidature->update([
                 'statut' => 'actif',
-                'pwd' => Hash::make($tempPassword)
+                'pwd' => Hash::make($tempPassword),
             ]);
 
             // Récupérer l'id du rôle "membre"
@@ -152,7 +149,6 @@ class CandidatureController extends Controller
                 'id_rl' => $idRoleMembre,
             ]);
 
-
             // TODO: Envoyer un email avec les identifiants
             Mail::to($candidature->email_user_ext)->send(new CandidatureApprovedMail($candidature, $tempPassword));
 
@@ -160,7 +156,7 @@ class CandidatureController extends Controller
                 ->with('success', 'Candidature approuvée avec succès. Un email a été envoyé au candidat.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'approbation : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'approbation : '.$e->getMessage());
         }
     }
 
@@ -185,7 +181,7 @@ class CandidatureController extends Controller
                 ->with('success', 'Candidature rejetée avec succès. Un email a été envoyé au candidat.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors du rejet : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors du rejet : '.$e->getMessage());
         }
     }
 }

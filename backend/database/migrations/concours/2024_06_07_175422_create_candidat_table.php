@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('ca_lieu_naiss');
             $table->string('ca_statut_mat');
             $table->string('ca_adresse')->nullable();
-            $table->string('ca_telephone',180)->unique();
-            $table->string('ca_num_cni',180)->unique();
+            $table->string('ca_telephone', 180)->unique();
+            $table->string('ca_num_cni', 180)->unique();
             $table->string('ca_email');
             $table->string('ca_premiere_lang');
             $table->string('ca_nationalite');
@@ -39,9 +39,9 @@ return new class extends Migration
             $table->string('ca_centre_examen');
             $table->string('ca_centre_depot');
             $table->string('ca_nom_pere');
-            $table->string('ca_telephone_pere',180);
+            $table->string('ca_telephone_pere', 180);
             $table->string('ca_nom_mere');
-            $table->string('ca_telephone_mere',180);
+            $table->string('ca_telephone_mere', 180);
             $table->string('ca_handicap');
             $table->string('ca_email_pere')->nullable();
             $table->string('ca_deliv_cni');
@@ -51,7 +51,7 @@ return new class extends Migration
 
             $table->foreign('filiere_code')->references('code_filiere')->on('filiere')->onDelete('cascade');
             $table->foreign('code_site')->references('code_site')->on('site_etude')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreign('id')->references('id')->on('session_concours')->onDelete('restrict')->onUpdate("cascade");
+            $table->foreign('id')->references('id')->on('session_concours')->onDelete('restrict')->onUpdate('cascade');
         });
     }
 

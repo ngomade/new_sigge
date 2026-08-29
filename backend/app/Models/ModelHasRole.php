@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -10,19 +9,22 @@ use Thiagoprz\CompositeKey\HasCompositeKey;
 class ModelHasRole extends Model
 {
     use HasCompositeKey;
-	protected $table = 'model_has_roles';
+
+    protected $table = 'model_has_roles';
+
     protected $primaryKey = ['role_id', 'model_type', 'model_id'];
-	public $incrementing = false;
-	public $timestamps = false;
 
+    public $incrementing = false;
 
-	protected $casts = [
-		'role_id' => 'int',
-		'model_id' => 'int'
-	];
+    public $timestamps = false;
 
-	public function role(): BelongsTo
+    protected $casts = [
+        'role_id' => 'int',
+        'model_id' => 'int',
+    ];
+
+    public function role(): BelongsTo
     {
-		return $this->belongsTo(Role::class);
-	}
+        return $this->belongsTo(Role::class);
+    }
 }

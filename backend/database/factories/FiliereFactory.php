@@ -31,13 +31,13 @@ class FiliereFactory extends Factory
             'Génie des Communications',
             'Génie de la Sécurité',
             'Génie de la Gestion',
-            'Génie de la Maintenance'
+            'Génie de la Maintenance',
         ];
 
         return [
-            'code_filiere' => $this->faker->numerify("FIL#####"),
-            'filiere_label' =>  $this->faker->randomElement($filieres),
-            'filiere_description' => $this->faker->paragraph()
+            'code_filiere' => $this->faker->numerify('FIL#####'),
+            'filiere_label' => $this->faker->randomElement($filieres),
+            'filiere_description' => $this->faker->paragraph(),
         ];
     }
 }

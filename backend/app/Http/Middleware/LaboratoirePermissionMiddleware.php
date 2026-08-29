@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\laboratoires\LaboratoirePersLab;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\laboratoires\LaboratoirePersLab;
 
 class LaboratoirePermissionMiddleware
 {
@@ -13,7 +13,6 @@ class LaboratoirePermissionMiddleware
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  $permission
      */
     public function handle(Request $request, Closure $next, string $permission): Response
     {
@@ -24,7 +23,7 @@ class LaboratoirePermissionMiddleware
         // Récupérer l'affectation
         $affectation = $request->attributes->get('affectation');
 
-        if (!$affectation) {
+        if (! $affectation) {
             $query = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('statut', 'actif')
                 ->with('roleLabo');
@@ -38,11 +37,12 @@ class LaboratoirePermissionMiddleware
             $affectation = $query->first();
         }
 
-        if (!$affectation || !$affectation->roleLabo) {
-            if (!$code_lab) {
+        if (! $affectation || ! $affectation->roleLabo) {
+            if (! $code_lab) {
                 return redirect()->route('labo.laboratoires.index')
                     ->with('error', 'Vous n\'avez pas les permissions nécessaires.');
             }
+
             return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
                 ->with('error', 'Vous n\'avez pas les permissions nécessaires.');
         }
@@ -111,11 +111,12 @@ class LaboratoirePermissionMiddleware
         $userPermissions = $rolePermissions[$userRole] ?? [];
 
         // Vérifier si l'utilisateur a la permission
-        if (!in_array('*', $userPermissions) && !in_array($permission, $userPermissions)) {
-            if (!$code_lab) {
+        if (! in_array('*', $userPermissions) && ! in_array($permission, $userPermissions)) {
+            if (! $code_lab) {
                 return redirect()->route('labo.laboratoires.index')
                     ->with('error', 'Vous n\'avez pas la permission d\'effectuer cette action.');
             }
+
             return redirect()->route('laboratoires.espace.membre', ['code_lab' => $code_lab])
                 ->with('error', 'Vous n\'avez pas la permission d\'effectuer cette action.');
         }

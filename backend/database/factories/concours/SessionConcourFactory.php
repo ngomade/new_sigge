@@ -2,8 +2,8 @@
 
 namespace Database\Factories\concours;
 
-use App\Models\Personnel;
 use App\Models\concours\SessionConcours;
+use App\Models\Personnel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SessionConcourFactory extends Factory

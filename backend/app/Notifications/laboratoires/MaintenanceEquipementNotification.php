@@ -2,20 +2,22 @@
 
 namespace App\Notifications\laboratoires;
 
+use App\Models\laboratoires\Equipements;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\laboratoires\Equipements;
-use App\Models\laboratoires\LaboratoirePersLab;
 
 class MaintenanceEquipementNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public $equipement;
+
     public $typeMaintenance;
+
     public $dateMaintenance;
+
     public $type;
 
     /**
@@ -46,10 +48,10 @@ class MaintenanceEquipementNotification extends Notification implements ShouldQu
 
         return (new MailMessage)
             ->subject("[$urgence] Maintenance d'équipement - {$this->equipement->nom_equip}")
-            ->greeting("Bonjour " . ($notifiable->persLab->nom_pers_lab ?? 'Membre du laboratoire'))
+            ->greeting('Bonjour '.($notifiable->persLab->nom_pers_lab ?? 'Membre du laboratoire'))
             ->line("Une maintenance est prévue pour l'équipement **{$this->equipement->nom_equip}**.")
             ->line("**Type de maintenance :** {$this->typeMaintenance}")
-            ->line("**Date prévue :** " . \Carbon\Carbon::parse($this->dateMaintenance)->format('d/m/Y'))
+            ->line('**Date prévue :** '.\Carbon\Carbon::parse($this->dateMaintenance)->format('d/m/Y'))
             ->line("**Localisation :** {$this->equipement->localisation}")
             ->action('Voir l\'équipement', route('laboratoires.admin.equipements.show', [$this->equipement->code_lab, $this->equipement->code_equip]))
             ->line('Merci de planifier cette maintenance dans votre planning.')
@@ -68,7 +70,7 @@ class MaintenanceEquipementNotification extends Notification implements ShouldQu
             'type_maintenance' => $this->typeMaintenance,
             'date_maintenance' => $this->dateMaintenance,
             'urgence' => $this->type,
-            'message' => "Maintenance prévue pour '{$this->equipement->nom_equip}' le " . \Carbon\Carbon::parse($this->dateMaintenance)->format('d/m/Y'),
+            'message' => "Maintenance prévue pour '{$this->equipement->nom_equip}' le ".\Carbon\Carbon::parse($this->dateMaintenance)->format('d/m/Y'),
             'action_url' => route('laboratoires.admin.equipements.show', [$this->equipement->code_lab, $this->equipement->code_equip]),
             'laboratoire_code' => $this->equipement->code_lab,
         ];

@@ -1,24 +1,24 @@
 <?php
 
-
 namespace App\Models;
 
-use App\Models\Users;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
 class UsersDiplome extends Model
 {
     use HasFactory;
+
     protected $table = 'users_diplome';
+
     public $incrementing = false;
+
     public $timestamps = true;
 
     protected $casts = [
         'code_dip' => 'int',
-        'annee_dip' => 'datetime'
+        'annee_dip' => 'datetime',
     ];
 
     protected $fillable = [
@@ -27,7 +27,7 @@ class UsersDiplome extends Model
         'annee_dip',
         'institution_dip',
         'mention_dip',
-        'pays_dip'
+        'pays_dip',
     ];
 
     public function diplome(): BelongsTo

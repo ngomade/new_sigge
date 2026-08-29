@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('presentation', function (Blueprint $table) {
             $table->increments('code_pres');
             $table->string('code_bureau', 128);
-             $table->foreign('code_bureau')->references('code_bureau')->on('bureau')->onDelete('cascade');
+            $table->foreign('code_bureau')->references('code_bureau')->on('bureau')->onDelete('cascade');
             $table->string('photo_chef', 128);
             $table->text('message_chef', 2000);
             $table->text('cursus_ing', 2000)->nullable();

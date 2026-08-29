@@ -20,11 +20,13 @@ class PersonnelControllerApi extends Controller
     public function index()
     {
         $personnels = Personnel::all();
+
         return response()->json($personnels);
     }
 
     /**
      * Enregistre un nouveau personnel.
+     *
      * @throws Throwable
      */
     public function store(StorePersonnelRequest $request)
@@ -43,10 +45,12 @@ class PersonnelControllerApi extends Controller
             $personnel = Personnel::create($validatedData);
 
             DB::commit();
+
             return response()->json($personnel);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Erreur lors de la création du personnel : ' . $th->getMessage());
+            Log::error('Erreur lors de la création du personnel : '.$th->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la création du personnel'], 500);
         }
     }
@@ -57,11 +61,13 @@ class PersonnelControllerApi extends Controller
     public function show(string $id)
     {
         $personnel = Personnel::findOrFail($id);
+
         return response()->json($personnel);
     }
 
     /**
      * Met à jour un personnel existant.
+     *
      * @throws Throwable
      */
     public function update(UpdatePersonnelRequest $request, string $id)
@@ -86,16 +92,19 @@ class PersonnelControllerApi extends Controller
             $personnel->update($validatedData);
 
             DB::commit();
+
             return response()->json($personnel);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Erreur lors de la mise à jour du personnel : ' . $th->getMessage());
+            Log::error('Erreur lors de la mise à jour du personnel : '.$th->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la mise à jour du personnel'], 500);
         }
     }
 
     /**
      * Supprime un personnel.
+     *
      * @throws Throwable
      */
     public function destroy(string $id)
@@ -112,10 +121,12 @@ class PersonnelControllerApi extends Controller
             $personnel->delete();
 
             DB::commit();
+
             return response()->noContent();
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Erreur lors de la suppression du personnel : ' . $th->getMessage());
+            Log::error('Erreur lors de la suppression du personnel : '.$th->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la suppression du personnel'], 500);
         }
     }

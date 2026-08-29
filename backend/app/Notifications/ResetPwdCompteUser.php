@@ -38,7 +38,7 @@ class ResetPwdCompteUser extends Notification
     {
         return (new MailMessage)
             ->subject('Réinitialisation de votre mot de passe')
-            ->view("concours.reset_password_mail", [
+            ->view('concours.reset_password_mail', [
                 'code' => $this->code,
                 'user' => $notifiable,
             ]);
@@ -52,11 +52,12 @@ class ResetPwdCompteUser extends Notification
     public function toArray(object $notifiable): array
     {
         $email = $notifiable instanceof Compte ? $notifiable->ca_email : $notifiable->email_pers;
+
         return [
-            "code" => $this->code,
-            "message" => "Un code de réinitialisation a été envoyé à : " . $email,
-            "action" => "reset_password",
-            "type_user" => $notifiable instanceof Compte ? 'candidat' : 'personnel',
+            'code' => $this->code,
+            'message' => 'Un code de réinitialisation a été envoyé à : '.$email,
+            'action' => 'reset_password',
+            'type_user' => $notifiable instanceof Compte ? 'candidat' : 'personnel',
         ];
     }
 }

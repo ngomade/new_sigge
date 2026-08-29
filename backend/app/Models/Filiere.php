@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use App\Models\concours\Candidat;
@@ -8,20 +7,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-
 class Filiere extends Model
 {
     use HasFactory;
 
     protected $table = 'filiere';
+
     protected $primaryKey = 'code_filiere';
+
     public $incrementing = false;
 
     protected $fillable = [
         'code_filiere',
         'code_bureau',
         'label_filiere',
-        'desc_filiere'
+        'desc_filiere',
     ];
 
     public function candidats(): HasMany

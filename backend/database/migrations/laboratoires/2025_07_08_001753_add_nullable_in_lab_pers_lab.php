@@ -24,7 +24,8 @@ return new class extends Migration
             // Supprimer les index existants
             try {
                 $table->dropIndex(['statut']);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
 
             // Ajouter la colonne id auto-incrémentée en première position
             $table->bigIncrements('id')->first();
@@ -60,13 +61,16 @@ return new class extends Migration
             // Ensuite supprimer les index ajoutés
             try {
                 $table->dropIndex(['code_lab', 'id_pers_lab']);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
             try {
                 $table->dropIndex(['code_lab', 'id_user_externe']);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
             try {
                 $table->dropIndex(['statut']);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
 
             // Supprimer la colonne id auto-incrémentée
             $table->dropColumn('id');

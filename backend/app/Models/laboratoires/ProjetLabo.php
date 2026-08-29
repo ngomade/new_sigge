@@ -11,8 +11,11 @@ class ProjetLabo extends Model
     use HasFactory;
 
     protected $table = 'projet_labo';
+
     protected $primaryKey = 'code_projet';
+
     public $incrementing = true;
+
     public $timestamps = true;
 
     protected $fillable = [
@@ -22,7 +25,7 @@ class ProjetLabo extends Model
         'code_lab',
         'statut_projet',
         'debut_projet',
-        'fin_projet'
+        'fin_projet',
     ];
 
     public function laboratoire()

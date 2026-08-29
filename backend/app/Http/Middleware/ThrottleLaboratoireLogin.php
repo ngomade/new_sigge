@@ -4,9 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleLaboratoireLogin
 {
@@ -24,9 +24,9 @@ class ThrottleLaboratoireLogin
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             $minutes = ceil($seconds / 60);
-            
+
             return back()->withErrors([
-                'login' => "Trop de tentatives de connexion. Veuillez réessayer dans {$minutes} minutes."
+                'login' => "Trop de tentatives de connexion. Veuillez réessayer dans {$minutes} minutes.",
             ])->withInput($request->only('login'));
         }
 
@@ -48,6 +48,6 @@ class ThrottleLaboratoireLogin
      */
     protected function throttleKey(Request $request): string
     {
-        return Str::lower($request->input('login')) . '|' . $request->ip();
+        return Str::lower($request->input('login')).'|'.$request->ip();
     }
 }

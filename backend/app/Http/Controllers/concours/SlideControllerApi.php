@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\concours\Slide;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -16,6 +16,7 @@ class SlideControllerApi extends Controller
     public function index()
     {
         $slides = Slide::with('personnel')->get();
+
         return response()->json($slides);
     }
 
@@ -33,9 +34,11 @@ class SlideControllerApi extends Controller
 
         try {
             $slide = Slide::create($validateData);
+
             return response()->json($slide->load('personnel'));
         } catch (Throwable $th) {
-            Log::error('Error creating slide: ' . $th->getMessage());
+            Log::error('Error creating slide: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la création du slide'], 500);
         }
     }
@@ -46,6 +49,7 @@ class SlideControllerApi extends Controller
     public function show(string $id)
     {
         $slide = Slide::with('personnel')->findOrFail($id);
+
         return response()->json($slide);
     }
 
@@ -64,10 +68,12 @@ class SlideControllerApi extends Controller
         $slide = Slide::findOrFail($id);
         try {
             $slide->update($validateData);
+
             return response()->json($slide->load('personnel'));
         } catch (Throwable $th) {
-            Log::error('Error updating slide: ' . $th->getMessage());
-            return response()->json(['erreur' => 'Erreur lors de la mise à jour du slide: ' . $th->getMessage()], 500);
+            Log::error('Error updating slide: '.$th->getMessage());
+
+            return response()->json(['erreur' => 'Erreur lors de la mise à jour du slide: '.$th->getMessage()], 500);
         }
     }
 
@@ -79,10 +85,12 @@ class SlideControllerApi extends Controller
         $slide = Slide::findOrFail($id);
         try {
             $slide->delete();
+
             return response()->noContent();
         } catch (Throwable $th) {
-            Log::error('Error deleting slide: ' . $th->getMessage());
-            return response()->json(['erreur' => 'Erreur lors de la suppression du slide: ' . $th->getMessage()], 500);
+            Log::error('Error deleting slide: '.$th->getMessage());
+
+            return response()->json(['erreur' => 'Erreur lors de la suppression du slide: '.$th->getMessage()], 500);
         }
     }
 }

@@ -12,7 +12,7 @@ class PersonnelFactory extends Factory
     public function definition(): array
     {
         return [
-            'code_pers' => $this->faker->numerify("PERS#####"),
+            'code_pers' => $this->faker->numerify('PERS#####'),
             'nom_pers' => $this->faker->lastName,
             'prenom_pers' => $this->faker->firstName,
             'sexe_pers' => $this->faker->randomElement(['M', 'F']),

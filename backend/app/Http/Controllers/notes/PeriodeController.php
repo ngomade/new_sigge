@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
+use App\Models\notes\Ec;
 use App\Models\notes\Periode;
 use App\Models\notes\Salle;
-use App\Models\notes\Ec;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class PeriodeController extends Controller
@@ -35,12 +35,12 @@ class PeriodeController extends Controller
             if ($request->filled('date_debut') && $request->filled('date_fin')) {
                 $query->whereBetween('debut_periode', [
                     $request->date_debut,
-                    $request->date_fin
+                    $request->date_fin,
                 ]);
             }
 
             // Vue par défaut : semaine courante
-            if (!$request->filled('date_debut') && !$request->filled('date_fin')) {
+            if (! $request->filled('date_debut') && ! $request->filled('date_fin')) {
                 $startOfWeek = now()->startOfWeek();
                 $endOfWeek = now()->endOfWeek();
                 $query->whereBetween('debut_periode', [$startOfWeek, $endOfWeek]);
@@ -55,7 +55,7 @@ class PeriodeController extends Controller
             // Préparer les données pour le calendrier
             $evenements = $periodes->map(function ($periode) {
                 return [
-                    'id' => $periode->code_salle . '-' . $periode->code_ec,
+                    'id' => $periode->code_salle.'-'.$periode->code_ec,
                     'title' => $periode->ec->intitule_ec ?? 'EC Inconnu',
                     'start' => $periode->debut_periode,
                     'end' => $periode->fin_periode,
@@ -67,8 +67,8 @@ class PeriodeController extends Controller
                         'ue' => $periode->ec->ue->intitule_ue ?? '',
                         'semestre' => $periode->ec->ue->semestre->label_sem ?? '',
                         'duree' => $periode->duree_periode,
-                        'capacite' => $periode->salle->nb_place_salle ?? 0
-                    ]
+                        'capacite' => $periode->salle->nb_place_salle ?? 0,
+                    ],
                 ];
             });
 
@@ -80,9 +80,9 @@ class PeriodeController extends Controller
             ));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des périodes: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage des périodes: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
 
             return redirect()->back()
@@ -104,8 +104,8 @@ class PeriodeController extends Controller
             return view('sige_app.backend.gestion_notes.periode.create', compact('salles', 'ecs'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de création de période: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage du formulaire de création de période: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('periodes.index')
@@ -158,6 +158,7 @@ class PeriodeController extends Controller
 
             if ($conflictSalle) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'La salle est déjà occupée pendant cette période.')
                     ->withInput();
@@ -169,8 +170,8 @@ class PeriodeController extends Controller
 
             if ($nombreEtudiants > $salle->nb_place_salle) {
                 return redirect()->back()
-                    ->with('warning', 
-                        "Attention : La salle a une capacité de {$salle->nb_place_salle} places " .
+                    ->with('warning',
+                        "Attention : La salle a une capacité de {$salle->nb_place_salle} places ".
                         "mais l'EC compte {$nombreEtudiants} étudiants. Voulez-vous continuer ?"
                     )
                     ->withInput();
@@ -194,7 +195,7 @@ class PeriodeController extends Controller
             Log::info('Période créée avec succès', [
                 'code_periode' => $codePeriode,
                 'user_id' => auth()->id(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return redirect()->route('periodes.index')
@@ -202,11 +203,11 @@ class PeriodeController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la création de la période: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la création de la période: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -225,10 +226,10 @@ class PeriodeController extends Controller
                 'salle',
                 'ec.ue.semestre',
                 'ec.assignations.personnel',
-                'ec.evaluations.user'
+                'ec.evaluations.user',
             ])->where([
                 'code_salle' => $code_salle,
-                'code_ec' => $code_ec
+                'code_ec' => $code_ec,
             ])->firstOrFail();
 
             // Statistiques de la période
@@ -237,7 +238,7 @@ class PeriodeController extends Controller
                 'capacite_salle' => $periode->salle->nb_place_salle ?? 0,
                 'etudiants_inscrits' => $this->getNombreEtudiantsEc($code_ec),
                 'taux_occupation' => $this->calculateTauxOccupation($periode),
-                'enseignants_assignes' => $periode->ec->assignations->count()
+                'enseignants_assignes' => $periode->ec->assignations->count(),
             ];
 
             // Autres périodes pour cette salle
@@ -248,7 +249,7 @@ class PeriodeController extends Controller
                 })
                 ->whereBetween('debut_periode', [
                     now()->startOfWeek(),
-                    now()->endOfWeek()->addWeek()
+                    now()->endOfWeek()->addWeek(),
                 ])
                 ->orderBy('debut_periode')
                 ->get();
@@ -256,10 +257,10 @@ class PeriodeController extends Controller
             return view('sige_app.backend.gestion_notes.periode.show', compact('periode', 'stats', 'autresPeriodesSalle'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage de la période: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage de la période: '.$e->getMessage(), [
                 'code_salle' => $code_salle,
                 'code_ec' => $code_ec,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('periodes.index')
@@ -275,7 +276,7 @@ class PeriodeController extends Controller
         try {
             $periode = Periode::with(['salle', 'ec'])->where([
                 'code_salle' => $code_salle,
-                'code_ec' => $code_ec
+                'code_ec' => $code_ec,
             ])->firstOrFail();
 
             $salles = Salle::where('etat_salle', true)->orderBy('code_salle')->get();
@@ -284,10 +285,10 @@ class PeriodeController extends Controller
             return view('sige_app.backend.gestion_notes.periode.edit', compact('periode', 'salles', 'ecs'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification: '.$e->getMessage(), [
                 'code_salle' => $code_salle,
                 'code_ec' => $code_ec,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('periodes.index')
@@ -332,14 +333,14 @@ class PeriodeController extends Controller
 
             $periode = Periode::where([
                 'code_salle' => $code_salle,
-                'code_ec' => $code_ec
+                'code_ec' => $code_ec,
             ])->firstOrFail();
 
             // Vérifier les conflits si la salle ou la période change
-            if ($request->new_code_salle != $code_salle || 
-                $request->debut_periode != $periode->debut_periode || 
+            if ($request->new_code_salle != $code_salle ||
+                $request->debut_periode != $periode->debut_periode ||
                 $request->fin_periode != $periode->fin_periode) {
-                
+
                 $conflictSalle = $this->checkSalleConflict(
                     $request->new_code_salle,
                     $request->debut_periode,
@@ -349,6 +350,7 @@ class PeriodeController extends Controller
 
                 if ($conflictSalle) {
                     DB::rollBack();
+
                     return redirect()->back()
                         ->with('error', 'La nouvelle salle est déjà occupée pendant cette période.')
                         ->withInput();
@@ -361,7 +363,7 @@ class PeriodeController extends Controller
             // Si la salle ou l'EC change, supprimer l'ancienne et créer une nouvelle
             if ($request->new_code_salle != $code_salle || $request->new_code_ec != $code_ec) {
                 $periode->delete();
-                
+
                 Periode::create([
                     'code_salle' => $request->new_code_salle,
                     'code_ec' => $request->new_code_ec,
@@ -390,7 +392,7 @@ class PeriodeController extends Controller
                 'new_code_ec' => $request->new_code_ec,
                 'user_id' => auth()->id(),
                 'old_data' => $oldData,
-                'new_data' => $request->all()
+                'new_data' => $request->all(),
             ]);
 
             return redirect()->route('periodes.index')
@@ -398,13 +400,13 @@ class PeriodeController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la modification de la période: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la modification de la période: '.$e->getMessage(), [
                 'code_salle' => $code_salle,
                 'code_ec' => $code_ec,
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -423,12 +425,13 @@ class PeriodeController extends Controller
 
             $periode = Periode::with(['salle', 'ec'])->where([
                 'code_salle' => $code_salle,
-                'code_ec' => $code_ec
+                'code_ec' => $code_ec,
             ])->firstOrFail();
 
             // Vérifier si la période a déjà commencé
             if (Carbon::parse($periode->debut_periode)->isPast()) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Impossible de supprimer une période qui a déjà commencé.');
             }
@@ -444,7 +447,7 @@ class PeriodeController extends Controller
                 'code_salle' => $code_salle,
                 'code_ec' => $code_ec,
                 'user_id' => auth()->id(),
-                'deleted_data' => $periodeData
+                'deleted_data' => $periodeData,
             ]);
 
             return redirect()->route('periodes.index')
@@ -452,12 +455,12 @@ class PeriodeController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la suppression de la période: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la suppression de la période: '.$e->getMessage(), [
                 'code_salle' => $code_salle,
                 'code_ec' => $code_ec,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -479,7 +482,7 @@ class PeriodeController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Paramètres invalides'
+                    'message' => 'Paramètres invalides',
                 ], 400);
             }
 
@@ -488,7 +491,7 @@ class PeriodeController extends Controller
                 ->get()
                 ->map(function ($periode) {
                     return [
-                        'id' => $periode->code_salle . '-' . $periode->code_ec,
+                        'id' => $periode->code_salle.'-'.$periode->code_ec,
                         'title' => $periode->ec->intitule_ec ?? 'EC Inconnu',
                         'start' => $periode->debut_periode,
                         'end' => $periode->fin_periode,
@@ -503,26 +506,26 @@ class PeriodeController extends Controller
                             'capacite' => $periode->salle->nb_place_salle ?? 0,
                             'url' => route('periodes.show', [
                                 'code_salle' => $periode->code_salle,
-                                'code_ec' => $periode->code_ec
-                            ])
-                        ]
+                                'code_ec' => $periode->code_ec,
+                            ]),
+                        ],
                     ];
                 });
 
             return response()->json([
                 'success' => true,
-                'events' => $periodes
+                'events' => $periodes,
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des périodes par plage de dates: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la récupération des périodes par plage de dates: '.$e->getMessage(), [
                 'request_data' => $request->all(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des périodes'
+                'message' => 'Erreur lors de la récupération des périodes',
             ], 500);
         }
     }
@@ -542,7 +545,7 @@ class PeriodeController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Paramètres invalides'
+                    'message' => 'Paramètres invalides',
                 ], 400);
             }
 
@@ -554,19 +557,19 @@ class PeriodeController extends Controller
 
             return response()->json([
                 'success' => true,
-                'available' => !$conflict,
-                'message' => $conflict ? 'Salle occupée pendant cette période' : 'Salle disponible'
+                'available' => ! $conflict,
+                'message' => $conflict ? 'Salle occupée pendant cette période' : 'Salle disponible',
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la vérification de disponibilité: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la vérification de disponibilité: '.$e->getMessage(), [
                 'request_data' => $request->all(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la vérification'
+                'message' => 'Erreur lors de la vérification',
             ], 500);
         }
     }
@@ -599,17 +602,19 @@ class PeriodeController extends Controller
                 try {
                     $periode = Periode::where([
                         'code_salle' => $periodeData['code_salle'],
-                        'code_ec' => $periodeData['code_ec']
+                        'code_ec' => $periodeData['code_ec'],
                     ])->first();
 
-                    if (!$periode) {
+                    if (! $periode) {
                         $errorCount++;
+
                         continue;
                     }
 
                     // Vérifier si la période a déjà commencé
                     if (Carbon::parse($periode->debut_periode)->isPast()) {
                         $pastPeriods++;
+
                         continue;
                     }
 
@@ -620,7 +625,7 @@ class PeriodeController extends Controller
                     $errorCount++;
                     Log::error('Erreur lors de la suppression en masse: ', [
                         'periode_data' => $periodeData,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -639,7 +644,7 @@ class PeriodeController extends Controller
                 'user_id' => auth()->id(),
                 'success_count' => $successCount,
                 'past_periods' => $pastPeriods,
-                'error_count' => $errorCount
+                'error_count' => $errorCount,
             ]);
 
             $alertType = ($pastPeriods + $errorCount) > 0 ? 'warning' : 'success';
@@ -649,11 +654,11 @@ class PeriodeController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la suppression en masse: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la suppression en masse: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -669,18 +674,18 @@ class PeriodeController extends Controller
         $query = Periode::where('code_salle', $codeSalle)
             ->where(function ($q) use ($debutPeriode, $finPeriode) {
                 $q->whereBetween('debut_periode', [$debutPeriode, $finPeriode])
-                  ->orWhereBetween('fin_periode', [$debutPeriode, $finPeriode])
-                  ->orWhere(function ($subQuery) use ($debutPeriode, $finPeriode) {
-                      $subQuery->where('debut_periode', '<=', $debutPeriode)
-                               ->where('fin_periode', '>=', $finPeriode);
-                  });
+                    ->orWhereBetween('fin_periode', [$debutPeriode, $finPeriode])
+                    ->orWhere(function ($subQuery) use ($debutPeriode, $finPeriode) {
+                        $subQuery->where('debut_periode', '<=', $debutPeriode)
+                            ->where('fin_periode', '>=', $finPeriode);
+                    });
             });
 
         // Exclure une période spécifique (pour les mises à jour)
         if ($excludePeriode) {
             $query->where(function ($q) use ($excludePeriode) {
                 $q->where('code_salle', '!=', $excludePeriode[0])
-                  ->orWhere('code_ec', '!=', $excludePeriode[1]);
+                    ->orWhere('code_ec', '!=', $excludePeriode[1]);
             });
         }
 
@@ -697,7 +702,8 @@ class PeriodeController extends Controller
                 ->where('code_ec', $codeEc)
                 ->count();
         } catch (Throwable $e) {
-            Log::warning('Erreur lors du calcul du nombre d\'étudiants: ' . $e->getMessage());
+            Log::warning('Erreur lors du calcul du nombre d\'étudiants: '.$e->getMessage());
+
             return 0;
         }
     }
@@ -721,10 +727,11 @@ class PeriodeController extends Controller
     {
         $colors = [
             '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
-            '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#16a085'
+            '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#16a085',
         ];
-        
+
         $index = abs(crc32($codeSalle)) % count($colors);
+
         return $colors[$index];
     }
 
@@ -735,11 +742,11 @@ class PeriodeController extends Controller
     {
         $capaciteSalle = $periode->salle->nb_place_salle ?? 0;
         $nombreEtudiants = $this->getNombreEtudiantsEc($periode->code_ec);
-        
+
         if ($capaciteSalle == 0) {
             return 0;
         }
-        
+
         return round(($nombreEtudiants / $capaciteSalle) * 100, 2);
     }
 
@@ -760,7 +767,7 @@ class PeriodeController extends Controller
             'duree_totale' => $periodes->sum('duree_periode'),
             'taux_occupation_moyen' => round($periodes->avg(function ($periode) {
                 return $this->calculateTauxOccupation($periode);
-            }) ?? 0, 2)
+            }) ?? 0, 2),
         ];
     }
 }

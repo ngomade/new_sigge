@@ -23,6 +23,7 @@ class UpdateCandidatRequest extends FormRequest
     public function rules(): array
     {
         $ca_code = $this->route('ca_code');
+
         return [
             'id' => ['sometimes', 'integer', 'exists:session_concours,id'],
             'filiere_code' => ['sometimes', 'string', 'exists:filiere,code_filiere'],

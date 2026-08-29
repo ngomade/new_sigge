@@ -14,13 +14,13 @@ class JwtMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param \Closure(Request): (Response) $next
+     * @param  \Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'User not found'], 404);
             }
         } catch (TokenExpiredException) {

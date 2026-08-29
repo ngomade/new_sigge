@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\laboratoires\EntretienReparation;
-use App\Models\laboratoires\ReservationAgent;
 use App\Models\laboratoires\Equipements;
 use App\Models\laboratoires\LaboratoirePersLab;
+use App\Models\laboratoires\ReservationAgent;
+use Illuminate\Database\Seeder;
 
 class EntretiensReservationsSeeder extends Seeder
 {
@@ -29,7 +29,7 @@ class EntretiensReservationsSeeder extends Seeder
                     'fin_entretien' => now()->addDays(3),
                     'type_entretien' => 'entretien',
                     'desc_entretien' => 'Entretien préventif programmé',
-                    'cout' => rand(50000, 200000)
+                    'cout' => rand(50000, 200000),
                 ]);
             }
 
@@ -40,7 +40,7 @@ class EntretiensReservationsSeeder extends Seeder
                     'id_pers_lab' => $membres->random()->id_pers_lab,
                     'debut_reserv' => now()->addDays(1),
                     'fin_reserv' => now()->addDays(5),
-                    'statut' => 'confirmé'
+                    'statut' => 'confirmé',
                 ]);
 
                 ReservationAgent::create([
@@ -48,7 +48,7 @@ class EntretiensReservationsSeeder extends Seeder
                     'id_pers_lab' => $membres->random()->id_pers_lab,
                     'debut_reserv' => now()->addDays(10),
                     'fin_reserv' => now()->addDays(12),
-                    'statut' => 'en attente'
+                    'statut' => 'en attente',
                 ]);
             }
         }

@@ -12,9 +12,12 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Users extends Authenticatable
 {
-    use Notifiable, HasRoles;
+    use HasRoles, Notifiable;
+
     protected $table = 'users';
+
     protected $primaryKey = 'code_user';
+
     public $incrementing = false;
 
     protected $casts = [
@@ -22,11 +25,11 @@ class Users extends Authenticatable
         'date_naissance_user' => 'datetime',
         'date_deliv_cni_user' => 'datetime',
         'nbre_enfant_user' => 'int',
-        'statut_user' => 'int'
+        'statut_user' => 'int',
     ];
 
     protected $fillable = [
-        "code_user",
+        'code_user',
         'code_info_extra',
         'nom_user',
         'prenom_user',
@@ -52,7 +55,7 @@ class Users extends Authenticatable
         'arrond_origine_user',
         'bibiographie_user',
         'statut_user',
-        'ecole_user'
+        'ecole_user',
     ];
 
     public function info_extra()

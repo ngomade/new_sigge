@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -14,24 +13,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $label_serie
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
  * @property Collection|FiliereDiplome[] $filiere_diplomes
- *
- * @package App\Models
  */
 class Serie extends Model
 {
-	protected $table = 'serie';
-	protected $primaryKey = 'code_serie';
+    protected $table = 'serie';
 
-	protected $fillable = [
-		'label_serie'
-	];
+    protected $primaryKey = 'code_serie';
 
-//	public function filiere_diplomes(): HasMany
-//	{
-//		return $this->hasMany(FiliereDiplome::class, 'code_serie');
-//	}
+    protected $fillable = [
+        'label_serie',
+    ];
+
+    //	public function filiere_diplomes(): HasMany
+    //	{
+    //		return $this->hasMany(FiliereDiplome::class, 'code_serie');
+    //	}
 
     public function diplomes()
     {

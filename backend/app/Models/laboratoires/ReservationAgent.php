@@ -11,6 +11,7 @@ class ReservationAgent extends Model
 
     // Changement important : utiliser 'id' comme clé primaire
     protected $primaryKey = 'id';
+
     public $incrementing = true;
 
     protected $fillable = [
@@ -19,14 +20,14 @@ class ReservationAgent extends Model
         'id_user_ext', // nouveau champ
         'debut_reserv',
         'fin_reserv',
-        'statut'
+        'statut',
     ];
 
     protected $casts = [
         'debut_reserv' => 'date',
         'fin_reserv' => 'date',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     // Relations
@@ -75,7 +76,7 @@ class ReservationAgent extends Model
     public function scopeActive($query)
     {
         return $query->where('debut_reserv', '<=', now())
-                    ->where('fin_reserv', '>=', now());
+            ->where('fin_reserv', '>=', now());
     }
 
     public function scopeFutur($query)
@@ -98,29 +99,31 @@ class ReservationAgent extends Model
                     'nom' => $pers->personnel->nom_pers ?? 'Non défini',
                     'email' => $pers->personnel->email_pers ?? 'Non défini',
                     'telephone' => $pers->personnel->first_phone_pers ?? 'Non défini',
-                    'type' => 'personnel'
+                    'type' => 'personnel',
                 ];
             } elseif ($pers->type_pers_lab === 'users' && $pers->user) {
                 return [
                     'nom' => $pers->user->nom_user ?? 'Non défini',
                     'email' => $pers->user->email_user ?? 'Non défini',
                     'telephone' => $pers->user->first_phone_user ?? 'Non défini',
-                    'type' => 'users'
+                    'type' => 'users',
                 ];
             } elseif ($pers->type_pers_lab === 'user_externe') {
                 $userExterne = \App\Models\laboratoires\UserExterne::where('id_user_ext', $pers->id_pers_lab)->first();
+
                 return [
                     'nom' => $userExterne->nom_user_ext ?? 'Non défini',
                     'email' => $userExterne->email_user_ext ?? 'Non défini',
                     'telephone' => $userExterne->tel_user_ext ?? 'Non défini',
-                    'type' => 'user_externe'
+                    'type' => 'user_externe',
                 ];
             }
+
             return [
                 'nom' => 'Membre interne',
                 'email' => 'Non défini',
                 'telephone' => 'Non défini',
-                'type' => $pers->type_pers_lab ?? 'personnel'
+                'type' => $pers->type_pers_lab ?? 'personnel',
             ];
         }
         if ($this->id_user_ext && $this->userExterne) {
@@ -129,20 +132,21 @@ class ReservationAgent extends Model
                 'email' => $this->userExterne->email_user_ext ?? 'Non défini',
                 'telephone' => $this->userExterne->tel_user_ext ?? 'Non défini',
                 'institution' => $this->userExterne->institution_user_ext ?? 'Non défini',
-                'type' => 'externe'
+                'type' => 'externe',
             ];
         }
+
         return [
             'nom' => 'Non défini',
             'email' => 'Non défini',
             'telephone' => 'Non défini',
-            'type' => 'inconnu'
+            'type' => 'inconnu',
         ];
     }
 
     public function getStatutBadgeAttribute()
     {
-        return match($this->statut) {
+        return match ($this->statut) {
             'en attente' => 'warning',
             'confirmé' => 'success',
             'refusé' => 'danger',
@@ -153,7 +157,7 @@ class ReservationAgent extends Model
 
     public function getStatutLabelAttribute()
     {
-        return match($this->statut) {
+        return match ($this->statut) {
             'en attente' => 'En attente',
             'confirmé' => 'Confirmé',
             'refusé' => 'Refusé',
@@ -210,7 +214,7 @@ class ReservationAgent extends Model
 
     public function getDuree()
     {
-        if (!$this->debut_reserv || !$this->fin_reserv) {
+        if (! $this->debut_reserv || ! $this->fin_reserv) {
             return null;
         }
 
@@ -228,12 +232,12 @@ class ReservationAgent extends Model
             return '1 jour';
         }
 
-        return ($duree + 1) . ' jour' . ($duree > 0 ? 's' : '');
+        return ($duree + 1).' jour'.($duree > 0 ? 's' : '');
     }
 
     public function getJoursRestants()
     {
-        if (!$this->isActive() || !$this->isConfirme()) {
+        if (! $this->isActive() || ! $this->isConfirme()) {
             return null;
         }
 
@@ -253,6 +257,6 @@ class ReservationAgent extends Model
             return 'Terminé';
         }
 
-        return $jours . ' jour' . ($jours > 1 ? 's' : '') . ' restant' . ($jours > 1 ? 's' : '');
+        return $jours.' jour'.($jours > 1 ? 's' : '').' restant'.($jours > 1 ? 's' : '');
     }
 }

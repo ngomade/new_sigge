@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use App\Models\laboratoires\LaboratoirePersLab;
 use App\Models\laboratoires\Laboratoire;
+use App\Models\laboratoires\LaboratoirePersLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -17,16 +17,16 @@ trait LaboratoirePermissions
         $userId = session('user_id');
         $userType = session('user_type');
 
-        if (!$userId || !$userType) {
+        if (! $userId || ! $userType) {
             return false;
         }
 
         // Si pas de code_lab fourni, essayer de le récupérer de la session
-        if (!$code_lab) {
+        if (! $code_lab) {
             $code_lab = session('laboratoire_code');
         }
 
-        if (!$code_lab) {
+        if (! $code_lab) {
             return false;
         }
 
@@ -43,7 +43,7 @@ trait LaboratoirePermissions
 
         $affectation = $query->first();
 
-        if (!$affectation || !$affectation->roleLabo) {
+        if (! $affectation || ! $affectation->roleLabo) {
             return false;
         }
 
@@ -64,11 +64,11 @@ trait LaboratoirePermissions
         $userId = session('user_id');
         $userType = session('user_type');
 
-        if (!$userId || !$userType) {
+        if (! $userId || ! $userType) {
             return false;
         }
 
-        if (!$code_lab) {
+        if (! $code_lab) {
             $code_lab = session('laboratoire_code');
         }
 
@@ -104,11 +104,11 @@ trait LaboratoirePermissions
         $userId = session('user_id');
         $userType = session('user_type');
 
-        if (!$userId || !$userType) {
+        if (! $userId || ! $userType) {
             return null;
         }
 
-        if (!$code_lab) {
+        if (! $code_lab) {
             $code_lab = session('laboratoire_code');
         }
 
@@ -132,7 +132,7 @@ trait LaboratoirePermissions
     {
         $affectation = $this->getCurrentAffectation($code_lab);
 
-        if (!$affectation || !$affectation->roleLabo) {
+        if (! $affectation || ! $affectation->roleLabo) {
             return [];
         }
 
@@ -196,6 +196,7 @@ trait LaboratoirePermissions
                 return true;
             }
         }
+
         return false;
     }
 
@@ -205,10 +206,11 @@ trait LaboratoirePermissions
     protected function hasAllPermissions(array $permissions, $code_lab = null): bool
     {
         foreach ($permissions as $permission) {
-            if (!$this->hasPermission($permission, $code_lab)) {
+            if (! $this->hasPermission($permission, $code_lab)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -217,7 +219,7 @@ trait LaboratoirePermissions
      */
     protected function authorizeAction($permission, $code_lab = null): void
     {
-        if (!$this->hasPermission($permission, $code_lab)) {
+        if (! $this->hasPermission($permission, $code_lab)) {
             abort(403, 'Vous n\'avez pas la permission d\'effectuer cette action.');
         }
     }
@@ -235,7 +237,7 @@ trait LaboratoirePermissions
             'url' => $request->fullUrl(),
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'timestamp' => now()->toIso8601String()
+            'timestamp' => now()->toIso8601String(),
         ]);
     }
 }

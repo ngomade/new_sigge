@@ -1,6 +1,7 @@
 <?php
 
 // CentreDepotFactory.php
+
 namespace Database\Factories\concours;
 
 use App\Models\CentreDepot;
@@ -15,8 +16,8 @@ class CentreDepotFactory extends Factory
         static $index = 1;
 
         return [
-            'centre_depot_code' => 'CD' . str_pad($index++, 4, '0', STR_PAD_LEFT),
-            'centre_depot_label' => $this->faker->company . ' - Centre de Dépôt'
+            'centre_depot_code' => 'CD'.str_pad($index++, 4, '0', STR_PAD_LEFT),
+            'centre_depot_label' => $this->faker->company.' - Centre de Dépôt',
         ];
     }
 }

@@ -28,6 +28,7 @@ class LaboChat extends Model
         } elseif ($this->type_expediteur === 'externe') {
             return $this->belongsTo(\App\Models\laboratoires\UserExterne::class, 'id_expediteur', 'id_user_ext');
         }
+
         return null;
     }
 }

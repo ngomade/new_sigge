@@ -36,6 +36,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
     public function index()
     {
         $comptes = Compte::with('candidat')->get();
+
         return response()->json($comptes);
     }
 
@@ -46,7 +47,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
     {
         try {
             $request->validate([
-                'receipt' => 'required|file|max:5120|mimes:pdf,jpg,jpeg,png'
+                'receipt' => 'required|file|max:5120|mimes:pdf,jpg,jpeg,png',
             ]);
 
             $result = $ocrService->extractDataFromReceipt($request->file('receipt'));
@@ -57,21 +58,22 @@ class CompteControllerApi extends Controller implements HasMiddleware
                 'success' => false,
                 'error' => 'Validation échouée',
                 'errors' => $e->errors(),
-                'data' => []
+                'data' => [],
             ], 422);
         } catch (Exception $e) {
-            Log::error('Erreur extraction OCR: ' . $e->getMessage());
+            Log::error('Erreur extraction OCR: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'error' => 'Erreur lors de l\'extraction des données: ' . $e->getMessage(),
-                'data' => []
+                'error' => 'Erreur lors de l\'extraction des données: '.$e->getMessage(),
+                'data' => [],
             ], 500);
         }
     }
 
     /**
      * Store a newly created resource in storage.
+     *
      * @throws Throwable
      */
     public function store(Request $request, AuthService $authService, ReceiptOCRService $ocrService)
@@ -89,7 +91,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
         } catch (ValidationException $e) {
             return response()->json([
                 'erreur' => 'Données de validation incorrectes',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         }
 
@@ -114,7 +116,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
                 // Créer un nouveau fichier uploadé depuis le PDF
                 $pdfFile = new File($pdfPath);
-                $filename = $validateData['ca_nom'] . '-' . $validateData['ca_prenom'] . '-' . now()->format('M_d_H_i') . '.pdf';
+                $filename = $validateData['ca_nom'].'-'.$validateData['ca_prenom'].'-'.now()->format('M_d_H_i').'.pdf';
                 $storedPath = Storage::putFileAs(getdate()['year'], $pdfFile, $filename);
 
                 // Nettoyer les fichiers temporaires
@@ -134,7 +136,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
             // Créer l'utilisateur associé
             if ($compte->ca_email) {
                 User::create([
-                    'name' => $compte->ca_nom . ' ' . $compte->ca_prenom,
+                    'name' => $compte->ca_nom.' '.$compte->ca_prenom,
                     'email' => $compte->ca_email,
                     'password' => $compte->ca_pwd,
                     'usertype' => 'candidat',
@@ -143,9 +145,9 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
             // Envoyer la notification
             try {
-                $compte->notify(new SendinfoOfConnection());
+                $compte->notify(new SendinfoOfConnection);
             } catch (Throwable $th) {
-                Log::warning('Erreur lors de l\'envoi de l\'email de connexion: ' . $th->getMessage());
+                Log::warning('Erreur lors de l\'envoi de l\'email de connexion: '.$th->getMessage());
                 // Ne pas faire échouer la création du compte pour un problème d'email
             }
 
@@ -154,8 +156,9 @@ class CompteControllerApi extends Controller implements HasMiddleware
             return $authService->generateTokenFromUser($compte, true);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Erreur lors de la création du compte: ' . $th->getMessage());
-            return response()->json(['erreur' => 'Erreur lors de la création du compte: ' . $th->getMessage()], 500);
+            Log::error('Erreur lors de la création du compte: '.$th->getMessage());
+
+            return response()->json(['erreur' => 'Erreur lors de la création du compte: '.$th->getMessage()], 500);
         }
     }
 
@@ -166,6 +169,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
     {
         try {
             $compte = Compte::with('candidat')->findOrFail($ca_num_recu);
+
             return response()->json($compte);
         } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
@@ -174,6 +178,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
 
     /**
      * Update the specified resource in storage.
+     *
      * @throws Throwable
      */
     public function update(Request $request, string $ca_num_recu)
@@ -190,11 +195,11 @@ class CompteControllerApi extends Controller implements HasMiddleware
         } catch (ValidationException $e) {
             return response()->json([
                 'erreur' => 'Données de validation incorrectes',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         }
 
-        if ($request->has("ca_pwd")) {
+        if ($request->has('ca_pwd')) {
             $validateData['ca_pwd'] = Hash::make($validateData['ca_pwd']);
         }
 
@@ -222,7 +227,7 @@ class CompteControllerApi extends Controller implements HasMiddleware
             if ($compte->ca_email) {
                 $user = User::where('email', $compte->ca_email)->first();
                 $user?->update([
-                    'name' => $compte->ca_nom . ' ' . $compte->ca_prenom,
+                    'name' => $compte->ca_nom.' '.$compte->ca_prenom,
                     'email' => $compte->ca_email,
                     'password' => $compte->ca_pwd,
                 ]);
@@ -235,13 +240,15 @@ class CompteControllerApi extends Controller implements HasMiddleware
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         } catch (Throwable $th) {
             DB::rollback();
-            Log::error('Erreur lors de la mise à jour du compte: ' . $th->getMessage());
+            Log::error('Erreur lors de la mise à jour du compte: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la mise à jour du compte'], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
+     *
      * @throws Throwable
      */
     public function destroy(string $ca_num_recu)
@@ -271,7 +278,8 @@ class CompteControllerApi extends Controller implements HasMiddleware
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
         } catch (Throwable $th) {
             DB::rollback();
-            Log::error('Erreur lors de la suppression du compte: ' . $th->getMessage());
+            Log::error('Erreur lors de la suppression du compte: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la suppression du compte'], 500);
         }
     }
@@ -282,16 +290,17 @@ class CompteControllerApi extends Controller implements HasMiddleware
             $compte = Compte::findOrFail($ca_num_recu);
             $recu = $compte->ca_recu;
 
-            if (!$recu || !Storage::exists($recu)) {
+            if (! $recu || ! Storage::exists($recu)) {
                 return response()->json(['erreur' => 'Reçu non trouvé'], 404);
             }
 
             $fileContent = Storage::get($recu);
             $base64 = base64_encode($fileContent);
+
             return response()->json([
                 'file_name' => 'document.pdf',
                 'mime_type' => 'application/pdf',
-                'base64_pdf' => $base64
+                'base64_pdf' => $base64,
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json(['erreur' => 'Compte non trouvé'], 404);
@@ -312,12 +321,14 @@ class CompteControllerApi extends Controller implements HasMiddleware
     public function byCandidat(string $ca_code)
     {
         $comptes = Compte::where('ca_code', $ca_code)->with('candidat')->get();
+
         return response()->json($comptes);
     }
 
     private function storageRecu($file, $nom, $prenom, $extension)
     {
-        $filename = $nom . '-' . $prenom . '-' . now()->format('M_d_H_i') . '.' . $extension;
+        $filename = $nom.'-'.$prenom.'-'.now()->format('M_d_H_i').'.'.$extension;
+
         return $file->storeAs(getdate()['year'], $filename);
     }
 }

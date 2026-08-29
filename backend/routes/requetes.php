@@ -1,17 +1,14 @@
 <?php
 
 // routes/api.php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\requetes\BureauControllerApi;
 use App\Http\Controllers\BureauController;
-use App\Http\Controllers\requetes\RequetteController;
 use App\Http\Controllers\requetes\AdminRequeteController;
-use App\Http\Controllers\requetes\AffectationPersonnelController;
-use App\Http\Controllers\requetes\AffectationPersonnelControllerApi;
 use App\Http\Controllers\requetes\AdminRequetteControllerApi;
-use App\Http\Controllers\requetes\RequetteControllerApi;
+use App\Http\Controllers\requetes\BureauControllerApi;
 use App\Http\Controllers\requetes\CategoryController;
-
+use App\Http\Controllers\requetes\RequetteController;
+use App\Http\Controllers\requetes\RequetteControllerApi;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('requete')->group(function () {
     // IMPORTANT: Routes personnalisées AVANT les routes de ressource
@@ -22,7 +19,7 @@ Route::prefix('requete')->group(function () {
 
     // Routes de ressource APRÈS les routes personnalisées
     Route::apiResource('bureaux', BureauControllerApi::class)->parameters([
-        'bureaux' => 'code_bureau'
+        'bureaux' => 'code_bureau',
     ]);
 });
 
@@ -45,16 +42,14 @@ Route::get('/api/bureau/by-type/{type}', [BureauController::class, 'getBureauxBy
 Route::get('/api/bureau/{type}/code', [BureauController::class, 'getBureauCodeByType'])->name('bureau.code_by_type');
 Route::get('/api/bureau/{code}/personnel', [BureauController::class, 'getPersonnelBureau'])->name('bureau.personnel');
 
-
 // routes pour web
-
 
 Route::middleware('web')->group(function () {
     Route::resource('requetes', RequetteController::class, ['parameters' => ['requetes' => 'code_requete']]);
 
     // Routes de ressource APRÈS les routes personnalisées
     Route::resource('bureaux', BureauController::class)->parameters([
-        'bureaux' => 'code_bureau'
+        'bureaux' => 'code_bureau',
     ]);
 });
 

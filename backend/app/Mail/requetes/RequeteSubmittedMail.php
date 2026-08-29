@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 class RequeteSubmittedMail extends Mailable
 {
-   use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
 
     public $requete;
 
@@ -23,7 +23,7 @@ class RequeteSubmittedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmation de soumission de votre requête - ' . $this->requete->code_requete,
+            subject: 'Confirmation de soumission de votre requête - '.$this->requete->code_requete,
         );
     }
 

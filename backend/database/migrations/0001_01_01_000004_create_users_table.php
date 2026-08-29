@@ -38,8 +38,8 @@ return new class extends Migration
             $table->string('depart_origine_user', 128)->nullable();
             $table->string('arrond_origine_user', 128)->nullable();
             $table->text('bibiographie_user')->nullable();
-            $table->smallInteger("statut_user")->default(1);
-            $table->string("ecole_user", 128)->default("ESTLC");
+            $table->smallInteger('statut_user')->default(1);
+            $table->string('ecole_user', 128)->default('ESTLC');
             $table->timestamps();
         });
     }

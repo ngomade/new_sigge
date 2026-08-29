@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\laboratoires\ProjetLabo;
-use App\Models\laboratoires\Equipements;
-use App\Models\laboratoires\LaboratoirePersLab;
 use App\Models\laboratoires\LabNotif;
-use App\Notifications\laboratoires\ProjetEcheanceNotification;
+use App\Models\laboratoires\LaboratoirePersLab;
+use App\Models\laboratoires\ProjetLabo;
 use App\Notifications\laboratoires\MaintenanceEquipementNotification;
+use App\Notifications\laboratoires\ProjetEcheanceNotification;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class LaboratoireAlertService
 {
@@ -51,7 +49,7 @@ class LaboratoireAlertService
                     ->whereDate('created_at', $aujourdhui)
                     ->first();
 
-                if (!$notificationExistante) {
+                if (! $notificationExistante) {
                     // Créer notification dans la base de données
                     LabNotif::create([
                         'code_lab' => $projet->code_lab,
@@ -59,8 +57,8 @@ class LaboratoireAlertService
                         'id_pers_lab_destinataire' => $membre->id_pers_lab,
                         'type' => 'projet_echeance',
                         'titre' => "Échéance de projet - {$projet->theme_projet}",
-                        'message' => "Le projet '{$projet->theme_projet}' arrive à échéance dans {$joursRestants} jour(s). Date de fin : " . Carbon::parse($projet->fin_projet)->format('d/m/Y'),
-                        'lu' => false
+                        'message' => "Le projet '{$projet->theme_projet}' arrive à échéance dans {$joursRestants} jour(s). Date de fin : ".Carbon::parse($projet->fin_projet)->format('d/m/Y'),
+                        'lu' => false,
                     ]);
 
                     // Envoyer notification par email
@@ -70,7 +68,7 @@ class LaboratoireAlertService
         }
     }
 
-        /**
+    /**
      * Vérifier les maintenances d'équipements et envoyer des notifications
      */
     public function checkMaintenanceEquipements()
@@ -110,7 +108,7 @@ class LaboratoireAlertService
                     ->whereDate('created_at', $aujourdhui)
                     ->first();
 
-                if (!$notificationExistante) {
+                if (! $notificationExistante) {
                     // Créer notification dans la base de données
                     LabNotif::create([
                         'code_lab' => $entretien->equipement->code_lab,
@@ -118,8 +116,8 @@ class LaboratoireAlertService
                         'id_pers_lab_destinataire' => $responsable->id_pers_lab,
                         'type' => 'maintenance_equipement',
                         'titre' => "Maintenance d'équipement - {$entretien->equipement->nom_equip}",
-                        'message' => "Maintenance prévue pour '{$entretien->equipement->nom_equip}' dans {$joursRestants} jour(s). Date : " . Carbon::parse($entretien->debut_entretien)->format('d/m/Y'),
-                        'lu' => false
+                        'message' => "Maintenance prévue pour '{$entretien->equipement->nom_equip}' dans {$joursRestants} jour(s). Date : ".Carbon::parse($entretien->debut_entretien)->format('d/m/Y'),
+                        'lu' => false,
                     ]);
 
                     // Envoyer notification par email
@@ -160,17 +158,17 @@ class LaboratoireAlertService
             ->count();
 
         // Maintenances d'équipements
-        $maintenancesUrgentes = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function($query) use ($codeLab) {
-                $query->where('code_lab', $codeLab);
-            })
+        $maintenancesUrgentes = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function ($query) use ($codeLab) {
+            $query->where('code_lab', $codeLab);
+        })
             ->where('debut_entretien', '>=', $aujourdhui)
             ->where('debut_entretien', '<=', $aujourdhui->copy()->addDays(3))
             ->where('statut_entretien', '!=', 'Annulé')
             ->count();
 
-        $maintenancesImportantes = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function($query) use ($codeLab) {
-                $query->where('code_lab', $codeLab);
-            })
+        $maintenancesImportantes = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function ($query) use ($codeLab) {
+            $query->where('code_lab', $codeLab);
+        })
             ->where('debut_entretien', '>=', $aujourdhui)
             ->where('debut_entretien', '<=', $aujourdhui->copy()->addDays(30))
             ->where('debut_entretien', '>', $aujourdhui->copy()->addDays(3))

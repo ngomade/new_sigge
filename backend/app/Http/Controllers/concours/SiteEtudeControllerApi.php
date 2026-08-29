@@ -16,6 +16,7 @@ class SiteEtudeControllerApi extends Controller
     public function index()
     {
         $sites = SiteEtude::with('candidats')->get();
+
         return response()->json($sites);
     }
 
@@ -31,9 +32,11 @@ class SiteEtudeControllerApi extends Controller
 
         try {
             $site = SiteEtude::create($validateData);
+
             return response()->json($site);
         } catch (Throwable $th) {
-            Log::error('Error creating site: ' . $th->getMessage());
+            Log::error('Error creating site: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la création du site d\'étude'], 500);
         }
     }
@@ -54,16 +57,18 @@ class SiteEtudeControllerApi extends Controller
     public function update(Request $request, string $code_site)
     {
         $validateData = $request->validate([
-            'label_site' => 'sometimes|required|string|max:255|unique:site_etude,label_site,' . $code_site . ',code_site',
+            'label_site' => 'sometimes|required|string|max:255|unique:site_etude,label_site,'.$code_site.',code_site',
             'description_site' => 'sometimes|required|string',
         ]);
 
-            $site = SiteEtude::findOrFail($code_site);
+        $site = SiteEtude::findOrFail($code_site);
         try {
             $site->update($validateData);
+
             return response()->json($site);
         } catch (Throwable $th) {
-            Log::error('Error updating site: ' . $th->getMessage());
+            Log::error('Error updating site: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la mise à jour du site d\'étude'], 500);
         }
     }
@@ -76,9 +81,11 @@ class SiteEtudeControllerApi extends Controller
         $site = SiteEtude::findOrFail($code_site);
         try {
             $site->delete();
+
             return response()->json(['succes' => 'Site d\'étude supprimé avec succès']);
         } catch (Throwable $th) {
-            Log::error('Error deleting site: ' . $th->getMessage());
+            Log::error('Error deleting site: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la suppression du site d\'étude'], 500);
         }
     }
@@ -112,7 +119,8 @@ class SiteEtudeControllerApi extends Controller
 
             return response()->json($stats);
         } catch (Throwable $th) {
-            Log::error('Error getting site statistics: ' . $th->getMessage());
+            Log::error('Error getting site statistics: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la récupération des statistiques du site'], 500);
         }
     }
@@ -126,18 +134,19 @@ class SiteEtudeControllerApi extends Controller
             $query = SiteEtude::query();
 
             if ($request->has('label')) {
-                $query->where('label_site', 'like', '%' . $request->label . '%');
+                $query->where('label_site', 'like', '%'.$request->label.'%');
             }
 
             if ($request->has('description')) {
-                $query->where('description_site', 'like', '%' . $request->description . '%');
+                $query->where('description_site', 'like', '%'.$request->description.'%');
             }
 
             $sites = $query->withCount('candidats')->get();
 
             return response()->json($sites);
         } catch (Throwable $th) {
-            Log::error('Error searching sites: ' . $th->getMessage());
+            Log::error('Error searching sites: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la recherche des sites'], 500);
         }
     }

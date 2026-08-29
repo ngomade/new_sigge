@@ -27,16 +27,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Routes pour verifier le token
-Route::get("check-token", [AuthController::class, 'checkToken']);
+Route::get('check-token', [AuthController::class, 'checkToken']);
 // Route pour l'extraction OCR (accessible sans authentification pour la création de compte)
 Route::post('comptes/extract-receipt', [CompteControllerApi::class, 'extractReceiptData']);
 
 // Routes d'authentification
-Route::group(['prefix' => 'auth', 'middleware' => "guest.sanctum"], function () {
-    Route::post("login", [AuthController::class, 'login']);
+Route::group(['prefix' => 'auth', 'middleware' => 'guest.sanctum'], function () {
+    Route::post('login', [AuthController::class, 'login']);
     Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
-    Route::get("refresh-token", [AuthController::class, 'refresh']);
+    Route::get('refresh-token', [AuthController::class, 'refresh']);
 });
 
 // Routes non protégées par authentification
@@ -51,16 +51,16 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::get("logout", [AuthController::class, 'logout']);
+    Route::get('logout', [AuthController::class, 'logout']);
     /*
     |--------------------------------------------------------------------------
     | Routes pour la gestion des candidats
     |--------------------------------------------------------------------------
     */
     Route::prefix('candidats')->group(function () {
-        Route::get("stats", [CandidatControllerApi::class, 'statCandidat']);
-        Route::get("get-candidats-by-centre/{id}", [CandidatControllerApi::class, 'getCandidatsBycentre']);
-        Route::post("send-general-email", [CandidatControllerApi::class, 'sendGeneralMail']);
+        Route::get('stats', [CandidatControllerApi::class, 'statCandidat']);
+        Route::get('get-candidats-by-centre/{id}', [CandidatControllerApi::class, 'getCandidatsBycentre']);
+        Route::post('send-general-email', [CandidatControllerApi::class, 'sendGeneralMail']);
         Route::get('filiere/{filiere_code}', [CandidatControllerApi::class, 'byFiliere']);
         Route::get('site/{code_site}', [CandidatControllerApi::class, 'bySite']);
         Route::post('search', [CandidatControllerApi::class, 'search']);
@@ -74,8 +74,8 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::prefix('comptes')->group(function () {
         Route::get('candidat/{ca_code}', [CompteControllerApi::class, 'byCandidat']);
-        Route::get("download-recu/{ca_num_recu}", [CompteControllerApi::class, 'showRecu']);
-        Route::get("stats", [CompteControllerApi::class, 'statsCompte']);
+        Route::get('download-recu/{ca_num_recu}', [CompteControllerApi::class, 'showRecu']);
+        Route::get('stats', [CompteControllerApi::class, 'statsCompte']);
     });
     Route::apiResource('comptes', CompteControllerApi::class)->except('store');
 
@@ -85,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('sessions')->group(function () {
-        Route::get('active', [SessionconcourControllerApi::class, 'active'])->withoutMiddleware("auth:sanctum");
+        Route::get('active', [SessionconcourControllerApi::class, 'active'])->withoutMiddleware('auth:sanctum');
         Route::get('year/{year}', [SessionconcourControllerApi::class, 'byYear']);
         Route::get('{id}/stats', [SessionconcourControllerApi::class, 'statistics']);
         Route::get('upcoming', [SessionconcourControllerApi::class, 'upcoming']);
@@ -146,8 +146,8 @@ Route::middleware('auth:sanctum')->group(function () {
     | Routes pour les dossiers
     |--------------------------------------------------------------------------
     */
-    Route::apiResource("diplomes", DiplomeController::class);
-    Route::get("diplomes/{code_filiere}/filiere", [DiplomeController::class, 'showByFiliere']);
+    Route::apiResource('diplomes', DiplomeController::class);
+    Route::get('diplomes/{code_filiere}/filiere', [DiplomeController::class, 'showByFiliere']);
 
     /*
     |--------------------------------------------------------------------------
@@ -156,16 +156,16 @@ Route::middleware('auth:sanctum')->group(function () {
     */
     Route::apiResource('filiere', FiliereControllerAPI::class);
     Route::apiResource('filiere_diplome', FiliereDiplomeControllerAPI::class);
-      // Diplome attachment routes
-      Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
-      Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
+    // Diplome attachment routes
+    Route::post('/{filiereCode}/attach-diplome', [FiliereControllerAPI::class, 'attachDiplome']);
+    Route::post('/{filiereCode}/detach-diplome', [FiliereControllerAPI::class, 'detachDiplome']);
 
-      //routes personnel
-      Route::apiResource('personnel',PersonnelControllerApi::class);
-      //routes slide
-      Route::apiResource('slide',SlideControllerApi::class);
+    // routes personnel
+    Route::apiResource('personnel', PersonnelControllerApi::class);
+    // routes slide
+    Route::apiResource('slide', SlideControllerApi::class);
 
-      // Additional routes
+    // Additional routes
     Route::get('/by-filiere/{filiereCode}', [FiliereDiplomeControllerAPI::class, 'byFiliere']);
     Route::get('/by-diplome/{diplomeCode}', [FiliereDiplomeControllerAPI::class, 'byDiplome']);
 

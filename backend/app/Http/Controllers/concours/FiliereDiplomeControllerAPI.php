@@ -15,9 +15,10 @@ class FiliereDiplomeControllerAPI extends Controller
     public function index()
     {
         $filiereDiplomes = FiliereDiplome::with(['filiere', 'diplome', 'serie'])->get();
+
         return response()->json([
             'status' => 'success',
-            'data' => $filiereDiplomes
+            'data' => $filiereDiplomes,
         ], 200);
     }
 
@@ -35,7 +36,7 @@ class FiliereDiplomeControllerAPI extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -48,7 +49,7 @@ class FiliereDiplomeControllerAPI extends Controller
         if ($exists) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'This relation already exists'
+                'message' => 'This relation already exists',
             ], 409);
         }
 
@@ -56,7 +57,7 @@ class FiliereDiplomeControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $filiereDiplome
+            'data' => $filiereDiplome,
         ], 201);
     }
 
@@ -67,16 +68,16 @@ class FiliereDiplomeControllerAPI extends Controller
     {
         $filiereDiplome = FiliereDiplome::with(['filiere', 'diplome', 'serie'])->find($id);
 
-        if (!$filiereDiplome) {
+        if (! $filiereDiplome) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'FiliereDiplome not found'
+                'message' => 'FiliereDiplome not found',
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $filiereDiplome
+            'data' => $filiereDiplome,
         ], 200);
     }
 
@@ -87,10 +88,10 @@ class FiliereDiplomeControllerAPI extends Controller
     {
         $filiereDiplome = FiliereDiplome::find($id);
 
-        if (!$filiereDiplome) {
+        if (! $filiereDiplome) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'FiliereDiplome not found'
+                'message' => 'FiliereDiplome not found',
             ], 404);
         }
 
@@ -103,7 +104,7 @@ class FiliereDiplomeControllerAPI extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -111,7 +112,7 @@ class FiliereDiplomeControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $filiereDiplome
+            'data' => $filiereDiplome,
         ], 200);
     }
 
@@ -122,10 +123,10 @@ class FiliereDiplomeControllerAPI extends Controller
     {
         $filiereDiplome = FiliereDiplome::find($id);
 
-        if (!$filiereDiplome) {
+        if (! $filiereDiplome) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'FiliereDiplome not found'
+                'message' => 'FiliereDiplome not found',
             ], 404);
         }
 
@@ -133,7 +134,7 @@ class FiliereDiplomeControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'FiliereDiplome deleted successfully'
+            'message' => 'FiliereDiplome deleted successfully',
         ], 200);
     }
 
@@ -148,7 +149,7 @@ class FiliereDiplomeControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $relations
+            'data' => $relations,
         ], 200);
     }
 
@@ -163,7 +164,7 @@ class FiliereDiplomeControllerAPI extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $relations
+            'data' => $relations,
         ], 200);
     }
 }

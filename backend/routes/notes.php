@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\notes\AnneescolaireController;
-use App\Http\Controllers\notes\ClasseController;
-use App\Http\Controllers\notes\NiveauController;
 use App\Http\Controllers\notes\AssignationController;
+use App\Http\Controllers\notes\ClasseController;
 use App\Http\Controllers\notes\EvaluationController;
-use App\Http\Controllers\notes\SessionExamenController;
 use App\Http\Controllers\notes\ExamenController;
+use App\Http\Controllers\notes\NiveauController;
 use App\Http\Controllers\notes\PeriodeController;
 use App\Http\Controllers\notes\RessourceController;
+use App\Http\Controllers\notes\SessionExamenController;
+use Illuminate\Support\Facades\Route;
 
 // Années scolaires routes
 Route::prefix('annees')->group(function () {
@@ -53,7 +53,7 @@ Route::prefix('assignations')->group(function () {
     Route::get('/{code_ass}/edit', [AssignationController::class, 'edit'])->name('assignations.edit');
     Route::put('/{code_ass}', [AssignationController::class, 'update'])->name('assignations.update');
     Route::delete('/{code_ass}', [AssignationController::class, 'destroy'])->name('assignations.destroy');
-    
+
     // Additional routes for assignation
     Route::post('/mass-assign', [AssignationController::class, 'massAssign'])->name('assignations.massAssign');
     Route::get('/get-ecs-by-classe/{code_class}', [AssignationController::class, 'getEcsByClasse'])->name('assignations.getEcsByClasse');
@@ -69,7 +69,7 @@ Route::prefix('evaluations')->group(function () {
     Route::get('/{code_ec}/{code_examen}/edit', [EvaluationController::class, 'edit'])->name('evaluations.edit');
     Route::put('/{code_ec}/{code_examen}', [EvaluationController::class, 'update'])->name('evaluations.update');
     Route::delete('/{code_ec}/{code_examen}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
-    
+
     // Additional routes for evaluations
     Route::get('/moyennes', [EvaluationController::class, 'moyennes'])->name('evaluations.moyennes');
     Route::get('/get-etudiants-by-ec/{code_ec}', [EvaluationController::class, 'getEtudiantsByEcApi'])->name('evaluations.getEtudiantsByEc');
@@ -85,7 +85,7 @@ Route::prefix('sessions-examen')->group(function () {
     Route::get('/{code_session}/edit', [SessionExamenController::class, 'edit'])->name('sessionsExamen.edit');
     Route::put('/{code_session}', [SessionExamenController::class, 'update'])->name('sessionsExamen.update');
     Route::delete('/{code_session}', [SessionExamenController::class, 'destroy'])->name('sessionsExamen.destroy');
-    
+
     // Additional routes for sessions d'examen
     Route::post('/{code_session}/toggle-status', [SessionExamenController::class, 'toggleStatus'])->name('sessionsExamen.toggleStatus');
     Route::get('/get-sessions-by-annee/{code_annee}', [SessionExamenController::class, 'getSessionsByAnnee'])->name('sessionsExamen.getSessionsByAnnee');
@@ -101,7 +101,7 @@ Route::prefix('examens')->group(function () {
     Route::get('/{code_examen}/edit', [ExamenController::class, 'edit'])->name('examens.edit');
     Route::put('/{code_examen}', [ExamenController::class, 'update'])->name('examens.update');
     Route::delete('/{code_examen}', [ExamenController::class, 'destroy'])->name('examens.destroy');
-    
+
     // Additional routes for examens
     Route::get('/{code_examen}/planifier', [ExamenController::class, 'planifier'])->name('examens.planifier');
     Route::post('/{code_examen}/planifier', [ExamenController::class, 'storePlanification'])->name('examens.storePlanification');
@@ -119,7 +119,7 @@ Route::prefix('periodes')->group(function () {
     Route::get('/{code_salle}/{code_ec}/edit', [PeriodeController::class, 'edit'])->name('periodes.edit');
     Route::put('/{code_salle}/{code_ec}', [PeriodeController::class, 'update'])->name('periodes.update');
     Route::delete('/{code_salle}/{code_ec}', [PeriodeController::class, 'destroy'])->name('periodes.destroy');
-    
+
     // Additional routes for périodes
     Route::get('/get-periodes-by-date-range', [PeriodeController::class, 'getPeriodesByDateRange'])->name('periodes.getPeriodesByDateRange');
     Route::get('/check-disponibilite-salle', [PeriodeController::class, 'checkDisponibiliteSalle'])->name('periodes.checkDisponibiliteSalle');
@@ -138,7 +138,7 @@ Route::prefix('ressources')->group(function () {
     Route::delete('/documents/{id}', [RessourceController::class, 'destroyDocument'])->name('ressources.documents.destroy');
     Route::get('/documents/{id}/download', [RessourceController::class, 'downloadDocument'])->name('ressources.documents.download');
     Route::get('/documents/session/{codeSession}', [RessourceController::class, 'getDocumentsBySession'])->name('ressources.documents.getBySession');
-    
+
     // Salles routes
     Route::get('/salles', [RessourceController::class, 'indexSalles'])->name('ressources.salles.index');
     Route::get('/salles/create', [RessourceController::class, 'createSalle'])->name('ressources.salles.create');
@@ -149,7 +149,7 @@ Route::prefix('ressources')->group(function () {
     Route::delete('/salles/{codeSalle}', [RessourceController::class, 'destroySalle'])->name('ressources.salles.destroy');
     Route::get('/salles-disponibles', [RessourceController::class, 'getSallesDisponibles'])->name('ressources.salles.disponibles');
     Route::get('/salles/{codeSalle}/verifier-disponibilite', [RessourceController::class, 'verifierDisponibiliteSalle'])->name('ressources.salles.verifierDisponibilite');
-    
+
     // Statistiques
     Route::get('/statistiques', [RessourceController::class, 'getStatistiquesRessources'])->name('ressources.statistiques');
 });
@@ -159,38 +159,36 @@ Route::prefix('consultation-note')->group(function () {
     Route::get('/', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.index');
     })->name('consultation.note.index');
-    
+
     Route::get('/student-notes', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.student_notes');
     })->name('consultation.note.studentNotes');
-    
+
     Route::get('/student-semester-notes', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.student_semester_notes');
     })->name('consultation.note.studentSemesterNotes');
-    
+
     Route::get('/student-report-card', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.student_report_card');
     })->name('consultation.note.studentReportCard');
-    
+
     Route::get('/student-transcript', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.student_transcript');
     })->name('consultation.note.studentTranscript');
-    
+
     Route::get('/class-results', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.class_results');
     })->name('consultation.note.classResults');
-    
+
     Route::get('/level-results', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.level_results');
     })->name('consultation.note.levelResults');
-    
+
     Route::get('/field-results', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.field_results');
     })->name('consultation.note.fieldResults');
-    
+
     Route::get('/semester-ranking', function () {
         return view('sige_app.backend.gestion_notes.consultation_note.semester_ranking');
     })->name('consultation.note.semesterRanking');
 });
-
-

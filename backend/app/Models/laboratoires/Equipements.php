@@ -10,8 +10,11 @@ use Illuminate\Support\Str;
 class Equipements extends Model
 {
     protected $table = 'equipements';
+
     protected $primaryKey = 'code_equip';
+
     public $incrementing = true;
+
     protected $fillable = [
         'nom_equip',
         'ref_equip',
@@ -21,14 +24,14 @@ class Equipements extends Model
         'date_achat',
         'valeur',
         'localisation',
-        'code_lab'
+        'code_lab',
     ];
 
     protected $casts = [
         'date_achat' => 'date',
         'valeur' => 'decimal:2',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     // Relations
@@ -76,7 +79,7 @@ class Equipements extends Model
     // Accesseurs
     public function getEtatBadgeAttribute()
     {
-        return match($this->etat) {
+        return match ($this->etat) {
             'disponible' => 'success',
             'en maintenance' => 'warning',
             'hors service' => 'danger',
@@ -88,7 +91,7 @@ class Equipements extends Model
 
     public function getEtatLabelAttribute()
     {
-        return match($this->etat) {
+        return match ($this->etat) {
             'disponible' => 'Disponible',
             'en maintenance' => 'En maintenance',
             'hors service' => 'Hors service',
@@ -100,7 +103,7 @@ class Equipements extends Model
 
     public function getValeurFormattedAttribute()
     {
-        return $this->valeur ? number_format($this->valeur, 0, ',', ' ') . ' FCFA' : 'Non définie';
+        return $this->valeur ? number_format($this->valeur, 0, ',', ' ').' FCFA' : 'Non définie';
     }
 
     public function getDateAchatFormattedAttribute()
@@ -184,13 +187,13 @@ class Equipements extends Model
     {
         $query = $this->reservations()
             ->where('statut', 'confirmé')
-            ->where(function($q) use ($debut, $fin) {
+            ->where(function ($q) use ($debut, $fin) {
                 $q->whereBetween('debut_reserv', [$debut, $fin])
-                  ->orWhereBetween('fin_reserv', [$debut, $fin])
-                  ->orWhere(function($subQ) use ($debut, $fin) {
-                      $subQ->where('debut_reserv', '<=', $debut)
-                           ->where('fin_reserv', '>=', $fin);
-                  });
+                    ->orWhereBetween('fin_reserv', [$debut, $fin])
+                    ->orWhere(function ($subQ) use ($debut, $fin) {
+                        $subQ->where('debut_reserv', '<=', $debut)
+                            ->where('fin_reserv', '>=', $fin);
+                    });
             });
 
         if ($excludeId) {
@@ -233,7 +236,7 @@ class Equipements extends Model
      */
     public function getAgeAttribute()
     {
-        if (!$this->date_achat) {
+        if (! $this->date_achat) {
             return null;
         }
 
@@ -254,7 +257,7 @@ class Equipements extends Model
             return 'Moins d\'un an';
         }
 
-        return $age . ' an' . ($age > 1 ? 's' : '');
+        return $age.' an'.($age > 1 ? 's' : '');
     }
 
     /**
@@ -272,6 +275,7 @@ class Equipements extends Model
         if ($entretienEnCours) {
             $this->etat = 'en maintenance';
             $this->save();
+
             return;
         }
         // Vérifier s'il y a une réservation confirmée active
@@ -283,6 +287,7 @@ class Equipements extends Model
         if ($reservationActive) {
             $this->etat = 'en utilisation';
             $this->save();
+
             return;
         }
         // Sinon, disponible

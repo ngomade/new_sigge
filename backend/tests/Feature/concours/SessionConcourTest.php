@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\concours;
 
-use Tests\TestCase;
+use App\Models\concours\Candidat;
+use App\Models\concours\Personnel;
+use App\Models\concours\SessionConcours;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{SessionConcours, Personnel, Candidat};
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class SessionConcourTest extends TestCase
 {
@@ -21,7 +23,7 @@ class SessionConcourTest extends TestCase
             'code_pers' => $personnel->code_pers,
             'annee' => '2024-01-01',
             'debut' => '2024-06-01',
-            'cloture' => '2024-08-31'
+            'cloture' => '2024-08-31',
         ]);
 
         $response->assertStatus(201)
@@ -33,12 +35,12 @@ class SessionConcourTest extends TestCase
     {
         $activeSession = SessionConcours::factory()->create([
             'debut' => now()->subDays(10),
-            'cloture' => now()->addDays(10)
+            'cloture' => now()->addDays(10),
         ]);
 
         SessionConcours::factory()->create([
             'debut' => now()->subMonths(3),
-            'cloture' => now()->subMonths(2)
+            'cloture' => now()->subMonths(2),
         ]);
 
         $response = $this->getJson('/api/concours/sessions/active');
@@ -55,12 +57,12 @@ class SessionConcourTest extends TestCase
         // Create candidats for this session
         Candidat::factory()->count(10)->create([
             'id' => $session->id,
-            'ca_sexe' => 'M'
+            'ca_sexe' => 'M',
         ]);
 
         Candidat::factory()->count(5)->create([
             'id' => $session->id,
-            'ca_sexe' => 'F'
+            'ca_sexe' => 'F',
         ]);
 
         $personnel = Personnel::factory()->create();
@@ -73,7 +75,7 @@ class SessionConcourTest extends TestCase
                 'total_candidats',
                 'candidats_par_sexe',
                 'candidats_par_filiere',
-                'candidats_par_site'
+                'candidats_par_site',
             ])
             ->assertJsonPath('total_candidats', 15);
     }

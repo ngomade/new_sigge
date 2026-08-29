@@ -8,15 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
         Schema::create('actualite', function (Blueprint $table) {
             $table->string('actu_code', 128)->primary();
             $table->char('code_pers', 32);
-            $table->foreign("code_pers")->references("code_pers")->on("personnel");
+            $table->foreign('code_pers')->references('code_pers')->on('personnel');
             $table->text('actu_title');
             $table->text('actu_content');
             $table->boolean('actu_status')->nullable();
@@ -27,8 +25,6 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\laboratoires\Equipements;
+use Illuminate\Console\Command;
 
 class UpdateEquipementsEtat extends Command
 {
@@ -33,6 +33,7 @@ class UpdateEquipementsEtat extends Command
             $count++;
         }
         $this->info("$count équipements mis à jour.");
+
         return 0;
     }
 }

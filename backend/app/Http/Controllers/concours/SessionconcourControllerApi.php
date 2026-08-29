@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\concours\SessionConcours;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use Carbon\Carbon;
 
 class SessionconcourControllerApi extends Controller
 {
@@ -18,6 +18,7 @@ class SessionconcourControllerApi extends Controller
     {
         // ::with(['personnel', 'candidat'])->orderBy('annee', 'desc')->get();
         $sessions = SessionConcours::all();
+
         return response()->json($sessions);
     }
 
@@ -35,9 +36,11 @@ class SessionconcourControllerApi extends Controller
 
         try {
             $session = SessionConcours::create($validateData);
+
             return response()->json($session->load('personnel'));
         } catch (Throwable $th) {
-            Log::error('Error creating session: ' . $th->getMessage());
+            Log::error('Error creating session: '.$th->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la création de la session'], 500);
         }
     }
@@ -67,10 +70,12 @@ class SessionconcourControllerApi extends Controller
         $session = SessionConcours::findOrFail($id);
         try {
             $session->update($validateData);
+
             return response()->json($session->load('personnel'));
         } catch (Throwable $th) {
-            Log::error('Error updating session: ' . $th->getMessage());
-            return response()->json(['erreur' => 'Erreur lors de la mise à jour de la session: ' . $th->getMessage()], 500);
+            Log::error('Error updating session: '.$th->getMessage());
+
+            return response()->json(['erreur' => 'Erreur lors de la mise à jour de la session: '.$th->getMessage()], 500);
         }
     }
 
@@ -82,10 +87,12 @@ class SessionconcourControllerApi extends Controller
         $session = SessionConcours::findOrFail($id);
         try {
             $session->delete();
+
             return response()->noContent();
         } catch (Throwable $th) {
-            Log::error('Error deleting session: ' . $th->getMessage());
-            return response()->json(['erreur' => 'Erreur lors de la suppression de la session: ' . $th->getMessage()], 500);
+            Log::error('Error deleting session: '.$th->getMessage());
+
+            return response()->json(['erreur' => 'Erreur lors de la suppression de la session: '.$th->getMessage()], 500);
         }
     }
 
@@ -99,9 +106,10 @@ class SessionconcourControllerApi extends Controller
             ->where('cloture', '>=', $today)
             ->first();
 
-        if (!$session) {
+        if (! $session) {
             return response()->json(['message' => 'Aucune session active'], 404);
         }
+
         return response()->json($session);
     }
 
@@ -111,7 +119,7 @@ class SessionconcourControllerApi extends Controller
     public function byYear($year)
     {
         $sessions = SessionConcours::whereYear('annee', $year)
-            ->with(['personnel','candidats'])
+            ->with(['personnel', 'candidats'])
             ->orderBy('debut')
             ->get();
 
@@ -165,7 +173,7 @@ class SessionconcourControllerApi extends Controller
     public function past()
     {
         $sessions = SessionConcours::where('cloture', '<', Carbon::now())
-            ->with(["personnel", "candidats"])
+            ->with(['personnel', 'candidats'])
             ->orderBy('cloture', 'desc')
             ->get();
 

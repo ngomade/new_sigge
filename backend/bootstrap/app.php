@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            "jwt" => JwtMiddleware::class,
+            'jwt' => JwtMiddleware::class,
             'guest.sanctum' => CheckAlreadyAuthenticated::class,
             'laboratoire.auth' => LaboratoireAuthMiddleware::class,
             'laboratoire.permission' => LaboratoirePermissionMiddleware::class,

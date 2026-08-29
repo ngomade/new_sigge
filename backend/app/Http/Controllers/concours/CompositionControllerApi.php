@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
+use App\Models\concours\Composition;
 use Exception;
 use Illuminate\Http\Request;
-use App\Models\concours\Composition;
 use Illuminate\Support\Facades\Log;
 
 class CompositionControllerApi extends Controller
@@ -16,6 +16,7 @@ class CompositionControllerApi extends Controller
     public function index()
     {
         $compositions = Composition::all();
+
         return response()->json($compositions);
     }
 
@@ -30,9 +31,11 @@ class CompositionControllerApi extends Controller
         ]);
         try {
             $composition = Composition::create($validateData);
+
             return response()->json($composition);
         } catch (Exception $e) {
-            Log::error('Error creating composition: ' . $e->getMessage());
+            Log::error('Error creating composition: '.$e->getMessage());
+
             return response()->json(['erreur' => 'erreur lors de l\'enregistrement de la composition'], 500);
         }
     }
@@ -43,6 +46,7 @@ class CompositionControllerApi extends Controller
     public function show(string $id)
     {
         $composition = Composition::findorFail($id);
+
         return response()->json($composition);
     }
 
@@ -58,9 +62,11 @@ class CompositionControllerApi extends Controller
         $composition = Composition::findOrFail($id);
         try {
             $composition->update($validateData);
+
             return response()->json($composition);
         } catch (Exception $e) {
-            Log::error('Error updating composition: ' . $e->getMessage());
+            Log::error('Error updating composition: '.$e->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la mise à jour de la composition.'], 500);
         }
     }
@@ -73,9 +79,11 @@ class CompositionControllerApi extends Controller
         $composition = Composition::findOrFail($id);
         try {
             $composition->delete();
+
             return response()->json(['succes' => 'Composition supprimée.']);
         } catch (Exception $e) {
-            Log::error('Error deleting composition: ' . $e->getMessage());
+            Log::error('Error deleting composition: '.$e->getMessage());
+
             return response()->json(['erreur' => 'Erreur lors de la suppression de la composition.'], 500);
         }
     }

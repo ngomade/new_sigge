@@ -10,16 +10,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class SiteEtude extends Model
 {
     use HasFactory;
-	protected $table = 'site_etude';
-	protected $primaryKey = 'code_site';
 
-	protected $fillable = [
-		'label_site',
-		'description_site'
-	];
+    protected $table = 'site_etude';
 
-	public function candidats(): HasMany
-	{
-		return $this->hasMany(Candidat::class, 'code_site');
-	}
+    protected $primaryKey = 'code_site';
+
+    protected $fillable = [
+        'label_site',
+        'description_site',
+    ];
+
+    public function candidats(): HasMany
+    {
+        return $this->hasMany(Candidat::class, 'code_site');
+    }
 }

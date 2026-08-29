@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('sous_bureau', function (Blueprint $table) {
             $table->string('code_bureau');
             $table->string('code_sous_bureau');
-            $table->foreign('code_bureau')->references
-            ('code_bureau')->on('bureau')->onDelete('cascade');
-             $table->foreign('code_sous_bureau')->references
-            ('code_bureau')->on('bureau')->onDelete('cascade');
+            $table->foreign('code_bureau')->references('code_bureau')->on('bureau')->onDelete('cascade');
+            $table->foreign('code_sous_bureau')->references('code_bureau')->on('bureau')->onDelete('cascade');
             $table->primary(['code_bureau', 'code_sous_bureau']);
             $table->timestamps();
         });

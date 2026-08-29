@@ -2,7 +2,6 @@
 
 namespace App\Models\concours;
 
-use App\Models\concours\Candidat;
 use App\Models\Personnel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,27 +11,28 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class SessionConcours extends Model
 {
     use HasFactory;
-	protected $table = 'session_concours';
 
-	protected $casts = [
-		'debut' => 'datetime',
-		'cloture' => 'datetime'
-	];
+    protected $table = 'session_concours';
 
-	protected $fillable = [
-		'code_pers',
-		'annee',
-		'debut',
-		'cloture'
-	];
+    protected $casts = [
+        'debut' => 'datetime',
+        'cloture' => 'datetime',
+    ];
 
-	public function personnel(): BelongsTo
-	{
-		return $this->belongsTo(Personnel::class, 'code_pers');
-	}
+    protected $fillable = [
+        'code_pers',
+        'annee',
+        'debut',
+        'cloture',
+    ];
 
-	public function candidats(): HasMany
-	{
-		return $this->hasMany(Candidat::class, 'id');
-	}
+    public function personnel(): BelongsTo
+    {
+        return $this->belongsTo(Personnel::class, 'code_pers');
+    }
+
+    public function candidats(): HasMany
+    {
+        return $this->hasMany(Candidat::class, 'id');
+    }
 }

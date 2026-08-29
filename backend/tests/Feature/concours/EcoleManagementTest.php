@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\concours;
 
-use App\Models\concours\{App\Models\CentreDepot, Personnel};
+use App\Models\concours\Personnel;
 use App\Models\Ecole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -20,9 +20,6 @@ class EcoleManagementTest extends TestCase
         Storage::fake('local');
     }
 
-
-
-
     /** @test */
     public function can_create_ecole_with_logo()
     {
@@ -38,20 +35,20 @@ class EcoleManagementTest extends TestCase
             'tel_ecole' => '699123456',
             'email_ecole' => 'contact@ecole.cm',
             'bp_ecole' => 'BP 123 Douala',
-            'centre_depot' => $centreDepot->centre_depot_code
+            'centre_depot' => $centreDepot->centre_depot_code,
         ]);
 
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('ecole', [
             'code_ecole' => 'ECOLE001',
-            'label_ecole' => 'École Polytechnique'
+            'label_ecole' => 'École Polytechnique',
         ]);
 
         Storage::assertExists('private/logos');
     }
-    /** @test */
 
+    /** @test */
     public function can_update_ecole_with_logo()
     {
         $ecole = Ecole::factory()->create();
@@ -65,12 +62,12 @@ class EcoleManagementTest extends TestCase
             'tel_ecole' => '699654321',
             'email_ecole' => 'logan@gmail.com',
             'bp_ecole' => 'BP 456 Yaoundé',
-            'centre_depot' => $ecole->centre_depot_code
+            'centre_depot' => $ecole->centre_depot_code,
         ]);
         $response->assertStatus(200);
         $this->assertDatabaseHas('ecole', [
             'code_ecole' => $ecole->code_ecole,
-            'label_ecole' => 'École Supérieure'
+            'label_ecole' => 'École Supérieure',
         ]);
         Storage::assertExists('private/logos/new_logo.png');
 
@@ -78,11 +75,11 @@ class EcoleManagementTest extends TestCase
         if ($ecole->logo_ecole) {
             Storage::delete($ecole->logo_ecole);
         }
-        Storage::assertMissing('private/logos/' . $ecole->logo_ecole);
+        Storage::assertMissing('private/logos/'.$ecole->logo_ecole);
 
+    }
 
-}
-/** @test */
+    /** @test */
     public function can_delete_ecole()
     {
         $ecole = Ecole::factory()->create();
@@ -93,9 +90,10 @@ class EcoleManagementTest extends TestCase
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('ecole', [
-            'code_ecole' => $ecole->code_ecole
+            'code_ecole' => $ecole->code_ecole,
         ]);
     }
+
     /** @test */
     public function can_list_ecoles()
     {
@@ -110,6 +108,7 @@ class EcoleManagementTest extends TestCase
             ->assertJsonFragment(['label_ecole' => 'École A'])
             ->assertJsonFragment(['label_ecole' => 'École B']);
     }
+
     /** @test */
     public function can_show_ecole_details()
     {
@@ -121,6 +120,7 @@ class EcoleManagementTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonFragment(['label_ecole' => $ecole->label_ecole]);
     }
+
     /** @test */
     public function cannot_create_ecole_without_required_fields()
     {
@@ -135,6 +135,7 @@ class EcoleManagementTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['label_ecole', 'logo_ecole', 'desc_ecole', 'tel_ecole', 'email_ecole', 'bp_ecole']);
     }
+
     /** @test */
     public function cannot_update_ecole_with_invalid_data()
     {
@@ -149,12 +150,13 @@ class EcoleManagementTest extends TestCase
             'tel_ecole' => 'invalid_phone', // Invalid phone format
             'email_ecole' => 'not-an-email', // Invalid email format
             'bp_ecole' => 'BP 789',
-            'centre_depot' => $ecole->centre_depot_code
+            'centre_depot' => $ecole->centre_depot_code,
         ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['label_ecole', 'tel_ecole', 'email_ecole']);
     }
+
     /** @test */
     public function cannot_delete_non_existent_ecole()
     {
@@ -165,6 +167,7 @@ class EcoleManagementTest extends TestCase
         $response->assertStatus(404)
             ->assertJson(['message' => 'Ecole not found']);
     }
+
     /** @test */
     public function cannot_access_ecole_management_without_authentication()
     {
@@ -172,10 +175,4 @@ class EcoleManagementTest extends TestCase
         $response->assertStatus(401)
             ->assertJson(['message' => 'Unauthenticated.']);
     }
-
-
-
 }
-
-
-

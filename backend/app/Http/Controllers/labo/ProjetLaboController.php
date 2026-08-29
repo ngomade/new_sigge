@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
-use App\Models\laboratoires\ProjetLabo;
 use App\Models\laboratoires\Laboratoire;
-use App\Models\laboratoires\PersLab;
-use App\Models\laboratoires\UserExterne;
 use App\Models\laboratoires\ParticiperProjet;
+use App\Models\laboratoires\PersLab;
+use App\Models\laboratoires\ProjetLabo;
+use App\Models\laboratoires\UserExterne;
 use Illuminate\Http\Request;
 
 class ProjetLaboController extends Controller
@@ -55,7 +55,7 @@ class ProjetLaboController extends Controller
             'fin_projet' => 'nullable|date|after:debut_projet',
             'participants_internes' => 'nullable|array',
             'participants_externes' => 'nullable|array',
-            'roles' => 'nullable|array'
+            'roles' => 'nullable|array',
         ]);
 
         $projet = ProjetLabo::create($validated);
@@ -67,7 +67,7 @@ class ProjetLaboController extends Controller
                     'code_projet' => $projet->code_projet,
                     'id_pers_lab' => $id_pers_lab,
                     'role' => $request->roles[$id_pers_lab] ?? 'Participant',
-                    'debut_participation' => $projet->debut_projet
+                    'debut_participation' => $projet->debut_projet,
                 ]);
             }
         }
@@ -78,8 +78,8 @@ class ProjetLaboController extends Controller
                 ParticiperProjet::create([
                     'code_projet' => $projet->code_projet,
                     'id_user_ext' => $id_user_ext,
-                    'role' => $request->roles['ext_' . $id_user_ext] ?? 'Participant externe',
-                    'debut_participation' => $projet->debut_projet
+                    'role' => $request->roles['ext_'.$id_user_ext] ?? 'Participant externe',
+                    'debut_participation' => $projet->debut_projet,
                 ]);
             }
         }
@@ -125,7 +125,7 @@ class ProjetLaboController extends Controller
             'code_lab' => 'required|exists:laboratoire,code_lab',
             'statut_projet' => 'required|in:en_cours,termine,suspendu',
             'debut_projet' => 'required|date',
-            'fin_projet' => 'nullable|date|after:debut_projet'
+            'fin_projet' => 'nullable|date|after:debut_projet',
         ]);
 
         $projet->update($validated);

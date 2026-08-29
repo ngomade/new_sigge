@@ -3,20 +3,17 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
+use App\Models\notes\Ec;
 use App\Models\notes\Examen;
-use App\Models\notes\SessionExamen;
 use App\Models\notes\Periode;
 use App\Models\notes\Salle;
-use App\Models\notes\Ec;
+use App\Models\notes\SessionExamen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 use Throwable;
-
-
 
 class ExamenController extends Controller
 {
@@ -41,7 +38,7 @@ class ExamenController extends Controller
                 $query->whereHas('sessionExamen', function ($q) use ($request) {
                     $q->whereBetween('date_debut_session', [
                         $request->date_debut,
-                        $request->date_fin
+                        $request->date_fin,
                     ]);
                 });
             }
@@ -60,7 +57,7 @@ class ExamenController extends Controller
                 'EXAM' => 'Examen Final',
                 'RATTRAPAGE' => 'Rattrapage',
                 'PROJET' => 'Projet',
-                'STAGE' => 'Stage'
+                'STAGE' => 'Stage',
             ];
 
             // Statistiques
@@ -68,14 +65,14 @@ class ExamenController extends Controller
                 'total_examens' => Examen::count(),
                 'examens_ce_mois' => Examen::whereHas('sessionExamen', function ($q) {
                     $q->whereMonth('date_debut_session', now()->month)
-                      ->whereYear('date_debut_session', now()->year);
+                        ->whereYear('date_debut_session', now()->year);
                 })->count(),
                 'examens_actifs' => Examen::whereHas('sessionExamen', function ($q) {
                     $q->where('statut_session', 1);
                 })->count(),
                 'total_evaluations' => $examens->sum(function ($examen) {
                     return $examen->evaluations->count();
-                })
+                }),
             ];
 
             return view('sige_app.backend.gestion_notes.examen.index', compact(
@@ -83,9 +80,9 @@ class ExamenController extends Controller
             ));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des examens: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage des examens: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
 
             return redirect()->back()
@@ -111,14 +108,14 @@ class ExamenController extends Controller
                 'EXAM' => 'Examen Final',
                 'RATTRAPAGE' => 'Rattrapage',
                 'PROJET' => 'Projet',
-                'STAGE' => 'Stage'
+                'STAGE' => 'Stage',
             ];
 
             return view('sige_app.backend.gestion_notes.examen.create', compact('sessions', 'typesEvaluation'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de création d\'examen: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage du formulaire de création d\'examen: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('examens.index')
@@ -154,6 +151,7 @@ class ExamenController extends Controller
             $session = SessionExamen::findOrFail($request->code_session);
             if ($session->statut_session != 1) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Impossible de créer un examen dans une session inactive.')
                     ->withInput();
@@ -170,7 +168,7 @@ class ExamenController extends Controller
             Log::info('Examen créé avec succès', [
                 'examen_id' => $examen->code_examen,
                 'user_id' => auth()->id(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return redirect()->route('examens.show', $examen->code_examen)
@@ -178,11 +176,11 @@ class ExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la création de l\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la création de l\'examen: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -202,7 +200,7 @@ class ExamenController extends Controller
                 'evaluations.ec.ue.semestre',
                 'evaluations.user',
                 'periodes.salle',
-                'periodes.ec'
+                'periodes.ec',
             ])->findOrFail($code_examen);
 
             // Statistiques de l'examen
@@ -212,7 +210,7 @@ class ExamenController extends Controller
                 'ecs_concernes' => $examen->evaluations->unique('code_ec')->count(),
                 'moyenne_generale' => round($examen->evaluations->avg('note_eval') ?? 0, 2),
                 'taux_reussite' => $this->calculateTauxReussite($examen->evaluations),
-                'periodes_planifiees' => $examen->periodes->count()
+                'periodes_planifiees' => $examen->periodes->count(),
             ];
 
             // Répartition par EC
@@ -220,20 +218,21 @@ class ExamenController extends Controller
                 ->groupBy('code_ec')
                 ->map(function ($evaluations, $code_ec) {
                     $ec = $evaluations->first()->ec;
+
                     return [
                         'ec' => $ec,
                         'count' => $evaluations->count(),
                         'moyenne' => round($evaluations->avg('note_eval'), 2),
-                        'taux_reussite' => $this->calculateTauxReussite($evaluations)
+                        'taux_reussite' => $this->calculateTauxReussite($evaluations),
                     ];
                 });
 
             return view('sige_app.backend.gestion_notes.examen.show', compact('examen', 'stats', 'repartitionEc'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage de l\'examen: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage de l\'examen: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('examens.index')
@@ -248,7 +247,7 @@ class ExamenController extends Controller
     {
         try {
             $examen = Examen::with('sessionExamen')->findOrFail($code_examen);
-            
+
             $sessions = SessionExamen::with('anneeScolaire')
                 ->where('statut_session', 1)
                 ->orderBy('date_debut_session', 'desc')
@@ -261,15 +260,15 @@ class ExamenController extends Controller
                 'EXAM' => 'Examen Final',
                 'RATTRAPAGE' => 'Rattrapage',
                 'PROJET' => 'Projet',
-                'STAGE' => 'Stage'
+                'STAGE' => 'Stage',
             ];
 
             return view('sige_app.backend.gestion_notes.examen.edit', compact('examen', 'sessions', 'typesEvaluation'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('examens.index')
@@ -307,6 +306,7 @@ class ExamenController extends Controller
             $session = SessionExamen::findOrFail($request->code_session);
             if ($session->statut_session != 1) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Impossible d\'assigner un examen à une session inactive.')
                     ->withInput();
@@ -326,7 +326,7 @@ class ExamenController extends Controller
                 'examen_id' => $code_examen,
                 'user_id' => auth()->id(),
                 'old_data' => $oldData,
-                'new_data' => $request->all()
+                'new_data' => $request->all(),
             ]);
 
             return redirect()->route('examens.show', $code_examen)
@@ -334,12 +334,12 @@ class ExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la modification de l\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la modification de l\'examen: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -361,6 +361,7 @@ class ExamenController extends Controller
             // Vérifier s'il y a des évaluations liées
             if ($examen->evaluations->isNotEmpty()) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Impossible de supprimer cet examen car des évaluations y sont liées.');
             }
@@ -380,7 +381,7 @@ class ExamenController extends Controller
             Log::info('Examen supprimé avec succès', [
                 'examen_id' => $code_examen,
                 'user_id' => auth()->id(),
-                'deleted_data' => $examenData
+                'deleted_data' => $examenData,
             ]);
 
             return redirect()->route('examens.index')
@@ -388,11 +389,11 @@ class ExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la suppression de l\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la suppression de l\'examen: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -407,11 +408,11 @@ class ExamenController extends Controller
     {
         try {
             $examen = Examen::with('sessionExamen')->findOrFail($code_examen);
-            
+
             $salles = Salle::where('etat_salle', true)
                 ->orderBy('code_salle')
                 ->get();
-            
+
             $ecs = Ec::with(['ue.semestre', 'assignations.classe'])
                 ->orderBy('intitule_ec')
                 ->get();
@@ -424,9 +425,9 @@ class ExamenController extends Controller
             return view('sige_app.backend.gestion_notes.examen.planifier', compact('examen', 'salles', 'ecs', 'periodesTourning'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de planification: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de planification: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('examens.show', $code_examen)
@@ -479,23 +480,24 @@ class ExamenController extends Controller
                         ->where(function ($query) use ($planifData) {
                             $query->whereBetween('debut_periode', [
                                 $planifData['debut_periode'],
-                                $planifData['fin_periode']
+                                $planifData['fin_periode'],
                             ])
-                            ->orWhereBetween('fin_periode', [
-                                $planifData['debut_periode'],
-                                $planifData['fin_periode']
-                            ])
-                            ->orWhere(function ($q) use ($planifData) {
-                                $q->where('debut_periode', '<=', $planifData['debut_periode'])
-                                  ->where('fin_periode', '>=', $planifData['fin_periode']);
-                            });
+                                ->orWhereBetween('fin_periode', [
+                                    $planifData['debut_periode'],
+                                    $planifData['fin_periode'],
+                                ])
+                                ->orWhere(function ($q) use ($planifData) {
+                                    $q->where('debut_periode', '<=', $planifData['debut_periode'])
+                                        ->where('fin_periode', '>=', $planifData['fin_periode']);
+                                });
                         })
                         ->exists();
 
                     if ($conflictSalle) {
                         $conflictCount++;
                         $salle = Salle::find($planifData['code_salle']);
-                        $errors[] = "Conflit de salle pour " . ($salle ? $salle->code_salle : 'salle inconnue');
+                        $errors[] = 'Conflit de salle pour '.($salle ? $salle->code_salle : 'salle inconnue');
+
                         continue;
                     }
 
@@ -514,11 +516,11 @@ class ExamenController extends Controller
 
                 } catch (Throwable $e) {
                     $ec = Ec::find($planifData['code_ec']);
-                    $errors[] = "Erreur pour l'EC " . ($ec ? $ec->intitule_ec : 'inconnu');
-                    
+                    $errors[] = "Erreur pour l'EC ".($ec ? $ec->intitule_ec : 'inconnu');
+
                     Log::error('Erreur lors de la planification: ', [
                         'error' => $e->getMessage(),
-                        'planif_data' => $planifData
+                        'planif_data' => $planifData,
                     ]);
                 }
             }
@@ -530,7 +532,7 @@ class ExamenController extends Controller
                 $message .= ", {$conflictCount} conflit(s) de salle";
             }
             if (count($errors) > 0) {
-                $message .= ", " . count($errors) . " erreur(s)";
+                $message .= ', '.count($errors).' erreur(s)';
             }
 
             Log::info('Planification d\'examen effectuée', [
@@ -538,7 +540,7 @@ class ExamenController extends Controller
                 'examen_id' => $code_examen,
                 'success_count' => $successCount,
                 'conflict_count' => $conflictCount,
-                'error_count' => count($errors)
+                'error_count' => count($errors),
             ]);
 
             $alertType = ($conflictCount + count($errors)) > 0 ? 'warning' : 'success';
@@ -548,12 +550,12 @@ class ExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la planification de l\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la planification de l\'examen: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -576,24 +578,24 @@ class ExamenController extends Controller
                         'code_examen' => $examen->code_examen,
                         'type_evaluation' => $examen->type_evaluation,
                         'created_at' => $examen->created_at->format('d/m/Y'),
-                        'evaluations_count' => $examen->evaluations->count()
+                        'evaluations_count' => $examen->evaluations->count(),
                     ];
                 });
 
             return response()->json([
                 'success' => true,
-                'examens' => $examens
+                'examens' => $examens,
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des examens par session: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la récupération des examens par session: '.$e->getMessage(), [
                 'code_session' => $code_session,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des examens'
+                'message' => 'Erreur lors de la récupération des examens',
             ], 500);
         }
     }
@@ -612,7 +614,7 @@ class ExamenController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Paramètres invalides'
+                    'message' => 'Paramètres invalides',
                 ], 400);
             }
 
@@ -620,16 +622,16 @@ class ExamenController extends Controller
             $sallesOccupees = Periode::where(function ($query) use ($request) {
                 $query->whereBetween('debut_periode', [
                     $request->debut_periode,
-                    $request->fin_periode
+                    $request->fin_periode,
                 ])
-                ->orWhereBetween('fin_periode', [
-                    $request->debut_periode,
-                    $request->fin_periode
-                ])
-                ->orWhere(function ($q) use ($request) {
-                    $q->where('debut_periode', '<=', $request->debut_periode)
-                      ->where('fin_periode', '>=', $request->fin_periode);
-                });
+                    ->orWhereBetween('fin_periode', [
+                        $request->debut_periode,
+                        $request->fin_periode,
+                    ])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('debut_periode', '<=', $request->debut_periode)
+                            ->where('fin_periode', '>=', $request->fin_periode);
+                    });
             })->pluck('code_salle');
 
             // Récupérer les salles disponibles
@@ -641,24 +643,24 @@ class ExamenController extends Controller
                     return [
                         'code_salle' => $salle->code_salle,
                         'nb_place_salle' => $salle->nb_place_salle,
-                        'desc_salle' => $salle->desc_salle
+                        'desc_salle' => $salle->desc_salle,
                     ];
                 });
 
             return response()->json([
                 'success' => true,
-                'salles' => $sallesDisponibles
+                'salles' => $sallesDisponibles,
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des salles disponibles: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la récupération des salles disponibles: '.$e->getMessage(), [
                 'request_data' => $request->all(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des salles disponibles'
+                'message' => 'Erreur lors de la récupération des salles disponibles',
             ], 500);
         }
     }
@@ -699,7 +701,7 @@ class ExamenController extends Controller
             $examen = Examen::with([
                 'sessionExamen.anneeScolaire',
                 'periodes.salle',
-                'periodes.ec.ue.semestre'
+                'periodes.ec.ue.semestre',
             ])->findOrFail($code_examen);
 
             if ($format === 'csv') {
@@ -713,10 +715,10 @@ class ExamenController extends Controller
                 ->with('info', 'Export PDF non encore implémenté. Utilisez le format CSV.');
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'export du planning: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'export du planning: '.$e->getMessage(), [
                 'examen_id' => $code_examen,
                 'format' => $format,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->back()
@@ -729,16 +731,16 @@ class ExamenController extends Controller
      */
     private function exportPlanningCSV($examen)
     {
-        $filename = 'planning_examen_' . $examen->code_examen . '_' . now()->format('Y-m-d_H-i-s') . '.csv';
-        
+        $filename = 'planning_examen_'.$examen->code_examen.'_'.now()->format('Y-m-d_H-i-s').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function() use ($examen) {
+        $callback = function () use ($examen) {
             $file = fopen('php://output', 'w');
-            
+
             // En-têtes CSV
             fputcsv($file, [
                 'Session',
@@ -751,7 +753,7 @@ class ExamenController extends Controller
                 'Date Début',
                 'Date Fin',
                 'Jour',
-                'Durée (min)'
+                'Durée (min)',
             ]);
 
             // Données
@@ -767,7 +769,7 @@ class ExamenController extends Controller
                     $periode->debut_periode,
                     $periode->fin_periode,
                     $periode->jour_periode,
-                    $periode->duree_periode
+                    $periode->duree_periode,
                 ]);
             }
 

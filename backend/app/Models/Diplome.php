@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,20 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Diplome extends Model
 {
     use HasFactory;
-	protected $table = 'diplome';
-	protected $primaryKey = 'code_dip';
 
-	protected $fillable = [
-		'label_dip',
-	];
+    protected $table = 'diplome';
 
-	public function filieres()
-	{
-		return $this->belongsToMany(Filiere::class, 'filiere_diplome', 'code_dip', 'code_filiere')
+    protected $primaryKey = 'code_dip';
+
+    protected $fillable = [
+        'label_dip',
+    ];
+
+    public function filieres()
+    {
+        return $this->belongsToMany(Filiere::class, 'filiere_diplome', 'code_dip', 'code_filiere')
             ->using(FiliereDiplome::class)
             ->withPivot('code_serie')
             ->withTimestamps();
-	}
+    }
 
     public function series()
     {

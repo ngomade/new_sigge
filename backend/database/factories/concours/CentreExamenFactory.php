@@ -14,7 +14,7 @@ class CentreExamenFactory extends Factory
     {
         return [
             'code_ecole' => Ecole::factory(),
-            'centre_exam_label' => $this->faker->city . ' - Centre d\'Examen'
+            'centre_exam_label' => $this->faker->city.' - Centre d\'Examen',
         ];
     }
 }

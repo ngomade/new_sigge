@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\requetes;
 
+use App\Http\Controllers\Controller;
 use App\Models\requetes\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Controller;
 
 class CategoryController extends Controller
 {
@@ -15,6 +15,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::orderBy('created_at', 'desc')->get();
+
         return view('sige_app.backend.requetes.categorie_index', compact('categories'));
     }
 
@@ -25,27 +26,27 @@ class CategoryController extends Controller
     {
         $request->validate([
             'label_cat' => 'required|string|max:255',
-            'desc_cat' => 'nullable|string'
+            'desc_cat' => 'nullable|string',
         ]);
 
         try {
             // Générer un code unique pour la catégorie
-            $code_cat = 'CAT_' . strtoupper(Str::random(6));
+            $code_cat = 'CAT_'.strtoupper(Str::random(6));
 
             // Vérifier que le code n'existe pas déjà
             while (Category::where('code_cat', $code_cat)->exists()) {
-                $code_cat = 'CAT_' . strtoupper(Str::random(6));
+                $code_cat = 'CAT_'.strtoupper(Str::random(6));
             }
 
             Category::create([
                 'code_cat' => $code_cat,
                 'label_cat' => $request->label_cat,
-                'desc_cat' => $request->desc_cat
+                'desc_cat' => $request->desc_cat,
             ]);
 
             return redirect()->back()->with('success', 'Catégorie ajoutée avec succès');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Erreur lors de l\'ajout de la catégorie: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erreur lors de l\'ajout de la catégorie: '.$e->getMessage());
         }
     }
 
@@ -56,7 +57,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'label_cat' => 'required|string|max:255',
-            'desc_cat' => 'nullable|string'
+            'desc_cat' => 'nullable|string',
         ]);
 
         try {
@@ -64,12 +65,12 @@ class CategoryController extends Controller
 
             $category->update([
                 'label_cat' => $request->label_cat,
-                'desc_cat' => $request->desc_cat
+                'desc_cat' => $request->desc_cat,
             ]);
 
             return redirect()->back()->with('success', 'Catégorie modifiée avec succès');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Erreur lors de la modification: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erreur lors de la modification: '.$e->getMessage());
         }
     }
 
@@ -90,7 +91,7 @@ class CategoryController extends Controller
 
             return redirect()->back()->with('success', 'Catégorie supprimée avec succès');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erreur lors de la suppression: '.$e->getMessage());
         }
     }
 }

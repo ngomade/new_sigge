@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
-use App\Models\laboratoires\PersLab;
 use App\Models\laboratoires\Laboratoire;
+use App\Models\laboratoires\PersLab;
 use App\Models\laboratoires\RoleLabo;
-use App\Models\laboratoires\PlRole;
 use Illuminate\Http\Request;
 
 class PersLabController extends Controller
@@ -56,7 +55,7 @@ class PersLabController extends Controller
             'date_sortie' => 'nullable|date|after:date_entree',
             'statut' => 'required|in:actif,inactif',
             'roles' => 'required|array|min:1',
-            'roles.*' => 'exists:role_labo,id_rl'
+            'roles.*' => 'exists:role_labo,id_rl',
         ]);
 
         $membre = PersLab::create($validated);
@@ -66,7 +65,7 @@ class PersLabController extends Controller
             PersLab::create([
                 'id_pers_lab' => $membre->id_pers_lab,
                 'id_rl' => $role_id,
-                'date_debut' => $membre->date_entree
+                'date_debut' => $membre->date_entree,
             ]);
         }
 
@@ -114,7 +113,7 @@ class PersLabController extends Controller
             'code_lab' => 'required|exists:laboratoire,code_lab',
             'date_entree' => 'required|date',
             'date_sortie' => 'nullable|date|after:date_entree',
-            'statut' => 'required|in:actif,inactif'
+            'statut' => 'required|in:actif,inactif',
         ]);
 
         $membre->update($validated);
@@ -131,7 +130,7 @@ class PersLabController extends Controller
                 PersLab::create([
                     'id_pers_lab' => $membre->id_pers_lab,
                     'id_rl' => $role_id,
-                    'date_debut' => now()
+                    'date_debut' => now(),
                 ]);
             }
         }

@@ -11,7 +11,7 @@ class Response extends Model
 
     protected $fillable = [
         'response_text',
-        'request_id'
+        'request_id',
     ];
 
     public function request()

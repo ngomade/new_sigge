@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('site_composition', function (Blueprint $table) {
-            $table->string('site_code',180)->primary();
-            $table->string('site_ville',180);
-            $table->string('site_lieu',180);
+            $table->string('site_code', 180)->primary();
+            $table->string('site_ville', 180);
+            $table->string('site_lieu', 180);
             $table->timestamps();
         });
     }

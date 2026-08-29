@@ -4,7 +4,6 @@ namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
 use App\Models\laboratoires\RoleLabo;
-use App\Models\laboratoires\LaboratoirePersLab;
 use Illuminate\Http\Request;
 
 class RoleLaboController extends Controller
@@ -20,6 +19,7 @@ class RoleLaboController extends Controller
         if ($layout === 'laboratoires.public.layout') {
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
         }
+
         return view('sige_app.frontend.labo.roles.index', compact('roles', 'layout', 'laboratoire'));
     }
 
@@ -33,6 +33,7 @@ class RoleLaboController extends Controller
         if ($layout === 'laboratoires.public.layout') {
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
         }
+
         return view('sige_app.frontend.labo.roles.create', compact('layout', 'laboratoire'));
     }
 
@@ -42,7 +43,7 @@ class RoleLaboController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'lib_rl' => 'required|unique:role_labo,lib_rl|max:100'
+            'lib_rl' => 'required|unique:role_labo,lib_rl|max:100',
         ]);
 
         RoleLabo::create($validated);
@@ -62,6 +63,7 @@ class RoleLaboController extends Controller
         if ($layout === 'laboratoires.public.layout') {
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
         }
+
         return view('sige_app.frontend.labo.roles.show', compact('role', 'layout', 'laboratoire'));
     }
 
@@ -76,6 +78,7 @@ class RoleLaboController extends Controller
         if ($layout === 'laboratoires.public.layout') {
             $laboratoire = \App\Models\laboratoires\Laboratoire::where('code_lab', session('laboratoire_code'))->first();
         }
+
         return view('sige_app.frontend.labo.roles.edit', compact('role', 'layout', 'laboratoire'));
     }
 
@@ -87,7 +90,7 @@ class RoleLaboController extends Controller
         $role = RoleLabo::findOrFail($id);
 
         $validated = $request->validate([
-            'lib_rl' => 'required|max:100|unique:role_labo,lib_rl,' . $id . ',id_rl'
+            'lib_rl' => 'required|max:100|unique:role_labo,lib_rl,'.$id.',id_rl',
         ]);
 
         $role->update($validated);

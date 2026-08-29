@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fichier_requetes', function (Blueprint $table) {
-            $table->string('id_fichier',32)->primary();
-            $table->string('chemin',180);
-             $table->string('code_requete');
+            $table->string('id_fichier', 32)->primary();
+            $table->string('chemin', 180);
+            $table->string('code_requete');
             $table->foreign('code_requete')->references('code_requete')->on('requetes')->onDelete('cascade');
             $table->timestamps();
         });

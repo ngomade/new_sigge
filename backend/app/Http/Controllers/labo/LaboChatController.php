@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\laboratoires\LaboChat;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class LaboChatController extends Controller
 {
@@ -19,6 +18,7 @@ class LaboChatController extends Controller
             ->take(30)
             ->get()
             ->reverse(); // Pour affichage du plus ancien au plus récent
+
         return view('laboratoires.public.chat', compact('messages', 'code_lab', 'laboratoire'));
     }
 
@@ -30,6 +30,7 @@ class LaboChatController extends Controller
             ->take(30)
             ->get()
             ->reverse();
+
         return response()->json($messages);
     }
 
@@ -41,10 +42,11 @@ class LaboChatController extends Controller
         ]);
         $userId = session('user_id');
         $userType = session('user_type');
-        if (!$userId || !$userType) {
+        if (! $userId || ! $userType) {
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['error' => 'Non authentifié'], 401);
             }
+
             return redirect()->route('chat.index', $code_lab)->with('error', 'Non authentifié');
         }
         $msg = LaboChat::create([
@@ -57,6 +59,7 @@ class LaboChatController extends Controller
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json($msg);
         }
+
         // Fallback : redirige vers le chat si submit natif
         return redirect()->route('chat.index', $code_lab)->with('success', 'Message envoyé !');
     }

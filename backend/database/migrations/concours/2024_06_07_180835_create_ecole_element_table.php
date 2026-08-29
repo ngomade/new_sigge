@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('code_ecole', 20);
             $table->unsignedBigInteger('code_el');
-           
 
             $table->foreign('code_ecole')->references('code_ecole')->on('ecole')->onDelete('cascade');
             $table->foreign('code_el')->references('code_el')->on('dossier')->onDelete('cascade');

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\LaboratoireAlertService;
+use Illuminate\Console\Command;
 
 class CheckLaboratoireAlerts extends Command
 {

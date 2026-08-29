@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Factories\concours;
 
 use App\Models\concours\SiteComposition;
@@ -11,11 +12,11 @@ class SiteCompositionFactory extends Factory
     public function definition(): array
     {
         static $index = 1;
-        
+
         return [
-            'site_code' => 'SITE' . str_pad($index++, 4, '0', STR_PAD_LEFT),
+            'site_code' => 'SITE'.str_pad($index++, 4, '0', STR_PAD_LEFT),
             'site_ville' => $this->faker->city,
-            'site_lieu' => $this->faker->streetAddress
+            'site_lieu' => $this->faker->streetAddress,
         ];
     }
 }

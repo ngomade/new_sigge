@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('compte', function (Blueprint $table) {
             $table->string('ca_num_recu', 40)->primary();
-             $table->string('ca_code', 20)->nullable();
+            $table->string('ca_code', 20)->nullable();
             $table->string('ca_pwd');
             $table->string('ca_recu');
             $table->string('ca_nom');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('ca_prenom');
             $table->timestamps();
 
-             $table->foreign('ca_code')->references('ca_code')->on('candidat')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('ca_code')->references('ca_code')->on('candidat')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\laboratoires\RoleLabo;
+use Illuminate\Database\Seeder;
 
 class RoleLaboSeeder extends Seeder
 {
@@ -17,7 +17,7 @@ class RoleLaboSeeder extends Seeder
             ['lib_rl' => 'membre'],
             ['lib_rl' => 'chercheur'],
             ['lib_rl' => 'technicien'],
-            ['lib_rl' => 'etudiant']
+            ['lib_rl' => 'etudiant'],
         ];
 
         foreach ($roles as $role) {

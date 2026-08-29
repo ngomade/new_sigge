@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class LaboratoireModuleSeeder extends Seeder
 {
@@ -109,7 +108,7 @@ class LaboratoireModuleSeeder extends Seeder
                 'partenaires' => 'Atos, Capgemini, Sopra Steria',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ];
 
         DB::table('laboratoire')->insert($laboratoires);

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\notes\Niveau;
 use App\Models\notes\Classe;
+use App\Models\notes\Niveau;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -17,6 +17,7 @@ class NiveauController extends Controller
     public function index()
     {
         $niveaux = Niveau::with('class')->paginate(10);
+
         return view('sige_app.backend.niveau.niveau_index', compact('niveaux'));
     }
 
@@ -26,6 +27,7 @@ class NiveauController extends Controller
     public function create()
     {
         $classes = Classe::all();
+
         return view('sige_app.backend.niveau.niveau_create', compact('classes'));
     }
 
@@ -36,7 +38,7 @@ class NiveauController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'label_niveau' => 'required|string|max:128',
-            'code_class' => 'nullable|exists:classes,code_class'
+            'code_class' => 'nullable|exists:classes,code_class',
         ]);
 
         if ($validator->fails()) {
@@ -49,7 +51,7 @@ class NiveauController extends Controller
             Niveau::create([
                 'code_niveau' => Str::uuid(),
                 'label_niveau' => $request->label_niveau,
-                'code_class' => $request->code_class
+                'code_class' => $request->code_class,
             ]);
 
             return redirect()->route('niveaux.index')
@@ -67,6 +69,7 @@ class NiveauController extends Controller
     public function show($code_niveau)
     {
         $niveau = Niveau::with(['class', 'semestres'])->findOrFail($code_niveau);
+
         return view('sige_app.backend.niveau.niveau_show', compact('niveau'));
     }
 
@@ -77,6 +80,7 @@ class NiveauController extends Controller
     {
         $niveau = Niveau::findOrFail($code_niveau);
         $classes = Classe::all();
+
         return view('sige_app.backend.niveau.niveau_edit', compact('niveau', 'classes'));
     }
 
@@ -87,7 +91,7 @@ class NiveauController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'label_niveau' => 'required|string|max:128',
-            'code_class' => 'nullable|exists:classes,code_class'
+            'code_class' => 'nullable|exists:classes,code_class',
         ]);
 
         if ($validator->fails()) {
@@ -100,7 +104,7 @@ class NiveauController extends Controller
             $niveau = Niveau::findOrFail($code_niveau);
             $niveau->update([
                 'label_niveau' => $request->label_niveau,
-                'code_class' => $request->code_class
+                'code_class' => $request->code_class,
             ]);
 
             return redirect()->route('niveaux.index')

@@ -2,7 +2,11 @@
 
 namespace Tests\Feature\concours;
 
-use App\Models\concours\{App\Models\Ecole, App\Models\SiteEtude, Candidat, Compte, Filiere, Personnel, SessionConcours};
+use App\Models\concours\Candidat;
+use App\Models\concours\Compte;
+use App\Models\concours\Filiere;
+use App\Models\concours\Personnel;
+use App\Models\concours\SessionConcours;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
@@ -20,7 +24,7 @@ class IntegrationTest extends TestCase
         $site = \App\Models\SiteEtude::factory()->create();
         $session = SessionConcours::factory()->create([
             'debut' => now()->subDays(5),
-            'cloture' => now()->addDays(30)
+            'cloture' => now()->addDays(30),
         ]);
         $ecole = \App\Models\Ecole::factory()->create();
 
@@ -31,7 +35,7 @@ class IntegrationTest extends TestCase
             'ca_recu' => UploadedFile::fake()->create('recu.pdf', 1000),
             'ca_nom' => 'Test',
             'ca_email' => 'test@example.com',
-            'ca_prenom' => 'User'
+            'ca_prenom' => 'User',
         ]);
 
         $response->assertStatus(201);
@@ -39,7 +43,7 @@ class IntegrationTest extends TestCase
 
         // 3. Check authentication
         $response = $this->getJson('/api/concours/check-token', [
-            'Authorization' => 'Bearer ' . $token
+            'Authorization' => 'Bearer '.$token,
         ]);
         $response->assertStatus(200);
 
@@ -81,7 +85,7 @@ class IntegrationTest extends TestCase
             'ca_deliv_cni' => '2020-01-01',
             'ca_num_recu' => 'RECU2024TEST',
             'ca_recu' => 'path/to/recu.pdf',
-            'ecoles' => [$ecole->code_ecole]
+            'ecoles' => [$ecole->code_ecole],
         ]);
 
         $response->assertStatus(201);
@@ -90,7 +94,7 @@ class IntegrationTest extends TestCase
         $candidat = Candidat::where('ca_email', 'test@example.com')->first();
 
         $response = $this->putJson('/api/concours/comptes/RECU2024TEST', [
-            'ca_code' => $candidat->ca_code
+            'ca_code' => $candidat->ca_code,
         ]);
 
         $response->assertStatus(200);
@@ -98,12 +102,12 @@ class IntegrationTest extends TestCase
         // 6. Verify complete registration
         $this->assertDatabaseHas('compte', [
             'ca_num_recu' => 'RECU2024TEST',
-            'ca_code' => 'CAND2024TEST'
+            'ca_code' => 'CAND2024TEST',
         ]);
 
         $this->assertDatabaseHas('candidat', [
             'ca_code' => 'CAND2024TEST',
-            'ca_email' => 'test@example.com'
+            'ca_email' => 'test@example.com',
         ]);
 
         // 7. Verify candidat can see their information

@@ -7,16 +7,15 @@ use App\Mail\requetes\RequeteAssignedMail;
 use App\Mail\requetes\RequeteResponseMail;
 use App\Mail\requetes\RequeteStatusChangeMail;
 use App\Models\Bureau;
+use App\Models\PersRole;
 use App\Models\requetes\Category;
 use App\Models\requetes\Reponse;
 use App\Models\requetes\Requete;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Models\PersRole;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-
 
 class AdminRequeteController extends Controller
 {
@@ -24,126 +23,126 @@ class AdminRequeteController extends Controller
      * Display a listing of all requests for admin
      */
     public function index(Request $request)
-{
-    $query = Requete::with(['category', 'user', 'bureau']);
-    
-    // Récupération du personnel en session
-    $personnel = session('pers');
-    
-    // // Vérification que l'utilisateur est connecté
-    // if (!$personnel) {
-    //     return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page.');
-    // }
-    
-    // Vérification des permissions d'accès
-    $userRoles = $personnel->getRoleNames()->toArray();
-    
-    // Vérification des rôles autorisés (ADMIN etc.)
-    $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
-    if (!array_intersect($userRoles, $rolesAutorises)) {
-        abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
-    }
+    {
+        $query = Requete::with(['category', 'user', 'bureau']);
 
-    // Tous les utilisateurs (sauf ADMIN) ne voient que les requêtes de leur(s) bureau(x)
-    if (!in_array('ADMIN', $userRoles)) {
-        $userBureaux = $this->getUserBureaux();
-        $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
-        if (!empty($codesBureaux)) {
-            $query->whereIn('code_bureau', $codesBureaux);
-        } else {
-            // Si aucun bureau assigné, ne rien retourner
-            $query->whereRaw('1 = 0');
+        // Récupération du personnel en session
+        $personnel = session('pers');
+
+        // // Vérification que l'utilisateur est connecté
+        // if (!$personnel) {
+        //     return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page.');
+        // }
+
+        // Vérification des permissions d'accès
+        $userRoles = $personnel->getRoleNames()->toArray();
+
+        // Vérification des rôles autorisés (ADMIN etc.)
+        $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
+        if (! array_intersect($userRoles, $rolesAutorises)) {
+            abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
         }
+
+        // Tous les utilisateurs (sauf ADMIN) ne voient que les requêtes de leur(s) bureau(x)
+        if (! in_array('ADMIN', $userRoles)) {
+            $userBureaux = $this->getUserBureaux();
+            $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
+            if (! empty($codesBureaux)) {
+                $query->whereIn('code_bureau', $codesBureaux);
+            } else {
+                // Si aucun bureau assigné, ne rien retourner
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        // Application des filtres
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('category')) {
+            $query->where('code_cat', $request->category);
+        }
+
+        if ($request->filled('bureau')) {
+            $query->where('code_bureau', $request->bureau);
+        }
+
+        if ($request->filled('priorite')) {
+            $query->where('priorite', $request->priorite);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('date_sousmis', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('date_sousmis', '<=', $request->date_to);
+        }
+
+        // Tri
+        $sortBy = $request->get('sort', 'date_sousmis');
+        $sortDirection = $request->get('direction', 'desc');
+        $query->orderBy($sortBy, $sortDirection);
+
+        $requetes = $query->paginate(15);
+        $categories = Category::all();
+
+        // Les bureaux affichés dans les filtres peuvent être limités au bureau de l'utilisateur
+        // ou tous les bureaux selon vos besoins
+        $bureaux = Bureau::all();
+        // Ou pour limiter au bureau de l'utilisateur :
+        // $bureaux = Bureau::where('code', $personnel->code_bureau)->get();
+
+        return view('sige_app.backend.administration.liste_requete', compact('requetes', 'categories', 'bureaux'));
     }
-    
-    // Application des filtres
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-    
-    if ($request->filled('category')) {
-        $query->where('code_cat', $request->category);
-    }
-    
-    if ($request->filled('bureau')) {
-        $query->where('code_bureau', $request->bureau);
-    }
-    
-    if ($request->filled('priorite')) {
-        $query->where('priorite', $request->priorite);
-    }
-    
-    if ($request->filled('date_from')) {
-        $query->whereDate('date_sousmis', '>=', $request->date_from);
-    }
-    
-    if ($request->filled('date_to')) {
-        $query->whereDate('date_sousmis', '<=', $request->date_to);
-    }
-    
-    // Tri
-    $sortBy = $request->get('sort', 'date_sousmis');
-    $sortDirection = $request->get('direction', 'desc');
-    $query->orderBy($sortBy, $sortDirection);
-    
-    $requetes = $query->paginate(15);
-    $categories = Category::all();
-    
-    // Les bureaux affichés dans les filtres peuvent être limités au bureau de l'utilisateur
-    // ou tous les bureaux selon vos besoins
-    $bureaux = Bureau::all();
-    // Ou pour limiter au bureau de l'utilisateur :
-    // $bureaux = Bureau::where('code', $personnel->code_bureau)->get();
-    
-    return view('sige_app.backend.administration.liste_requete', compact('requetes', 'categories', 'bureaux'));
-}
 
     /**
      * Show the specified request for admin
      */
-   public function show(string $code_requete)
-{
-    $query = Requete::with(['category', 'user', 'bureau', 'fichiers', 'reponses']);
-    
-    // Récupération du personnel en session
-    $personnel = session('pers');
-    
-    // Vérification que l'utilisateur est connecté
-    // if (!$personnel) {
-    //     return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page.');
-    // }
-    
-    // Vérification des permissions d'accès
-    $userRoles = $personnel->getRoleNames()->toArray();
-    
-    // Vérification des rôles autorisés
-    $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
-    if (!array_intersect($userRoles, $rolesAutorises)) {
-        abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
-    }
+    public function show(string $code_requete)
+    {
+        $query = Requete::with(['category', 'user', 'bureau', 'fichiers', 'reponses']);
 
-    // Tous les utilisateurs (sauf ADMIN) ne peuvent voir que les requêtes de leur(s) bureau(x)
-    if (!in_array('ADMIN', $userRoles)) {
-        $userBureaux = $this->getUserBureaux();
-        $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
-        if (!empty($codesBureaux)) {
-            $query->whereIn('code_bureau', $codesBureaux);
-        } else {
-            // Si aucun bureau assigné, ne rien retourner
-            $query->whereRaw('1 = 0');
+        // Récupération du personnel en session
+        $personnel = session('pers');
+
+        // Vérification que l'utilisateur est connecté
+        // if (!$personnel) {
+        //     return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page.');
+        // }
+
+        // Vérification des permissions d'accès
+        $userRoles = $personnel->getRoleNames()->toArray();
+
+        // Vérification des rôles autorisés
+        $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
+        if (! array_intersect($userRoles, $rolesAutorises)) {
+            abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
         }
+
+        // Tous les utilisateurs (sauf ADMIN) ne peuvent voir que les requêtes de leur(s) bureau(x)
+        if (! in_array('ADMIN', $userRoles)) {
+            $userBureaux = $this->getUserBureaux();
+            $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
+            if (! empty($codesBureaux)) {
+                $query->whereIn('code_bureau', $codesBureaux);
+            } else {
+                // Si aucun bureau assigné, ne rien retourner
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        // Recherche de la requête spécifique
+        $requete = $query->where('code_requete', $code_requete)->first();
+
+        // Vérification que la requête existe et appartient au bureau de l'utilisateur
+        if (! $requete) {
+            abort(404, 'Requête non trouvée ou vous n\'avez pas l\'autorisation de la consulter.');
+        }
+
+        return view('sige_app.backend.administration.details_requete', compact('requete'));
     }
-    
-    // Recherche de la requête spécifique
-    $requete = $query->where('code_requete', $code_requete)->first();
-    
-    // Vérification que la requête existe et appartient au bureau de l'utilisateur
-    if (!$requete) {
-        abort(404, 'Requête non trouvée ou vous n\'avez pas l\'autorisation de la consulter.');
-    }
-    
-    return view('sige_app.backend.administration.details_requete', compact('requete'));
-}
 
     /**
      * Update request status
@@ -151,8 +150,8 @@ class AdminRequeteController extends Controller
     public function updateStatus(Request $request, string $code_requete)
     {
         $request->validate([
-            'status'         => 'required|in:en cours,en attente,traitée,rejetée',
-            'note_interne'   => 'nullable|string|max:191',
+            'status' => 'required|in:en cours,en attente,traitée,rejetée',
+            'note_interne' => 'nullable|string|max:191',
             'nouveau_bureau' => 'nullable|exists:bureau,code_bureau',
             'email_notifications' => 'nullable|boolean',
         ]);
@@ -160,26 +159,26 @@ class AdminRequeteController extends Controller
         $query = Requete::query();
         // Récupération du personnel en session
         $personnel = session('pers');
-       // Vérification des permissions d'accès
-    $userRoles = $personnel->getRoleNames()->toArray();
-    
-    // Vérification des rôles autorisés
-    $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
-    if (!array_intersect($userRoles, $rolesAutorises)) {
-        abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
-    }
+        // Vérification des permissions d'accès
+        $userRoles = $personnel->getRoleNames()->toArray();
 
-    // Tous les utilisateurs (sauf ADMIN) ne peuvent voir que les requêtes de leur(s) bureau(x)
-    if (!in_array('ADMIN', $userRoles)) {
-        $userBureaux = $this->getUserBureaux();
-        $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
-        if (!empty($codesBureaux)) {
-            $query->whereIn('code_bureau', $codesBureaux);
-        } else {
-            // Si aucun bureau assigné, ne rien retourner
-            $query->whereRaw('1 = 0');
+        // Vérification des rôles autorisés
+        $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
+        if (! array_intersect($userRoles, $rolesAutorises)) {
+            abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
         }
-    }
+
+        // Tous les utilisateurs (sauf ADMIN) ne peuvent voir que les requêtes de leur(s) bureau(x)
+        if (! in_array('ADMIN', $userRoles)) {
+            $userBureaux = $this->getUserBureaux();
+            $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
+            if (! empty($codesBureaux)) {
+                $query->whereIn('code_bureau', $codesBureaux);
+            } else {
+                // Si aucun bureau assigné, ne rien retourner
+                $query->whereRaw('1 = 0');
+            }
+        }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -213,8 +212,8 @@ class AdminRequeteController extends Controller
             // Transfert vers un autre bureau
             $statusChangedByTransfer = false;
             if ($request->filled('nouveau_bureau') && $request->nouveau_bureau !== $requete->code_bureau) {
-                $updateData['code_bureau']     = $request->nouveau_bureau;
-                $updateData['status']          = 'en cours'; // Automatically set to 'en cours' on transfer
+                $updateData['code_bureau'] = $request->nouveau_bureau;
+                $updateData['status'] = 'en cours'; // Automatically set to 'en cours' on transfer
                 $updateData['date_asignation'] = now();
                 $statusChangedByTransfer = true;
             }
@@ -230,7 +229,8 @@ class AdminRequeteController extends Controller
                     try {
                         Mail::to($userEmail)->send(new RequeteAssignedMail($requete, $request->nouveau_bureau));
                     } catch (\Exception $e) {
-                        Log::error('Erreur envoi mail assignation: ' . $e->getMessage());
+                        Log::error('Erreur envoi mail assignation: '.$e->getMessage());
+
                         return back()->with('success', 'Statut de la requête mis à jour avec succès, mais le mail d\'assignation n\'a pas pu être envoyé.');
                     }
                 }
@@ -246,7 +246,8 @@ class AdminRequeteController extends Controller
                         }
                         Mail::to($userEmail)->send(new RequeteStatusChangeMail($requete, $emailOldStatus, $emailNewStatus));
                     } catch (\Exception $e) {
-                        Log::error('Erreur envoi mail changement statut: ' . $e->getMessage());
+                        Log::error('Erreur envoi mail changement statut: '.$e->getMessage());
+
                         return back()->with('success', 'Statut de la requête mis à jour avec succès, mais le mail de changement de statut n\'a pas pu être envoyé.');
                     }
                 }
@@ -258,8 +259,9 @@ class AdminRequeteController extends Controller
                 return back()->with('success', 'Statut de la requête mis à jour avec succès, mail non envoyé.');
             }
         } catch (\Exception $e) {
-            Log::error('Erreur mise à jour statut requête: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
-            return back()->with('error', 'Erreur lors de la mise à jour du statut. Détails: ' . $e->getMessage());
+            Log::error('Erreur mise à jour statut requête: '.$e->getMessage().' Trace: '.$e->getTraceAsString());
+
+            return back()->with('error', 'Erreur lors de la mise à jour du statut. Détails: '.$e->getMessage());
         }
     }
 
@@ -305,32 +307,31 @@ class AdminRequeteController extends Controller
             'text_reponse' => 'required|string|max:180',
             'email_notifications' => 'nullable|boolean',
         ]);
-        
 
         $query = Requete::query();
 
-         // Récupération du personnel en session
+        // Récupération du personnel en session
         $personnel = session('pers');
-       // Vérification des permissions d'accès
-    $userRoles = $personnel->getRoleNames()->toArray();
-    
-    // Vérification des rôles autorisés
-    $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
-    if (!array_intersect($userRoles, $rolesAutorises)) {
-        abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
-    }
+        // Vérification des permissions d'accès
+        $userRoles = $personnel->getRoleNames()->toArray();
 
-    // Tous les utilisateurs (sauf ADMIN) ne peuvent voir que les requêtes de leur(s) bureau(x)
-    if (!in_array('ADMIN', $userRoles)) {
-        $userBureaux = $this->getUserBureaux();
-        $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
-        if (!empty($codesBureaux)) {
-            $query->whereIn('code_bureau', $codesBureaux);
-        } else {
-            // Si aucun bureau assigné, ne rien retourner
-            $query->whereRaw('1 = 0');
+        // Vérification des rôles autorisés
+        $rolesAutorises = ['ADMIN', 'CHEF_SERV', 'CHEF_DEPT', 'CHEF_DIV', 'PERSONNEL_APPUI', 'ENSEIGNANT']; // Ajustez selon vos besoins
+        if (! array_intersect($userRoles, $rolesAutorises)) {
+            abort(403, 'Accès non autorisé. Vous n\'avez pas les privilèges nécessaires.');
         }
-    }
+
+        // Tous les utilisateurs (sauf ADMIN) ne peuvent voir que les requêtes de leur(s) bureau(x)
+        if (! in_array('ADMIN', $userRoles)) {
+            $userBureaux = $this->getUserBureaux();
+            $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
+            if (! empty($codesBureaux)) {
+                $query->whereIn('code_bureau', $codesBureaux);
+            } else {
+                // Si aucun bureau assigné, ne rien retourner
+                $query->whereRaw('1 = 0');
+            }
+        }
 
         $requete = $query->where('code_requete', $code_requete)->firstOrFail();
 
@@ -353,7 +354,8 @@ class AdminRequeteController extends Controller
                 try {
                     Mail::to($userEmail)->send(new RequeteResponseMail($requete, $reponse));
                 } catch (\Exception $e) {
-                    Log::error('Erreur envoi mail réponse: ' . $e->getMessage());
+                    Log::error('Erreur envoi mail réponse: '.$e->getMessage());
+
                     return back()->with('success', 'Réponse ajoutée avec succès, mais le mail de réponse n\'a pas pu être envoyé.');
                 }
             }
@@ -364,8 +366,9 @@ class AdminRequeteController extends Controller
                 return back()->with('success', 'Réponse ajoutée avec succès, mail non envoyé.');
             }
         } catch (\Exception $e) {
-            Log::error('Erreur d\'ajout de la requete: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
-            return back()->with('error', 'Erreur lors de l\'ajout de la reponse. Détails: ' . $e->getMessage());
+            Log::error('Erreur d\'ajout de la requete: '.$e->getMessage().' Trace: '.$e->getTraceAsString());
+
+            return back()->with('error', 'Erreur lors de l\'ajout de la reponse. Détails: '.$e->getMessage());
         }
     }
 
@@ -452,7 +455,7 @@ class AdminRequeteController extends Controller
 
         // Statistiques globales (limitées selon le rôle)
         $totalRequetes = $baseQuery->count();
-        $requetesEnAttente = (clone $baseQuery)->where('status','en attente')->count();
+        $requetesEnAttente = (clone $baseQuery)->where('status', 'en attente')->count();
         $requetesEnCours = (clone $baseQuery)->where('status', 'en cours')->count();
         $requetesTraitees = (clone $baseQuery)->where('status', 'traitée')->count();
         $requetesRejetees = (clone $baseQuery)->where('status', 'rejetée')->count();
@@ -523,7 +526,7 @@ class AdminRequeteController extends Controller
                 'traitees' => (clone $bureauStats)->where('status', 'traitée')->count(),
                 'rejetees' => (clone $bureauStats)->where('status', 'rejetée')->count(),
                 'temps_moyen' => $this->getTempsTraitementMoyen($bureau->code_bureau),
-                'taux_resolution' => $this->getTauxResolution($bureau->code_bureau)
+                'taux_resolution' => $this->getTauxResolution($bureau->code_bureau),
             ];
 
             $performanceParBureau[] = $performance;
@@ -555,7 +558,7 @@ class AdminRequeteController extends Controller
     {
         $personnel = session('pers');
 
-        if (!$personnel) {
+        if (! $personnel) {
             // Si pas de personnel en session, retourner une requête vide
             return $query->whereRaw('1 = 0');
         }
@@ -572,7 +575,7 @@ class AdminRequeteController extends Controller
             $userBureaux = $this->getUserBureaux();
             $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
 
-            if (!empty($codesBureaux)) {
+            if (! empty($codesBureaux)) {
                 return $query->whereIn('code_bureau', $codesBureaux);
             }
         }
@@ -582,7 +585,7 @@ class AdminRequeteController extends Controller
             $userBureaux = $this->getUserBureaux();
             $codesBureaux = $userBureaux->pluck('code_bureau')->toArray();
 
-            if (!empty($codesBureaux)) {
+            if (! empty($codesBureaux)) {
                 return $query->whereIn('code_bureau', $codesBureaux);
             }
         }
@@ -596,11 +599,11 @@ class AdminRequeteController extends Controller
      */
     private function getUserRoles($personnel = null)
     {
-        if (!$personnel) {
+        if (! $personnel) {
             $personnel = session('pers');
         }
 
-        if (!$personnel) {
+        if (! $personnel) {
             return [];
         }
 
@@ -638,7 +641,7 @@ class AdminRequeteController extends Controller
             'CHEF_SERV' => 4,
             'CHEF_DIV' => 5,
             'PERSONNEL_APPUI' => 6,
-            'ENSEIGNANT' => 6
+            'ENSEIGNANT' => 6,
         ];
 
         $highestRole = 'GUEST';
@@ -662,7 +665,7 @@ class AdminRequeteController extends Controller
     {
         $personnel = session('pers');
 
-        if (!$personnel) {
+        if (! $personnel) {
             return collect();
         }
 
@@ -708,6 +711,7 @@ class AdminRequeteController extends Controller
     private function canAccessBureau($codeBureau)
     {
         $accessibleBureaux = $this->getAccessibleBureaux();
+
         return $accessibleBureaux->contains('code_bureau', $codeBureau);
     }
 
@@ -755,14 +759,14 @@ class AdminRequeteController extends Controller
             case 'CHEF_DEPT':
             case 'CHEF_SERV':
                 $data['title'] = 'Tableau de bord - Chef de Service';
-                $data['scope'] = 'Bureaux: ' . $bureaux->pluck('label_bureau')->join(', ');
+                $data['scope'] = 'Bureaux: '.$bureaux->pluck('label_bureau')->join(', ');
                 $data['permissions'] = ['view_bureau', 'manage_bureau', 'transfer_limited'];
                 break;
 
             case 'CHEF_DIV':
             case 'PERSONNEL_APPUI':
                 $data['title'] = 'Tableau de bord - Agent';
-                $data['scope'] = 'Bureau: ' . $bureaux->pluck('label_bureau')->join(', ');
+                $data['scope'] = 'Bureau: '.$bureaux->pluck('label_bureau')->join(', ');
                 $data['permissions'] = ['view_bureau', 'respond_only'];
                 break;
 

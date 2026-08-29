@@ -2,19 +2,20 @@
 
 namespace App\Notifications\laboratoires;
 
+use App\Models\laboratoires\ProjetLabo;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\laboratoires\ProjetLabo;
-use App\Models\laboratoires\LaboratoirePersLab;
 
 class ProjetEcheanceNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public $projet;
+
     public $joursRestants;
+
     public $type;
 
     /**
@@ -44,9 +45,9 @@ class ProjetEcheanceNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject("[$urgence] Échéance de projet - {$this->projet->theme_projet}")
-            ->greeting("Bonjour " . ($notifiable->persLab->nom_pers_lab ?? 'Membre du laboratoire'))
+            ->greeting('Bonjour '.($notifiable->persLab->nom_pers_lab ?? 'Membre du laboratoire'))
             ->line("Le projet **{$this->projet->theme_projet}** arrive à échéance.")
-            ->line("**Date de fin prévue :** " . \Carbon\Carbon::parse($this->projet->fin_projet)->format('d/m/Y'))
+            ->line('**Date de fin prévue :** '.\Carbon\Carbon::parse($this->projet->fin_projet)->format('d/m/Y'))
             ->line("**Jours restants :** {$this->joursRestants} jour(s)")
             ->action('Voir le projet', route('laboratoires.admin.projets.show', [$this->projet->code_lab, $this->projet->code_projet]))
             ->line('Merci de prendre les mesures nécessaires pour finaliser ce projet.')

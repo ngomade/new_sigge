@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('examen', function (Blueprint $table) {
             $table->char('code_examen', 32)->primary();
             $table->char('code_session', 32);
-             $table->foreign('code_session')->references('code_session')->on('session_examen')->onDelete('cascade');
+            $table->foreign('code_session')->references('code_session')->on('session_examen')->onDelete('cascade');
             $table->char('type_evaluation', 32);
             $table->timestamps();
         });

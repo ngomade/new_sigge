@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\laboratoires\Laboratoire;
+use App\Models\laboratoires\LaboratoirePersLab;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\laboratoires\LaboratoirePersLab;
-use App\Models\laboratoires\Laboratoire;
 
 class LaboratoireAdminMiddleware
 {
@@ -21,7 +21,7 @@ class LaboratoireAdminMiddleware
         $userId = session('user_id');
         $userType = session('user_type');
 
-        if (!$code_lab || !$userId || !$userType) {
+        if (! $code_lab || ! $userId || ! $userType) {
             return redirect()->route('laboratoires.show', $code_lab ?? 'default')
                 ->with('error', 'Accès non autorisé.');
         }
@@ -36,7 +36,7 @@ class LaboratoireAdminMiddleware
         }
 
         // Sinon, vérifier le rôle dans l'affectation
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $query = LaboratoirePersLab::where('code_lab', $code_lab)
                 ->where('statut', 'actif')
                 ->with('roleLabo');
@@ -54,7 +54,7 @@ class LaboratoireAdminMiddleware
             }
         }
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             return redirect()->route('laboratoires.espace.membre', $code_lab)
                 ->with('error', 'Vous devez être administrateur du laboratoire pour accéder à cette page.');
         }

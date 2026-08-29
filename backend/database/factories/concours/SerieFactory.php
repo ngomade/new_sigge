@@ -1,6 +1,7 @@
 <?php
 
 // SerieFactory.php
+
 namespace Database\Factories\concours;
 
 use App\Models\Serie;
@@ -22,11 +23,11 @@ class SerieFactory extends Factory
             'F3',
             'G1',
             'G2',
-            'G3'
+            'G3',
         ];
 
         return [
-            'label_serie' => $this->faker->randomElement($series)
+            'label_serie' => $this->faker->randomElement($series),
         ];
     }
 }

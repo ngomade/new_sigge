@@ -1,31 +1,30 @@
 <?php
 
-
 namespace App\Models\notes;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Examen extends Model
 {
-	protected $table = 'examen';
-	protected $primaryKey = 'code_examen';
-	public $incrementing = false;
+    protected $table = 'examen';
 
-	protected $fillable = [
+    protected $primaryKey = 'code_examen';
+
+    public $incrementing = false;
+
+    protected $fillable = [
         'code_examen',
-		'code_session',
-		'type_evaluation'
-	];
+        'code_session',
+        'type_evaluation',
+    ];
 
-	public function sessionExamen()
-	{
-		return $this->belongsTo(SessionExamen::class, 'code_session');
-	}
+    public function sessionExamen()
+    {
+        return $this->belongsTo(SessionExamen::class, 'code_session');
+    }
 
-	public function evaluations()
-	{
-		return $this->hasMany(Evaluation::class, 'code_examen');
-	}
+    public function evaluations()
+    {
+        return $this->hasMany(Evaluation::class, 'code_examen');
+    }
 }

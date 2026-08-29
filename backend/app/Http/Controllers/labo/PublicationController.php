@@ -4,7 +4,6 @@ namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
 use App\Models\laboratoires\Publication;
-use App\Models\laboratoires\PersLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -46,7 +45,7 @@ class PublicationController extends Controller
         }
 
         if ($request->filled('domaine')) {
-            $query->where('domaine', 'like', '%' . $request->domaine . '%');
+            $query->where('domaine', 'like', '%'.$request->domaine.'%');
         }
 
         if ($request->filled('annee')) {
@@ -55,11 +54,11 @@ class PublicationController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('titre_publi', 'like', "%$search%")
-                  ->orWhere('domaine', 'like', "%$search%")
-                  ->orWhere('tags', 'like', "%$search%")
-                  ->orWhere('reference', 'like', "%$search%");
+                    ->orWhere('domaine', 'like', "%$search%")
+                    ->orWhere('tags', 'like', "%$search%")
+                    ->orWhere('reference', 'like', "%$search%");
             });
         }
 
@@ -86,7 +85,7 @@ class PublicationController extends Controller
                 $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', $laboratoire->code_lab)->get();
             } else {
                 $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', $laboratoire->code_lab)
-                    ->whereHas('participants', function($q) use ($userId, $userType) {
+                    ->whereHas('participants', function ($q) use ($userId, $userType) {
                         if ($userType === 'externe') {
                             $q->where('id_user_ext', $userId);
                         } else {
@@ -162,7 +161,7 @@ class PublicationController extends Controller
                 } else {
                     // Récupérer les projets où l'utilisateur est participant
                     $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))
-                        ->whereHas('participants', function($q) use ($userId, $userType) {
+                        ->whereHas('participants', function ($q) use ($userId, $userType) {
                             if ($userType === 'externe') {
                                 $q->where('id_user_ext', $userId);
                             } else {
@@ -172,6 +171,7 @@ class PublicationController extends Controller
                 }
             }
         }
+
         return view('laboratoires.admin.publications.create', compact('laboratoire', 'projets'));
     }
 
@@ -210,7 +210,7 @@ class PublicationController extends Controller
         $userType = session('user_type');
         $codeLab = session('laboratoire_code');
 
-        if (!$userId || !$userType || !$codeLab) {
+        if (! $userId || ! $userType || ! $codeLab) {
             return back()->withInput()->with('error', 'Vous devez être connecté pour créer une publication.');
         }
 
@@ -238,14 +238,14 @@ class PublicationController extends Controller
             }
             $estMembreProjet = \App\Models\laboratoires\ProjetLabo::where('code_projet', $codeProjet)
                 ->where('code_lab', $codeLab)
-                ->whereHas('participants', function($q) use ($userId, $userType) {
+                ->whereHas('participants', function ($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
                         $q->where('id_user_ext', $userId);
                     } else {
                         $q->where('id_pers_lab', $userId);
                     }
                 })->exists();
-            if (!$isAdmin && !$estMembreProjet) {
+            if (! $isAdmin && ! $estMembreProjet) {
                 return back()->withInput()->with('error', 'Vous n’êtes pas membre de ce projet.');
             }
             $validated['code_projet'] = $codeProjet;
@@ -288,9 +288,10 @@ class PublicationController extends Controller
                 $isMembre = true;
             }
         }
-        if (!$isMembre) {
+        if (! $isMembre) {
             abort(403, 'Vous devez être membre du laboratoire pour consulter cette publication.');
         }
+
         // Plus de restriction sur l'auteur ou l'admin pour la consultation
         return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
     }
@@ -327,7 +328,7 @@ class PublicationController extends Controller
                 $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))->get();
             } else {
                 $projets = \App\Models\laboratoires\ProjetLabo::where('code_lab', session('laboratoire_code'))
-                    ->whereHas('participants', function($q) use ($userId, $userType) {
+                    ->whereHas('participants', function ($q) use ($userId, $userType) {
                         if ($userType === 'externe') {
                             $q->where('id_user_ext', $userId);
                         } else {
@@ -337,9 +338,10 @@ class PublicationController extends Controller
             }
         }
         // Check if user is admin or creator
-        if (!$isAdmin && $publication->id_pers_lab !== $userId) {
+        if (! $isAdmin && $publication->id_pers_lab !== $userId) {
             abort(403, 'Unauthorized access to edit this publication.');
         }
+
         return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire', 'projets'));
     }
 
@@ -399,14 +401,14 @@ class PublicationController extends Controller
             }
             $estMembreProjet = \App\Models\laboratoires\ProjetLabo::where('code_projet', $codeProjet)
                 ->where('code_lab', $codeLab)
-                ->whereHas('participants', function($q) use ($userId, $userType) {
+                ->whereHas('participants', function ($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
                         $q->where('id_user_ext', $userId);
                     } else {
                         $q->where('id_pers_lab', $userId);
                     }
                 })->exists();
-            if (!$isAdmin && !$estMembreProjet) {
+            if (! $isAdmin && ! $estMembreProjet) {
                 return back()->withInput()->with('error', 'Vous n’êtes pas membre de ce projet.');
             }
             $validated['code_projet'] = $codeProjet;
@@ -414,6 +416,7 @@ class PublicationController extends Controller
             $validated['code_projet'] = null;
         }
         $publication->update($validated);
+
         return redirect()->route('labo.publications.show', $publication->code_publi)
             ->with('success', 'Publication mise à jour avec succès.');
     }
@@ -451,7 +454,7 @@ class PublicationController extends Controller
         if ($publication->code_projet) {
             $estMembreProjet = \App\Models\laboratoires\ProjetLabo::where('code_projet', $publication->code_projet)
                 ->where('code_lab', $codeLab)
-                ->whereHas('participants', function($q) use ($userId, $userType) {
+                ->whereHas('participants', function ($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
                         $q->where('id_user_ext', $userId);
                     } else {
@@ -459,7 +462,7 @@ class PublicationController extends Controller
                     }
                 })->exists();
         }
-        if (!$isAdmin && !$estMembreProjet && $publication->id_pers_lab !== $userId) {
+        if (! $isAdmin && ! $estMembreProjet && $publication->id_pers_lab !== $userId) {
             abort(403, 'Vous n’êtes pas autorisé à supprimer cette publication.');
         }
 

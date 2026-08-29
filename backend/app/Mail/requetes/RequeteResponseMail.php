@@ -4,14 +4,15 @@ namespace App\Mail\requetes;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Content;
+use Illuminate\Queue\SerializesModels;
 
 class RequeteResponseMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $requete;
+
     public $reponse;
 
     /**
@@ -29,10 +30,8 @@ class RequeteResponseMail extends Mailable
     public function build()
     {
         return $this->subject('Nouvelle réponse à votre requête')
-                    ->view('emails.requetes.response');
+            ->view('emails.requetes.response');
     }
-
-
 
     /**
      * Get the message content definition.

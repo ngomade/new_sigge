@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Anneescolaire extends Model
 {
     protected $table = 'anneescolaire';
+
     protected $primaryKey = 'code_annee';
+
     public $incrementing = false;
 
     protected $casts = [
@@ -19,7 +21,7 @@ class Anneescolaire extends Model
     protected $fillable = [
         'code_annee',
         'debut_annee',
-        'fin_annee'
+        'fin_annee',
     ];
 
     public function inscriptions()

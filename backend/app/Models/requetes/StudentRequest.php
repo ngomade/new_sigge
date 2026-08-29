@@ -2,8 +2,6 @@
 
 namespace App\Models\requetes;
 
-
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,7 +22,7 @@ class StudentRequest extends Model
         'submitted_at',
         'assigned_at',
         'processed_at',
-        'internal_notes'
+        'internal_notes',
     ];
 
     protected $casts = [
@@ -79,4 +77,3 @@ class StudentRequest extends Model
         return $query->whereNull('agent_id');
     }
 }
-

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('ue', function (Blueprint $table) {
             $table->char('code_ue', 32)->primary();
             $table->string('code_sem', 10);
-             $table->foreign('code_sem')->references('code_sem')->on('semestre')->onDelete('cascade');
+            $table->foreign('code_sem')->references('code_sem')->on('semestre')->onDelete('cascade');
             $table->string('intitule_ue', 128);
             $table->text('desc_ue')->nullable();
             $table->timestamps();

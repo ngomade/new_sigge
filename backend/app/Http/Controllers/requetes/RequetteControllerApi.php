@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
-use App\Models\requetes\Requete;
-use App\Models\requetes\Category;
-use App\Models\Bureau;
-use App\Models\requetes\FichierRequete;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\requetes\RequeteSubmittedMail;
+use App\Models\requetes\FichierRequete;
+use App\Models\requetes\Requete;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class RequetteControllerApi extends Controller
 {
@@ -56,11 +54,11 @@ class RequetteControllerApi extends Controller
             'code_cat' => 'required|exists:categories,code_cat',
             'code_bureau' => 'required|exists:bureau,code_bureau',
             'fichiers.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
-            'priorite' => 'in:urgent,standard'
+            'priorite' => 'in:urgent,standard',
         ]);
 
         try {
-            $codeRequete = 'REQ-' . date('Ymd') . '-' . strtoupper(Str::random(8));
+            $codeRequete = 'REQ-'.date('Ymd').'-'.strtoupper(Str::random(8));
 
             $requete = Requete::create([
                 'code_requete' => $codeRequete,
@@ -71,20 +69,20 @@ class RequetteControllerApi extends Controller
                 'code_cat' => $request->code_cat,
                 'code_user' => Auth::user()->code_user,
                 'code_bureau' => $request->code_bureau,
-                'priorite' => $request->priorite ?? 'standard'
+                'priorite' => $request->priorite ?? 'standard',
             ]);
 
             if ($request->hasFile('fichiers')) {
                 foreach ($request->file('fichiers') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $path = $file->storeAs('requetes_fichiers', $filename, 'public');
 
                     FichierRequete::create([
-                        'id_fichier' => 'FILE-' . strtoupper(Str::random(10)),
+                        'id_fichier' => 'FILE-'.strtoupper(Str::random(10)),
                         'chemin' => $path,
                         'code_requete' => $codeRequete,
                         'nom_original' => $file->getClientOriginalName(),
-                        'taille' => $file->getSize()
+                        'taille' => $file->getSize(),
                     ]);
                 }
             }
@@ -93,12 +91,12 @@ class RequetteControllerApi extends Controller
 
             return response()->json([
                 'message' => 'Votre requête a été soumise avec succès.',
-                'code_requete' => $codeRequete
+                'code_requete' => $codeRequete,
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Erreur lors de la soumission de la requête. Veuillez réessayer.'
+                'error' => 'Erreur lors de la soumission de la requête. Veuillez réessayer.',
             ], 500);
         }
     }
@@ -132,7 +130,7 @@ class RequetteControllerApi extends Controller
             'code_cat' => 'required|exists:categories,code_cat',
             'code_bureau' => 'required|exists:bureau,code_bureau',
             'fichiers.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
-            'priorite' => 'in:urgent,standard'
+            'priorite' => 'in:urgent,standard',
         ]);
 
         try {
@@ -141,31 +139,31 @@ class RequetteControllerApi extends Controller
                 'desc_requete' => $request->desc_requete,
                 'code_cat' => $request->code_cat,
                 'code_bureau' => $request->code_bureau,
-                'priorite' => $request->priorite ?? 'standard'
+                'priorite' => $request->priorite ?? 'standard',
             ]);
 
             if ($request->hasFile('fichiers')) {
                 foreach ($request->file('fichiers') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $path = $file->storeAs('requetes_fichiers', $filename, 'public');
 
                     FichierRequete::create([
-                        'id_fichier' => 'FILE-' . strtoupper(Str::random(10)),
+                        'id_fichier' => 'FILE-'.strtoupper(Str::random(10)),
                         'chemin' => $path,
                         'code_requete' => $code_requete,
                         'nom_original' => $file->getClientOriginalName(),
-                        'taille' => $file->getSize()
+                        'taille' => $file->getSize(),
                     ]);
                 }
             }
 
             return response()->json([
-                'message' => 'Votre requête a été mise à jour avec succès.'
+                'message' => 'Votre requête a été mise à jour avec succès.',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Erreur lors de la mise à jour de la requête.'
+                'error' => 'Erreur lors de la mise à jour de la requête.',
             ], 500);
         }
     }
@@ -189,12 +187,12 @@ class RequetteControllerApi extends Controller
             $requete->delete();
 
             return response()->json([
-                'message' => 'Requête supprimée avec succès.'
+                'message' => 'Requête supprimée avec succès.',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Erreur lors de la suppression de la requête.'
+                'error' => 'Erreur lors de la suppression de la requête.',
             ], 500);
         }
     }

@@ -56,6 +56,6 @@ try {
     echo "🚀 Vous pouvez maintenant tester le module avec des données réalistes !\n";
 
 } catch (Exception $e) {
-    echo "❌ Erreur lors de la création des données : " . $e->getMessage() . "\n";
-    echo "Stack trace : " . $e->getTraceAsString() . "\n";
+    echo '❌ Erreur lors de la création des données : '.$e->getMessage()."\n";
+    echo 'Stack trace : '.$e->getTraceAsString()."\n";
 }

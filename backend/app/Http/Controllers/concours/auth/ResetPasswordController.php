@@ -9,15 +9,14 @@ use App\Notifications\ResetPwdCompteUser;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ResetPasswordController extends Controller
 {
     /**
      * Envoie un email de réinitialisation de mot de passe
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function forgotPassword(Request $request)
@@ -30,38 +29,36 @@ class ResetPasswordController extends Controller
 
             $user = Compte::where('ca_num_recu', $request->login)->first() ?: Personnel::where('login_pers', $request->login)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
-                    'message' => 'Aucun compte trouvé avec cet identifiant.'
+                    'message' => 'Aucun compte trouvé avec cet identifiant.',
                 ], 404);
             }
             // Générer un code à 5 chiffres
             $code = (string) random_int(10000, 99999);
-//            $user->reset_token = $code;
-//            $user->reset_token_expires_at = now()->addHours(24);
-            $user->ca_pwd  =  Hash::make($code);
+            //            $user->reset_token = $code;
+            //            $user->reset_token_expires_at = now()->addHours(24);
+            $user->ca_pwd = Hash::make($code);
             $user->save();
 
             $user->notify(new ResetPwdCompteUser($code));
 
             return response()->json([
                 'message' => 'Un email de réinitialisation a été envoyé à votre adresse email.',
-                "email" => $user->ca_email
+                'email' => $user->ca_email,
             ]);
         } catch (Exception $e) {
-            Log::error('Error in forgotPassword: ' . $e->getMessage());
+            Log::error('Error in forgotPassword: '.$e->getMessage());
+
             return response()->json([
                 'message' => 'Une erreur est survenue lors de l\'envoi de l\'email de réinitialisation.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Réinitialise le mot de passe avec le token
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function resetPassword(Request $request): JsonResponse
     {
@@ -80,9 +77,9 @@ class ResetPasswordController extends Controller
                     ->where('reset_token_expires_at', '>', now())
                     ->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
-                    'message' => 'Token invalide ou expiré.'
+                    'message' => 'Token invalide ou expiré.',
                 ], 400);
             }
 
@@ -93,18 +90,19 @@ class ResetPasswordController extends Controller
 
             $user->reset_token = null;
             $user->reset_token_expires_at = null;
-            if (!$user->hasVerifiedEmail()) {
+            if (! $user->hasVerifiedEmail()) {
                 $user->email_verified_at = now();
             }
             $user->save();
 
             return response()->json([
-                'message' => 'Votre mot de passe a été réinitialisé avec succès.'
+                'message' => 'Votre mot de passe a été réinitialisé avec succès.',
             ]);
         } catch (Exception $e) {
-            Log::error('Error in resetPassword: ' . $e->getMessage());
+            Log::error('Error in resetPassword: '.$e->getMessage());
+
             return response()->json([
-                'message' => 'Une erreur est survenue lors de la réinitialisation du mot de passe.'
+                'message' => 'Une erreur est survenue lors de la réinitialisation du mot de passe.',
             ], 500);
         }
     }

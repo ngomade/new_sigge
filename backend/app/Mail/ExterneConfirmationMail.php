@@ -2,21 +2,22 @@
 
 namespace App\Mail;
 
+use App\Models\laboratoires\Laboratoire;
+use App\Models\laboratoires\UserExterne;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\laboratoires\UserExterne;
-use App\Models\laboratoires\Laboratoire;
 
 class ExterneConfirmationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $userExterne;
+
     public $laboratoire;
+
     public $password;
 
     /**
@@ -35,7 +36,7 @@ class ExterneConfirmationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmation de création de compte - ' . $this->laboratoire->label_labo,
+            subject: 'Confirmation de création de compte - '.$this->laboratoire->label_labo,
         );
     }
 

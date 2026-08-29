@@ -20,7 +20,7 @@ return new class extends Migration
 
         // Exemple d'ajout de champ à projet_labo (à adapter selon tes besoins)
         Schema::table('projet_labo', function (Blueprint $table) {
-            $table->enum("statut_projet", ["En cours", "Terminé", "En pause", "Annulé"])->default("En cours");
+            $table->enum('statut_projet', ['En cours', 'Terminé', 'En pause', 'Annulé'])->default('En cours');
             $table->date('debut_projet')->default(now());
             $table->date('fin_projet')->nullable();
         });
@@ -31,8 +31,8 @@ return new class extends Migration
         Schema::table('laboratoire', function (Blueprint $table) {
             $table->dropColumn([
                 'sigle', 'logo_labo',
-                'email_labo', 'tel_labo','adresse_labo',
-                'axes_recherche'
+                'email_labo', 'tel_labo', 'adresse_labo',
+                'axes_recherche',
             ]);
         });
         Schema::table('projet_labo', function (Blueprint $table) {

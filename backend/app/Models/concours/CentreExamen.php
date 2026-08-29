@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models\concours;
 
 use App\Models\Ecole;
@@ -9,16 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CentreExamen extends Model
 {
-	protected $table = 'centre_examen';
-	protected $primaryKey = 'centre_exam_code';
+    protected $table = 'centre_examen';
 
-	protected $fillable = [
-		'code_ecole',
-		'centre_exam_label'
-	];
+    protected $primaryKey = 'centre_exam_code';
 
-	public function ecole(): BelongsTo
-	{
-		return $this->belongsTo(Ecole::class, 'code_ecole');
-	}
+    protected $fillable = [
+        'code_ecole',
+        'centre_exam_label',
+    ];
+
+    public function ecole(): BelongsTo
+    {
+        return $this->belongsTo(Ecole::class, 'code_ecole');
+    }
 }

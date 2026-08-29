@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\laboratoires\Equipements;
 use App\Models\laboratoires\Laboratoire;
 use App\Models\laboratoires\ReservationAgent;
-use App\Models\laboratoires\EntretienReparation;
 use Illuminate\Http\Request;
 
 class EquipementsController extends Controller
@@ -38,6 +37,7 @@ class EquipementsController extends Controller
     public function create()
     {
         $laboratoires = Laboratoire::all();
+
         return view('sige_app.frontend.admin.equipements.create', compact('laboratoires'));
     }
 
@@ -54,7 +54,7 @@ class EquipementsController extends Controller
             'date_achat' => 'required|date',
             'valeur' => 'required|numeric|min:0',
             'localisation' => 'required|max:255',
-            'code_lab' => 'required|exists:laboratoire,code_lab'
+            'code_lab' => 'required|exists:laboratoire,code_lab',
         ]);
 
         Equipements::create($validated);
@@ -106,13 +106,13 @@ class EquipementsController extends Controller
 
         $validated = $request->validate([
             'nom_equip' => 'required|max:255',
-            'ref_equip' => 'required|unique:equipements,ref_equip,' . $id . ',code_equip',
+            'ref_equip' => 'required|unique:equipements,ref_equip,'.$id.',code_equip',
             'desc_equip' => 'nullable',
             'etat' => 'required|in:disponible,en_maintenance,hors_service',
             'date_achat' => 'required|date',
             'valeur' => 'required|numeric|min:0',
             'localisation' => 'required|max:255',
-            'code_lab' => 'required|exists:laboratoire,code_lab'
+            'code_lab' => 'required|exists:laboratoire,code_lab',
         ]);
 
         $equipement->update($validated);
@@ -170,12 +170,12 @@ class EquipementsController extends Controller
             'id_pers_lab' => 'nullable|exists:pers_lab,id_pers_lab',
             'id_user_ext' => 'nullable|exists:user_externe,id_user_ext',
             'debut_reserv' => 'required|date|after:now',
-            'fin_reserv' => 'required|date|after:debut_reserv'
+            'fin_reserv' => 'required|date|after:debut_reserv',
         ]);
-        if ($request->participant_type === 'interne' && !$request->id_pers_lab) {
+        if ($request->participant_type === 'interne' && ! $request->id_pers_lab) {
             return redirect()->back()->with('error', 'Veuillez sélectionner un membre interne.');
         }
-        if ($request->participant_type === 'externe' && !$request->id_user_ext) {
+        if ($request->participant_type === 'externe' && ! $request->id_user_ext) {
             return redirect()->back()->with('error', 'Veuillez sélectionner un user externe.');
         }
         if ($request->id_pers_lab && $request->id_user_ext) {
@@ -201,9 +201,10 @@ class EquipementsController extends Controller
             'id_user_ext' => $request->participant_type === 'externe' ? $request->id_user_ext : null,
             'debut_reserv' => $request->debut_reserv,
             'fin_reserv' => $request->fin_reserv,
-            'statut' => 'en_attente'
+            'statut' => 'en_attente',
         ]);
         $equipement->updateEtatAutomatique();
+
         return redirect()->route('equipements.show', $id)
             ->with('success', 'Demande de réservation enregistrée avec succès.');
     }

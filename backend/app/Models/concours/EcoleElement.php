@@ -2,7 +2,6 @@
 
 namespace App\Models\concours;
 
-
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class EcoleElement extends Pivot
@@ -12,7 +11,7 @@ class EcoleElement extends Pivot
     // public $incrementing = false;
 
     protected $fillable = [
-		'code_ecole',
+        'code_ecole',
         'code_el',
         // Add other fillable fields as needed
     ];

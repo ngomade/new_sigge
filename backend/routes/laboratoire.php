@@ -1,16 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\labo\LaboratoireController;
-use App\Http\Controllers\labo\ProjetLaboController;
-use App\Http\Controllers\labo\PersLabController;
-use App\Http\Controllers\labo\EquipementsController;
-use App\Http\Controllers\labo\PublicationController;
-use App\Http\Controllers\labo\UserExterneController;
-use App\Http\Controllers\labo\RoleLaboController;
-use App\Http\Controllers\labo\PublicLaboratoireController;
-use App\Http\Controllers\labo\CandidatureController;
 use App\Http\Controllers\labo\AdminLaboratoireController;
+use App\Http\Controllers\labo\CandidatureController;
+use App\Http\Controllers\labo\EquipementsController;
+use App\Http\Controllers\labo\LaboratoireController;
+use App\Http\Controllers\labo\PersLabController;
+use App\Http\Controllers\labo\ProjetLaboController;
+use App\Http\Controllers\labo\PublicLaboratoireController;
+use App\Http\Controllers\labo\RoleLaboController;
+use App\Http\Controllers\labo\UserExterneController;
+use Illuminate\Support\Facades\Route;
 
 // Routes publiques pour les laboratoires
 Route::prefix('laboratoires')->name('laboratoires.')->group(function () {
@@ -108,8 +107,9 @@ Route::prefix('labo')->name('labo.')->group(function () {
             'membres' => \App\Models\laboratoires\PersLab::where('statut', 'actif')->count(),
             'equipements' => \App\Models\laboratoires\Equipements::count(),
             'publications' => \App\Models\laboratoires\Publication::count(),
-            'externes' => \App\Models\laboratoires\UserExterne::where('statut', 'actif')->count()
+            'externes' => \App\Models\laboratoires\UserExterne::where('statut', 'actif')->count(),
         ];
+
         return view('sige_app.frontend.labo.dashboard', compact('stats'));
     })->name('dashboard')->middleware('laboratoire.permission:dashboard.view');
 
@@ -128,8 +128,7 @@ Route::prefix('labo')->name('labo.')->group(function () {
 });
 
 Route::get('/presentation_ufd_tsi', [LaboratoireController::class, 'index']);
-//Route::get('/presentation_labo/{id}',  [LaboratoireController::class, 'show']);
-
+// Route::get('/presentation_labo/{id}',  [LaboratoireController::class, 'show']);
 
 // Dashboard admin du laboratoire
 Route::get('/laboratoires/{code_lab}/admin', [AdminLaboratoireController::class, 'dashboard'])
@@ -189,7 +188,6 @@ Route::post('/laboratoires/{code_lab}/admin/candidatures/{candidature}/reject', 
     ->name('laboratoires.admin.candidatures.reject')
     ->middleware('laboratoire.permission:candidatures.process');
 
-
 // Gestion des utilisateurs externes du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/externes', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'externes'])
     ->name('laboratoires.admin.externes')
@@ -224,7 +222,6 @@ Route::post('/laboratoires/{code_lab}/admin/externes/{externe}/reset-password', 
     ->where('externe', '[A-Za-z0-9\-]+')
     ->name('laboratoires.admin.externes.reset-password')
     ->middleware('laboratoire.permission:membres.edit');
-
 
 // Gestion des projets du laboratoire (admin)
 Route::get('/laboratoires/{code_lab}/admin/projets', [\App\Http\Controllers\Labo\AdminLaboratoireController::class, 'projets'])

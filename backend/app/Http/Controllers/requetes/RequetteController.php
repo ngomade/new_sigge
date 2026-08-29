@@ -3,32 +3,25 @@
 namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
-use App\Models\requetes\Requete;
-use App\Models\requetes\Category;
+use App\Mail\requetes\RequeteSubmittedMail;
 use App\Models\Bureau;
+use App\Models\requetes\Category;
 use App\Models\requetes\FichierRequete;
+use App\Models\requetes\Requete;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\requetes\RequeteSubmittedMail;
-use App\Mail\requetes\RequetteStatusChangeMail;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class RequetteController extends Controller
 {
     //
     /**
      * Display a listing of the resource.
-     *
-     *
      */
-
-
     public function index(Request $request)
-
     {
         $id = $request->session()->get('user')->code_user;
         $query = Requete::with(['category', 'user', 'bureau'])
@@ -53,6 +46,7 @@ class RequetteController extends Controller
 
         $requetes = $query->orderBy('date_sousmis', 'desc')->paginate(10);
         $categories = Category::all();
+
         return view('sige_app.backend.requetes.index', compact('requetes', 'categories'));
     }
 
@@ -63,16 +57,13 @@ class RequetteController extends Controller
     {
         $categories = Category::all();
         $bureaux = Bureau::all();
+
         return view('sige_app.backend.requetes.create', compact('categories', 'bureaux'));
     }
 
     /**
      * Store a newly created resource in storage.
-
-
      */
-
-
     public function store(Request $request)
     {
         $request->validate([
@@ -96,7 +87,7 @@ class RequetteController extends Controller
                 ->orWhere('code_bureau')
                 ->first();
 
-            if (!$bureauScolarite) {
+            if (! $bureauScolarite) {
                 return back()->withErrors(['error' => 'Service Scolarité non trouvé. Contactez l\'administrateur.']);
             }
             // Créer la requête
@@ -118,15 +109,15 @@ class RequetteController extends Controller
             // Gérer les fichiers joints
             if ($request->hasFile('fichiers')) {
                 foreach ($request->file('fichiers') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $path = $file->storeAs('requetes_fichiers', $filename, 'public');
 
                     FichierRequete::create([
-                        'id_fichier' => 'FILE-' . strtoupper(Str::random(10)),
+                        'id_fichier' => 'FILE-'.strtoupper(Str::random(10)),
                         'chemin' => $path,
                         'code_requete' => $requete->code_requete,
                         'nom_original' => $file->getClientOriginalName(),
-                        'taille' => $file->getSize()
+                        'taille' => $file->getSize(),
                     ]);
                 }
             }
@@ -141,11 +132,11 @@ class RequetteController extends Controller
                 Mail::to($user->email_user)->send(new RequeteSubmittedMail($requete));
             } catch (\Exception $mailException) {
                 $mailSent = false;
-                Log::error('Erreur lors de l\'envoi de l\'email de confirmation: ' . $mailException->getMessage());
+                Log::error('Erreur lors de l\'envoi de l\'email de confirmation: '.$mailException->getMessage());
             }
 
-            $successMessage = 'Votre requête a été soumise avec succès. Numéro de référence: ' . $requete->code_requete;
-            if (!$mailSent) {
+            $successMessage = 'Votre requête a été soumise avec succès. Numéro de référence: '.$requete->code_requete;
+            if (! $mailSent) {
                 $successMessage .= ' Cependant, l\'email de confirmation n\'a pas pu être envoyé.';
             }
 
@@ -154,7 +145,7 @@ class RequetteController extends Controller
         } catch (\Exception $e) {
             // Log::error('Erreur lors de la soumission de la requête: ' . $e->getMessage());
             return back()->withInput()
-                ->with('error', 'Erreur lors de la soumission de la requête. Veuillez réessayer. Détails: ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la soumission de la requête. Veuillez réessayer. Détails: '.$e->getMessage());
         }
     }
 
@@ -174,20 +165,21 @@ class RequetteController extends Controller
 
         // Helper function to get personnel managing bureau at a given date
         $getManagerAtDate = function ($bureauCode, $date) {
-            if (!$date) {
+            if (! $date) {
                 return null;
             }
             $persRole = \App\Models\PersRole::where('code_bureau', $bureauCode)
                 ->where('statut_role', \App\Models\PersRole::STATUT_ACTIF)
                 ->where(function ($query) use ($date) {
                     $query->whereNull('date_fin_role')
-                          ->orWhere('date_fin_role', '>', $date);
+                        ->orWhere('date_fin_role', '>', $date);
                 })
                 ->where('date_debut_role', '<=', $date)
                 ->with('personnel')
                 ->where('date_debut_role', '<=', $date)
                 ->with('personnel')
                 ->first();
+
             return $persRole ? $persRole->personnel : null;
         };
 
@@ -262,6 +254,7 @@ class RequetteController extends Controller
 
         $categories = Category::all();
         $bureaux = Bureau::all();
+
         // $personnel = session('user');
         return view('sige_app.backend.requetes.edit', compact('requete', 'categories', 'bureaux'));
     }
@@ -298,25 +291,26 @@ class RequetteController extends Controller
             // Gérer les nouveaux fichiers
             if ($request->hasFile('fichiers')) {
                 foreach ($request->file('fichiers') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $path = $file->storeAs('requetes_fichiers', $filename, 'public');
 
                     FichierRequete::create([
-                        'id_fichier' => 'FILE-' . strtoupper(Str::random(10)),
+                        'id_fichier' => 'FILE-'.strtoupper(Str::random(10)),
                         'chemin' => $path,
                         'code_requete' => $code_requete,
                         'nom_original' => $file->getClientOriginalName(),
-                        'taille' => $file->getSize()
+                        'taille' => $file->getSize(),
                     ]);
                 }
             }
 
-            Log::info('Requete updated successfully: ' . $code_requete);
+            Log::info('Requete updated successfully: '.$code_requete);
 
             return redirect()->route('requetes.show', $code_requete)
                 ->with('success', 'Votre requête a été mise à jour avec succès.');
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la mise à jour de la requête: ' . $e->getMessage());
+            Log::error('Erreur lors de la mise à jour de la requête: '.$e->getMessage());
+
             return back()->withInput()
                 ->with('error', 'Erreur lors de la mise à jour de la requête.');
         }
@@ -382,11 +376,12 @@ class RequetteController extends Controller
             })
             ->firstOrFail();
 
-        if (!Storage::disk('public')->exists($fichier->chemin)) {
+        if (! Storage::disk('public')->exists($fichier->chemin)) {
             abort(404, 'Fichier non trouvé');
         }
 
         $filePath = Storage::disk('public')->path($fichier->chemin);
+
         return response()->download($filePath, $fichier->nom_original);
     }
 
@@ -394,9 +389,7 @@ class RequetteController extends Controller
      * Tableau de bord des statistiques
      */
 
-
     /**
      * Afficher les statistiques des requêtes
      */
 }
-

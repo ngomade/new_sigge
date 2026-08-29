@@ -3,21 +3,19 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
-use App\Models\notes\Evaluation;
-use App\Models\notes\Ec;
-use App\Models\notes\Examen;
-use App\Models\notes\SessionExamen;
-use App\Models\Users;
 use App\Models\AnneeScolaire;
-use App\Models\Ue;
-use App\Models\Semestre;
+use App\Models\notes\Ec;
+use App\Models\notes\Evaluation;
+use App\Models\notes\Examen;
 use App\Models\notes\Inscription;
+use App\Models\notes\SessionExamen;
+use App\Models\Semestre;
+use App\Models\Ue;
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class EvaluationController extends Controller
@@ -48,7 +46,7 @@ class EvaluationController extends Controller
             if ($request->filled('date_debut') && $request->filled('date_fin')) {
                 $query->whereBetween('date_evaluation', [
                     $request->date_debut,
-                    $request->date_fin
+                    $request->date_fin,
                 ]);
             }
 
@@ -58,7 +56,7 @@ class EvaluationController extends Controller
             $sessions = SessionExamen::with('anneeScolaire')
                 ->orderBy('date_debut_session', 'desc')
                 ->get();
-            
+
             $ecs = Ec::with('ue')->orderBy('intitule_ec')->get();
             $etudiants = Users::role('etudiant')
                 ->orderBy('nom_user')
@@ -75,9 +73,9 @@ class EvaluationController extends Controller
                     ->count(),
                 'moyenne_generale' => round(Evaluation::avg('note_eval') ?? 0, 2),
                 'taux_reussite' => round(
-                    (Evaluation::where('note_eval', '>=', 10)->count() / 
+                    (Evaluation::where('note_eval', '>=', 10)->count() /
                     max(Evaluation::count(), 1)) * 100, 2
-                )
+                ),
             ];
 
             return view('sige_app.backend.gestion_notes.evaluation.index', compact(
@@ -85,9 +83,9 @@ class EvaluationController extends Controller
             ));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des évaluations: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage des évaluations: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
 
             return redirect()->back()
@@ -104,7 +102,7 @@ class EvaluationController extends Controller
             $ecs = Ec::with(['ue.semestre', 'assignations.classe'])
                 ->orderBy('intitule_ec')
                 ->get();
-            
+
             $examens = Examen::with('sessionExamen')
                 ->whereHas('sessionExamen', function ($q) {
                     $q->where('statut_session', 1); // Sessions actives uniquement
@@ -121,8 +119,8 @@ class EvaluationController extends Controller
             return view('sige_app.backend.gestion_notes.evaluation.create', compact('ecs', 'examens', 'etudiants'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de création d\'évaluation: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage du formulaire de création d\'évaluation: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('evaluations.index')
@@ -199,11 +197,11 @@ class EvaluationController extends Controller
 
                 } catch (Throwable $e) {
                     $user = User::find($evalData['code_user']);
-                    $errors[] = "Erreur pour l'étudiant " . ($user ? $user->name : $evalData['code_user']);
-                    
-                    Log::error('Erreur lors de la création d\'évaluation pour étudiant: ' . $evalData['code_user'], [
+                    $errors[] = "Erreur pour l'étudiant ".($user ? $user->name : $evalData['code_user']);
+
+                    Log::error('Erreur lors de la création d\'évaluation pour étudiant: '.$evalData['code_user'], [
                         'error' => $e->getMessage(),
-                        'eval_data' => $evalData
+                        'eval_data' => $evalData,
                     ]);
                 }
             }
@@ -212,7 +210,7 @@ class EvaluationController extends Controller
 
             $message = "Évaluations enregistrées : {$successCount} créée(s), {$updateCount} mise(s) à jour";
             if (count($errors) > 0) {
-                $message .= ", " . count($errors) . " erreur(s)";
+                $message .= ', '.count($errors).' erreur(s)';
             }
 
             Log::info('Évaluations créées/mises à jour', [
@@ -221,7 +219,7 @@ class EvaluationController extends Controller
                 'code_examen' => $request->code_examen,
                 'success_count' => $successCount,
                 'update_count' => $updateCount,
-                'error_count' => count($errors)
+                'error_count' => count($errors),
             ]);
 
             $alertType = count($errors) > 0 ? 'warning' : 'success';
@@ -231,11 +229,11 @@ class EvaluationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la création des évaluations: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la création des évaluations: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -253,11 +251,11 @@ class EvaluationController extends Controller
             $evaluation = Evaluation::with([
                 'ec.ue.semestre',
                 'examen.sessionExamen.anneeScolaire',
-                'user'
+                'user',
             ])->where([
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
-                'code_user' => $code_user
+                'code_user' => $code_user,
             ])->firstOrFail();
 
             // Autres évaluations de cet étudiant pour cet EC
@@ -273,11 +271,11 @@ class EvaluationController extends Controller
             return view('sige_app.backend.gestion_notes.evaluation.show', compact('evaluation', 'autresEvaluations'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage de l\'évaluation: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage de l\'évaluation: '.$e->getMessage(), [
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
                 'code_user' => $code_user,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('evaluations.index')
@@ -307,10 +305,10 @@ class EvaluationController extends Controller
             return view('sige_app.backend.gestion_notes.evaluation.edit', compact('ec', 'examen', 'evaluations', 'etudiants'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification: '.$e->getMessage(), [
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('evaluations.index')
@@ -364,12 +362,12 @@ class EvaluationController extends Controller
 
                 } catch (Throwable $e) {
                     $user = User::find($evalData['code_user']);
-                    $errors[] = "Erreur pour l'étudiant " . ($user ? $user->name : $evalData['code_user']);
-                    
-                    Log::error('Erreur lors de la mise à jour d\'évaluation: ' . $evalData['code_user'], [
+                    $errors[] = "Erreur pour l'étudiant ".($user ? $user->name : $evalData['code_user']);
+
+                    Log::error('Erreur lors de la mise à jour d\'évaluation: '.$evalData['code_user'], [
                         'error' => $e->getMessage(),
                         'code_ec' => $code_ec,
-                        'code_examen' => $code_examen
+                        'code_examen' => $code_examen,
                     ]);
                 }
             }
@@ -378,7 +376,7 @@ class EvaluationController extends Controller
 
             $message = "Évaluations mises à jour : {$successCount} modifiée(s)";
             if (count($errors) > 0) {
-                $message .= ", " . count($errors) . " erreur(s)";
+                $message .= ', '.count($errors).' erreur(s)';
             }
 
             Log::info('Évaluations mises à jour', [
@@ -386,7 +384,7 @@ class EvaluationController extends Controller
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
                 'success_count' => $successCount,
-                'error_count' => count($errors)
+                'error_count' => count($errors),
             ]);
 
             $alertType = count($errors) > 0 ? 'warning' : 'success';
@@ -396,12 +394,12 @@ class EvaluationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la mise à jour des évaluations: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la mise à jour des évaluations: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -420,23 +418,24 @@ class EvaluationController extends Controller
 
             $evaluations = Evaluation::where([
                 'code_ec' => $code_ec,
-                'code_examen' => $code_examen
+                'code_examen' => $code_examen,
             ])->get();
 
             if ($evaluations->isEmpty()) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Aucune évaluation trouvée pour ces critères.');
             }
 
             $count = $evaluations->count();
-            
+
             // Sauvegarder pour les logs
             $evaluationData = $evaluations->load(['ec', 'examen', 'user'])->toArray();
 
             Evaluation::where([
                 'code_ec' => $code_ec,
-                'code_examen' => $code_examen
+                'code_examen' => $code_examen,
             ])->delete();
 
             DB::commit();
@@ -446,7 +445,7 @@ class EvaluationController extends Controller
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
                 'count' => $count,
-                'deleted_data' => $evaluationData
+                'deleted_data' => $evaluationData,
             ]);
 
             return redirect()->route('evaluations.index')
@@ -454,12 +453,12 @@ class EvaluationController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la suppression des évaluations: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la suppression des évaluations: '.$e->getMessage(), [
                 'code_ec' => $code_ec,
                 'code_examen' => $code_examen,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -491,7 +490,7 @@ class EvaluationController extends Controller
             $inscriptions = Inscription::where([
                 'code_user' => $request->code_user,
                 'code_annee' => $request->code_annee,
-                'statut_ins' => 1
+                'statut_ins' => 1,
             ])->with('filiereNiveaux.niveau.semestres.ues.ecs')->get();
 
             $resultats = [];
@@ -499,14 +498,14 @@ class EvaluationController extends Controller
             foreach ($inscriptions as $inscription) {
                 foreach ($inscription->filiereNiveaux as $filiereNiveau) {
                     $niveau = $filiereNiveau->niveau;
-                    
+
                     foreach ($niveau->semestres as $semestre) {
                         $semestreData = [
                             'semestre' => $semestre,
                             'ues' => [],
                             'moyenne_semestre' => 0,
                             'total_credits' => 0,
-                            'credits_obtenus' => 0
+                            'credits_obtenus' => 0,
                         ];
 
                         foreach ($semestre->ues as $ue) {
@@ -515,14 +514,14 @@ class EvaluationController extends Controller
                                 'ecs' => [],
                                 'moyenne_ue' => 0,
                                 'total_credits_ue' => 0,
-                                'credits_obtenus_ue' => 0
+                                'credits_obtenus_ue' => 0,
                             ];
 
                             foreach ($ue->ecs as $ec) {
                                 // Récupérer les évaluations pour cet EC
                                 $evaluations = Evaluation::where([
                                     'code_ec' => $ec->code_ec,
-                                    'code_user' => $request->code_user
+                                    'code_user' => $request->code_user,
                                 ])->with('examen.sessionExamen')->get();
 
                                 if ($evaluations->isNotEmpty()) {
@@ -533,7 +532,7 @@ class EvaluationController extends Controller
                                         'ec' => $ec,
                                         'evaluations' => $evaluations,
                                         'moyenne' => round($moyenne_ec, 2),
-                                        'credits_obtenus' => $credits_obtenus
+                                        'credits_obtenus' => $credits_obtenus,
                                     ];
 
                                     $ueData['total_credits_ue'] += $ec->credit_ec;
@@ -550,7 +549,7 @@ class EvaluationController extends Controller
                                 $ueData['moyenne_ue'] = round($somme_ponderee / $ueData['total_credits_ue'], 2);
                             }
 
-                            if (!empty($ueData['ecs'])) {
+                            if (! empty($ueData['ecs'])) {
                                 $semestreData['ues'][] = $ueData;
                                 $semestreData['total_credits'] += $ueData['total_credits_ue'];
                                 $semestreData['credits_obtenus'] += $ueData['credits_obtenus_ue'];
@@ -566,7 +565,7 @@ class EvaluationController extends Controller
                             $semestreData['moyenne_semestre'] = round($somme_ponderee_sem / $semestreData['total_credits'], 2);
                         }
 
-                        if (!empty($semestreData['ues'])) {
+                        if (! empty($semestreData['ues'])) {
                             $resultats[] = $semestreData;
                         }
                     }
@@ -576,7 +575,7 @@ class EvaluationController extends Controller
             // Calculer la moyenne générale de l'année
             $total_credits_annee = array_sum(array_column($resultats, 'total_credits'));
             $moyenne_annee = 0;
-            
+
             if ($total_credits_annee > 0) {
                 $somme_ponderee_annee = 0;
                 foreach ($resultats as $semestreData) {
@@ -590,9 +589,9 @@ class EvaluationController extends Controller
             ));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors du calcul des moyennes: ' . $e->getMessage(), [
+            Log::error('Erreur lors du calcul des moyennes: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
 
             return redirect()->back()
@@ -612,9 +611,10 @@ class EvaluationController extends Controller
             })->orderBy('name')->get();
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des étudiants par EC: ' . $e->getMessage(), [
-                'code_ec' => $code_ec
+            Log::error('Erreur lors de la récupération des étudiants par EC: '.$e->getMessage(), [
+                'code_ec' => $code_ec,
             ]);
+
             return collect();
         }
     }
@@ -635,17 +635,17 @@ class EvaluationController extends Controller
                         'name' => $etudiant->name,
                         'email' => $etudiant->email,
                     ];
-                })
+                }),
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur API récupération étudiants par EC: ' . $e->getMessage(), [
-                'code_ec' => $code_ec
+            Log::error('Erreur API récupération étudiants par EC: '.$e->getMessage(), [
+                'code_ec' => $code_ec,
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des étudiants'
+                'message' => 'Erreur lors de la récupération des étudiants',
             ], 500);
         }
     }
@@ -656,8 +656,8 @@ class EvaluationController extends Controller
     public function export(Request $request)
     {
         try {
-            $filename = 'evaluations_' . now()->format('Y-m-d_H-i-s') . '.csv';
-            
+            $filename = 'evaluations_'.now()->format('Y-m-d_H-i-s').'.csv';
+
             $headers = [
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => "attachment; filename=\"{$filename}\"",
@@ -682,9 +682,9 @@ class EvaluationController extends Controller
 
             $evaluations = $query->orderBy('date_evaluation', 'desc')->get();
 
-            $callback = function() use ($evaluations) {
+            $callback = function () use ($evaluations) {
                 $file = fopen('php://output', 'w');
-                
+
                 // En-têtes CSV
                 fputcsv($file, [
                     'Date Évaluation',
@@ -696,7 +696,7 @@ class EvaluationController extends Controller
                     'Session',
                     'Type Examen',
                     'Note',
-                    'Date Saisie'
+                    'Date Saisie',
                 ]);
 
                 // Données
@@ -711,7 +711,7 @@ class EvaluationController extends Controller
                         $evaluation->examen->sessionExamen->label_session ?? '',
                         $evaluation->examen->type_evaluation ?? '',
                         $evaluation->note_eval,
-                        $evaluation->date_evalu
+                        $evaluation->date_evalu,
                     ]);
                 }
 
@@ -721,15 +721,15 @@ class EvaluationController extends Controller
             Log::info('Export des évaluations effectué', [
                 'user_id' => auth()->id(),
                 'count' => $evaluations->count(),
-                'filters' => $request->all()
+                'filters' => $request->all(),
             ]);
 
             return response()->stream($callback, 200, $headers);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'export des évaluations: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'export des évaluations: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()

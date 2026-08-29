@@ -8,15 +8,13 @@ class CreateRessourceActuTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
         Schema::create('ressource_actu', function (Blueprint $table) {
             $table->integer('r_id', true);
             $table->string('actu_code', 128);
-            $table->foreign('actu_code')->references("actu_code")->on("actualite");
+            $table->foreign('actu_code')->references('actu_code')->on('actualite');
             $table->string('r_type', 128);
             $table->string('r_name', 128);
             $table->timestamps();
@@ -25,8 +23,6 @@ class CreateRessourceActuTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\concours;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\concours\Compte;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class ResetPasswordTest extends TestCase
 {
@@ -23,16 +23,16 @@ class ResetPasswordTest extends TestCase
     {
         $compte = Compte::factory()->create([
             'ca_num_recu' => 'TEST123',
-            'ca_email' => 'test@example.com'
+            'ca_email' => 'test@example.com',
         ]);
 
         $response = $this->postJson('/api/concours/auth/forgot-password ', [
-            'login' => 'TEST123'
+            'login' => 'TEST123',
         ]);
 
         $response->assertStatus(201)
             ->assertJson([
-                'message' => 'Un email de réinitialisation a été envoyé à votre adresse email.'
+                'message' => 'Un email de réinitialisation a été envoyé à votre adresse email.',
             ]);
 
         $compte->refresh();
@@ -45,17 +45,17 @@ class ResetPasswordTest extends TestCase
     {
         $compte = Compte::factory()->create([
             'reset_token' => '12345',
-            'reset_token_expires_at' => now()->addHours()
+            'reset_token_expires_at' => now()->addHours(),
         ]);
 
         $response = $this->postJson('/api/concours/auth/reset-password', [
             'token' => '12345',
-            'password' => 'newpassword123'
+            'password' => 'newpassword123',
         ]);
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Votre mot de passe a été réinitialisé avec succès.'
+                'message' => 'Votre mot de passe a été réinitialisé avec succès.',
             ]);
 
         $compte->refresh();
@@ -68,17 +68,17 @@ class ResetPasswordTest extends TestCase
     {
         Compte::factory()->create([
             'reset_token' => '12345',
-            'reset_token_expires_at' => now()->subHours()
+            'reset_token_expires_at' => now()->subHours(),
         ]);
 
         $response = $this->postJson('/api/concours/auth/reset-password', [
             'token' => '12345',
-            'password' => 'newpassword123'
+            'password' => 'newpassword123',
         ]);
 
         $response->assertStatus(400)
             ->assertJson([
-                'message' => 'Token invalide ou expiré.'
+                'message' => 'Token invalide ou expiré.',
             ]);
     }
 }

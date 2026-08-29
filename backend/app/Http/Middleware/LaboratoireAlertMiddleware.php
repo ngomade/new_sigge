@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\LaboratoireAlertService;
 use Closure;
 use Illuminate\Http\Request;
-use App\Services\LaboratoireAlertService;
 use Illuminate\Support\Facades\Log;
 
 class LaboratoireAlertMiddleware
@@ -12,7 +12,6 @@ class LaboratoireAlertMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
@@ -25,11 +24,11 @@ class LaboratoireAlertMiddleware
             if ($codeLab) {
                 // Exécuter les vérifications d'alertes en arrière-plan
                 try {
-                    $alertService = new LaboratoireAlertService();
+                    $alertService = new LaboratoireAlertService;
                     $alertService->runAllChecks();
                 } catch (\Exception $e) {
                     // Log l'erreur mais ne pas interrompre la requête
-                    Log::error('Erreur lors de la vérification des alertes: ' . $e->getMessage());
+                    Log::error('Erreur lors de la vérification des alertes: '.$e->getMessage());
                 }
             }
         }

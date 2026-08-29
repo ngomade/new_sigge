@@ -14,6 +14,7 @@ class UsersRoleControllerApi extends Controller
     public function index()
     {
         $usersRoles = UsersRole::all();
+
         return response()->json($usersRoles);
     }
 
@@ -31,10 +32,12 @@ class UsersRoleControllerApi extends Controller
             DB::beginTransaction();
             $usersRole = UsersRole::create($validatedData);
             DB::commit();
+
             return response()->json($usersRole);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error creating UsersRole: ' . $th->getMessage());
+            Log::error('Error creating UsersRole: '.$th->getMessage());
+
             return response()->json(['error' => 'Error creating UsersRole'], 500);
         }
     }
@@ -44,6 +47,7 @@ class UsersRoleControllerApi extends Controller
         $usersRole = UsersRole::where('code_user', $code_user)
             ->where('id_role', $id_role)
             ->firstOrFail();
+
         return response()->json($usersRole);
     }
 
@@ -65,10 +69,12 @@ class UsersRoleControllerApi extends Controller
             DB::beginTransaction();
             $usersRole->update($validatedData);
             DB::commit();
+
             return response()->json($usersRole);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error updating UsersRole: ' . $th->getMessage());
+            Log::error('Error updating UsersRole: '.$th->getMessage());
+
             return response()->json(['error' => 'Error updating UsersRole'], 500);
         }
     }
@@ -83,10 +89,12 @@ class UsersRoleControllerApi extends Controller
             DB::beginTransaction();
             $usersRole->delete();
             DB::commit();
+
             return response()->noContent();
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error deleting UsersRole: ' . $th->getMessage());
+            Log::error('Error deleting UsersRole: '.$th->getMessage());
+
             return response()->json(['error' => 'Error deleting UsersRole'], 500);
         }
     }

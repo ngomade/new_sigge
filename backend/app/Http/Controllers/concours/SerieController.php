@@ -19,6 +19,7 @@ class SerieController extends Controller
             'label_serie' => 'required|string|max:255',
         ]);
         $serie = Serie::create($validated);
+
         return response()->json($serie);
     }
 
@@ -26,12 +27,14 @@ class SerieController extends Controller
     {
 
         $serie = Serie::with(['diplomes', 'filieres'])->findOrFail($id);
+
         return response()->json($serie);
     }
+
     public function showByIdDiplomeAndFiliere(string $filiere_id, string $diplome_id)
     {
         // On récupère toutes les séries associées à la combinaison filière/diplôme via la table pivot
-        $series = Serie::whereHas('diplomes', function($q) use ($filiere_id, $diplome_id) {
+        $series = Serie::whereHas('diplomes', function ($q) use ($filiere_id, $diplome_id) {
             $q->where('filiere_diplome.filiere_code', $filiere_id)
                 ->where('filiere_diplome.code_dip', $diplome_id);
         })->get();
@@ -46,6 +49,7 @@ class SerieController extends Controller
         ]);
         $serie = Serie::findOrFail($id);
         $serie->update($validated);
+
         return response()->json($serie);
     }
 
@@ -55,7 +59,7 @@ class SerieController extends Controller
         $serie->diplomes()->detach();
         $serie->filieres()->detach();
         $serie->delete();
+
         return response()->noContent();
     }
 }
-

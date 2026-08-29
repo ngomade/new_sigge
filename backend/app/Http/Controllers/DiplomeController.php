@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Diplome;
 use App\Models\Filiere;
 use Illuminate\Http\Request;
@@ -27,12 +26,14 @@ class DiplomeController extends Controller
         if (isset($validated['filiere_codes'])) {
             $diplome->filieres()->sync($validated['filiere_codes']);
         }
+
         return response()->json($diplome->load('filieres'));
     }
 
     public function show(string $id)
     {
         $diplome = Diplome::findOrFail($id);
+
         return response()->json($diplome);
     }
 
@@ -41,6 +42,7 @@ class DiplomeController extends Controller
         // $id est l'identifiant de la filière, on retourne les diplômes associés à cette filière sans doublons
         $filiere = Filiere::with('diplomes')->findOrFail($id);
         $diplomes = $filiere->diplomes->unique('code_dip')->values();
+
         return response()->json($diplomes);
     }
 
@@ -58,6 +60,7 @@ class DiplomeController extends Controller
         if (isset($validated['filiere_codes'])) {
             $diplome->filieres()->sync($validated['filiere_codes']);
         }
+
         return response()->json($diplome->load('filieres'));
     }
 
@@ -66,6 +69,7 @@ class DiplomeController extends Controller
         $diplome = Diplome::findOrFail($id);
         $diplome->filieres()->detach(); // Detach all filieres before deleting
         $diplome->delete();
+
         return response()->noContent();
     }
 }

@@ -9,7 +9,9 @@ use Illuminate\Notifications\Notification;
 class GeneralNotifForCandidat extends Notification
 {
     use Queueable;
+
     public string $objet;
+
     public string $contenu;
 
     /**
@@ -53,7 +55,7 @@ class GeneralNotifForCandidat extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'sujet' => "Email de groupe",
+            'sujet' => 'Email de groupe',
             'objet' => $this->objet,
             'contenu' => $this->contenu,
             'notifiable_id' => $notifiable->id,

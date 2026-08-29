@@ -42,7 +42,7 @@ class NettoyerInvitationsExpirees extends Command
         $this->info("Nettoyage terminé. {$count} invitation(s) expirée(s) marquée(s) comme expirée(s).");
 
         Log::info('Nettoyage automatique des invitations expirées terminé', [
-            'nombre_invitations_expirees' => $count
+            'nombre_invitations_expirees' => $count,
         ]);
 
         return 0;

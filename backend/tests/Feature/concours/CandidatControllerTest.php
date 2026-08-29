@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\concours;
 
-use App\Models\concours\{App\Models\Ecole, App\Models\SiteEtude, Candidat, Filiere, Personnel, SessionConcours};
+use App\Models\concours\Candidat;
+use App\Models\concours\Filiere;
+use App\Models\concours\Personnel;
+use App\Models\concours\SessionConcours;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -10,9 +13,13 @@ use Tests\TestCase;
 class CandidatControllerTest extends TestCase
 {
     use RefreshDatabase;
+
     protected $filiere;
+
     protected $site;
+
     protected $session;
+
     protected $ecole;
 
     protected function setUp(): void
@@ -69,17 +76,17 @@ class CandidatControllerTest extends TestCase
             'ca_deliv_cni' => '2020-01-15',
             'ca_num_recu' => 'RECU2024001',
             'ca_recu' => 'path/to/recu.pdf',
-            'ecoles' => [$this->ecole->code_ecole]
+            'ecoles' => [$this->ecole->code_ecole],
         ]);
 
         $response->assertStatus(201)
             ->assertJson([
-                'message' => 'Candidat enregistré avec success'
+                'message' => 'Candidat enregistré avec success',
             ]);
 
         $this->assertDatabaseHas('candidat', [
             'ca_code' => 'CND2024001',
-            'ca_email' => 'john.doe@example.com'
+            'ca_email' => 'john.doe@example.com',
         ]);
     }
 
@@ -90,7 +97,7 @@ class CandidatControllerTest extends TestCase
             'ca_nom' => 'Searchable',
             'ca_prenom' => 'Test',
             'ca_email' => 'search@example.com',
-            'ca_num_cni' => '987654321'
+            'ca_num_cni' => '987654321',
         ]);
 
         $personnel = Personnel::factory()->create();
@@ -138,7 +145,7 @@ class CandidatControllerTest extends TestCase
                 'candidats_avec_handicap',
                 'repartition_par_centre_examen',
                 'repartition_par_centre_depot',
-                'age_moyen'
+                'age_moyen',
             ]);
 
         $this->assertEquals(8, $response->json('total_candidats'));

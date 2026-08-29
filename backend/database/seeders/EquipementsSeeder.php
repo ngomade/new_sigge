@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\laboratoires\Equipements;
 use App\Models\laboratoires\Laboratoire;
+use Illuminate\Database\Seeder;
 
 class EquipementsSeeder extends Seeder
 {
@@ -23,7 +23,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2023-03-15',
                         'valeur' => 2500000,
-                        'localisation' => 'Salle serveurs A12'
+                        'localisation' => 'Salle serveurs A12',
                     ],
                     [
                         'nom_equip' => 'Microscope électronique à balayage',
@@ -32,7 +32,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2023-06-20',
                         'valeur' => 4500000,
-                        'localisation' => 'Laboratoire d\'analyse B15'
+                        'localisation' => 'Laboratoire d\'analyse B15',
                     ],
                     [
                         'nom_equip' => 'Station de travail HP Z8 G4',
@@ -41,7 +41,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'en maintenance',
                         'date_achat' => '2023-09-10',
                         'valeur' => 1800000,
-                        'localisation' => 'Salle informatique C8'
+                        'localisation' => 'Salle informatique C8',
                     ],
                     [
                         'nom_equip' => 'Oscilloscope numérique Tektronix',
@@ -50,7 +50,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2022-11-05',
                         'valeur' => 850000,
-                        'localisation' => 'Laboratoire électronique D3'
+                        'localisation' => 'Laboratoire électronique D3',
                     ],
                     [
                         'nom_equip' => 'Imprimante 3D Ultimaker S5',
@@ -59,8 +59,8 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'hors service',
                         'date_achat' => '2023-01-15',
                         'valeur' => 1200000,
-                        'localisation' => 'Atelier de prototypage E7'
-                    ]
+                        'localisation' => 'Atelier de prototypage E7',
+                    ],
                 ];
             }
             // Équipements de laboratoire de recherche
@@ -73,7 +73,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2023-04-12',
                         'valeur' => 950000,
-                        'localisation' => 'Laboratoire de biologie F10'
+                        'localisation' => 'Laboratoire de biologie F10',
                     ],
                     [
                         'nom_equip' => 'Spectrophotomètre UV-Vis',
@@ -82,7 +82,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2023-07-08',
                         'valeur' => 750000,
-                        'localisation' => 'Laboratoire de chimie G5'
+                        'localisation' => 'Laboratoire de chimie G5',
                     ],
                     [
                         'nom_equip' => 'Étuve de séchage',
@@ -91,7 +91,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'en maintenance',
                         'date_achat' => '2022-12-20',
                         'valeur' => 450000,
-                        'localisation' => 'Laboratoire de préparation H2'
+                        'localisation' => 'Laboratoire de préparation H2',
                     ],
                     [
                         'nom_equip' => 'Microscope optique binoculaire',
@@ -100,7 +100,7 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2023-02-28',
                         'valeur' => 650000,
-                        'localisation' => 'Laboratoire d\'observation I9'
+                        'localisation' => 'Laboratoire d\'observation I9',
                     ],
                     [
                         'nom_equip' => 'Balance de précision',
@@ -109,8 +109,8 @@ class EquipementsSeeder extends Seeder
                         'etat' => 'disponible',
                         'date_achat' => '2023-05-15',
                         'valeur' => 350000,
-                        'localisation' => 'Laboratoire de pesée J4'
-                    ]
+                        'localisation' => 'Laboratoire de pesée J4',
+                    ],
                 ];
             }
 
@@ -123,7 +123,7 @@ class EquipementsSeeder extends Seeder
                     'date_achat' => $equipement['date_achat'],
                     'valeur' => $equipement['valeur'],
                     'localisation' => $equipement['localisation'],
-                    'code_lab' => $laboratoire->code_lab
+                    'code_lab' => $laboratoire->code_lab,
                 ]);
             }
         }

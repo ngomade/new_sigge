@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class LaboAnnonce extends Model
 {
     protected $table = 'labo_annonces';
+
     protected $fillable = [
-        'code_lab', 'id_admin', 'titre', 'contenu', 'fichier'
+        'code_lab', 'id_admin', 'titre', 'contenu', 'fichier',
     ];
 
     public function laboratoire()

@@ -4,15 +4,17 @@ namespace App\Mail;
 
 use App\Models\Users;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class PassWordRecoverMail extends Mailable
 {
     use Queueable, SerializesModels;
+
     protected $user;
+
     protected $pwd;
+
     /**
      * Create a new message instance.
      *
@@ -31,9 +33,9 @@ class PassWordRecoverMail extends Mailable
      */
     public function build()
     {
-        return $this->view("sige_app.mails.info_connexion")
-        ->subject("Informations perdues")
-        ->with("user", $this->user)
-        ->with("pwd", $this->pwd);
+        return $this->view('sige_app.mails.info_connexion')
+            ->subject('Informations perdues')
+            ->with('user', $this->user)
+            ->with('pwd', $this->pwd);
     }
 }

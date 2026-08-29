@@ -1,6 +1,7 @@
 <?php
 
 // DossierFactory.php
+
 namespace Database\Factories\concours;
 
 use App\Models\concours\Dossier;
@@ -20,11 +21,11 @@ class DossierFactory extends Factory
             'Photo d\'identité',
             'Certificat médical',
             'Casier judiciaire',
-            'Attestation de bourse'
+            'Attestation de bourse',
         ];
 
         return [
-            'label_el' => $this->faker->randomElement($elements)
+            'label_el' => $this->faker->randomElement($elements),
         ];
     }
 }

@@ -2,30 +2,30 @@
 
 namespace App\Models\notes;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Salle extends Model
 {
-	protected $table = 'salle';
-	protected $primaryKey = 'code_salle';
-	public $incrementing = false;
+    protected $table = 'salle';
 
-	protected $casts = [
-		'nb_place_salle' => 'int',
-		'etat_salle' => 'bool'
-	];
+    protected $primaryKey = 'code_salle';
 
-	protected $fillable = [
+    public $incrementing = false;
+
+    protected $casts = [
+        'nb_place_salle' => 'int',
+        'etat_salle' => 'bool',
+    ];
+
+    protected $fillable = [
         'code_salle',
-		'nb_place_salle',
-		'etat_salle',
-		'desc_salle'
-	];
+        'nb_place_salle',
+        'etat_salle',
+        'desc_salle',
+    ];
 
-	public function periodes()
-	{
-		return $this->hasMany(Periode::class, 'code_salle');
-	}
+    public function periodes()
+    {
+        return $this->hasMany(Periode::class, 'code_salle');
+    }
 }

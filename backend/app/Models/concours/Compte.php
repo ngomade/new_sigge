@@ -1,9 +1,7 @@
 <?php
 
-
 namespace App\Models\concours;
 
-use App\Models\concours\Candidat;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,39 +11,47 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Compte extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens;
-	protected $table = 'compte';
-	protected $primaryKey = 'ca_num_recu';
+    use HasApiTokens, HasFactory, Notifiable;
+
+    protected $table = 'compte';
+
+    protected $primaryKey = 'ca_num_recu';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
-	protected $fillable = [
+    protected $fillable = [
         'ca_num_recu',
-		'ca_code',
-		'ca_pwd',
-		'ca_recu',
+        'ca_code',
+        'ca_pwd',
+        'ca_recu',
         'email_verified_at',
         'reset_token',
         'reset_token_expires_at',
-		'ca_nom',
-		'ca_email',
-		'ca_prenom'
-	];
+        'ca_nom',
+        'ca_email',
+        'ca_prenom',
+    ];
+
     protected $hidden = [
         'ca_pwd',
         'reset_token',
-        'reset_token_expires_at'
+        'reset_token_expires_at',
     ];
+
     public function getAuthPassword(): string
     {
         return $this->ca_pwd;
     }
+
     public function routeNotificationForMail(): string
     {
         return $this->ca_email;
     }
+
     public function candidat(): BelongsTo
-	{
-		return $this->belongsTo(Candidat::class, 'ca_code');
-	}
+    {
+        return $this->belongsTo(Candidat::class, 'ca_code');
+    }
 }

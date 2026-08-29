@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('ec', function (Blueprint $table) {
             $table->char('code_ec', 32)->primary();
             $table->char('code_ue', 32);
-             $table->foreign('code_ue')->references('code_ue')->on('ue')->onDelete('cascade');
+            $table->foreign('code_ue')->references('code_ue')->on('ue')->onDelete('cascade');
             $table->string('intitule_ec', 128);
             $table->smallInteger('credit_ec');
             $table->smallInteger('vh_ec');

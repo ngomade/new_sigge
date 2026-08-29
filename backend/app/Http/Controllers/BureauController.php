@@ -8,14 +8,12 @@ use App\Models\Personnel;
 use App\Models\PersRole;
 use App\Models\Presentation;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 use Image;
 use Throwable;
 
@@ -32,7 +30,7 @@ class BureauController extends Controller
 
         // Prendre les premières lettres de chaque mot significatif
         foreach ($words as $word) {
-            if (strlen($word) > 2 && !in_array(strtolower($word), ['de', 'du', 'la', 'le', 'les', 'des', 'et'])) {
+            if (strlen($word) > 2 && ! in_array(strtolower($word), ['de', 'du', 'la', 'le', 'les', 'des', 'et'])) {
                 $acronym .= strtoupper(substr($word, 0, 1));
             }
         }
@@ -47,7 +45,7 @@ class BureauController extends Controller
             'Departement' => 'DEPT',
             'Division' => 'DIV',
             'Cellule' => 'CEL',
-            'Service' => 'SERV'
+            'Service' => 'SERV',
         ];
 
         $prefix = $prefixes[$type] ?? 'BUR';
@@ -56,9 +54,9 @@ class BureauController extends Controller
         if ($type === 'Service' && $parentCode) {
             // Extraire l'acronyme du parent
             $parentAcronym = substr($parentCode, -3);
-            $baseCode = $prefix . '_' . $parentAcronym . '_' . $acronym;
+            $baseCode = $prefix.'_'.$parentAcronym.'_'.$acronym;
         } else {
-            $baseCode = $prefix . '_' . $acronym;
+            $baseCode = $prefix.'_'.$acronym;
         }
 
         // Vérifier l'unicité et ajouter un numéro si nécessaire
@@ -66,7 +64,7 @@ class BureauController extends Controller
         $counter = 1;
 
         while (Bureau::where('code_bureau', $code)->exists()) {
-            $code = $baseCode . '_' . str_pad($counter, 2, '0', STR_PAD_LEFT);
+            $code = $baseCode.'_'.str_pad($counter, 2, '0', STR_PAD_LEFT);
             $counter++;
         }
 
@@ -88,7 +86,7 @@ class BureauController extends Controller
                     'niveau' => 'Parent',
                     'type' => $parent->type_bureau,
                     'code' => $parent->code_bureau,
-                    'label' => $parent->label_bureau
+                    'label' => $parent->label_bureau,
                 ];
             }
         }
@@ -102,9 +100,9 @@ class BureauController extends Controller
                     return [
                         'type' => $sb->type_bureau,
                         'code' => $sb->code_bureau,
-                        'label' => $sb->label_bureau
+                        'label' => $sb->label_bureau,
                     ];
-                })
+                }),
             ];
         }
 
@@ -135,10 +133,10 @@ class BureauController extends Controller
                 ->count(),
             'avec_sous_bureaux' => $bureaux->filter(function ($b) {
                 return $b->sousBureau->count() > 0;
-            })->count()
+            })->count(),
         ];
 
-        return view("sige_app.backend.administration.bureau", compact("type_bureau", "bureaux", "bureaux_parents", "stats"));
+        return view('sige_app.backend.administration.bureau', compact('type_bureau', 'bureaux', 'bureaux_parents', 'stats'));
     }
 
     /**
@@ -149,7 +147,7 @@ class BureauController extends Controller
         $request->validate([
             'type_bureau' => 'required|string',
             'label_bureau' => 'required|string',
-            'bureau_parent' => 'nullable|string|exists:bureau,code_bureau'
+            'bureau_parent' => 'nullable|string|exists:bureau,code_bureau',
         ]);
 
         $code = $this->generateCodeBureau(
@@ -176,8 +174,8 @@ class BureauController extends Controller
             $bureau = Bureau::where('type_bureau', $type_bureau)->first();
         }
 
-        if (!$bureau) {
-            return redirect()->back()->withErrors("Aucun bureau trouvé pour le type: " . $type_bureau);
+        if (! $bureau) {
+            return redirect()->back()->withErrors('Aucun bureau trouvé pour le type: '.$type_bureau);
         }
 
         // Récupérer tous les bureaux du même type pour le sélecteur
@@ -185,7 +183,7 @@ class BureauController extends Controller
             ->orderBy('label_bureau')
             ->get();
 
-        return view("sige_app.backend.administration.affectation_personnel", compact("type_bureau", "bureau", "bureaux"));
+        return view('sige_app.backend.administration.affectation_personnel', compact('type_bureau', 'bureau', 'bureaux'));
     }
 
     public function store(Request $request)
@@ -197,7 +195,7 @@ class BureauController extends Controller
                 'type_bureau' => 'required|string|max:128',
                 'desc_bureau' => 'nullable|string',
                 'code_bureau' => 'nullable|string|max:128|unique:bureau,code_bureau',
-                'bureau_parent' => 'nullable|string|exists:bureau,code_bureau'
+                'bureau_parent' => 'nullable|string|exists:bureau,code_bureau',
             ];
 
             // Pour les services, le parent est obligatoire
@@ -224,7 +222,7 @@ class BureauController extends Controller
                 'code_bureau' => $codeBureau,
                 'label_bureau' => $request->label_bureau,
                 'type_bureau' => $request->type_bureau,
-                'desc_bureau' => $request->desc_bureau
+                'desc_bureau' => $request->desc_bureau,
             ]);
 
             // Si c'est un service et qu'un bureau parent est spécifié
@@ -233,25 +231,27 @@ class BureauController extends Controller
                     'code_bureau' => $request->bureau_parent,
                     'code_sous_bureau' => $codeBureau,
                     'created_at' => now(),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
             }
 
             DB::commit();
 
             // Log de l'activité
-            Log::info("Bureau créé", [
+            Log::info('Bureau créé', [
                 'type' => $request->type_bureau,
                 'code' => $codeBureau,
-                'user' => Auth::id()
+                'user' => Auth::id(),
             ]);
 
-            $success = $request->type_bureau . " créé avec succès (Code: " . $codeBureau . ")";
-            return redirect("/bureau/" . $request->type_bureau)->with(compact("success"));
+            $success = $request->type_bureau.' créé avec succès (Code: '.$codeBureau.')';
+
+            return redirect('/bureau/'.$request->type_bureau)->with(compact('success'));
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error("Erreur création bureau", ['error' => $th->getMessage()]);
-            return redirect()->back()->withErrors("Echec de création du " . $request->type_bureau . " : " . $th->getMessage())->withInput();
+            Log::error('Erreur création bureau', ['error' => $th->getMessage()]);
+
+            return redirect()->back()->withErrors('Echec de création du '.$request->type_bureau.' : '.$th->getMessage())->withInput();
         }
     }
 
@@ -279,12 +279,12 @@ class BureauController extends Controller
             $parent_actuel = $bureau->bureauParents()->first();
         }
 
-        return view("sige_app.backend.administration.edit_bureau", compact(
-            "bureau",
-            "type_bureau",
-            "bureaux_parents",
-            "parent_actuel",
-            "hierarchy"
+        return view('sige_app.backend.administration.edit_bureau', compact(
+            'bureau',
+            'type_bureau',
+            'bureaux_parents',
+            'parent_actuel',
+            'hierarchy'
         ));
     }
 
@@ -300,7 +300,7 @@ class BureauController extends Controller
             $rules = [
                 'label_bureau' => 'required|string|max:128',
                 'desc_bureau' => 'nullable|string',
-                'bureau_parent' => 'nullable|string|exists:bureau,code_bureau'
+                'bureau_parent' => 'nullable|string|exists:bureau,code_bureau',
             ];
 
             // Pour les services, le parent est obligatoire
@@ -315,7 +315,7 @@ class BureauController extends Controller
             // Mettre à jour le bureau
             $bureau->update([
                 'label_bureau' => $request->label_bureau,
-                'desc_bureau' => $request->desc_bureau
+                'desc_bureau' => $request->desc_bureau,
             ]);
 
             // Si c'est un service, gérer la relation parent
@@ -328,14 +328,15 @@ class BureauController extends Controller
                     // Vérifier qu'on ne crée pas de cycle
                     if ($this->wouldCreateCycle($request->bureau_parent, $code_bureau)) {
                         DB::rollBack();
-                        return redirect()->back()->withErrors("Impossible : cela créerait une relation circulaire")->withInput();
+
+                        return redirect()->back()->withErrors('Impossible : cela créerait une relation circulaire')->withInput();
                     }
 
                     DB::table('sous_bureau')->insert([
                         'code_bureau' => $request->bureau_parent,
                         'code_sous_bureau' => $code_bureau,
                         'created_at' => now(),
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
                 }
             }
@@ -343,17 +344,19 @@ class BureauController extends Controller
             DB::commit();
 
             // Log de l'activité
-            Log::info("Bureau modifié", [
+            Log::info('Bureau modifié', [
                 'code' => $code_bureau,
                 'user' => Auth::id(),
             ]);
 
-            $success = $bureau->type_bureau . " modifié avec succès";
-            return redirect("/bureau/" . $bureau->type_bureau)->with(compact("success"));
+            $success = $bureau->type_bureau.' modifié avec succès';
+
+            return redirect('/bureau/'.$bureau->type_bureau)->with(compact('success'));
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error("Erreur modification bureau", ['error' => $th->getMessage()]);
-            return redirect()->back()->withErrors("Echec de modification : " . $th->getMessage())->withInput();
+            Log::error('Erreur modification bureau', ['error' => $th->getMessage()]);
+
+            return redirect()->back()->withErrors('Echec de modification : '.$th->getMessage())->withInput();
         }
     }
 
@@ -364,6 +367,7 @@ class BureauController extends Controller
     {
         // Vérifier si le parent est déjà un descendant de l'enfant
         $descendants = $this->getAllDescendants($childCode);
+
         return in_array($parentCode, $descendants);
     }
 
@@ -375,7 +379,7 @@ class BureauController extends Controller
         $descendants = [];
         $toCheck = [$bureauCode];
 
-        while (!empty($toCheck)) {
+        while (! empty($toCheck)) {
             $current = array_shift($toCheck);
             $sousBureaux = DB::table('sous_bureau')
                 ->where('code_bureau', $current)
@@ -383,7 +387,7 @@ class BureauController extends Controller
                 ->toArray();
 
             foreach ($sousBureaux as $sb) {
-                if (!in_array($sb, $descendants)) {
+                if (! in_array($sb, $descendants)) {
                     $descendants[] = $sb;
                     $toCheck[] = $sb;
                 }
@@ -410,7 +414,7 @@ class BureauController extends Controller
                 'nb_sous_bureaux' => $sb->nb_sous_bureaux,
                 'nb_personnel' => PersRole::where('code_bureau', $sb->code_bureau)
                     ->where('statut_role', PersRole::STATUT_ACTIF)
-                    ->count()
+                    ->count(),
             ];
         });
 
@@ -425,6 +429,7 @@ class BureauController extends Controller
         $bureaux = Bureau::where('type_bureau', $type)
             ->orderBy('label_bureau')
             ->get(['code_bureau', 'label_bureau']);
+
         return response()->json($bureaux);
     }
 
@@ -457,7 +462,7 @@ class BureauController extends Controller
             'label' => $bureau->label_bureau,
             'type' => $bureau->type_bureau,
             'description' => $bureau->desc_bureau,
-            'enfants' => []
+            'enfants' => [],
         ];
 
         $sousBureaux = $bureau->sousBureau()->orderBy('type_bureau')->orderBy('label_bureau')->get();
@@ -478,7 +483,8 @@ class BureauController extends Controller
             $sousBureaux = DB::table('sous_bureau')->where('code_bureau', $code_bureau)->count();
             if ($sousBureaux > 0) {
                 DB::rollBack();
-                return redirect("/bureau/" . $type_bureau)->withErrors("Impossible de supprimer ce bureau car il contient " . $sousBureaux . " sous-bureau(x)");
+
+                return redirect('/bureau/'.$type_bureau)->withErrors('Impossible de supprimer ce bureau car il contient '.$sousBureaux.' sous-bureau(x)');
             }
 
             // Vérifier si le bureau a du personnel actif
@@ -488,7 +494,8 @@ class BureauController extends Controller
 
             if ($personnelActif > 0) {
                 DB::rollBack();
-                return redirect("/bureau/" . $type_bureau)->withErrors("Impossible de supprimer ce bureau car il contient " . $personnelActif . " personnel(s) actif(s)");
+
+                return redirect('/bureau/'.$type_bureau)->withErrors('Impossible de supprimer ce bureau car il contient '.$personnelActif.' personnel(s) actif(s)');
             }
 
             // Supprimer les relations où ce bureau est un sous-bureau
@@ -509,19 +516,21 @@ class BureauController extends Controller
             DB::commit();
 
             // Log de l'activité
-            Log::info("Bureau supprimé", [
+            Log::info('Bureau supprimé', [
                 'code' => $code_bureau,
                 'type' => $type_bureau,
-                'user' => Auth::id()
+                'user' => Auth::id(),
             ]);
 
-            $success = $type_bureau . " supprimé avec succès";
-            return redirect("/bureau/" . $type_bureau)->with(compact(["success"]));
+            $success = $type_bureau.' supprimé avec succès';
+
+            return redirect('/bureau/'.$type_bureau)->with(compact(['success']));
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error("Erreur suppression bureau", ['error' => $th->getMessage()]);
-            $errors = "Echec de suppression : " . $th->getMessage();
-            return redirect("/bureau/" . $type_bureau)->withErrors($errors);
+            Log::error('Erreur suppression bureau', ['error' => $th->getMessage()]);
+            $errors = 'Echec de suppression : '.$th->getMessage();
+
+            return redirect('/bureau/'.$type_bureau)->withErrors($errors);
         }
     }
 
@@ -547,7 +556,7 @@ class BureauController extends Controller
                 $bureau->code_bureau,
                 $bureau->label_bureau,
                 $bureau->type_bureau,
-                str_replace(["\n", "\r", ";"], [" ", " ", ","], strip_tags($bureau->desc_bureau)),
+                str_replace(["\n", "\r", ';'], [' ', ' ', ','], strip_tags($bureau->desc_bureau)),
                 $parent ? $parent->label_bureau : '',
                 $bureau->sousBureau->count(),
                 $nbPersonnel
@@ -556,7 +565,7 @@ class BureauController extends Controller
 
         return response($csv)
             ->header('Content-Type', 'text/csv; charset=UTF-8')
-            ->header('Content-Disposition', 'attachment; filename="bureaux_' . $type_bureau . '_' . date('Y-m-d') . '.csv"');
+            ->header('Content-Disposition', 'attachment; filename="bureaux_'.$type_bureau.'_'.date('Y-m-d').'.csv"');
     }
 
     // Les méthodes existantes pour la gestion du personnel restent inchangées...
@@ -567,7 +576,7 @@ class BureauController extends Controller
         $query = Personnel::query()
             ->select('code_pers', 'nom_pers', 'prenom_pers', 'cni_pers', 'first_phone_pers', 'second_phone_pers');
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('nom_pers', 'LIKE', "%{$search}%")
                     ->orWhere('prenom_pers', 'LIKE', "%{$search}%")
@@ -602,7 +611,7 @@ class BureauController extends Controller
             'personnels.*.id' => 'required|exists:personnel,code_pers',
             'personnels.*.role_id' => 'required|integer|exists:roles,id',
             'personnels.*.date_fin_role' => 'nullable|date|after:today',
-            'personnels.*.statut_role' => 'sometimes|integer|in:0,1'
+            'personnels.*.statut_role' => 'sometimes|integer|in:0,1',
         ]);
 
         try {
@@ -615,14 +624,14 @@ class BureauController extends Controller
                 $existingRole = PersRole::where([
                     'code_bureau' => $bureauCode,
                     'code_pers' => $personnel['id'],
-                    'code_role' => $personnel['role_id']
+                    'code_role' => $personnel['role_id'],
                 ])->first();
 
                 if ($existingRole) {
                     $existingRole->update([
                         'date_debut_role' => now(),
                         'date_fin_role' => $personnel['date_fin_role'] ?? null,
-                        'statut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF
+                        'statut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF,
                     ]);
                 } else {
                     PersRole::create([
@@ -631,7 +640,7 @@ class BureauController extends Controller
                         'code_role' => $personnel['role_id'],
                         'date_debut_role' => now(),
                         'date_fin_role' => $personnel['date_fin_role'] ?? null,
-                        'statut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF
+                        'statut_role' => $personnel['statut_role'] ?? PersRole::STATUT_ACTIF,
                     ]);
                 }
             }
@@ -640,15 +649,15 @@ class BureauController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Affectation du personnel enregistrée avec succès'
+                'message' => 'Affectation du personnel enregistrée avec succès',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de l\'affectation du personnel: ' . $e->getMessage());
+            Log::error('Erreur lors de l\'affectation du personnel: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Une erreur est survenue lors de l\'affectation du personnel: ' . $e->getMessage()
+                'message' => 'Une erreur est survenue lors de l\'affectation du personnel: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -661,7 +670,7 @@ class BureauController extends Controller
             },
             'role' => function ($query) {
                 $query->select('id', 'name');
-            }
+            },
         ])
             ->where('code_bureau', $code)
             ->get(['code_bureau', 'code_pers', 'code_role', 'date_debut_role', 'date_fin_role', 'statut_role']);
@@ -685,7 +694,7 @@ class BureauController extends Controller
                 'role_libelle' => $item->role->name ?? 'Inconnu',
                 'date_debut' => $item->date_debut_role ? Carbon::parse($item->date_debut_role)->format('d/m/Y') : null,
                 'date_fin' => $item->date_fin_role ? Carbon::parse($item->date_fin_role)->format('d/m/Y') : null,
-                'statut' => $statut
+                'statut' => $statut,
             ];
         });
 
@@ -697,94 +706,100 @@ class BureauController extends Controller
         try {
             $bureau = Bureau::where('type_bureau', $type)->first();
 
-            if (!$bureau) {
+            if (! $bureau) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Aucun bureau trouvé pour ce type'
+                    'message' => 'Aucun bureau trouvé pour ce type',
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'code_bureau' => $bureau->code_bureau
+                'code_bureau' => $bureau->code_bureau,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération du code du bureau: ' . $e->getMessage()
+                'message' => 'Erreur lors de la récupération du code du bureau: '.$e->getMessage(),
             ], 500);
         }
     }
 
     public function presentation_departement(string $id)
     {
-        $presentation = Presentation::where("code_bureau",$id)->first();
-        $bureau = Bureau::where("code_bureau", $presentation->code_bureau)->first();
-        return view("sige_app.frontend.departement.presentation_departement",compact(["presentation", "bureau"]));
+        $presentation = Presentation::where('code_bureau', $id)->first();
+        $bureau = Bureau::where('code_bureau', $presentation->code_bureau)->first();
+
+        return view('sige_app.frontend.departement.presentation_departement', compact(['presentation', 'bureau']));
     }
+
     public function download_grille($dept, $nom)
     {
-        return Response::download(storage_path("app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."departements".DIRECTORY_SEPARATOR.$dept.DIRECTORY_SEPARATOR.$nom.".pdf"));
+        return Response::download(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'departements'.DIRECTORY_SEPARATOR.$dept.DIRECTORY_SEPARATOR.$nom.'.pdf'));
     }
+
     public function store_present(Request $request)
     {
 
         try {
             DB::beginTransaction();
-            $exist = Presentation::where("code_bureau", $request->code_bureau)->count();
-            if($exist == 0){
+            $exist = Presentation::where('code_bureau', $request->code_bureau)->count();
+            if ($exist == 0) {
                 $photo_chef = $request->file('photo_chef');
                 $depliant_ingenieur = $request->file('depliant_ingenieur');
                 $depliant_science = $request->file('depliant_science');
-                $nom_photo = "photo_".$request->code_bureau.".".$photo_chef->extension();
-                $res = Presentation::create(array_merge($request->all(),[
-                    "photo_chef"     =>$nom_photo
+                $nom_photo = 'photo_'.$request->code_bureau.'.'.$photo_chef->extension();
+                $res = Presentation::create(array_merge($request->all(), [
+                    'photo_chef' => $nom_photo,
                 ]));
                 if ($res) {
-                    $image_extension = ["png", "jpg", "gif", "bmp"];
-                    $path = "/public/departements/".$request->code_bureau."/";
-                    if (!Storage::exists($path)) {
+                    $image_extension = ['png', 'jpg', 'gif', 'bmp'];
+                    $path = '/public/departements/'.$request->code_bureau.'/';
+                    if (! Storage::exists($path)) {
 
-                        Storage::makeDirectory($path,  0775, true);
+                        Storage::makeDirectory($path, 0775, true);
                     }
                     if (($photo_chef != null) && (in_array($photo_chef->extension(), $image_extension))) {
                         $photo_chef->storeAs($path, $nom_photo);
-                        $file = storage_path().DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR ."departements".DIRECTORY_SEPARATOR.$request->code_bureau.DIRECTORY_SEPARATOR.$nom_photo;
-                        $img = Image::make($file)->resize(300, 300, function($constraint) {
+                        $file = storage_path().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'departements'.DIRECTORY_SEPARATOR.$request->code_bureau.DIRECTORY_SEPARATOR.$nom_photo;
+                        $img = Image::make($file)->resize(300, 300, function ($constraint) {
                             $constraint->aspectRatio();
                         });
                         $img->save($file);
                     }
                     DB::commit();
-                    $depliant_ingenieur->storeAs($path, "depliant_ingenieur". ".".$depliant_science->extension());
-                    $depliant_science->storeAs($path, "depliant_science". ".".$depliant_science->extension());
-                    for ($i=1; $i <= 10; $i++) {
-                        $nom_fichier="flyer_science_".$i."";
-                        if ($request->file("document_".$i) != null) {
-                            $nom_fichier = "flyer_ingenieur".$i;
-                            if ($i<=5) {
-                                $request->file("document_".$i)->storeAs($path, $nom_fichier.".{$request->file("document_".$i)->extension()}");
+                    $depliant_ingenieur->storeAs($path, 'depliant_ingenieur'.'.'.$depliant_science->extension());
+                    $depliant_science->storeAs($path, 'depliant_science'.'.'.$depliant_science->extension());
+                    for ($i = 1; $i <= 10; $i++) {
+                        $nom_fichier = 'flyer_science_'.$i.'';
+                        if ($request->file('document_'.$i) != null) {
+                            $nom_fichier = 'flyer_ingenieur'.$i;
+                            if ($i <= 5) {
+                                $request->file('document_'.$i)->storeAs($path, $nom_fichier.".{$request->file('document_'.$i)->extension()}");
                             } else {
-                                $request->file("document_".$i)->storeAs($path, $nom_fichier.".{$request->file("document_".$i)->extension()}");
+                                $request->file('document_'.$i)->storeAs($path, $nom_fichier.".{$request->file('document_'.$i)->extension()}");
                             }
                             Document::create([
-                                'code_bureau'   =>$request->code_bureau  ,
-                                'label_doc'     =>"Flyer ".$i ." Pour le département".$request->code_bureau,
-                                'type_doc'      =>"Image",
-                                'nom_fichier'   =>$nom_fichier.".".$request->file("document_".$i)->extension()
+                                'code_bureau' => $request->code_bureau,
+                                'label_doc' => 'Flyer '.$i.' Pour le département'.$request->code_bureau,
+                                'type_doc' => 'Image',
+                                'nom_fichier' => $nom_fichier.'.'.$request->file('document_'.$i)->extension(),
                             ]);
                         }
                     }
-                    $success = $request->type_bureau."Présentation mis créée avec success";
-                    return redirect("/bureau/Departement")->with(compact("success"));
+                    $success = $request->type_bureau.'Présentation mis créée avec success';
+
+                    return redirect('/bureau/Departement')->with(compact('success'));
                 }
-                return redirect()->back()->withErrors("Echec de création de la présentation ")->withInput();
-            }else {
-                return redirect()->back()->withErrors("Cette présentation existe déja veuiller plutot la modifier")->withInput();
+
+                return redirect()->back()->withErrors('Echec de création de la présentation ')->withInput();
+            } else {
+                return redirect()->back()->withErrors('Cette présentation existe déja veuiller plutot la modifier')->withInput();
             }
         } catch (\Throwable $th) {
             dd($th);
-            return redirect()->back()->withErrors("Echec de création  de la présentation".$th)->withInput();
+
+            return redirect()->back()->withErrors('Echec de création  de la présentation'.$th)->withInput();
         }
     }
 }

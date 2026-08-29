@@ -14,12 +14,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class InvitationController extends Controller
 {
-        /**
+    /**
      * Affiche la page de gestion des invitations pour l'admin
      */
     public function index($code_lab)
@@ -28,7 +27,7 @@ class InvitationController extends Controller
         $adminId = session('user_id');
         $userType = session('user_type');
 
-        if (!$adminId || !$userType) {
+        if (! $adminId || ! $userType) {
             return redirect()->route('laboratoires.login.form', $code_lab)
                 ->withErrors(['error' => 'Veuillez vous connecter pour accéder à cette page.']);
         }
@@ -38,7 +37,7 @@ class InvitationController extends Controller
         // Vérifier que l'utilisateur est admin du laboratoire
         $persLab = PersLab::where('id_pers_lab', $adminId)->first();
 
-        if (!$persLab) {
+        if (! $persLab) {
             return redirect()->route('laboratoires.login.form', $code_lab)
                 ->withErrors(['error' => 'Profil utilisateur non trouvé.']);
         }
@@ -48,7 +47,7 @@ class InvitationController extends Controller
             ->where('statut', 'actif')
             ->first();
 
-        if (!$affectation) {
+        if (! $affectation) {
             return redirect()->route('laboratoires.login.form', $code_lab)
                 ->withErrors(['error' => 'Vous n\'êtes pas autorisé à accéder à cette page.']);
         }
@@ -78,24 +77,24 @@ class InvitationController extends Controller
             'id_rl' => 'nullable|exists:role_labo,id_rl',
             'date_fin_affectation' => 'required|date|after:today',
             'duree_validite_jours' => 'required|integer|min:1|max:30',
-            'nombre_utilisations_max' => 'required|integer|min:1|max:100'
+            'nombre_utilisations_max' => 'required|integer|min:1|max:100',
         ]);
 
-                try {
+        try {
             $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
             // Récupérer l'ID de l'admin connecté depuis la session
             $adminId = session('user_id');
             $userType = session('user_type');
 
-            if (!$adminId || !$userType) {
+            if (! $adminId || ! $userType) {
                 return back()->withErrors(['error' => 'Session admin non trouvée. Veuillez vous reconnecter.']);
             }
 
             // Vérifier que l'utilisateur est bien admin du laboratoire
             $persLab = PersLab::where('id_pers_lab', $adminId)->first();
 
-            if (!$persLab) {
+            if (! $persLab) {
                 return back()->withErrors(['error' => 'Profil utilisateur non trouvé.']);
             }
 
@@ -104,7 +103,7 @@ class InvitationController extends Controller
                 ->where('statut', 'actif')
                 ->first();
 
-            if (!$affectation) {
+            if (! $affectation) {
                 return back()->withErrors(['error' => 'Vous n\'êtes pas autorisé à créer des invitations pour ce laboratoire.']);
             }
 
@@ -124,10 +123,11 @@ class InvitationController extends Controller
             );
 
             return back()->with('success', 'Lien d\'invitation créé avec succès !')
-                        ->with('invitation_url', $invitation->url_invitation);
+                ->with('invitation_url', $invitation->url_invitation);
 
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la création de l\'invitation: ' . $e->getMessage());
+            Log::error('Erreur lors de la création de l\'invitation: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Erreur lors de la création de l\'invitation']);
         }
     }
@@ -144,9 +144,11 @@ class InvitationController extends Controller
             }
 
             $invitation->delete();
+
             return back()->with('success', 'Invitation supprimée avec succès');
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la suppression de l\'invitation: ' . $e->getMessage());
+            Log::error('Erreur lors de la suppression de l\'invitation: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Erreur lors de la suppression']);
         }
     }
@@ -160,11 +162,11 @@ class InvitationController extends Controller
             ->with(['laboratoire', 'roleLabo'])
             ->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             return redirect()->route('home')->withErrors(['error' => 'Lien d\'invitation invalide']);
         }
 
-        if (!$invitation->est_valide) {
+        if (! $invitation->est_valide) {
             return redirect()->route('home')->withErrors(['error' => 'Ce lien d\'invitation a expiré ou a déjà été utilisé']);
         }
 
@@ -178,12 +180,12 @@ class InvitationController extends Controller
     {
         $request->validate([
             'login' => 'required|string',
-            'password' => 'required|string'
+            'password' => 'required|string',
         ]);
 
         $invitation = LaboratoireInvitation::where('token', $token)->first();
 
-        if (!$invitation || !$invitation->est_valide) {
+        if (! $invitation || ! $invitation->est_valide) {
             return back()->withErrors(['error' => 'Lien d\'invitation invalide ou expiré']);
         }
 
@@ -193,7 +195,7 @@ class InvitationController extends Controller
             // Vérifier l'authentification
             $personne = $this->verifierAuthentification($request->login, $request->password);
 
-            if (!$personne) {
+            if (! $personne) {
                 return back()->withErrors(['error' => 'Identifiants incorrects. Vérifiez votre login et mot de passe.']);
             }
 
@@ -215,7 +217,7 @@ class InvitationController extends Controller
                     'id_pers_lab' => $personne['id'],
                     'type_pers_lab' => $personne['type'],
                     'date_entree' => now(),
-                    'statut' => 'actif'
+                    'statut' => 'actif',
                 ]);
             }
 
@@ -226,7 +228,7 @@ class InvitationController extends Controller
                 'id_rl' => $invitation->id_rl,
                 'date_affectation' => now(),
                 'date_fin_affectation' => $invitation->date_fin_affectation,
-                'statut' => 'actif'
+                'statut' => 'actif',
             ]);
 
             // Marquer l'invitation comme utilisée
@@ -239,7 +241,8 @@ class InvitationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors du traitement de l\'invitation: ' . $e->getMessage());
+            Log::error('Erreur lors du traitement de l\'invitation: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Erreur lors de l\'acceptation de l\'invitation']);
         }
     }
@@ -268,7 +271,7 @@ class InvitationController extends Controller
                     'id' => $personnel->code_pers,
                     'type' => 'personnel',
                     'nom' => $personnel->nom_pers,
-                    'prenom' => $personnel->prenom_pers
+                    'prenom' => $personnel->prenom_pers,
                 ];
             }
         }
@@ -292,7 +295,7 @@ class InvitationController extends Controller
                     'id' => $user->code_user,
                     'type' => 'user',
                     'nom' => $user->nom_user,
-                    'prenom' => $user->prenom_user
+                    'prenom' => $user->prenom_user,
                 ];
             }
         }
@@ -300,14 +303,14 @@ class InvitationController extends Controller
         return null;
     }
 
-            /**
+    /**
      * Télécharge le QR code d'une invitation
      */
     public function telechargerQRCode($token)
     {
         $invitation = LaboratoireInvitation::where('token', $token)->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             abort(404, 'Invitation non trouvée');
         }
 
@@ -315,6 +318,7 @@ class InvitationController extends Controller
 
         if ($format === 'svg') {
             $qrCodeSvg = $invitation->qr_code;
+
             return response($qrCodeSvg)
                 ->header('Content-Type', 'image/svg+xml');
         } else {
@@ -329,7 +333,7 @@ class InvitationController extends Controller
 
             return response($qrCodePng)
                 ->header('Content-Type', 'image/png')
-                ->header('Content-Disposition', 'attachment; filename="qr-code-invitation-' . $token . '.png"');
+                ->header('Content-Disposition', 'attachment; filename="qr-code-invitation-'.$token.'.png"');
         }
     }
 
@@ -347,7 +351,7 @@ class InvitationController extends Controller
         }
 
         Log::info('Nettoyage des invitations expirées terminé', [
-            'nombre_invitations_expirees' => $invitationsExpirees->count()
+            'nombre_invitations_expirees' => $invitationsExpirees->count(),
         ]);
 
         return $invitationsExpirees->count();

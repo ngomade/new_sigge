@@ -3,28 +3,28 @@
 namespace App\Http\Controllers\labo;
 
 use App\Http\Controllers\Controller;
-use App\Models\laboratoires\ReservationAgent;
-use Exception;
-use Illuminate\Http\Request;
+use App\Mail\CandidatureApprovedMail;
+use App\Mail\CandidatureRejectedMail;
+use App\Mail\ExterneConfirmationMail;
+use App\Mail\ExternePasswordResetMail;
+use App\Models\LaboAnnonce;
+use App\Models\laboratoires\Equipements;
+use App\Models\laboratoires\LabNotif;
 use App\Models\laboratoires\Laboratoire;
 use App\Models\laboratoires\LaboratoirePersLab;
 use App\Models\laboratoires\ProjetLabo;
-use App\Models\laboratoires\Equipements;
 use App\Models\laboratoires\Publication;
-use App\Models\laboratoires\UserExterne;
 use App\Models\laboratoires\RapportLabo;
-use App\Models\laboratoires\LabNotif;
+use App\Models\laboratoires\ReservationAgent;
+use App\Models\laboratoires\UserExterne;
 use App\Services\LaboratoireAlertService;
-use App\Mail\ExterneConfirmationMail;
-use App\Mail\ExternePasswordResetMail;
-use App\Mail\CandidatureApprovedMail;
-use App\Mail\CandidatureRejectedMail;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\LaboAnnonce;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminLaboratoireController extends Controller
 {
@@ -179,7 +179,7 @@ class AdminLaboratoireController extends Controller
                 'persLab.personnel',
                 'persLab.user',
                 'roleLabo',
-                'userExterne'
+                'userExterne',
             ]);
 
         if ($role) {
@@ -228,6 +228,7 @@ class AdminLaboratoireController extends Controller
         $personnel = \App\Models\Personnel::all();
         $users = \App\Models\Users::all();
         $userExternes = \App\Models\laboratoires\UserExterne::where('code_lab', $code_lab)->get();
+
         return view('laboratoires.admin.membres.create', compact('laboratoire', 'roles', 'personnel', 'users', 'userExternes'));
     }
 
@@ -239,7 +240,7 @@ class AdminLaboratoireController extends Controller
             'id_rl' => 'required|exists:role_labo,id_rl',
             'date_affectation' => 'required|date',
             'date_fin_affectation' => 'nullable|date|after:date_affectation',
-            'statut' => 'required|in:actif,inactif'
+            'statut' => 'required|in:actif,inactif',
         ]);
 
         // Créer l'affectation selon le type
@@ -251,18 +252,18 @@ class AdminLaboratoireController extends Controller
                 'id_rl' => $request->id_rl,
                 'date_affectation' => $request->date_affectation,
                 'date_fin_affectation' => $request->date_fin_affectation,
-                'statut' => $request->statut
+                'statut' => $request->statut,
             ];
         } else {
             // Pour personnel et users : créer dans pers_lab puis affecter
             $persLab = \App\Models\laboratoires\PersLab::firstOrCreate(
                 [
                     'id_pers_lab' => $request->id_pers_lab,
-                    'type_pers_lab' => $request->type_pers_lab
+                    'type_pers_lab' => $request->type_pers_lab,
                 ],
                 [
                     'date_entree' => now(),
-                    'statut' => 'actif'
+                    'statut' => 'actif',
                 ]
             );
 
@@ -272,7 +273,7 @@ class AdminLaboratoireController extends Controller
                 'id_rl' => $request->id_rl,
                 'date_affectation' => $request->date_affectation,
                 'date_fin_affectation' => $request->date_fin_affectation,
-                'statut' => $request->statut
+                'statut' => $request->statut,
             ];
         }
 
@@ -293,6 +294,7 @@ class AdminLaboratoireController extends Controller
                     ->orWhere('id_user_externe', $membre);
             })
             ->firstOrFail();
+
         return view('laboratoires.admin.membres.show', compact('laboratoire', 'affectation', 'layout'));
     }
 
@@ -308,6 +310,7 @@ class AdminLaboratoireController extends Controller
             })
             ->firstOrFail();
         $roles = \App\Models\laboratoires\RoleLabo::all();
+
         return view('laboratoires.admin.membres.edit', compact('laboratoire', 'affectation', 'roles', 'layout'));
     }
 
@@ -317,7 +320,7 @@ class AdminLaboratoireController extends Controller
             'id_rl' => 'required|exists:role_labo,id_rl',
             'date_affectation' => 'required|date',
             'date_fin_affectation' => 'nullable|date|after:date_affectation',
-            'statut' => 'required|in:actif,inactif'
+            'statut' => 'required|in:actif,inactif',
         ]);
         $affectation = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where(function ($q) use ($membre) {
@@ -329,8 +332,9 @@ class AdminLaboratoireController extends Controller
             'id_rl' => $request->id_rl,
             'date_affectation' => $request->date_affectation,
             'date_fin_affectation' => $request->date_fin_affectation,
-            'statut' => $request->statut
+            'statut' => $request->statut,
         ]);
+
         return redirect()->route('laboratoires.admin.membres', $code_lab)
             ->with('success', 'Membre modifié avec succès.');
     }
@@ -344,6 +348,7 @@ class AdminLaboratoireController extends Controller
             })
             ->firstOrFail();
         $affectation->delete();
+
         return redirect()->route('laboratoires.admin.membres', $code_lab)
             ->with('success', 'Membre supprimé avec succès.');
     }
@@ -352,7 +357,7 @@ class AdminLaboratoireController extends Controller
     {
         $action = $request->input('action');
         $ids = $request->input('ids', []);
-        if (!is_array($ids) || count($ids) === 0) {
+        if (! is_array($ids) || count($ids) === 0) {
             return back()->with('error', 'Aucun membre sélectionné.');
         }
         $affected = 0;
@@ -363,10 +368,11 @@ class AdminLaboratoireController extends Controller
                         ->orWhereIn('id_user_externe', $ids);
                 })
                 ->delete();
+
             return back()->with('success', "$affected membre(s) supprimé(s) avec succès.");
         } elseif ($action === 'role') {
             $role = $request->input('role');
-            if (!$role) {
+            if (! $role) {
                 return back()->with('error', 'Veuillez sélectionner un rôle.');
             }
             $affected = LaboratoirePersLab::where('code_lab', $code_lab)
@@ -375,10 +381,11 @@ class AdminLaboratoireController extends Controller
                         ->orWhereIn('id_user_externe', $ids);
                 })
                 ->update(['id_rl' => $role]);
+
             return back()->with('success', "$affected membre(s) mis à jour (rôle).");
         } elseif ($action === 'statut') {
             $statut = $request->input('statut');
-            if (!$statut) {
+            if (! $statut) {
                 return back()->with('error', 'Veuillez sélectionner un statut.');
             }
             $affected = LaboratoirePersLab::where('code_lab', $code_lab)
@@ -387,8 +394,10 @@ class AdminLaboratoireController extends Controller
                         ->orWhereIn('id_user_externe', $ids);
                 })
                 ->update(['statut' => $statut]);
+
             return back()->with('success', "$affected membre(s) mis à jour (statut).");
         }
+
         return back()->with('error', 'Action non reconnue.');
     }
 
@@ -429,7 +438,7 @@ class AdminLaboratoireController extends Controller
             ->with([
                 'persLab.personnel',
                 'persLab.user',
-                'userExterne'
+                'userExterne',
             ])
             ->get();
 
@@ -449,7 +458,7 @@ class AdminLaboratoireController extends Controller
             'participants' => 'nullable|array',
             'participants.*' => 'exists:laboratoire_pers_lab,id_pers_lab',
             'roles_participants' => 'nullable|array',
-            'roles_participants.*' => 'string|max:100'
+            'roles_participants.*' => 'string|max:100',
         ]);
 
         try {
@@ -460,7 +469,7 @@ class AdminLaboratoireController extends Controller
                 'code_lab' => $code_lab,
                 'statut_projet' => $request->statut_projet,
                 'debut_projet' => $request->debut_projet,
-                'fin_projet' => $request->fin_projet
+                'fin_projet' => $request->fin_projet,
             ]);
 
             // Ajouter les participants
@@ -473,7 +482,7 @@ class AdminLaboratoireController extends Controller
                         'id_pers_lab' => $id_pers_lab,
                         'role' => $role,
                         'debut_participation' => $request->debut_projet,
-                        'fin_participation' => $request->fin_projet
+                        'fin_participation' => $request->fin_projet,
                     ]);
                 }
             }
@@ -482,7 +491,7 @@ class AdminLaboratoireController extends Controller
                 ->with('success', 'Projet créé avec succès.');
         } catch (Exception $e) {
             return back()->withInput()
-                ->with('error', 'Erreur lors de la création : ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la création : '.$e->getMessage());
         }
     }
 
@@ -495,7 +504,7 @@ class AdminLaboratoireController extends Controller
                 'participants.membre.personnel',
                 'participants.membre.user',
                 'participants.userExterne',
-                'docs'
+                'docs',
             ])
             ->firstOrFail();
 
@@ -525,7 +534,7 @@ class AdminLaboratoireController extends Controller
             ->with([
                 'persLab.personnel',
                 'persLab.user',
-                'userExterne'
+                'userExterne',
             ])
             ->get();
 
@@ -544,7 +553,7 @@ class AdminLaboratoireController extends Controller
             'description_projet' => 'required|string',
             'statut_projet' => 'required|in:En cours,Terminé,En pause,Annulé',
             'debut_projet' => 'required|date',
-            'fin_projet' => 'nullable|date|after:debut_projet'
+            'fin_projet' => 'nullable|date|after:debut_projet',
         ]);
 
         try {
@@ -553,14 +562,14 @@ class AdminLaboratoireController extends Controller
                 'description_projet' => $request->description_projet,
                 'statut_projet' => $request->statut_projet,
                 'debut_projet' => $request->debut_projet,
-                'fin_projet' => $request->fin_projet
+                'fin_projet' => $request->fin_projet,
             ]);
 
             return redirect()->route('laboratoires.admin.projets.show', [$code_lab, $projet->code_projet])
                 ->with('success', 'Projet mis à jour avec succès.');
         } catch (Exception $e) {
             return back()->withInput()
-                ->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la mise à jour : '.$e->getMessage());
         }
     }
 
@@ -584,7 +593,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.projets', $code_lab)
                 ->with('success', 'Projet supprimé avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la suppression : '.$e->getMessage());
         }
     }
 
@@ -596,7 +605,7 @@ class AdminLaboratoireController extends Controller
             ->with([
                 'participants.membre.personnel',
                 'participants.membre.user',
-                'participants.userExterne'
+                'participants.userExterne',
             ])
             ->firstOrFail();
 
@@ -613,7 +622,7 @@ class AdminLaboratoireController extends Controller
                     'membre_nom' => $p->membre ? $p->membre->nom_complet : null,
                     'membre_email' => $p->membre ? $p->membre->email : null,
                 ];
-            })->toArray()
+            })->toArray(),
         ]);
 
         // Récupérer les participants déjà dans le projet
@@ -641,7 +650,7 @@ class AdminLaboratoireController extends Controller
             ->whereNotIn('id', $idsParticipantsExistants) // Exclure ceux déjà dans le projet
             ->with([
                 'persLab.personnel',
-                'persLab.user'
+                'persLab.user',
             ])
             ->get();
 
@@ -661,13 +670,13 @@ class AdminLaboratoireController extends Controller
             ->where('code_projet', $projet)
             ->firstOrFail();
 
-            $rules = [
+        $rules = [
             'type_participant' => 'required|in:membre,externe',
 
             'role' => 'required|string|max:100',
             'debut_participation' => 'required|date',
-            'fin_participation' => 'nullable|date|after:debut_participation'
-            ];
+            'fin_participation' => 'nullable|date|after:debut_participation',
+        ];
 
         // Ajouter les règles conditionnelles
         if ($request->type_participant === 'membre') {
@@ -691,8 +700,8 @@ class AdminLaboratoireController extends Controller
             $id_user_ext = null;
             if ($request->type_participant === 'membre') {
                 // Debug: afficher les données reçues
-                \Log::info('Ajout membre - type_participant: ' . $request->type_participant);
-                \Log::info('Ajout membre - membre_id: ' . $request->membre_id);
+                \Log::info('Ajout membre - type_participant: '.$request->type_participant);
+                \Log::info('Ajout membre - membre_id: '.$request->membre_id);
 
                 // Pour les membres, récupérer l'id_pers_lab depuis laboratoire_pers_lab
                 $affectation = \App\Models\laboratoires\LaboratoirePersLab::where('id', $request->membre_id)
@@ -700,16 +709,17 @@ class AdminLaboratoireController extends Controller
                     ->where('statut', 'actif')
                     ->first();
 
-                if (!$affectation) {
-                    \Log::error('Affectation non trouvée pour membre_id: ' . $request->membre_id);
+                if (! $affectation) {
+                    \Log::error('Affectation non trouvée pour membre_id: '.$request->membre_id);
+
                     return back()->with('error', 'Membre non trouvé ou inactif.');
                 }
 
                 $id_pers_lab = $affectation->id_pers_lab;
-                \Log::info('Ajout membre - id_pers_lab trouvé: ' . $id_pers_lab);
+                \Log::info('Ajout membre - id_pers_lab trouvé: '.$id_pers_lab);
             } else {
                 $id_user_ext = $request->user_externe_id;
-                \Log::info('Ajout externe - id_user_ext: ' . $id_user_ext);
+                \Log::info('Ajout externe - id_user_ext: '.$id_user_ext);
             }
 
             // Vérifier si le participant n'est pas déjà dans le projet
@@ -735,7 +745,7 @@ class AdminLaboratoireController extends Controller
                 'id_user_ext' => $id_user_ext,
                 'role' => $request->role,
                 'debut_participation' => $request->debut_participation,
-                'fin_participation' => $request->fin_participation
+                'fin_participation' => $request->fin_participation,
             ]);
 
             $participant = \App\Models\laboratoires\ParticiperProjet::create([
@@ -744,23 +754,25 @@ class AdminLaboratoireController extends Controller
                 'id_user_ext' => $id_user_ext,
                 'role' => $request->role,
                 'debut_participation' => $request->debut_participation,
-                'fin_participation' => $request->fin_participation
+                'fin_participation' => $request->fin_participation,
             ]);
 
             // Debug: vérifier que l'enregistrement a été créé
-            if (!$participant) {
+            if (! $participant) {
                 \Log::error('Échec de création du participant');
+
                 return back()->with('error', 'Erreur lors de la création de l\'enregistrement participant.');
             }
 
-            \Log::info('Participant créé avec succès, ID: ' . $participant->id);
+            \Log::info('Participant créé avec succès, ID: '.$participant->id);
 
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant ajouté avec succès.');
         } catch (Exception $e) {
-            \Log::error('Erreur lors de l\'ajout du participant: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
+            \Log::error('Erreur lors de l\'ajout du participant: '.$e->getMessage());
+            \Log::error('Stack trace: '.$e->getTraceAsString());
+
+            return back()->with('error', 'Erreur lors de l\'ajout : '.$e->getMessage());
         }
     }
 
@@ -774,7 +786,7 @@ class AdminLaboratoireController extends Controller
         $request->validate([
             'default_role' => 'required|string|max:100',
             'debut_participation_all' => 'required|date',
-            'fin_participation_all' => 'nullable|date|after:debut_participation_all'
+            'fin_participation_all' => 'nullable|date|after:debut_participation_all',
         ]);
 
         try {
@@ -803,7 +815,7 @@ class AdminLaboratoireController extends Controller
                 ->whereNotIn('id', $idsParticipantsExistants) // Exclure ceux déjà dans le projet
                 ->with([
                     'persLab.personnel',
-                    'persLab.user'
+                    'persLab.user',
                 ])
                 ->get();
 
@@ -822,14 +834,14 @@ class AdminLaboratoireController extends Controller
                     ->where('id_pers_lab', $membre->id_pers_lab)
                     ->first();
 
-                if (!$existing) {
+                if (! $existing) {
                     \App\Models\laboratoires\ParticiperProjet::create([
                         'code_projet' => $projet->code_projet,
                         'id_pers_lab' => $membre->id_pers_lab,
                         'id_user_ext' => null,
                         'role' => $request->default_role,
                         'debut_participation' => $request->debut_participation_all,
-                        'fin_participation' => $request->fin_participation_all
+                        'fin_participation' => $request->fin_participation_all,
                     ]);
                     $participantsAjoutes++;
                 }
@@ -842,14 +854,14 @@ class AdminLaboratoireController extends Controller
                     ->where('id_user_ext', $userExterne->id_user_ext)
                     ->first();
 
-                if (!$existing) {
+                if (! $existing) {
                     \App\Models\laboratoires\ParticiperProjet::create([
                         'code_projet' => $projet->code_projet,
                         'id_pers_lab' => null,
                         'id_user_ext' => $userExterne->id_user_ext,
                         'role' => $request->default_role,
                         'debut_participation' => $request->debut_participation_all,
-                        'fin_participation' => $request->fin_participation_all
+                        'fin_participation' => $request->fin_participation_all,
                     ]);
                     $participantsAjoutes++;
                 }
@@ -857,16 +869,17 @@ class AdminLaboratoireController extends Controller
 
             if ($participantsAjoutes > 0) {
                 return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
-                    ->with('success', $participantsAjoutes . ' participant(s) ajouté(s) avec succès au projet.');
+                    ->with('success', $participantsAjoutes.' participant(s) ajouté(s) avec succès au projet.');
             } else {
                 return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                     ->with('info', 'Aucun nouveau participant à ajouter. Tous les membres du laboratoire sont déjà participants à ce projet.');
             }
 
         } catch (Exception $e) {
-            \Log::error('Erreur lors de l\'ajout de tous les participants: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return back()->with('error', 'Erreur lors de l\'ajout des participants : ' . $e->getMessage());
+            \Log::error('Erreur lors de l\'ajout de tous les participants: '.$e->getMessage());
+            \Log::error('Stack trace: '.$e->getTraceAsString());
+
+            return back()->with('error', 'Erreur lors de l\'ajout des participants : '.$e->getMessage());
         }
     }
 
@@ -882,20 +895,21 @@ class AdminLaboratoireController extends Controller
             \Log::info('Suppression participant:', [
                 'code_lab' => $code_lab,
                 'code_projet' => $projet->code_projet,
-                'participant_id' => $participant
+                'participant_id' => $participant,
             ]);
 
             // Vérifier d'abord combien de participants existent
             $totalParticipants = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)->count();
-            \Log::info('Nombre total de participants avant suppression: ' . $totalParticipants);
+            \Log::info('Nombre total de participants avant suppression: '.$totalParticipants);
 
             // Supprimer le participant par son ID dans la table participer_projet
             $participantRecord = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)
                 ->where('id', $participant)
                 ->first();
 
-            if (!$participantRecord) {
-                \Log::error('Participant non trouvé avec ID: ' . $participant);
+            if (! $participantRecord) {
+                \Log::error('Participant non trouvé avec ID: '.$participant);
+
                 return back()->with('error', 'Participant non trouvé.');
             }
 
@@ -903,21 +917,22 @@ class AdminLaboratoireController extends Controller
                 'id' => $participantRecord->id,
                 'id_pers_lab' => $participantRecord->id_pers_lab,
                 'id_user_ext' => $participantRecord->id_user_ext,
-                'role' => $participantRecord->role
+                'role' => $participantRecord->role,
             ]);
 
             $participantRecord->delete();
 
             // Vérifier combien de participants restent
             $participantsRestants = \App\Models\laboratoires\ParticiperProjet::where('code_projet', $projet->code_projet)->count();
-            \Log::info('Nombre de participants après suppression: ' . $participantsRestants);
+            \Log::info('Nombre de participants après suppression: '.$participantsRestants);
 
             return redirect()->route('laboratoires.admin.projets.participants', [$code_lab, $projet->code_projet])
                 ->with('success', 'Participant retiré avec succès.');
         } catch (Exception $e) {
-            \Log::error('Erreur lors de la suppression: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            \Log::error('Erreur lors de la suppression: '.$e->getMessage());
+            \Log::error('Stack trace: '.$e->getTraceAsString());
+
+            return back()->with('error', 'Erreur lors de la suppression : '.$e->getMessage());
         }
     }
 
@@ -944,7 +959,7 @@ class AdminLaboratoireController extends Controller
         $request->validate([
             'titre_doc' => 'required|string|max:255',
             'description_doc' => 'nullable|string|max:1000',
-            'path' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240'
+            'path' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240',
         ]);
 
         try {
@@ -954,13 +969,13 @@ class AdminLaboratoireController extends Controller
                 'code_projet' => $projet->code_projet,
                 'titre_doc' => $request->titre_doc,
                 'description_doc' => $request->description_doc,
-                'path' => $path
+                'path' => $path,
             ]);
 
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
                 ->with('success', 'Document ajouté avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'ajout : '.$e->getMessage());
         }
     }
 
@@ -974,12 +989,12 @@ class AdminLaboratoireController extends Controller
         // Supprimer le fichier physique si présent
         if ($doc->path && \Storage::disk('public')->exists($doc->path)) {
             \Storage::disk('public')->delete($doc->path);
-            }
+        }
 
-            $doc->delete();
+        $doc->delete();
 
         return back()->with('success', 'Document supprimé avec succès.');
-        }
+    }
 
     public function projetDocumentsUpdate(Request $request, $code_lab, $projet, $document)
     {
@@ -989,11 +1004,11 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
         $doc = \App\Models\laboratoires\DocProjetLabo::where('id_doc', $document)
             ->where('code_projet', $projet->code_projet)
-                ->firstOrFail();
+            ->firstOrFail();
 
         $request->validate([
             'titre_doc' => 'required|string|max:255',
-            'path' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240'
+            'path' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif|max:10240',
         ]);
 
         try {
@@ -1012,7 +1027,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.projets.documents', [$code_lab, $projet->code_projet])
                 ->with('success', 'Document modifié avec succès.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de la modification : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la modification : '.$e->getMessage());
         }
     }
 
@@ -1058,6 +1073,7 @@ class AdminLaboratoireController extends Controller
     public function equipementCreate($code_lab)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
+
         return view('laboratoires.admin.equipements.create', compact('laboratoire'));
     }
 
@@ -1073,7 +1089,7 @@ class AdminLaboratoireController extends Controller
             'etat' => 'required|in:disponible,en maintenance,hors service',
             'date_achat' => 'nullable|date',
             'valeur' => 'nullable|numeric|min:0',
-            'localisation' => 'nullable|string|max:150'
+            'localisation' => 'nullable|string|max:150',
         ]);
 
         try {
@@ -1085,7 +1101,7 @@ class AdminLaboratoireController extends Controller
                 'date_achat' => $request->date_achat,
                 'valeur' => $request->valeur,
                 'localisation' => $request->localisation,
-                'code_lab' => $code_lab
+                'code_lab' => $code_lab,
             ];
             if ($request->hasFile('image')) {
                 $data['image_path'] = $request->file('image')->store('equipements', 'public');
@@ -1095,7 +1111,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement ajouté avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'ajout : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'ajout : '.$e->getMessage());
         }
     }
 
@@ -1135,7 +1151,7 @@ class AdminLaboratoireController extends Controller
             'etat' => 'required|in:disponible,en maintenance,hors service',
             'date_achat' => 'nullable|date',
             'valeur' => 'nullable|numeric|min:0',
-            'localisation' => 'nullable|string|max:150'
+            'localisation' => 'nullable|string|max:150',
         ]);
 
         try {
@@ -1146,7 +1162,7 @@ class AdminLaboratoireController extends Controller
                 'etat' => $request->etat,
                 'date_achat' => $request->date_achat,
                 'valeur' => $request->valeur,
-                'localisation' => $request->localisation
+                'localisation' => $request->localisation,
             ];
             if ($request->hasFile('image')) {
                 $data['image_path'] = $request->file('image')->store('equipements', 'public');
@@ -1156,7 +1172,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.equipements.show', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Équipement mis à jour avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la mise à jour : '.$e->getMessage());
         }
     }
 
@@ -1183,7 +1199,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.equipements', $code_lab)
                 ->with('success', 'Équipement supprimé avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la suppression : '.$e->getMessage());
         }
     }
 
@@ -1223,14 +1239,14 @@ class AdminLaboratoireController extends Controller
             'debut_entretien' => 'required|date',
             'fin_entretien' => 'required|date|after:debut_entretien',
             'desc_entretien' => 'nullable|string',
-            'cout' => 'nullable|numeric|min:0'
+            'cout' => 'nullable|numeric|min:0',
         ]);
 
         // Validation logique
-        if ($request->participant_type === 'interne' && !$request->id_pers_lab) {
+        if ($request->participant_type === 'interne' && ! $request->id_pers_lab) {
             return back()->with('error', 'Veuillez sélectionner un membre interne.');
         }
-        if ($request->participant_type === 'externe' && !$request->id_user_ext) {
+        if ($request->participant_type === 'externe' && ! $request->id_user_ext) {
             return back()->with('error', 'Veuillez sélectionner un user externe.');
         }
         if ($request->id_pers_lab && $request->id_user_ext) {
@@ -1254,21 +1270,22 @@ class AdminLaboratoireController extends Controller
                 'fin_entretien' => $request->fin_entretien,
                 'type_entretien' => $request->type_entretien,
                 'desc_entretien' => $request->desc_entretien,
-                'cout' => $request->cout
+                'cout' => $request->cout,
             ]);
             $equipement->update(['etat' => 'en maintenance']);
             // Après la création d'un entretien
             $equipement->updateEtatAutomatique();
+
             return redirect()->route('laboratoires.admin.equipements.entretiens', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Entretien programmé avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la programmation : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la programmation : '.$e->getMessage());
         }
     }
 
     public function equipementEntretienUpdate(Request $request, $code_lab, $equipement, $entretien)
     {
-        if (!$this->peutValider($code_lab)) {
+        if (! $this->peutValider($code_lab)) {
             abort(403, 'Vous n\'êtes pas autorisé à valider ou refuser un entretien.');
         }
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
@@ -1284,13 +1301,13 @@ class AdminLaboratoireController extends Controller
         // Si on change seulement le statut (depuis les boutons d'action)
         if ($request->has('keep_dates') && $request->keep_dates === 'true') {
             $request->validate([
-                'statut_entretien' => 'required|in:En cours,Terminé,En pause,Annulé'
+                'statut_entretien' => 'required|in:En cours,Terminé,En pause,Annulé',
             ]);
 
             try {
                 // Mettre à jour seulement le statut
                 $entretien->update([
-                    'statut_entretien' => $request->statut_entretien
+                    'statut_entretien' => $request->statut_entretien,
                 ]);
 
                 // Mettre à jour l'état de l'équipement selon le statut
@@ -1300,7 +1317,7 @@ class AdminLaboratoireController extends Controller
                     ->with('success', 'Statut de l\'entretien mis à jour avec succès.');
 
             } catch (Exception $e) {
-                return back()->with('error', 'Erreur lors de la mise à jour du statut : ' . $e->getMessage());
+                return back()->with('error', 'Erreur lors de la mise à jour du statut : '.$e->getMessage());
             }
         }
 
@@ -1310,7 +1327,7 @@ class AdminLaboratoireController extends Controller
             'debut_entretien' => 'required|date',
             'fin_entretien' => 'required|date|after:debut_entretien',
             'desc_entretien' => 'nullable|string',
-            'cout' => 'nullable|numeric|min:0'
+            'cout' => 'nullable|numeric|min:0',
         ]);
 
         try {
@@ -1319,7 +1336,7 @@ class AdminLaboratoireController extends Controller
                 'debut_entretien' => $request->debut_entretien,
                 'fin_entretien' => $request->fin_entretien,
                 'desc_entretien' => $request->desc_entretien,
-                'cout' => $request->cout
+                'cout' => $request->cout,
             ]);
 
             // Mettre à jour l'état de l'équipement selon le statut
@@ -1329,7 +1346,7 @@ class AdminLaboratoireController extends Controller
                 ->with('success', 'Entretien mis à jour avec succès.');
 
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la mise à jour : '.$e->getMessage());
         }
     }
 
@@ -1345,7 +1362,7 @@ class AdminLaboratoireController extends Controller
                 ->whereIn('statut_entretien', ['En cours', 'En pause'])
                 ->exists();
 
-            if (!$autresEntretiensEnCours) {
+            if (! $autresEntretiensEnCours) {
                 // Vérifier s'il y a des réservations actives
                 $reservationsActives = ReservationAgent::where('code_equip', $equipement->code_equip)
                     ->where('statut', 'confirmé')
@@ -1398,19 +1415,19 @@ class AdminLaboratoireController extends Controller
             'id_pers_lab' => 'nullable|exists:laboratoire_pers_lab,id_pers_lab',
             'id_user_ext' => 'nullable|exists:user_externe,id_user_ext',
             'debut_reserv' => 'required|date|after_or_equal:today',
-            'fin_reserv' => 'required|date|after:debut_reserv'
+            'fin_reserv' => 'required|date|after:debut_reserv',
         ]);
-        if ($request->participant_type === 'interne' && !$request->id_pers_lab) {
+        if ($request->participant_type === 'interne' && ! $request->id_pers_lab) {
             return back()->with('error', 'Veuillez sélectionner un membre interne.');
         }
-        if ($request->participant_type === 'externe' && !$request->id_user_ext) {
+        if ($request->participant_type === 'externe' && ! $request->id_user_ext) {
             return back()->with('error', 'Veuillez sélectionner un user externe.');
         }
         if ($request->id_pers_lab && $request->id_user_ext) {
             return back()->with('error', 'Un seul type de participant doit être sélectionné.');
         }
         try {
-            if (!$equipement->isDisponible()) {
+            if (! $equipement->isDisponible()) {
                 return back()->with('error', 'Cet équipement n\'est pas disponible pour la réservation.');
             }
             $conflit = ReservationAgent::where('code_equip', $equipement->code_equip)
@@ -1433,20 +1450,21 @@ class AdminLaboratoireController extends Controller
                 'id_user_ext' => $request->participant_type === 'externe' ? $request->id_user_ext : null,
                 'debut_reserv' => $request->debut_reserv,
                 'fin_reserv' => $request->fin_reserv,
-                'statut' => 'en attente'
+                'statut' => 'en attente',
             ]);
             // Après la création d'une réservation
             $equipement->updateEtatAutomatique();
+
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Demande de réservation créée avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la création : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la création : '.$e->getMessage());
         }
     }
 
     public function equipementReservationUpdate(Request $request, $code_lab, $equipement, $reservation)
     {
-        if (!$this->peutValider($code_lab)) {
+        if (! $this->peutValider($code_lab)) {
             abort(403, 'Vous n\'êtes pas autorisé à valider ou refuser une réservation.');
         }
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
@@ -1460,7 +1478,7 @@ class AdminLaboratoireController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'statut' => 'required|in:en attente,confirmé,refusé,annulé'
+            'statut' => 'required|in:en attente,confirmé,refusé,annulé',
         ]);
 
         try {
@@ -1485,6 +1503,7 @@ class AdminLaboratoireController extends Controller
                 if ($conflits) {
                     // Annuler la confirmation s'il y a un conflit
                     $reservation->update(['statut' => 'en attente']);
+
                     return back()->with('error', 'Il y a un conflit avec une autre réservation confirmée pour cette période.');
                 }
 
@@ -1501,7 +1520,7 @@ class AdminLaboratoireController extends Controller
                     ->where('fin_reserv', '>=', now())
                     ->exists();
 
-                if (!$autresReservationsActives && $equipement->etat === 'en utilisation') {
+                if (! $autresReservationsActives && $equipement->etat === 'en utilisation') {
                     $equipement->update(['etat' => 'disponible']);
                 }
             }
@@ -1509,10 +1528,9 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.equipements.reservations', [$code_lab, $equipement->code_equip])
                 ->with('success', 'Statut de la réservation mis à jour avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la mise à jour : '.$e->getMessage());
         }
     }
-
 
     public function candidatures($code_lab, Request $request)
     {
@@ -1565,7 +1583,7 @@ class AdminLaboratoireController extends Controller
             // Mettre à jour le statut et le mot de passe
             $candidature->update([
                 'statut' => 'actif',
-                'pwd' => \Illuminate\Support\Facades\Hash::make($tempPassword)
+                'pwd' => \Illuminate\Support\Facades\Hash::make($tempPassword),
             ]);
 
             // Récupérer l'id du rôle "membre"
@@ -1576,7 +1594,7 @@ class AdminLaboratoireController extends Controller
             $affectation = LaboratoirePersLab::where('code_lab', $candidature->code_lab)
                 ->where('id_user_externe', $candidature->id_user_ext)
                 ->first();
-            if (!$affectation) {
+            if (! $affectation) {
                 LaboratoirePersLab::create([
                     'code_lab' => $candidature->code_lab,
                     'id_user_externe' => $candidature->id_user_ext,
@@ -1597,7 +1615,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature approuvée avec succès. Un email a été envoyé au candidat.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'approbation : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'approbation : '.$e->getMessage());
         }
     }
 
@@ -1622,7 +1640,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.candidatures', $code_lab)
                 ->with('success', 'Candidature rejetée avec succès. Un email a été envoyé au candidat.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors du rejet : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors du rejet : '.$e->getMessage());
         }
     }
 
@@ -1675,7 +1693,7 @@ class AdminLaboratoireController extends Controller
             'date_fin' => 'nullable|date|after:date_debut',
             'motivation' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
             'id_rl' => 'required|exists:role_labo,id_rl',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
+            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         try {
@@ -1716,7 +1734,7 @@ class AdminLaboratoireController extends Controller
                 'id_rl' => $request->id_rl,
                 'date_affectation' => $request->date_debut,
                 'date_fin_affectation' => $request->date_fin,
-                'statut' => $request->statut
+                'statut' => $request->statut,
             ]);
 
             // Envoyer l'email de confirmation
@@ -1724,10 +1742,10 @@ class AdminLaboratoireController extends Controller
             $emailErrorMessage = '';
 
             // Validate email format more strictly before sending
-            if (!filter_var($userExterne->email_user_ext, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($userExterne->email_user_ext, FILTER_VALIDATE_EMAIL)) {
                 $emailSent = false;
                 $emailErrorMessage = 'Adresse email invalide.';
-                \Illuminate\Support\Facades\Log::error('Email confirmation externe: adresse email invalide pour ' . $userExterne->email_user_ext);
+                \Illuminate\Support\Facades\Log::error('Email confirmation externe: adresse email invalide pour '.$userExterne->email_user_ext);
             } else {
                 try {
                     \Illuminate\Support\Facades\Mail::to($userExterne->email_user_ext)
@@ -1736,22 +1754,22 @@ class AdminLaboratoireController extends Controller
                     $emailSent = false;
                     $emailErrorMessage = $e->getMessage();
                     // Log l'erreur d'envoi d'email mais ne pas faire échouer la création
-                    \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: ' . $emailErrorMessage);
+                    \Illuminate\Support\Facades\Log::error('Erreur envoi email confirmation externe: '.$emailErrorMessage);
                 }
             }
 
             $successMessage = 'Utilisateur externe créé avec succès.';
             if ($emailSent) {
-                $successMessage .= ' Un email de confirmation avec le mot de passe a été envoyé à ' . $userExterne->email_user_ext;
+                $successMessage .= ' Un email de confirmation avec le mot de passe a été envoyé à '.$userExterne->email_user_ext;
             } else {
-                $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : ' . $emailErrorMessage . '. Veuillez vérifier l\'adresse email du destinataire et la configuration du serveur SMTP.';
+                $successMessage .= ' Cependant, l\'envoi de l\'email a échoué : '.$emailErrorMessage.'. Veuillez vérifier l\'adresse email du destinataire et la configuration du serveur SMTP.';
             }
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', $successMessage);
         } catch (Exception $e) {
             return back()->withInput()
-                ->with('error', 'Erreur lors de la création : ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la création : '.$e->getMessage());
         }
     }
 
@@ -1797,14 +1815,14 @@ class AdminLaboratoireController extends Controller
         $request->validate([
             'nom_user_ext' => 'required|string|max:255',
             'prenom_user_ext' => 'required|string|max:255',
-            'email_user_ext' => 'required|email|unique:user_externe,email_user_ext,' . $externe->id_user_ext . ',id_user_ext',
+            'email_user_ext' => 'required|email|unique:user_externe,email_user_ext,'.$externe->id_user_ext.',id_user_ext',
             'tel_user_ext' => 'required|string|max:20',
             'statut' => 'required|in:actif,inactif',
             'date_debut' => 'required|date',
             'date_fin' => 'nullable|date|after:date_debut',
             'motivation' => 'nullable|string',
             'id_rl' => 'required|exists:role_labo,id_rl',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
+            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         try {
@@ -1817,7 +1835,7 @@ class AdminLaboratoireController extends Controller
                 'statut' => $request->statut,
                 'date_debut' => $request->date_debut,
                 'date_fin' => $request->date_fin,
-                'motivation' => $request->motivation
+                'motivation' => $request->motivation,
             ]);
 
             // Gérer le CV si fourni
@@ -1833,14 +1851,14 @@ class AdminLaboratoireController extends Controller
                     'id_rl' => $request->id_rl,
                     'date_affectation' => $request->date_debut,
                     'date_fin_affectation' => $request->date_fin,
-                    'statut' => $request->statut
+                    'statut' => $request->statut,
                 ]);
 
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', 'Utilisateur externe mis à jour avec succès.');
         } catch (Exception $e) {
             return back()->withInput()
-                ->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la mise à jour : '.$e->getMessage());
         }
     }
 
@@ -1868,7 +1886,7 @@ class AdminLaboratoireController extends Controller
             return redirect()->route('laboratoires.admin.externes', $code_lab)
                 ->with('success', 'Utilisateur externe supprimé avec succès.');
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la suppression : '.$e->getMessage());
         }
     }
 
@@ -1888,7 +1906,7 @@ class AdminLaboratoireController extends Controller
 
             // Mettre à jour le mot de passe
             $externe->update([
-                'pwd' => \Illuminate\Support\Facades\Hash::make($newPassword)
+                'pwd' => \Illuminate\Support\Facades\Hash::make($newPassword),
             ]);
 
             // Envoyer l'email de réinitialisation
@@ -1897,13 +1915,13 @@ class AdminLaboratoireController extends Controller
                     ->send(new ExternePasswordResetMail($externe, $laboratoire, $newPassword));
             } catch (Exception $e) {
                 // Log l'erreur d'envoi d'email mais ne pas faire échouer la réinitialisation
-                \Illuminate\Support\Facades\Log::error('Erreur envoi email réinitialisation mot de passe externe: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error('Erreur envoi email réinitialisation mot de passe externe: '.$e->getMessage());
             }
 
             return redirect()->route('laboratoires.admin.externes.show', [$code_lab, $externe->id_user_ext])
-                ->with('success', 'Mot de passe réinitialisé avec succès. Un email avec le nouveau mot de passe a été envoyé à ' . $externe->email_user_ext);
+                ->with('success', 'Mot de passe réinitialisé avec succès. Un email avec le nouveau mot de passe a été envoyé à '.$externe->email_user_ext);
         } catch (Exception $e) {
-            return back()->with('error', 'Erreur lors de la réinitialisation du mot de passe : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de la réinitialisation du mot de passe : '.$e->getMessage());
         }
     }
 
@@ -1921,7 +1939,7 @@ class AdminLaboratoireController extends Controller
         // Générer le PDF
         $pdf = \PDF::loadView('laboratoires.admin.reports.pdf', compact('laboratoire', 'data', 'type'));
 
-        $filename = "rapport_{$laboratoire->code_lab}_{$type}_" . now()->format('Y-m-d') . ".pdf";
+        $filename = "rapport_{$laboratoire->code_lab}_{$type}_".now()->format('Y-m-d').'.pdf';
 
         return $pdf->download($filename);
     }
@@ -1937,7 +1955,7 @@ class AdminLaboratoireController extends Controller
         // Récupérer les données selon le type de rapport
         $data = $this->getReportData($code_lab, $type);
 
-        $filename = "rapport_{$laboratoire->code_lab}_{$type}_" . now()->format('Y-m-d') . ".xlsx";
+        $filename = "rapport_{$laboratoire->code_lab}_{$type}_".now()->format('Y-m-d').'.xlsx';
 
         return \Excel::download(new \App\Exports\LaboratoireReportExport($laboratoire, $data, $type), $filename);
     }
@@ -1966,7 +1984,7 @@ class AdminLaboratoireController extends Controller
                         return \Carbon\Carbon::parse($r->debut_reserv)->diffInHours($r->fin_reserv);
                     }),
                     'nombre_reservations' => $reservations->count(),
-                    'taux_utilisation' => $reservations->where('statut', 'confirmé')->count() / max($reservations->count(), 1) * 100
+                    'taux_utilisation' => $reservations->where('statut', 'confirmé')->count() / max($reservations->count(), 1) * 100,
                 ];
             });
 
@@ -2053,20 +2071,20 @@ class AdminLaboratoireController extends Controller
             'titre' => 'required|string|max:255',
             'contenu' => 'required|string',
             'type_rapport' => 'required|in:pdf,word',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
         ]);
 
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
 
         // Générer un code unique pour le rapport
-        $code_rl = 'RL' . strtoupper(Str::random(8));
+        $code_rl = 'RL'.strtoupper(Str::random(8));
 
         // Créer le rapport
         $rapport = RapportLabo::create([
             'code_rl' => $code_rl,
             'path_rl' => '', // Sera mis à jour après génération
             'desc_rapport' => $request->description,
-            'code_lab' => $code_lab
+            'code_lab' => $code_lab,
         ]);
 
         // Générer le fichier selon le type
@@ -2098,8 +2116,8 @@ class AdminLaboratoireController extends Controller
     {
         $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
 
-        $filePath = storage_path('app/private/' . $rapport->path_rl);
-        if (!file_exists($filePath)) {
+        $filePath = storage_path('app/private/'.$rapport->path_rl);
+        if (! file_exists($filePath)) {
             return back()->with('error', 'Fichier non trouvé.');
         }
 
@@ -2114,7 +2132,7 @@ class AdminLaboratoireController extends Controller
         $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
 
         // Supprimer le fichier physique
-        $filePath = storage_path('app/private/' . $rapport->path_rl);
+        $filePath = storage_path('app/private/'.$rapport->path_rl);
         if (file_exists($filePath) && is_file($filePath)) {
             unlink($filePath);
         }
@@ -2135,13 +2153,13 @@ class AdminLaboratoireController extends Controller
             'contenu' => $contenu,
             'laboratoire' => $laboratoire,
             'date_generation' => Carbon::now()->format('d/m/Y H:i'),
-            'rapport' => $rapport
+            'rapport' => $rapport,
         ];
 
         $pdf = \PDF::loadView('laboratoires.admin.rapports.template-pdf', $data);
 
-        $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".pdf";
-        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+        $filename = "rapport_{$rapport->code_rl}_".Carbon::now()->format('Y-m-d_H-i-s').'.pdf';
+        $path = "rapports/{$laboratoire->code_lab}/".$filename;
 
         // Créer le dossier s'il n'existe pas
         \Storage::makeDirectory("rapports/{$laboratoire->code_lab}");
@@ -2163,20 +2181,20 @@ class AdminLaboratoireController extends Controller
             'contenu' => $contenu,
             'laboratoire' => $laboratoire,
             'date_generation' => Carbon::now()->format('d/m/Y H:i'),
-            'rapport' => $rapport
+            'rapport' => $rapport,
         ];
 
-        $filename = "rapport_{$rapport->code_rl}_" . Carbon::now()->format('Y-m-d_H-i-s') . ".docx";
-        $path = "rapports/{$laboratoire->code_lab}/" . $filename;
+        $filename = "rapport_{$rapport->code_rl}_".Carbon::now()->format('Y-m-d_H-i-s').'.docx';
+        $path = "rapports/{$laboratoire->code_lab}/".$filename;
 
         // Créer le dossier s'il n'existe pas
         $dirPath = storage_path("app/private/rapports/{$laboratoire->code_lab}");
-        if (!file_exists($dirPath)) {
+        if (! file_exists($dirPath)) {
             mkdir($dirPath, 0755, true);
         }
 
         // Utiliser PhpWord pour générer le document Word
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = new \PhpOffice\PhpWord\PhpWord;
 
         // Créer une section
         $section = $phpWord->addSection();
@@ -2186,19 +2204,19 @@ class AdminLaboratoireController extends Controller
         $section->addTextBreak();
 
         // Informations du laboratoire
-        $section->addText("Laboratoire : " . $laboratoire->label_labo, ['bold' => true]);
-        $section->addText("Code : " . $laboratoire->code_lab);
-        $section->addText("Date de génération : " . $data['date_generation']);
+        $section->addText('Laboratoire : '.$laboratoire->label_labo, ['bold' => true]);
+        $section->addText('Code : '.$laboratoire->code_lab);
+        $section->addText('Date de génération : '.$data['date_generation']);
         $section->addTextBreak();
 
         // Contenu
-        $section->addText("Contenu du rapport :", ['bold' => true]);
+        $section->addText('Contenu du rapport :', ['bold' => true]);
         $section->addTextBreak();
         $section->addText($contenu);
 
         // Sauvegarder le document
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save(storage_path('app/' . $path));
+        $objWriter->save(storage_path('app/'.$path));
 
         // Mettre à jour le chemin dans la base de données
         $rapport->update(['path_rl' => $path]);
@@ -2353,7 +2371,7 @@ class AdminLaboratoireController extends Controller
     public function alertes($code_lab)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $alertService = new LaboratoireAlertService();
+        $alertService = new LaboratoireAlertService;
 
         // Obtenir les statistiques des alertes
         $alertStats = $alertService->getAlertStats($code_lab);
@@ -2409,7 +2427,7 @@ class AdminLaboratoireController extends Controller
      */
     public function runAlertChecks($code_lab)
     {
-        $alertService = new LaboratoireAlertService();
+        $alertService = new LaboratoireAlertService;
         $alertService->runAllChecks();
 
         return redirect()->route('laboratoires.admin.alertes', $code_lab)
@@ -2445,15 +2463,15 @@ class AdminLaboratoireController extends Controller
     public function rapportView($code_lab, $rapport)
     {
         $rapport = RapportLabo::where('code_rl', $rapport)->firstOrFail();
-        $filePath = storage_path('app/private/' . $rapport->path_rl);
+        $filePath = storage_path('app/private/'.$rapport->path_rl);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             abort(404, 'Fichier non trouvé.');
         }
 
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+            'Content-Disposition' => 'inline; filename="'.basename($filePath).'"',
         ]);
     }
 
@@ -2472,7 +2490,7 @@ class AdminLaboratoireController extends Controller
                 ->where('date_affectation', '<=', now())
                 ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                        ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
@@ -2480,6 +2498,7 @@ class AdminLaboratoireController extends Controller
                 $isAdmin = true;
             }
         }
+
         return view('laboratoires.admin.annonces.index', compact('laboratoire', 'annonces', 'isAdmin'));
     }
 
@@ -2503,7 +2522,7 @@ class AdminLaboratoireController extends Controller
                 ->where('date_affectation', '<=', now())
                 ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                        ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
@@ -2511,7 +2530,7 @@ class AdminLaboratoireController extends Controller
                 $isAdmin = true;
             }
         }
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             abort(403, 'Seul l\'administrateur du laboratoire peut envoyer une annonce.');
         }
         $fichier = null;
@@ -2524,8 +2543,9 @@ class AdminLaboratoireController extends Controller
             'id_admin' => session('user_id'),
             'titre' => $request->titre,
             'contenu' => $request->contenu,
-            'fichier' => $fichier
+            'fichier' => $fichier,
         ]);
+
         return redirect()->route('laboratoires.admin.annonces', $code_lab)->with('success', 'Annonce envoyée à tous les membres du laboratoire.');
     }
 
@@ -2544,7 +2564,7 @@ class AdminLaboratoireController extends Controller
                 ->where('date_affectation', '<=', now())
                 ->where(function ($query) {
                     $query->whereNull('date_fin_affectation')
-                          ->orWhere('date_fin_affectation', '>=', now());
+                        ->orWhere('date_fin_affectation', '>=', now());
                 })
                 ->with('roleLabo')
                 ->first();
@@ -2552,7 +2572,7 @@ class AdminLaboratoireController extends Controller
                 $isAdmin = true;
             }
         }
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             abort(403, 'Seul l\'administrateur du laboratoire peut supprimer une annonce.');
         }
         // Supprimer le fichier joint si existe
@@ -2560,6 +2580,7 @@ class AdminLaboratoireController extends Controller
             \Storage::disk('local')->delete($annonce->fichier);
         }
         $annonce->delete();
+
         return redirect()->route('laboratoires.admin.annonces', $code_lab)->with('success', 'Annonce supprimée.');
     }
 
@@ -2569,17 +2590,18 @@ class AdminLaboratoireController extends Controller
     public function downloadAnnonceFile($code_lab, $id)
     {
         $annonce = \App\Models\LaboAnnonce::where('id', $id)->where('code_lab', $code_lab)->firstOrFail();
-        $chemin = storage_path('app/private/' . $annonce->fichier);
-        if (!is_file($chemin)) {
+        $chemin = storage_path('app/private/'.$annonce->fichier);
+        if (! is_file($chemin)) {
             return response()->view('errors.fichier_annonce_introuvable', [
                 'message' => 'Le fichier joint de cette annonce est introuvable ou a été supprimé.',
                 'annonce' => $annonce,
-                'laboratoire' => $annonce->laboratoire
+                'laboratoire' => $annonce->laboratoire,
             ], 404);
         }
+
         return response()->file($chemin, [
             'Content-Type' => mime_content_type($chemin),
-            'Content-Disposition' => 'inline; filename="' . basename($chemin) . '"'
+            'Content-Disposition' => 'inline; filename="'.basename($chemin).'"',
         ]);
     }
 
@@ -2609,7 +2631,7 @@ class AdminLaboratoireController extends Controller
             $projets = ProjetLabo::where('code_lab', $code_lab)->get();
         } else {
             $projets = ProjetLabo::where('code_lab', $code_lab)
-                ->whereHas('participants', function($q) use ($userId, $userType) {
+                ->whereHas('participants', function ($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
                         $q->where('id_user_ext', $userId);
                     } else {
@@ -2623,7 +2645,7 @@ class AdminLaboratoireController extends Controller
             $query->where('type_publi', $request->type);
         }
         if ($request->filled('domaine')) {
-            $query->where('domaine', 'like', '%' . $request->domaine . '%');
+            $query->where('domaine', 'like', '%'.$request->domaine.'%');
         }
         if ($request->filled('annee')) {
             $query->whereYear('created_at', $request->annee);
@@ -2650,6 +2672,7 @@ class AdminLaboratoireController extends Controller
         ];
         $types = ['article', 'conference', 'livre', 'rapport', 'these'];
         $annees = Publication::where('code_lab', $code_lab)->selectRaw('YEAR(created_at) as annee')->distinct()->orderBy('annee', 'desc')->pluck('annee');
+
         return view('laboratoires.admin.publications.index', compact('publications', 'laboratoire', 'stats', 'types', 'annees', 'request', 'projets'));
     }
 
@@ -2678,7 +2701,7 @@ class AdminLaboratoireController extends Controller
             $projets = ProjetLabo::where('code_lab', $code_lab)->get();
         } else {
             $projets = ProjetLabo::where('code_lab', $code_lab)
-                ->whereHas('participants', function($q) use ($userId, $userType) {
+                ->whereHas('participants', function ($q) use ($userId, $userType) {
                     if ($userType === 'externe') {
                         $q->where('id_user_ext', $userId);
                     } else {
@@ -2686,6 +2709,7 @@ class AdminLaboratoireController extends Controller
                     }
                 })->get();
         }
+
         return view('laboratoires.admin.publications.create', compact('laboratoire', 'projets'));
     }
 
@@ -2707,7 +2731,7 @@ class AdminLaboratoireController extends Controller
         }
         $userId = session('user_id');
         $userType = session('user_type');
-        if (!$userId || !$userType) {
+        if (! $userId || ! $userType) {
             return back()->withInput()->with('error', 'Vous devez être connecté pour créer une publication.');
         }
         $validated['id_pers_lab'] = $userId;
@@ -2718,6 +2742,7 @@ class AdminLaboratoireController extends Controller
             $validated['code_projet'] = null;
         }
         Publication::create($validated);
+
         return redirect()->route('laboratoires.admin.publications.index', $code_lab)
             ->with('success', 'Publication ajoutée avec succès.');
     }
@@ -2746,9 +2771,10 @@ class AdminLaboratoireController extends Controller
         if ($affectation) {
             $isMembre = true;
         }
-        if (!$isMembre) {
+        if (! $isMembre) {
             abort(403, 'Vous devez être membre du laboratoire pour consulter cette publication.');
         }
+
         // Plus de restriction sur l'auteur ou l'admin pour la consultation
         return view('laboratoires.admin.publications.show', compact('publication', 'laboratoire'));
     }
@@ -2781,6 +2807,7 @@ class AdminLaboratoireController extends Controller
         if ($publication->id_pers_lab != $userId) {
             abort(403, 'Vous n\'êtes pas autorisé à modifier cette publication.');
         }
+
         return view('laboratoires.admin.publications.edit', compact('publication', 'laboratoire'));
     }
 
@@ -2828,6 +2855,7 @@ class AdminLaboratoireController extends Controller
             $validated['rapport_path'] = $rapportPath;
         }
         $publication->update($validated);
+
         return redirect()->route('laboratoires.admin.publications.show', [$code_lab, $publication->code_publi])
             ->with('success', 'Publication mise à jour avec succès.');
     }
@@ -2859,6 +2887,7 @@ class AdminLaboratoireController extends Controller
             abort(403, 'Vous n\'êtes pas autorisé à supprimer cette publication.');
         }
         $publication->delete();
+
         return redirect()->route('laboratoires.admin.publications.index', $code_lab)
             ->with('success', 'Publication supprimée avec succès.');
     }
@@ -2881,8 +2910,11 @@ class AdminLaboratoireController extends Controller
             })
             ->with('roleLabo')
             ->first();
-        if (!$affectation || !$affectation->roleLabo) return false;
+        if (! $affectation || ! $affectation->roleLabo) {
+            return false;
+        }
         $role = strtolower($affectation->roleLabo->lib_rl);
+
         return in_array($role, ['admin', 'technicien', 'chef de projet', 'chef_projet', 'chef-projet']);
     }
 
@@ -2892,9 +2924,10 @@ class AdminLaboratoireController extends Controller
     public function tousLesEntretiens($code_lab)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $entretiens = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function($q) use ($code_lab) {
+        $entretiens = \App\Models\laboratoires\EntretienReparation::whereHas('equipement', function ($q) use ($code_lab) {
             $q->where('code_lab', $code_lab);
         })->with(['equipement', 'persLab', 'userExterne'])->orderByDesc('debut_entretien')->get();
+
         return view('laboratoires.admin.equipements.entretiens_all', compact('laboratoire', 'entretiens'));
     }
 
@@ -2904,9 +2937,10 @@ class AdminLaboratoireController extends Controller
     public function toutesLesReservations($code_lab)
     {
         $laboratoire = Laboratoire::where('code_lab', $code_lab)->firstOrFail();
-        $reservations = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function($q) use ($code_lab) {
+        $reservations = \App\Models\laboratoires\ReservationAgent::whereHas('equipement', function ($q) use ($code_lab) {
             $q->where('code_lab', $code_lab);
         })->with(['equipement', 'persLab', 'userExterne'])->orderByDesc('debut_reserv')->get();
+
         return view('laboratoires.admin.equipements.reservations_all', compact('laboratoire', 'reservations'));
     }
 }

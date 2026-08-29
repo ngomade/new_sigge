@@ -23,6 +23,7 @@ class UpdatePersonnelRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->route('personnel');
+
         return [
             'nom_pers' => 'sometimes|string|max:255',
             'prenom_pers' => 'nullable|string|max:255',
@@ -35,8 +36,8 @@ class UpdatePersonnelRequest extends FormRequest
             'second_phone_pers' => 'nullable|string|max:32',
             'cni_pers' => 'sometimes|string|max:32',
             'date_deliv_cni_pers' => 'sometimes|date',
-            'email_pers' => 'sometimes|email|max:255|unique:personnel,email_pers,' . $id . ',code_pers',
-            'login_pers' => 'sometimes|string|max:255|unique:personnel,login_pers,' . $id . ',code_pers',
+            'email_pers' => 'sometimes|email|max:255|unique:personnel,email_pers,'.$id.',code_pers',
+            'login_pers' => 'sometimes|string|max:255|unique:personnel,login_pers,'.$id.',code_pers',
             'pwd_pers' => 'sometimes|string|min:6',
             'photo_pers' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
             'lang_pers' => 'nullable|string|max:10',

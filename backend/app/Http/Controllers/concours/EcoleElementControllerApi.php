@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\concours;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\concours\EcoleElement;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -16,6 +16,7 @@ class EcoleElementControllerApi extends Controller
     public function index()
     {
         $ecoleElements = EcoleElement::all();
+
         return response()->json($ecoleElements);
     }
 
@@ -30,9 +31,11 @@ class EcoleElementControllerApi extends Controller
         ]);
         try {
             $ecoleElement = EcoleElement::create($validateData);
+
             return response()->json($ecoleElement);
         } catch (Throwable $th) {
-            Log::error('Error creating ecole element: ' . $th->getMessage());
+            Log::error('Error creating ecole element: '.$th->getMessage());
+
             return response()->json(['erreur' => 'erreur lors de l\'enregistrement de l\'ecole element'], 500);
         }
     }
@@ -59,9 +62,11 @@ class EcoleElementControllerApi extends Controller
         try {
             $ecoleElement = EcoleElement::findOrFail($id);
             $ecoleElement->update($validateData);
+
             return response()->json($ecoleElement);
         } catch (Throwable $th) {
-            Log::error('Error updating ecole element: ' . $th->getMessage());
+            Log::error('Error updating ecole element: '.$th->getMessage());
+
             return response()->json(['erreur' => 'erreur lors de la mise à jour de l\'ecole element'], 500);
         }
     }
@@ -74,9 +79,11 @@ class EcoleElementControllerApi extends Controller
         try {
             $ecoleElement = EcoleElement::findOrFail($id);
             $ecoleElement->delete();
+
             return response()->json(['succes' => 'ecole element supprimé']);
         } catch (Throwable $th) {
-            Log::error('Error deleting ecole element: ' . $th->getMessage());
+            Log::error('Error deleting ecole element: '.$th->getMessage());
+
             return response()->json(['erreur' => 'erreur lors de la suppression de l\'ecole element'], 500);
         }
     }

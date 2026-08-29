@@ -11,6 +11,7 @@ class CandidatureRejectedMail extends Mailable
     use Queueable, SerializesModels;
 
     public $candidature;
+
     public $motif;
 
     public function __construct($candidature, $motif)

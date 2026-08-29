@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
-use App\Models\notes\Evaluation;
 use App\Models\concours\User;
-use App\Models\notes\Classe;
-use App\Models\notes\Niveau;
 use App\Models\Filiere;
-use App\Models\notes\Ue;
-use App\Models\notes\Ec;
-use App\Models\Semestre;
+use App\Models\notes\Classe;
+use App\Models\notes\Evaluation;
 use App\Models\notes\Inscription;
-use App\Models\SessionExamen;
+use App\Models\notes\Niveau;
+use App\Models\notes\Ue;
+use App\Models\Semestre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +20,7 @@ class ConsultationNotesController extends Controller
     /**
      * 2.7.1 - Visualisation des notes par étudiant
      */
-    
+
     /**
      * Obtenir toutes les notes d'un étudiant
      */
@@ -30,15 +28,15 @@ class ConsultationNotesController extends Controller
     {
         try {
             $etudiant = User::findOrFail($codeUser);
-            
+
             $notes = Evaluation::with([
                 'ec.ue.semestre',
                 'examen.sessionExamen',
-                'user'
+                'user',
             ])
-            ->where('code_user', $codeUser)
-            ->orderBy('date_evaluation', 'desc')
-            ->get();
+                ->where('code_user', $codeUser)
+                ->orderBy('date_evaluation', 'desc')
+                ->get();
 
             // Organiser les notes par semestre et UE
             $notesOrganisees = $this->organiserNotesParSemestre($notes);
@@ -48,16 +46,16 @@ class ConsultationNotesController extends Controller
                 'data' => [
                     'etudiant' => $etudiant->only(['code_user', 'name', 'email']),
                     'notes' => $notesOrganisees,
-                    'statistiques' => $this->calculerStatistiquesEtudiant($notes)
+                    'statistiques' => $this->calculerStatistiquesEtudiant($notes),
                 ],
-                'message' => 'Notes de l\'étudiant récupérées avec succès'
+                'message' => 'Notes de l\'étudiant récupérées avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des notes',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -70,14 +68,14 @@ class ConsultationNotesController extends Controller
         try {
             $notes = Evaluation::with([
                 'ec.ue',
-                'examen.sessionExamen'
+                'examen.sessionExamen',
             ])
-            ->whereHas('ec.ue', function($query) use ($codeSemestre) {
-                $query->where('code_sem', $codeSemestre);
-            })
-            ->where('code_user', $codeUser)
-            ->orderBy('date_evaluation', 'desc')
-            ->get();
+                ->whereHas('ec.ue', function ($query) use ($codeSemestre) {
+                    $query->where('code_sem', $codeSemestre);
+                })
+                ->where('code_user', $codeUser)
+                ->orderBy('date_evaluation', 'desc')
+                ->get();
 
             $moyennes = $this->calculerMoyennesSemestre($notes, $codeUser, $codeSemestre);
 
@@ -85,16 +83,16 @@ class ConsultationNotesController extends Controller
                 'success' => true,
                 'data' => [
                     'notes' => $notes,
-                    'moyennes' => $moyennes
+                    'moyennes' => $moyennes,
                 ],
-                'message' => 'Notes du semestre récupérées avec succès'
+                'message' => 'Notes du semestre récupérées avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des notes du semestre',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -110,42 +108,42 @@ class ConsultationNotesController extends Controller
     {
         try {
             $etudiant = User::findOrFail($codeUser);
-            
+
             // Vérifier l'inscription de l'étudiant
             $inscription = Inscription::where('code_user', $codeUser)
                 ->where('code_annee', $codeAnnee)
                 ->first();
 
-            if (!$inscription) {
+            if (! $inscription) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Étudiant non inscrit pour cette année'
+                    'message' => 'Étudiant non inscrit pour cette année',
                 ], 404);
             }
 
             // Récupérer les UE du semestre avec les notes
             $ues = Ue::with([
-                'ecs.evaluations' => function($query) use ($codeUser) {
+                'ecs.evaluations' => function ($query) use ($codeUser) {
                     $query->where('code_user', $codeUser);
                 },
-                'ecs.evaluations.examen.sessionExamen'
+                'ecs.evaluations.examen.sessionExamen',
             ])
-            ->where('code_sem', $codeSemestre)
-            ->get();
+                ->where('code_sem', $codeSemestre)
+                ->get();
 
             $bulletin = $this->construireBulletin($etudiant, $ues, $codeSemestre, $codeAnnee);
 
             return response()->json([
                 'success' => true,
                 'data' => $bulletin,
-                'message' => 'Bulletin généré avec succès'
+                'message' => 'Bulletin généré avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la génération du bulletin',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -157,31 +155,31 @@ class ConsultationNotesController extends Controller
     {
         try {
             $etudiant = User::findOrFail($codeUser);
-            
+
             // Récupérer toutes les notes de l'année
             $evaluations = Evaluation::with([
                 'ec.ue.semestre',
-                'examen.sessionExamen'
+                'examen.sessionExamen',
             ])
-            ->where('code_user', $codeUser)
-            ->whereHas('examen.sessionExamen', function($query) use ($codeAnnee) {
-                $query->where('code_annee', $codeAnnee);
-            })
-            ->get();
+                ->where('code_user', $codeUser)
+                ->whereHas('examen.sessionExamen', function ($query) use ($codeAnnee) {
+                    $query->where('code_annee', $codeAnnee);
+                })
+                ->get();
 
             $releve = $this->construireReleveNotes($etudiant, $evaluations, $codeAnnee);
 
             return response()->json([
                 'success' => true,
                 'data' => $releve,
-                'message' => 'Relevé de notes généré avec succès'
+                'message' => 'Relevé de notes généré avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la génération du relevé',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -197,13 +195,13 @@ class ConsultationNotesController extends Controller
     {
         try {
             $classe = Classe::with('user')->findOrFail($codeClasse);
-            
+
             // Récupérer les étudiants de la classe
-            $etudiants = User::whereHas('inscriptions', function($query) use ($codeClasse, $codeAnnee) {
+            $etudiants = User::whereHas('inscriptions', function ($query) use ($codeClasse, $codeAnnee) {
                 $query->where('code_annee', $codeAnnee)
-                      ->whereHas('filiereNiveaux.niveau', function($q) use ($codeClasse) {
-                          $q->where('code_class', $codeClasse);
-                      });
+                    ->whereHas('filiereNiveaux.niveau', function ($q) use ($codeClasse) {
+                        $q->where('code_class', $codeClasse);
+                    });
             })->get();
 
             $resultats = [];
@@ -213,10 +211,10 @@ class ConsultationNotesController extends Controller
                     $etudiant->code_user,
                     $codeSemestre
                 );
-                
+
                 $resultats[] = [
                     'etudiant' => $etudiant->only(['code_user', 'name', 'email']),
-                    'moyennes' => $moyennes
+                    'moyennes' => $moyennes,
                 ];
             }
 
@@ -228,16 +226,16 @@ class ConsultationNotesController extends Controller
                 'data' => [
                     'classe' => $classe,
                     'resultats' => $resultats,
-                    'statistiques' => $statistiques
+                    'statistiques' => $statistiques,
                 ],
-                'message' => 'Résultats de la classe récupérés avec succès'
+                'message' => 'Résultats de la classe récupérés avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des résultats de classe',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -249,7 +247,7 @@ class ConsultationNotesController extends Controller
     {
         try {
             $niveau = Niveau::with('classe')->findOrFail($codeNiveau);
-            
+
             $resultats = DB::table('users as u')
                 ->join('inscription as i', 'u.code_user', '=', 'i.code_user')
                 ->join('filiere_niveau as fn', 'i.code_ins', '=', 'fn.code_ins')
@@ -264,7 +262,7 @@ class ConsultationNotesController extends Controller
                     'u.name',
                     'u.email',
                     DB::raw('AVG(e.note_eval) as moyenne_generale'),
-                    DB::raw('COUNT(DISTINCT ec.code_ec) as nb_ec_evaluees')
+                    DB::raw('COUNT(DISTINCT ec.code_ec) as nb_ec_evaluees'),
                 ])
                 ->groupBy('u.code_user', 'u.name', 'u.email')
                 ->orderBy('moyenne_generale', 'desc')
@@ -275,16 +273,16 @@ class ConsultationNotesController extends Controller
                 'data' => [
                     'niveau' => $niveau,
                     'resultats' => $resultats,
-                    'statistiques' => $this->calculerStatistiquesNiveau($resultats)
+                    'statistiques' => $this->calculerStatistiquesNiveau($resultats),
                 ],
-                'message' => 'Résultats du niveau récupérés avec succès'
+                'message' => 'Résultats du niveau récupérés avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des résultats de niveau',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -296,7 +294,7 @@ class ConsultationNotesController extends Controller
     {
         try {
             $filiere = Filiere::findOrFail($codeFiliere);
-            
+
             $resultats = DB::table('users as u')
                 ->join('inscription as i', 'u.code_user', '=', 'i.code_user')
                 ->join('filiere_niveau as fn', 'i.code_ins', '=', 'fn.code_ins')
@@ -312,7 +310,7 @@ class ConsultationNotesController extends Controller
                     'u.email',
                     'fn.code_niveau',
                     DB::raw('AVG(e.note_eval) as moyenne_generale'),
-                    DB::raw('COUNT(DISTINCT ec.code_ec) as nb_ec_evaluees')
+                    DB::raw('COUNT(DISTINCT ec.code_ec) as nb_ec_evaluees'),
                 ])
                 ->groupBy('u.code_user', 'u.name', 'u.email', 'fn.code_niveau')
                 ->orderBy('moyenne_generale', 'desc')
@@ -323,16 +321,16 @@ class ConsultationNotesController extends Controller
                 'data' => [
                     'filiere' => $filiere,
                     'resultats' => $resultats,
-                    'statistiques' => $this->calculerStatistiquesFiliere($resultats)
+                    'statistiques' => $this->calculerStatistiquesFiliere($resultats),
                 ],
-                'message' => 'Résultats de la filière récupérés avec succès'
+                'message' => 'Résultats de la filière récupérés avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des résultats de filière',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -345,14 +343,14 @@ class ConsultationNotesController extends Controller
         $validator = Validator::make($request->all(), [
             'code_classe' => 'nullable|string|exists:classes,code_class',
             'code_niveau' => 'nullable|string|exists:niveau,code_niveau',
-            'code_filiere' => 'nullable|string|exists:filiere,code_filiere'
+            'code_filiere' => 'nullable|string|exists:filiere,code_filiere',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Paramètres invalides',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -369,7 +367,7 @@ class ConsultationNotesController extends Controller
             // Appliquer les filtres
             if ($request->code_classe) {
                 $query->join('niveau as n', 'fn.code_niveau', '=', 'n.code_niveau')
-                      ->where('n.code_class', $request->code_classe);
+                    ->where('n.code_class', $request->code_classe);
             }
 
             if ($request->code_niveau) {
@@ -381,15 +379,15 @@ class ConsultationNotesController extends Controller
             }
 
             $classement = $query->select([
-                    'u.code_user',
-                    'u.name',
-                    'u.email',
-                    'fn.code_niveau',
-                    'fn.code_filiere',
-                    DB::raw('AVG(e.note_eval) as moyenne_generale'),
-                    DB::raw('COUNT(DISTINCT ec.code_ec) as nb_ec_evaluees'),
-                    DB::raw('ROW_NUMBER() OVER (ORDER BY AVG(e.note_eval) DESC) as rang')
-                ])
+                'u.code_user',
+                'u.name',
+                'u.email',
+                'fn.code_niveau',
+                'fn.code_filiere',
+                DB::raw('AVG(e.note_eval) as moyenne_generale'),
+                DB::raw('COUNT(DISTINCT ec.code_ec) as nb_ec_evaluees'),
+                DB::raw('ROW_NUMBER() OVER (ORDER BY AVG(e.note_eval) DESC) as rang'),
+            ])
                 ->groupBy('u.code_user', 'u.name', 'u.email', 'fn.code_niveau', 'fn.code_filiere')
                 ->orderBy('moyenne_generale', 'desc')
                 ->get();
@@ -399,16 +397,16 @@ class ConsultationNotesController extends Controller
                 'data' => [
                     'classement' => $classement,
                     'total_etudiants' => $classement->count(),
-                    'filtres_appliques' => $request->only(['code_classe', 'code_niveau', 'code_filiere'])
+                    'filtres_appliques' => $request->only(['code_classe', 'code_niveau', 'code_filiere']),
                 ],
-                'message' => 'Classement récupéré avec succès'
+                'message' => 'Classement récupéré avec succès',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération du classement',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -423,28 +421,28 @@ class ConsultationNotesController extends Controller
     private function organiserNotesParSemestre($notes)
     {
         $notesOrganisees = [];
-        
+
         foreach ($notes as $note) {
             $codeSem = $note->ec->ue->code_sem;
             $codeUe = $note->ec->code_ue;
-            
-            if (!isset($notesOrganisees[$codeSem])) {
+
+            if (! isset($notesOrganisees[$codeSem])) {
                 $notesOrganisees[$codeSem] = [
                     'semestre' => $note->ec->ue->semestre,
-                    'ues' => []
+                    'ues' => [],
                 ];
             }
-            
-            if (!isset($notesOrganisees[$codeSem]['ues'][$codeUe])) {
+
+            if (! isset($notesOrganisees[$codeSem]['ues'][$codeUe])) {
                 $notesOrganisees[$codeSem]['ues'][$codeUe] = [
                     'ue' => $note->ec->ue,
-                    'ecs' => []
+                    'ecs' => [],
                 ];
             }
-            
+
             $notesOrganisees[$codeSem]['ues'][$codeUe]['ecs'][] = $note;
         }
-        
+
         return $notesOrganisees;
     }
 
@@ -470,11 +468,11 @@ class ConsultationNotesController extends Controller
             }
 
             $moyenneUE = $totalCreditsUE > 0 ? $totalNotesEC / $totalCreditsUE : 0;
-            
+
             $moyennesUE[$codeUe] = [
                 'moyenne' => round($moyenneUE, 2),
                 'credits' => $totalCreditsUE,
-                'statut' => $moyenneUE >= 10 ? 'Validé' : 'Non validé'
+                'statut' => $moyenneUE >= 10 ? 'Validé' : 'Non validé',
             ];
 
             $sommeNotesPonderees += $moyenneUE * $totalCreditsUE;
@@ -487,7 +485,7 @@ class ConsultationNotesController extends Controller
             'moyennes_ue' => $moyennesUE,
             'moyenne_generale' => round($moyenneGenerale, 2),
             'total_credits' => $totalCredits,
-            'statut_semestre' => $moyenneGenerale >= 10 ? 'Validé' : 'Non validé'
+            'statut_semestre' => $moyenneGenerale >= 10 ? 'Validé' : 'Non validé',
         ];
     }
 
@@ -501,16 +499,16 @@ class ConsultationNotesController extends Controller
         }
 
         $notesMoyennes = $notes->pluck('note_eval');
-        
+
         return [
             'nombre_evaluations' => $notes->count(),
             'note_maximale' => $notesMoyennes->max(),
             'note_minimale' => $notesMoyennes->min(),
             'moyenne_generale' => round($notesMoyennes->avg(), 2),
             'nombre_ue_validees' => $this->compterUEValidees($notes),
-            'taux_reussite' => round(($notesMoyennes->filter(function($note) {
+            'taux_reussite' => round(($notesMoyennes->filter(function ($note) {
                 return $note >= 10;
-            })->count() / $notes->count()) * 100, 2)
+            })->count() / $notes->count()) * 100, 2),
         ];
     }
 
@@ -527,7 +525,7 @@ class ConsultationNotesController extends Controller
             'ues' => [],
             'moyenne_generale' => 0,
             'total_credits' => 0,
-            'credits_obtenus' => 0
+            'credits_obtenus' => 0,
         ];
 
         $sommeNotesPonderees = 0;
@@ -540,7 +538,7 @@ class ConsultationNotesController extends Controller
                 'ecs' => [],
                 'moyenne_ue' => 0,
                 'credits_ue' => 0,
-                'statut' => 'Non validé'
+                'statut' => 'Non validé',
             ];
 
             $totalNotesUE = 0;
@@ -554,7 +552,7 @@ class ConsultationNotesController extends Controller
                         'intitule_ec' => $ec->intitule_ec,
                         'credit_ec' => $ec->credit_ec,
                         'moyenne_ec' => round($moyenneEC, 2),
-                        'evaluations' => $ec->evaluations
+                        'evaluations' => $ec->evaluations,
                     ];
 
                     $totalNotesUE += $moyenneEC * $ec->credit_ec;
@@ -593,18 +591,18 @@ class ConsultationNotesController extends Controller
             'etudiant' => $etudiant->only(['code_user', 'name', 'email']),
             'annee_scolaire' => $codeAnnee,
             'date_generation' => now()->format('Y-m-d H:i:s'),
-            'semestres' => []
+            'semestres' => [],
         ];
 
         $evaluationsParSemestre = $evaluations->groupBy('ec.ue.code_sem');
 
         foreach ($evaluationsParSemestre as $codeSem => $notesSemestre) {
             $moyennes = $this->calculerMoyennesSemestre($notesSemestre, $etudiant->code_user, $codeSem);
-            
+
             $releve['semestres'][$codeSem] = [
                 'code_semestre' => $codeSem,
                 'evaluations' => $notesSemestre,
-                'moyennes' => $moyennes
+                'moyennes' => $moyennes,
             ];
         }
 
@@ -617,7 +615,7 @@ class ConsultationNotesController extends Controller
     private function getNotesEtudiantPourSemestre($codeUser, $codeSemestre)
     {
         return Evaluation::with(['ec.ue'])
-            ->whereHas('ec.ue', function($query) use ($codeSemestre) {
+            ->whereHas('ec.ue', function ($query) use ($codeSemestre) {
                 $query->where('code_sem', $codeSemestre);
             })
             ->where('code_user', $codeUser)
@@ -652,15 +650,15 @@ class ConsultationNotesController extends Controller
         }
 
         $moyennes = collect($resultats)->pluck('moyennes.moyenne_generale');
-        
+
         return [
             'nombre_etudiants' => count($resultats),
             'moyenne_classe' => round($moyennes->avg(), 2),
             'note_maximale' => $moyennes->max(),
             'note_minimale' => $moyennes->min(),
-            'taux_reussite' => round(($moyennes->filter(function($moyenne) {
+            'taux_reussite' => round(($moyennes->filter(function ($moyenne) {
                 return $moyenne >= 10;
-            })->count() / count($resultats)) * 100, 2)
+            })->count() / count($resultats)) * 100, 2),
         ];
     }
 
@@ -674,15 +672,15 @@ class ConsultationNotesController extends Controller
         }
 
         $moyennes = $resultats->pluck('moyenne_generale');
-        
+
         return [
             'nombre_etudiants' => $resultats->count(),
             'moyenne_niveau' => round($moyennes->avg(), 2),
             'note_maximale' => $moyennes->max(),
             'note_minimale' => $moyennes->min(),
-            'taux_reussite' => round(($moyennes->filter(function($moyenne) {
+            'taux_reussite' => round(($moyennes->filter(function ($moyenne) {
                 return $moyenne >= 10;
-            })->count() / $resultats->count()) * 100, 2)
+            })->count() / $resultats->count()) * 100, 2),
         ];
     }
 
@@ -697,22 +695,22 @@ class ConsultationNotesController extends Controller
 
         $moyennes = $resultats->pluck('moyenne_generale');
         $resultatsParNiveau = $resultats->groupBy('code_niveau');
-        
+
         return [
             'nombre_etudiants' => $resultats->count(),
             'nombre_niveaux' => $resultatsParNiveau->count(),
             'moyenne_filiere' => round($moyennes->avg(), 2),
             'note_maximale' => $moyennes->max(),
             'note_minimale' => $moyennes->min(),
-            'taux_reussite' => round(($moyennes->filter(function($moyenne) {
+            'taux_reussite' => round(($moyennes->filter(function ($moyenne) {
                 return $moyenne >= 10;
             })->count() / $resultats->count()) * 100, 2),
-            'repartition_par_niveau' => $resultatsParNiveau->map(function($niveauResultats) {
+            'repartition_par_niveau' => $resultatsParNiveau->map(function ($niveauResultats) {
                 return [
                     'nombre_etudiants' => $niveauResultats->count(),
-                    'moyenne' => round($niveauResultats->pluck('moyenne_generale')->avg(), 2)
+                    'moyenne' => round($niveauResultats->pluck('moyenne_generale')->avg(), 2),
                 ];
-            })
+            }),
         ];
     }
 }

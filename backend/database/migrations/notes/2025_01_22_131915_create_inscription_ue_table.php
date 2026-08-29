@@ -16,10 +16,10 @@ class CreateInscriptionUeTable extends Migration
         Schema::create('inscription_ue', function (Blueprint $table) {
             $table->char('code_ins', 32);
             $table->char('code_ue', 32);
-            $table->integer("etat")->default(0);
-            $table->primary(["code_ins", "code_ue"]);
-            $table->foreign('code_ins' )->references('code_ins')->on('inscription');
-            $table->foreign('code_ue' )->references(['code_ue'])->on('ue');
+            $table->integer('etat')->default(0);
+            $table->primary(['code_ins', 'code_ue']);
+            $table->foreign('code_ins')->references('code_ins')->on('inscription');
+            $table->foreign('code_ue')->references(['code_ue'])->on('ue');
             $table->timestamps();
         });
     }

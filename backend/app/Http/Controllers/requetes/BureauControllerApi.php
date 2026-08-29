@@ -4,8 +4,8 @@ namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bureau;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class BureauControllerApi extends Controller
@@ -18,17 +18,17 @@ class BureauControllerApi extends Controller
         try {
             $bureaux = Bureau::with(['documents', 'presentations', 'sousBureau', 'bureauParents'])
                 ->paginate(15);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Liste des bureaux récupérée avec succès',
-                'data' => $bureaux
+                'data' => $bureaux,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des bureaux',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -45,14 +45,14 @@ class BureauControllerApi extends Controller
                 'desc_bureau' => 'nullable|string',
                 'type_bureau' => 'required|string|max:100',
                 'sous_bureaux' => 'nullable|array',
-                'sous_bureaux.*' => 'exists:bureau,code_bureau'
+                'sous_bureaux.*' => 'exists:bureau,code_bureau',
             ]);
 
             $bureau = Bureau::create([
                 'code_bureau' => $validated['code_bureau'],
                 'label_bureau' => $validated['label_bureau'],
                 'desc_bureau' => $validated['desc_bureau'] ?? null,
-                'type_bureau' => $validated['type_bureau']
+                'type_bureau' => $validated['type_bureau'],
             ]);
 
             // Attacher les sous-bureaux si fournis
@@ -65,19 +65,19 @@ class BureauControllerApi extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Bureau créé avec succès',
-                'data' => $bureau
+                'data' => $bureau,
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création du bureau',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -92,23 +92,23 @@ class BureauControllerApi extends Controller
                 ->where('code_bureau', $code_bureau)
                 ->first();
 
-            if (!$bureau) {
+            if (! $bureau) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bureau non trouvé'
+                    'message' => 'Bureau non trouvé',
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Bureau récupéré avec succès',
-                'data' => $bureau
+                'data' => $bureau,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération du bureau',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -121,10 +121,10 @@ class BureauControllerApi extends Controller
         try {
             $bureau = Bureau::where('code_bureau', $code_bureau)->first();
 
-            if (!$bureau) {
+            if (! $bureau) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bureau non trouvé'
+                    'message' => 'Bureau non trouvé',
                 ], 404);
             }
 
@@ -133,7 +133,7 @@ class BureauControllerApi extends Controller
                 'desc_bureau' => 'nullable|string',
                 'type_bureau' => 'sometimes|required|string|max:100',
                 'sous_bureaux' => 'nullable|array',
-                'sous_bureaux.*' => 'exists:bureau,code_bureau'
+                'sous_bureaux.*' => 'exists:bureau,code_bureau',
             ]);
 
             $bureau->update($validated);
@@ -148,19 +148,19 @@ class BureauControllerApi extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Bureau mis à jour avec succès',
-                'data' => $bureau
+                'data' => $bureau,
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du bureau',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -173,10 +173,10 @@ class BureauControllerApi extends Controller
         try {
             $bureau = Bureau::where('code_bureau', $code_bureau)->first();
 
-            if (!$bureau) {
+            if (! $bureau) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bureau non trouvé'
+                    'message' => 'Bureau non trouvé',
                 ], 404);
             }
 
@@ -188,13 +188,13 @@ class BureauControllerApi extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Bureau supprimé avec succès'
+                'message' => 'Bureau supprimé avec succès',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression du bureau',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -211,10 +211,10 @@ class BureauControllerApi extends Controller
             $bureaux = Bureau::query();
 
             if ($query) {
-                $bureaux->where(function($q) use ($query) {
+                $bureaux->where(function ($q) use ($query) {
                     $q->where('label_bureau', 'LIKE', "%{$query}%")
-                      ->orWhere('desc_bureau', 'LIKE', "%{$query}%")
-                      ->orWhere('code_bureau', 'LIKE', "%{$query}%");
+                        ->orWhere('desc_bureau', 'LIKE', "%{$query}%")
+                        ->orWhere('code_bureau', 'LIKE', "%{$query}%");
                 });
             }
 
@@ -228,13 +228,13 @@ class BureauControllerApi extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Recherche effectuée avec succès',
-                'data' => $results
+                'data' => $results,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la recherche',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -247,10 +247,10 @@ class BureauControllerApi extends Controller
         try {
             $bureau = Bureau::where('code_bureau', $code_bureau)->first();
 
-            if (!$bureau) {
+            if (! $bureau) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bureau non trouvé'
+                    'message' => 'Bureau non trouvé',
                 ], 404);
             }
 
@@ -259,13 +259,13 @@ class BureauControllerApi extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sous-bureaux récupérés avec succès',
-                'data' => $sousBureaux
+                'data' => $sousBureaux,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des sous-bureaux',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -278,10 +278,10 @@ class BureauControllerApi extends Controller
         try {
             $bureau = Bureau::where('code_bureau', $code_bureau)->first();
 
-            if (!$bureau) {
+            if (! $bureau) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bureau non trouvé'
+                    'message' => 'Bureau non trouvé',
                 ], 404);
             }
 
@@ -290,13 +290,13 @@ class BureauControllerApi extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Bureaux parents récupérés avec succès',
-                'data' => $bureauParents
+                'data' => $bureauParents,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des bureaux parents',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

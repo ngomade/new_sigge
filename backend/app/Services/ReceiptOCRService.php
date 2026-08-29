@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use thiagoalessio\TesseractOCR\TesseractOCR;
-use Illuminate\Http\UploadedFile;
-use Imagick;
 use Exception;
-
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Imagick;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class ReceiptOCRService
 {
@@ -37,17 +36,17 @@ class ReceiptOCRService
             // Pattern pour nom de famille répété "MAHOP MAHOP"
             '/([A-ZÀ-Ÿ]{2,})\s+\1(?=\s|$)/i',
             // Pattern général pour nom en majuscules
-            '/([A-ZÀ-Ÿ]{2,}(?:\s+[A-ZÀ-Ÿ]{2,})*)/u'
+            '/([A-ZÀ-Ÿ]{2,}(?:\s+[A-ZÀ-Ÿ]{2,})*)/u',
         ],
         'ca_prenom' => [
             // Pattern pour "Prénom: BORIS JUNIOR"
             '/(?:pr[eé]nom|pr6nom|firstname)\s*:?\s*([A-ZÀ-Ÿ][A-ZÀ-Ÿ\s\-\']+?)(?=\s*(?:email|mail|date|montant|$))/i',
             // Pattern pour extraire après le nom "MAHOP MAHOP BORIS JUNIOR"
-            '/[A-ZÀ-Ÿ]{2,}\s+[A-ZÀ-Ÿ]{2,}\s+([A-ZÀ-Ÿ\s]+?)(?=\s*(?:email|mail|date|$))/i'
+            '/[A-ZÀ-Ÿ]{2,}\s+[A-ZÀ-Ÿ]{2,}\s+([A-ZÀ-Ÿ\s]+?)(?=\s*(?:email|mail|date|$))/i',
         ],
         'ca_email' => [
-            '/([a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,})/i'
-        ]
+            '/([a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,})/i',
+        ],
     ];
 
     /**
@@ -74,19 +73,19 @@ class ReceiptOCRService
             return [
                 'success' => true,
                 'data' => $extractedData,
-                'raw_text' => $text
+                'raw_text' => $text,
             ];
         } catch (Exception $e) {
             Log::error('Erreur OCR', [
                 'error' => $e->getMessage(),
                 'file_name' => $file->getClientOriginalName(),
-                'file_size' => $file->getSize()
+                'file_size' => $file->getSize(),
             ]);
 
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
-                'data' => []
+                'data' => [],
             ];
         }
     }
@@ -138,8 +137,9 @@ class ReceiptOCRService
                         Log::info('Numéro de reçu trouvé', [
                             'number' => $number,
                             'pattern_index' => $index,
-                            'pattern' => $pattern
+                            'pattern' => $pattern,
                         ]);
+
                         return $number;
                     }
                 }
@@ -151,6 +151,7 @@ class ReceiptOCRService
             $number = $match[1];
             if (strlen($number) === 6) {
                 Log::info('Numéro de reçu trouvé (méthode alternative)', ['number' => $number]);
+
                 return $number;
             }
         }
@@ -159,14 +160,16 @@ class ReceiptOCRService
         if (preg_match_all('/(?<!\d)(\d{6})(?!\d)/', $cleanedText, $matches)) {
             foreach ($matches[1] as $number) {
                 // Exclure les dates (qui commencent souvent par 20)
-                if (!str_starts_with($number, '20')) {
+                if (! str_starts_with($number, '20')) {
                     Log::info('Numéro de reçu trouvé (dernière tentative)', ['number' => $number]);
+
                     return $number;
                 }
             }
         }
 
         Log::warning('Aucun numéro de reçu trouvé');
+
         return null;
     }
 
@@ -208,9 +211,11 @@ class ReceiptOCRService
 
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 Log::info('Email trouvé', ['email' => $email]);
+
                 return $email;
             }
         }
+
         return null;
     }
 
@@ -226,7 +231,7 @@ class ReceiptOCRService
             'yah00.com' => 'yahoo.com',
             'yaho0.com' => 'yahoo.com',
             'hotmai1.com' => 'hotmail.com',
-            'hotmaii.com' => 'hotmail.com'
+            'hotmaii.com' => 'hotmail.com',
         ];
 
         foreach ($corrections as $error => $correction) {
@@ -248,7 +253,7 @@ class ReceiptOCRService
         // Extraire le nom
         if (preg_match($nomPattern, $text, $matches)) {
             $nom = trim($matches[1]);
-            if (!empty($nom)) {
+            if (! empty($nom)) {
                 $data['ca_nom'] = strtoupper($nom);
                 Log::info('Nom trouvé', ['nom' => $data['ca_nom']]);
             }
@@ -257,7 +262,7 @@ class ReceiptOCRService
         // Extraire le prénom
         if (preg_match($prenomPattern, $text, $matches)) {
             $prenom = trim($matches[1]);
-            if (!empty($prenom)) {
+            if (! empty($prenom)) {
                 $data['ca_prenom'] = strtoupper($prenom);
                 Log::info('Prénom trouvé', ['prenom' => $data['ca_prenom']]);
             }
@@ -267,7 +272,7 @@ class ReceiptOCRService
         Log::info('Résultat extraction nom/prénom', [
             'text_original' => $text,
             'nom_extrait' => $data['ca_nom'] ?? 'non trouvé',
-            'prenom_extrait' => $data['ca_prenom'] ?? 'non trouvé'
+            'prenom_extrait' => $data['ca_prenom'] ?? 'non trouvé',
         ]);
     }
 
@@ -353,7 +358,7 @@ class ReceiptOCRService
             '/pr6nom/i' => 'prénom',
             '/n°?de regu/i' => 'N° de reçu',
             '/pay6/i' => 'payé',
-            '/dexamen/i' => 'd\'examen'
+            '/dexamen/i' => 'd\'examen',
         ];
 
         foreach ($corrections as $pattern => $replacement) {
@@ -381,7 +386,7 @@ class ReceiptOCRService
         }
 
         // Valider l'email
-        if (isset($data['ca_email']) && !filter_var($data['ca_email'], FILTER_VALIDATE_EMAIL)) {
+        if (isset($data['ca_email']) && ! filter_var($data['ca_email'], FILTER_VALIDATE_EMAIL)) {
             unset($data['ca_email']);
         }
 
@@ -423,26 +428,27 @@ class ReceiptOCRService
         try {
             return $this->convertPdfWithImageMagick($file);
         } catch (Exception $e) {
-            Log::warning('ImageMagick PDF failed: ' . $e->getMessage());
+            Log::warning('ImageMagick PDF failed: '.$e->getMessage());
         }
 
         // Méthode 2: Utiliser ghostscript directement
         try {
             return $this->convertPdfWithGhostscript($file);
         } catch (Exception $e) {
-            Log::warning('Ghostscript PDF failed: ' . $e->getMessage());
+            Log::warning('Ghostscript PDF failed: '.$e->getMessage());
         }
 
         // Méthode 3: Utiliser poppler-utils
         try {
             return $this->convertPdfWithPoppler($file);
         } catch (Exception $e) {
-            Log::warning('Poppler PDF failed: ' . $e->getMessage());
+            Log::warning('Poppler PDF failed: '.$e->getMessage());
         }
 
         // Si toutes les méthodes échouent, retourner le PDF original
         // Tesseract peut parfois traiter directement les PDF
         Log::info('Attempting direct PDF OCR with Tesseract');
+
         return $file->getPathname();
     }
 
@@ -451,25 +457,25 @@ class ReceiptOCRService
      */
     private function convertPdfWithImageMagick(UploadedFile $file): string
     {
-        if (!extension_loaded('imagick')) {
+        if (! extension_loaded('imagick')) {
             throw new Exception('Extension Imagick non disponible');
         }
 
         // Vérifier si ImageMagick supporte les PDF
         $formats = Imagick::queryFormats();
-        if (!in_array('PDF', $formats)) {
+        if (! in_array('PDF', $formats)) {
             throw new Exception('ImageMagick ne supporte pas les PDF');
         }
 
         try {
-            $imagick = new Imagick();
+            $imagick = new Imagick;
 
             // Configuration pour PDF
             $imagick->setResolution(300, 300);
             $imagick->setOption('pdf:use-cropbox', 'true');
 
             // Lire seulement la première page
-            $imagick->readImage($file->getPathname() . '[0]');
+            $imagick->readImage($file->getPathname().'[0]');
 
             // Convertir et optimiser
             $imagick->setImageFormat('png');
@@ -477,13 +483,13 @@ class ReceiptOCRService
             $imagick->contrastImage(1);
             $imagick->normalizeImage();
 
-            $tempPath = sys_get_temp_dir() . '/pdf_image_' . uniqid() . '.png';
+            $tempPath = sys_get_temp_dir().'/pdf_image_'.uniqid().'.png';
             $imagick->writeImage($tempPath);
             $imagick->destroy();
 
             return $tempPath;
         } catch (Exception $e) {
-            throw new Exception('Erreur ImageMagick PDF: ' . $e->getMessage());
+            throw new Exception('Erreur ImageMagick PDF: '.$e->getMessage());
         }
     }
 
@@ -494,11 +500,11 @@ class ReceiptOCRService
     {
         // Vérifier si ghostscript est disponible
         $gsCommand = $this->findGhostscriptCommand();
-        if (!$gsCommand) {
+        if (! $gsCommand) {
             throw new Exception('Ghostscript non trouvé');
         }
 
-        $tempPath = sys_get_temp_dir() . '/pdf_gs_' . uniqid() . '.png';
+        $tempPath = sys_get_temp_dir().'/pdf_gs_'.uniqid().'.png';
 
         $command = sprintf(
             '%s -dNOPAUSE -dBATCH -dSAFER -sDEVICE=png16m -r300 -dFirstPage=1 -dLastPage=1 -sOutputFile=%s %s 2>&1',
@@ -509,8 +515,8 @@ class ReceiptOCRService
 
         exec($command, $output, $returnCode);
 
-        if ($returnCode !== 0 || !file_exists($tempPath)) {
-            throw new Exception('Erreur Ghostscript: ' . implode("\n", $output));
+        if ($returnCode !== 0 || ! file_exists($tempPath)) {
+            throw new Exception('Erreur Ghostscript: '.implode("\n", $output));
         }
 
         return $tempPath;
@@ -527,7 +533,7 @@ class ReceiptOCRService
             throw new Exception('pdftoppm non trouvé');
         }
 
-        $tempPath = sys_get_temp_dir() . '/pdf_poppler_' . uniqid();
+        $tempPath = sys_get_temp_dir().'/pdf_poppler_'.uniqid();
 
         $command = sprintf(
             'pdftoppm -png -r 300 -f 1 -l 1 %s %s 2>&1',
@@ -538,10 +544,10 @@ class ReceiptOCRService
         exec($command, $output, $returnCode);
 
         // pdftoppm ajoute -1 au nom de fichier
-        $generatedFile = $tempPath . '-1.png';
+        $generatedFile = $tempPath.'-1.png';
 
-        if ($returnCode !== 0 || !file_exists($generatedFile)) {
-            throw new Exception('Erreur pdftoppm: ' . implode("\n", $output));
+        if ($returnCode !== 0 || ! file_exists($generatedFile)) {
+            throw new Exception('Erreur pdftoppm: '.implode("\n", $output));
         }
 
         return $generatedFile;
@@ -567,7 +573,7 @@ class ReceiptOCRService
     private function enhanceImage(string $imagePath): string
     {
         try {
-            if (!extension_loaded('imagick')) {
+            if (! extension_loaded('imagick')) {
                 return $imagePath;
             }
 
@@ -584,7 +590,7 @@ class ReceiptOCRService
             $imagick->despeckleImage();
             $imagick->normalizeImage();
 
-            $tempPath = sys_get_temp_dir() . '/enhanced_' . uniqid() . '.png';
+            $tempPath = sys_get_temp_dir().'/enhanced_'.uniqid().'.png';
             $imagick->setImageFormat('png');
             $imagick->writeImage($tempPath);
             $imagick->destroy();
@@ -621,7 +627,7 @@ class ReceiptOCRService
 
             return $text;
         } catch (Exception $e) {
-            throw new Exception('Erreur lors de l\'OCR: ' . $e->getMessage());
+            throw new Exception('Erreur lors de l\'OCR: '.$e->getMessage());
         }
     }
 
@@ -644,14 +650,14 @@ class ReceiptOCRService
 
                     return $pdfPath;
                 } catch (Exception $e) {
-                    Log::warning('ImageMagick conversion failed: ' . $e->getMessage());
+                    Log::warning('ImageMagick conversion failed: '.$e->getMessage());
                 }
             }
 
             // Méthode 2: Utiliser fpdf pour créer un PDF simple
             return $this->createPdfWithFpdf($imagePath);
         } catch (Exception $e) {
-            throw new Exception('Erreur lors de la conversion en PDF: ' . $e->getMessage());
+            throw new Exception('Erreur lors de la conversion en PDF: '.$e->getMessage());
         }
     }
 
@@ -661,16 +667,16 @@ class ReceiptOCRService
     private function createPdfWithFpdf(string $imagePath): string
     {
         // Vérifier si FPDF est disponible
-        if (!class_exists('FPDF')) {
+        if (! class_exists('FPDF')) {
             throw new Exception('FPDF non disponible pour la conversion PDF');
         }
 
-        $pdf = new \FPDF();
+        $pdf = new \FPDF;
         $pdf->AddPage();
 
         // Obtenir les dimensions de l'image
         $imageInfo = getimagesize($imagePath);
-        if (!$imageInfo) {
+        if (! $imageInfo) {
             throw new Exception('Impossible de lire les dimensions de l\'image');
         }
 
@@ -703,11 +709,11 @@ class ReceiptOCRService
     private function generatePdfPath(string $imagePath): string
     {
         $pathInfo = pathinfo($imagePath);
-        $pdfPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.pdf';
+        $pdfPath = $pathInfo['dirname'].'/'.$pathInfo['filename'].'.pdf';
 
         // Si le fichier existe déjà, ajouter un timestamp
         if (file_exists($pdfPath)) {
-            $pdfPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_' . time() . '.pdf';
+            $pdfPath = $pathInfo['dirname'].'/'.$pathInfo['filename'].'_'.time().'.pdf';
         }
 
         return $pdfPath;

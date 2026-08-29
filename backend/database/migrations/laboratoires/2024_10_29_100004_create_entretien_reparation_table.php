@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('entretien_reparation', function (Blueprint $table) {
             $table->unsignedBigInteger('code_equip');
             $table->string('id_pers_lab');
-            $table->enum('statut_entretien', ['En cours', 'Terminé', 'En pause', 'Annulé'])->default("En cours");
+            $table->enum('statut_entretien', ['En cours', 'Terminé', 'En pause', 'Annulé'])->default('En cours');
             $table->date('debut_entretien');
             $table->date('fin_entretien');
             $table->string('type_entretien', 50); // entretien ou reparation

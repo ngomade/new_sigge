@@ -18,7 +18,7 @@ class CheckAlreadyAuthenticated
             if ($personalAccessToken && $personalAccessToken->expires_at && $personalAccessToken->expires_at->isFuture()) {
                 return response()->json([
                     'message' => 'Vous êtes déjà connecté',
-                    'token' => $token
+                    'token' => $token,
                 ], 401);
             }
         }

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('composition', function (Blueprint $table) {
-            $table->string('code_ecole',100);
-            $table->string('site_code',100);
+            $table->string('code_ecole', 100);
+            $table->string('site_code', 100);
             $table->primary(['code_ecole', 'site_code']);
             $table->foreign('code_ecole')->references('code_ecole')->on('ecole')->onDelete('cascade');
             $table->foreign('site_code')->references('site_code')->on('site_composition')->onDelete('cascade');

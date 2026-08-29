@@ -15,7 +15,8 @@ class CentreExamenControllerApi extends Controller
      */
     public function index()
     {
-        $centres = CentreExamen::with("ecole")->get();
+        $centres = CentreExamen::with('ecole')->get();
+
         return response()->json($centres);
     }
 
@@ -32,9 +33,11 @@ class CentreExamenControllerApi extends Controller
 
         try {
             $centre = CentreExamen::create($validatedData);
+
             return response()->json($centre);
         } catch (Exception $e) {
-            Log::error('Error creating centre examen: ' . $e->getMessage());
+            Log::error('Error creating centre examen: '.$e->getMessage());
+
             return response()->json(['error' => 'Erreur lors de l\'enregistrement du centre d\'examen'], 500);
         }
     }
@@ -45,7 +48,8 @@ class CentreExamenControllerApi extends Controller
     public function show(string $id)
     {
         $centre = CentreExamen::findorfail($id);
-        return response()->json($centre->load("ecole"));
+
+        return response()->json($centre->load('ecole'));
     }
 
     /**
@@ -61,9 +65,11 @@ class CentreExamenControllerApi extends Controller
         $centre = CentreExamen::findOrFail($id);
         try {
             $centre->update($validatedData);
+
             return response()->json($centre);
         } catch (Exception $e) {
-            Log::error('Error updating centre examen: ' . $e->getMessage());
+            Log::error('Error updating centre examen: '.$e->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la mise à jour du centre d\'examen'], 500);
         }
     }
@@ -76,9 +82,11 @@ class CentreExamenControllerApi extends Controller
         $centre = CentreExamen::findOrFail($id);
         try {
             $centre->delete();
+
             return response()->json(['message' => 'CentreExamen supprimé avec succès'], 200);
         } catch (Exception $e) {
-            Log::error('Error deleting centre examen: ' . $e->getMessage());
+            Log::error('Error deleting centre examen: '.$e->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la suppression du centre d\'examen'], 500);
         }
     }

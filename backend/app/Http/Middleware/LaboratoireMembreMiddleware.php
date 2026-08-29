@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\laboratoires\LaboratoirePersLab;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\laboratoires\LaboratoirePersLab;
 
 class LaboratoireMembreMiddleware
 {
@@ -20,7 +20,7 @@ class LaboratoireMembreMiddleware
         $userId = session('user_id');
         $userType = session('user_type');
 
-        if (!$code_lab || !$userId || !$userType) {
+        if (! $code_lab || ! $userId || ! $userType) {
             return redirect()->route('laboratoires.show', $code_lab ?? 'default')
                 ->with('error', 'Accès non autorisé.');
         }
@@ -29,9 +29,9 @@ class LaboratoireMembreMiddleware
         $query = LaboratoirePersLab::where('code_lab', $code_lab)
             ->where('statut', 'actif')
             ->where('date_affectation', '<=', now())
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('date_fin_affectation')
-                  ->orWhere('date_fin_affectation', '>=', now());
+                    ->orWhere('date_fin_affectation', '>=', now());
             });
 
         if ($userType === 'externe') {
@@ -42,7 +42,7 @@ class LaboratoireMembreMiddleware
 
         $affectation = $query->first();
 
-        if (!$affectation) {
+        if (! $affectation) {
             return redirect()->route('laboratoires.show', $code_lab)
                 ->with('error', 'Vous n\'êtes pas membre actif de ce laboratoire.');
         }

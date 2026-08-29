@@ -10,9 +10,8 @@ use Tests\TestCase;
 class SiteEtudeControllerApiTest extends TestCase
 {
     use RefreshDatabase;
+
     protected $user;
-
-
 
     protected function setUp(): void
     {
@@ -35,7 +34,7 @@ class SiteEtudeControllerApiTest extends TestCase
     {
         $siteData = [
             'label_site' => 'Test Site',
-            'description_site' => 'Test Description'
+            'description_site' => 'Test Description',
         ];
 
         $response = $this->actingAs($this->user)
@@ -57,7 +56,7 @@ class SiteEtudeControllerApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonFragment([
                 'label_site' => $site->label_site,
-                'description_site' => $site->description_site
+                'description_site' => $site->description_site,
             ]);
     }
 
@@ -66,7 +65,7 @@ class SiteEtudeControllerApiTest extends TestCase
         $site = SiteEtude::factory()->create();
         $updateData = [
             'label_site' => 'Updated Site',
-            'description_site' => 'Updated Description'
+            'description_site' => 'Updated Description',
         ];
 
         $response = $this->actingAs($this->user)
@@ -102,7 +101,7 @@ class SiteEtudeControllerApiTest extends TestCase
                 'total_candidats',
                 'candidats_par_sexe',
                 'candidats_par_filiere',
-                'candidats_par_nationalite'
+                'candidats_par_nationalite',
             ]);
     }
 

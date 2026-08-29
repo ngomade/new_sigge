@@ -17,11 +17,13 @@ class SiteCompositionControllerApi extends Controller
     public function index()
     {
         $sites = SiteComposition::all();
+
         return response()->json($sites->load('ecoles'));
     }
 
     /**
      * Store a newly created resource in storage.
+     *
      * @throws Throwable
      */
     public function store(Request $request)
@@ -30,8 +32,8 @@ class SiteCompositionControllerApi extends Controller
             'site_code' => 'required|string|max:255|unique:site_composition,site_code',
             'site_ville' => 'required|string|max:255',
             'site_lieu' => 'required|string|max:255',
-            'ecoles' => "sometimes|array",
-            'ecoles.*' => "required|exists:ecole,code_ecole",
+            'ecoles' => 'sometimes|array',
+            'ecoles.*' => 'required|exists:ecole,code_ecole',
         ]);
 
         try {
@@ -41,11 +43,13 @@ class SiteCompositionControllerApi extends Controller
                 $site->ecoles()->attach($request->ecoles);
             }
             DB::commit();
+
             return response()->json($site);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error creating site-composition : ' . $th->getMessage());
-            return response()->json(['error' => 'Erreur lors de l\'enregistrement du site' . $th->getMessage()], 500);
+            Log::error('Error creating site-composition : '.$th->getMessage());
+
+            return response()->json(['error' => 'Erreur lors de l\'enregistrement du site'.$th->getMessage()], 500);
         }
     }
 
@@ -55,21 +59,23 @@ class SiteCompositionControllerApi extends Controller
     public function show(string $id)
     {
         $site = SiteComposition::findorFail($id);
+
         return response()->json($site->load('ecoles'));
     }
 
     /**
      * Update the specified resource in storage.
+     *
      * @throws Throwable
      */
     public function update(Request $request, string $site_code)
     {
         $validatedData = $request->validate([
-            'site_code' => 'sometimes|string|max:255|unique:site_composition,site_code,' . $site_code . ',site_code',
+            'site_code' => 'sometimes|string|max:255|unique:site_composition,site_code,'.$site_code.',site_code',
             'site_ville' => 'sometimes|string|max:255',
             'site_lieu' => 'sometimes|string|max:255',
             'ecoles' => 'sometimes|array',
-            'ecoles.*' => "required|exists:ecole,code_ecole",
+            'ecoles.*' => 'required|exists:ecole,code_ecole',
         ]);
 
         $site = SiteComposition::findOrFail($site_code);
@@ -80,16 +86,19 @@ class SiteCompositionControllerApi extends Controller
                 $site->ecoles()->sync($request->ecoles);
             }
             DB::commit();
+
             return response()->json($site);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error updating site-composition : ' . $th->getMessage());
-            return response()->json(['error' => 'Erreur lors de la mise à jour du site'  . $th->getMessage()], 500);
+            Log::error('Error updating site-composition : '.$th->getMessage());
+
+            return response()->json(['error' => 'Erreur lors de la mise à jour du site'.$th->getMessage()], 500);
         }
     }
 
     /**
      * Remove the specified resource from storage.
+     *
      * @throws Throwable
      */
     public function destroy(string $id)
@@ -102,10 +111,12 @@ class SiteCompositionControllerApi extends Controller
             }
             $site->delete();
             DB::commit();
+
             return response()->noContent();
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error deleting site-composition : ' . $th->getMessage());
+            Log::error('Error deleting site-composition : '.$th->getMessage());
+
             return response()->json(['error' => 'Erreur lors de la suppression du site'], 500);
         }
     }

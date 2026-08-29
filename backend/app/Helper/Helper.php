@@ -2,7 +2,6 @@
 
 namespace App\Helper;
 
-use App\Models\concours\User;
 use App\Models\notes\Ec;
 use App\Models\notes\FiliereNiveau;
 use App\Models\notes\Inscription;
@@ -12,8 +11,8 @@ use App\Models\Users;
 use App\Models\UsersDiplome;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 class Helper
@@ -25,10 +24,10 @@ class Helper
     {
         $annee_f = Carbon::parse($annee)->format('y');
         $nb = rand(1, 999);
-        $id = $annee_f . "TLC" . sprintf("%03d", $nb);
+        $id = $annee_f.'TLC'.sprintf('%03d', $nb);
 
-        if ($ecole == "ISLAPE") {
-            $id .= "I";
+        if ($ecole == 'ISLAPE') {
+            $id .= 'I';
         } else {
             $alphabet = 'abcdefghjklmnopqrstuvwxyz';
             $randomChar = $alphabet[rand(0, strlen($alphabet) - 1)];
@@ -36,7 +35,7 @@ class Helper
         }
 
         // Vérifier l'unicité
-        if (Users::where("code_user", $id)->exists()) {
+        if (Users::where('code_user', $id)->exists()) {
             return self::generate_matricule($annee, $ecole);
         }
 
@@ -48,12 +47,12 @@ class Helper
      */
     public static function get_current_niveau($matricule)
     {
-        $ins = Inscription::where("code_user", $matricule)
-            ->orderBy("date_ins", "desc")
+        $ins = Inscription::where('code_user', $matricule)
+            ->orderBy('date_ins', 'desc')
             ->first();
 
         if ($ins) {
-            return FiliereNiveau::where("code_ins", $ins->code_ins)->first();
+            return FiliereNiveau::where('code_ins', $ins->code_ins)->first();
         }
 
         return null;
@@ -65,11 +64,11 @@ class Helper
      */
     public static function generate_matricule_pers(): string
     {
-        $year = Str::substr(date("Y"), 2, 2); // Année sur 2 chiffres
-        $prefix = $year . "PS";
+        $year = Str::substr(date('Y'), 2, 2); // Année sur 2 chiffres
+        $prefix = $year.'PS';
 
         // Récupérer le dernier matricule de l'année courante
-        $lastPersonnel = Personnel::where('code_pers', 'LIKE', $prefix . '%')
+        $lastPersonnel = Personnel::where('code_pers', 'LIKE', $prefix.'%')
             ->orderBy('code_pers', 'desc')
             ->first();
 
@@ -81,10 +80,10 @@ class Helper
             $nb = 1;
         }
 
-        $id = $prefix . sprintf("%03d", $nb);
+        $id = $prefix.sprintf('%03d', $nb);
 
         // Double vérification (au cas où)
-        if (Personnel::where("code_pers", $id)->exists()) {
+        if (Personnel::where('code_pers', $id)->exists()) {
             return self::generate_matricule_pers();
         }
 
@@ -99,13 +98,13 @@ class Helper
         $year = Str::substr($annee, 2, 2);
 
         // Compter les inscriptions de cette année
-        $count = Inscription::where('code_ins', 'LIKE', $year . '%')->count();
+        $count = Inscription::where('code_ins', 'LIKE', $year.'%')->count();
         $nb = $count + 1;
 
-        $id = $year . Str::upper(Str::random(1)) . sprintf("%05d", $nb);
+        $id = $year.Str::upper(Str::random(1)).sprintf('%05d', $nb);
 
         // Vérifier l'unicité
-        if (Inscription::where("code_ins", $id)->exists()) {
+        if (Inscription::where('code_ins', $id)->exists()) {
             return self::generate_inscription($annee);
         }
 
@@ -121,13 +120,13 @@ class Helper
         $year = Str::substr($annee, 2, 2);
 
         // Compter les quitus de cette année
-        $count = Quitus::where('numero_quitus', 'LIKE', $year . '%')->count();
+        $count = Quitus::where('numero_quitus', 'LIKE', $year.'%')->count();
         $nb = $count + 1;
 
-        $id = $year . Str::upper(Str::random(1)) . sprintf("%07d", $nb);
+        $id = $year.Str::upper(Str::random(1)).sprintf('%07d', $nb);
 
         // Vérifier l'unicité
-        if (Quitus::where("numero_quitus", $id)->exists()) {
+        if (Quitus::where('numero_quitus', $id)->exists()) {
             return self::generate_quitus();
         }
 
@@ -139,13 +138,13 @@ class Helper
      */
     public static function get_filiere($code_user)
     {
-        $inscription = Inscription::where("code_user", $code_user)->first();
+        $inscription = Inscription::where('code_user', $code_user)->first();
 
-        if (!$inscription) {
+        if (! $inscription) {
             return null;
         }
 
-        $filiere_niveau = FiliereNiveau::where("code_ins", $inscription->code_ins)->first();
+        $filiere_niveau = FiliereNiveau::where('code_ins', $inscription->code_ins)->first();
 
         return $filiere_niveau?->code_filiere;
     }
@@ -155,11 +154,12 @@ class Helper
      */
     public static function get_nb_credit($code_ue)
     {
-        return Ec::where("code_ue", $code_ue)->sum('credit_ec');
+        return Ec::where('code_ue', $code_ue)->sum('credit_ec');
     }
 
     /**
      * Met à jour les matricules du personnel
+     *
      * @throws Throwable
      */
     public static function update_matricule_pers($matricules, $ecole): string
@@ -174,7 +174,7 @@ class Helper
                 $new_matricule = self::generate_matricule(Carbon::now(), $ecole);
                 $user = Users::find($matricule);
 
-                if (!$user) {
+                if (! $user) {
                     continue; // Passer au suivant si l'utilisateur n'existe pas
                 }
 
@@ -182,15 +182,15 @@ class Helper
                 $user->inscriptions()->update(['code_user' => $new_matricule]);
 
                 // Mettre à jour les diplômes
-                UsersDiplome::where("code_user", $user->code_user)
-                    ->update(["code_user" => $new_matricule]);
+                UsersDiplome::where('code_user', $user->code_user)
+                    ->update(['code_user' => $new_matricule]);
 
                 // Mettre à jour l'utilisateur
                 $user->update([
                     'code_user' => $new_matricule,
-                    "ecole_user" => $ecole,
-                    "login_user" => $new_matricule,
-                    "pwd_user" => bcrypt($new_matricule) // Utiliser bcrypt au lieu de md5
+                    'ecole_user' => $ecole,
+                    'login_user' => $new_matricule,
+                    'pwd_user' => bcrypt($new_matricule), // Utiliser bcrypt au lieu de md5
                 ]);
             }
 
@@ -199,14 +199,14 @@ class Helper
             // Réactiver les contraintes de clés étrangères
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-            return "OK";
+            return 'OK';
 
         } catch (Throwable $th) {
             DB::rollBack();
             DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // Réactiver même en cas d'erreur
 
             // Log l'erreur au lieu de l'afficher
-            Log::error('Erreur lors de la mise à jour des matricules: ' . $th->getMessage());
+            Log::error('Erreur lors de la mise à jour des matricules: '.$th->getMessage());
 
             return $th->getMessage();
         }
@@ -214,56 +214,56 @@ class Helper
 }
 
 // Fonctions globales pour la compatibilité avec l'ancien code
-if (!function_exists('generate_matricule')) {
+if (! function_exists('generate_matricule')) {
     function generate_matricule($annee, $ecole): string
     {
         return \App\Helper\Helper::generate_matricule($annee, $ecole);
     }
 }
 
-if (!function_exists('get_current_niveau')) {
+if (! function_exists('get_current_niveau')) {
     function get_current_niveau($matricule)
     {
         return \App\Helper\Helper::get_current_niveau($matricule);
     }
 }
 
-if (!function_exists('generate_matricule_pers')) {
+if (! function_exists('generate_matricule_pers')) {
     function generate_matricule_pers(): string
     {
         return \App\Helper\Helper::generate_matricule_pers();
     }
 }
 
-if (!function_exists('generate_inscription')) {
+if (! function_exists('generate_inscription')) {
     function generate_inscription($annee): string
     {
         return \App\Helper\Helper::generate_inscription($annee);
     }
 }
 
-if (!function_exists('generate_quitus')) {
+if (! function_exists('generate_quitus')) {
     function generate_quitus(): string
     {
         return \App\Helper\Helper::generate_quitus();
     }
 }
 
-if (!function_exists('get_filiere')) {
+if (! function_exists('get_filiere')) {
     function get_filiere($code_user)
     {
         return \App\Helper\Helper::get_filiere($code_user);
     }
 }
 
-if (!function_exists('get_nb_credit')) {
+if (! function_exists('get_nb_credit')) {
     function get_nb_credit($code_ue)
     {
         return \App\Helper\Helper::get_nb_credit($code_ue);
     }
 }
 
-if (!function_exists('update_matricule_pers')) {
+if (! function_exists('update_matricule_pers')) {
     /**
      * @throws Throwable
      */

@@ -4,7 +4,6 @@ namespace App\Notifications\concours;
 
 use App\Models\concours\Compte;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -27,7 +26,7 @@ class SendinfoOfConnection extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail','database'];
+        return ['mail', 'database'];
     }
 
     /**

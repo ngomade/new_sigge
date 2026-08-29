@@ -5,7 +5,6 @@ namespace App\Models\laboratoires;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LaboratoireInvitation extends Model
@@ -21,14 +20,14 @@ class LaboratoireInvitation extends Model
         'statut',
         'nombre_utilisations_max',
         'nombre_utilisations_actuelles',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [
         'date_fin_affectation' => 'date',
         'date_expiration' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
     ];
 
     // Relations
@@ -61,7 +60,7 @@ class LaboratoireInvitation extends Model
     public function scopeValide($query)
     {
         return $query->where('statut', 'actif')
-                    ->where('date_expiration', '>', now());
+            ->where('date_expiration', '>', now());
     }
 
     // Accesseurs
@@ -69,7 +68,8 @@ class LaboratoireInvitation extends Model
     {
         // Utiliser une URL courte et fiable pour les QR codes
         $baseUrl = config('app.url');
-        return rtrim($baseUrl, '/') . '/i/' . $this->token;
+
+        return rtrim($baseUrl, '/').'/i/'.$this->token;
     }
 
     public function getUrlInvitationCompleteAttribute(): string
@@ -83,10 +83,10 @@ class LaboratoireInvitation extends Model
         return $this->date_expiration < now();
     }
 
-        public function getEstValideAttribute(): bool
+    public function getEstValideAttribute(): bool
     {
         return $this->statut === 'actif' &&
-               !$this->est_expire &&
+               ! $this->est_expire &&
                $this->nombre_utilisations_actuelles < $this->nombre_utilisations_max;
     }
 
@@ -146,7 +146,7 @@ class LaboratoireInvitation extends Model
             'statut' => 'actif',
             'nombre_utilisations_max' => $nombre_utilisations_max,
             'nombre_utilisations_actuelles' => 0,
-            'created_by' => $created_by
+            'created_by' => $created_by,
         ]);
     }
 

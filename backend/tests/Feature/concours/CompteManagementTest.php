@@ -2,15 +2,16 @@
 
 namespace Tests\Feature\concours;
 
-use Exception;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\concours\{Compte, Candidat};
-use Laravel\Sanctum\Sanctum;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Notification;
+use App\Models\concours\Candidat;
+use App\Models\concours\Compte;
 use App\Notifications\concours\SendinfoOfConnection;
+use Exception;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class CompteManagementTest extends TestCase
 {
@@ -37,19 +38,19 @@ class CompteManagementTest extends TestCase
             'ca_recu' => UploadedFile::fake()->create('recu.pdf', 1000),
             'ca_nom' => 'Doe',
             'ca_email' => 'john.doe@example.com',
-            'ca_prenom' => 'John'
+            'ca_prenom' => 'John',
         ]);
 
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'access_token',
                 'token_type',
-                'user'
+                'user',
             ]);
 
         $this->assertDatabaseHas('compte', [
             'ca_num_recu' => 'RECU2024001',
-            'ca_email' => 'john.doe@example.com'
+            'ca_email' => 'john.doe@example.com',
         ]);
 
         Notification::assertSentTo(Compte::first(), SendinfoOfConnection::class);
@@ -65,7 +66,7 @@ class CompteManagementTest extends TestCase
             'ca_pwd' => 'password123',
             'ca_recu' => UploadedFile::fake()->create('recu.pdf', 1000),
             'ca_nom' => 'Doe',
-            'ca_prenom' => 'John'
+            'ca_prenom' => 'John',
         ]);
 
         $response->assertStatus(422)
@@ -80,7 +81,7 @@ class CompteManagementTest extends TestCase
 
         $response = $this->putJson("/api/concours/comptes$compte->ca_num_recu", [
             'ca_nom' => 'Updated Name',
-            'ca_email' => 'updated@example.com'
+            'ca_email' => 'updated@example.com',
         ]);
 
         $response->assertStatus(200);
@@ -88,7 +89,7 @@ class CompteManagementTest extends TestCase
         $this->assertDatabaseHas('compte', [
             'ca_num_recu' => $compte->ca_num_recu,
             'ca_nom' => 'Updated Name',
-            'ca_email' => 'updated@example.com'
+            'ca_email' => 'updated@example.com',
         ]);
     }
 

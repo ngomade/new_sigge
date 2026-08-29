@@ -7,12 +7,11 @@ use App\Models\concours\Compte;
 use App\Models\Personnel;
 use App\Services\AuthService;
 use Exception;
-
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -24,7 +23,7 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-{
+    {
         $request->validate([
             'login' => 'required|string',
             'password' => 'required|string',
@@ -58,10 +57,11 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => 'Déconnexion réussie.',
-                'status' => 'success'
+                'status' => 'success',
             ]);
         } catch (Exception $e) {
-            Log::error('Error in logout: ' . $e->getMessage());
+            Log::error('Error in logout: '.$e->getMessage());
+
             return response()->json([
                 'message' => 'Erreur lors de la déconnexion.',
             ], 500);
@@ -76,21 +76,23 @@ class AuthController extends Controller
      * une réponse JSON avec un message d'erreur et le code 401. Si le token est valide, elle retourne
      * les informations de l'utilisateur associé via le service d'authentification.
      *
-     * @param Request $request La requête HTTP contenant le bearer token.
+     * @param  Request  $request  La requête HTTP contenant le bearer token.
      * @return JsonResponse Réponse JSON contenant les informations de l'utilisateur ou un message d'erreur.
      */
     public function checkToken(Request $request)
     {
         try {
             $token = PersonalAccessToken::findToken($request->bearerToken());
-            if (!$token || $token->expires_at->isPast())
+            if (! $token || $token->expires_at->isPast()) {
                 return response()->json([
-                    'message' => 'Session invalide ou expiré.'
+                    'message' => 'Session invalide ou expiré.',
                 ], 401);
+            }
 
             return $this->authService->getUserFromToken($token, $request->bearerToken());
         } catch (Exception $e) {
-            Log::error('Error in checkToken: ' . $e->getMessage());
+            Log::error('Error in checkToken: '.$e->getMessage());
+
             return response()->json([
                 'message' => 'Erreur lors de la verification du token.',
             ], 500);
@@ -103,17 +105,21 @@ class AuthController extends Controller
         try {
             // Révoquer l'ancien token
             $token = $request->user()->currentAccessToken();
-            if ($token instanceof PersonalAccessToken) $token->delete();
+            if ($token instanceof PersonalAccessToken) {
+                $token->delete();
+            }
             $newToken = $request->user()->createToken('auth_token')->plainTextToken;
+
             return response()->json([
                 'access_token' => $newToken,
                 'token_type' => 'Bearer',
-                'message' => 'Token rafraîchi avec succès.'
+                'message' => 'Token rafraîchi avec succès.',
             ]);
         } catch (Exception $e) {
-            Log::error('Error in refresh: ' . $e->getMessage());
+            Log::error('Error in refresh: '.$e->getMessage());
+
             return response()->json([
-                'message' => 'Erreur lors du rafraîchissement du token.'
+                'message' => 'Erreur lors du rafraîchissement du token.',
             ], 500);
         }
     }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models\concours;
 
 use App\Models\Ecole;
@@ -9,17 +8,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Dossier extends Model
 {
-	protected $table = 'dossier';
-	protected $primaryKey = 'code_el';
+    protected $table = 'dossier';
 
-	protected $fillable = [
-		'label_el'
-	];
+    protected $primaryKey = 'code_el';
 
-	public function ecole_elements(): BelongsToMany
-	{
-		return $this->belongsToMany(Ecole::class, 'ecole_element', 'code_el', 'code_ecole')
+    protected $fillable = [
+        'label_el',
+    ];
+
+    public function ecole_elements(): BelongsToMany
+    {
+        return $this->belongsToMany(Ecole::class, 'ecole_element', 'code_el', 'code_ecole')
             ->using(EcoleElement::class)
             ->withTimestamps();
-	}
+    }
 }

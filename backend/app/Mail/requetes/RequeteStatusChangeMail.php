@@ -11,10 +11,12 @@ use Illuminate\Queue\SerializesModels;
 
 class RequeteStatusChangeMail extends Mailable
 {
-   use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
 
     public $requete;
+
     public $oldStatus;
+
     public $newStatus;
 
     public function __construct(Requete $requete, string $oldStatus, string $newStatus)
@@ -27,7 +29,7 @@ class RequeteStatusChangeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mise à jour de votre requête - ' . $this->requete->code_requete,
+            subject: 'Mise à jour de votre requête - '.$this->requete->code_requete,
         );
     }
 

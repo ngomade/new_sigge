@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('reservation_agent')) {
+        if (! Schema::hasTable('reservation_agent')) {
 
-        Schema::table('laboratoire_invitations', function (Blueprint $table) {
-            $table->unsignedInteger('nombre_utilisations_max')->default(1)->after('statut');
-            $table->unsignedInteger('nombre_utilisations_actuelles')->default(0)->after('nombre_utilisations_max');
-        });
+            Schema::table('laboratoire_invitations', function (Blueprint $table) {
+                $table->unsignedInteger('nombre_utilisations_max')->default(1)->after('statut');
+                $table->unsignedInteger('nombre_utilisations_actuelles')->default(0)->after('nombre_utilisations_max');
+            });
         }
     }
 
@@ -25,11 +25,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('reservation_agent')) {
+        if (! Schema::hasTable('reservation_agent')) {
 
-        Schema::table('laboratoire_invitations', function (Blueprint $table) {
-            $table->dropColumn(['nombre_utilisations_max', 'nombre_utilisations_actuelles']);
-        });
+            Schema::table('laboratoire_invitations', function (Blueprint $table) {
+                $table->dropColumn(['nombre_utilisations_max', 'nombre_utilisations_actuelles']);
+            });
         }
     }
 };

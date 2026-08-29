@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\laboratoires\LaboratoirePersLab;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\laboratoires\LaboratoirePersLab;
 
 class LaboratoireAuthMiddleware
 {
@@ -17,7 +17,7 @@ class LaboratoireAuthMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Vérifier si l'utilisateur est connecté au laboratoire
-        if (!session('user_id') || !session('laboratoire_code')) {
+        if (! session('user_id') || ! session('laboratoire_code')) {
             return redirect()->route('laboratoires.login.form', $request->route('code_lab'))
                 ->with('error', 'Vous devez être connecté pour accéder à cette page.');
         }
@@ -30,22 +30,23 @@ class LaboratoireAuthMiddleware
         }
 
         // Vérifier que l'affectation est toujours valide (dates et statut)
-$userType = session('user_type');
+        $userType = session('user_type');
 
-$query = LaboratoirePersLab::where('code_lab', $code_lab)
-    ->where('statut', 'actif');
+        $query = LaboratoirePersLab::where('code_lab', $code_lab)
+            ->where('statut', 'actif');
 
-if ($userType === 'externe') {
-    $query->where('id_user_externe', session('user_id'));
-} else {
-    $query->where('id_pers_lab', session('user_id'));
-}
+        if ($userType === 'externe') {
+            $query->where('id_user_externe', session('user_id'));
+        } else {
+            $query->where('id_pers_lab', session('user_id'));
+        }
 
-$affectation = $query->first();
+        $affectation = $query->first();
 
-        if (!$affectation) {
+        if (! $affectation) {
             // Nettoyer la session et rediriger
             session()->forget(['user_id', 'user_name', 'user_type', 'laboratoire_code']);
+
             return redirect()->route('laboratoires.show', $code_lab)
                 ->with('error', 'Votre affectation au laboratoire n\'est plus valide.');
         }
@@ -54,12 +55,14 @@ $affectation = $query->first();
         $now = now();
         if ($affectation->date_affectation > $now) {
             session()->forget(['user_id', 'user_name', 'user_type', 'laboratoire_code']);
+
             return redirect()->route('laboratoires.show', $code_lab)
                 ->with('error', 'Votre affectation au laboratoire n\'a pas encore commencé.');
         }
 
         if ($affectation->date_fin_affectation && $affectation->date_fin_affectation < $now) {
             session()->forget(['user_id', 'user_name', 'user_type', 'laboratoire_code']);
+
             return redirect()->route('laboratoires.show', $code_lab)
                 ->with('error', 'Votre affectation au laboratoire a expiré.');
         }

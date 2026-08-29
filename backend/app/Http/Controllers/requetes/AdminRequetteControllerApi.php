@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\requetes;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\requetes\Requete;
-use App\Models\requetes\Category;
+use App\Mail\requetes\RequeteAssignedMail;
+use App\Mail\requetes\RequeteResponseMail;
+use App\Mail\requetes\RequeteStatusChangeMail;
 use App\Models\Bureau;
+use App\Models\requetes\Category;
 use App\Models\requetes\Reponse;
+use App\Models\requetes\Requete;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Mail\requetes\RequeteStatusChangeMail;
-use App\Mail\requetes\RequeteAssignedMail;
-use App\Mail\requetes\RequeteResponseMail;
 
 class AdminRequetteControllerApi extends Controller
 {
@@ -63,7 +63,7 @@ class AdminRequetteControllerApi extends Controller
         return response()->json([
             'requetes' => $requetes,
             'categories' => $categories,
-            'bureaux' => $bureaux
+            'bureaux' => $bureaux,
         ]);
     }
 
@@ -91,7 +91,7 @@ class AdminRequetteControllerApi extends Controller
         $request->validate([
             'status' => 'required|in:en attente,en cours,traitée,rejetée,escaladée',
             'note_interne' => 'nullable|string|max:191',
-            'nouveau_bureau' => 'nullable|exists:bureau,code_bureau'
+            'nouveau_bureau' => 'nullable|exists:bureau,code_bureau',
         ]);
 
         $query = Requete::query();
@@ -108,7 +108,7 @@ class AdminRequetteControllerApi extends Controller
         try {
             $updateData = [
                 'status' => $newStatus,
-                'note_interne' => $request->note_interne
+                'note_interne' => $request->note_interne,
             ];
 
             switch ($newStatus) {
@@ -151,7 +151,7 @@ class AdminRequetteControllerApi extends Controller
     public function assign(Request $request, string $code_requete)
     {
         $request->validate([
-            'code_bureau' => 'required|exists:bureau,code_bureau'
+            'code_bureau' => 'required|exists:bureau,code_bureau',
         ]);
 
         $requete = Requete::where('code_requete', $code_requete)->firstOrFail();
@@ -164,7 +164,7 @@ class AdminRequetteControllerApi extends Controller
             $requete->update([
                 'code_bureau' => $request->code_bureau,
                 'status' => 'en attente',
-                'date_asignation' => now()
+                'date_asignation' => now(),
             ]);
 
             Mail::to($requete->user->email_user)->send(new RequeteAssignedMail($requete, $request->code_bureau));
@@ -182,7 +182,7 @@ class AdminRequetteControllerApi extends Controller
     public function addResponse(Request $request, string $code_requete)
     {
         $request->validate([
-            'text_repone' => 'required|string|max:180'
+            'text_repone' => 'required|string|max:180',
         ]);
 
         $query = Requete::query();
@@ -195,10 +195,10 @@ class AdminRequetteControllerApi extends Controller
 
         try {
             $reponse = Reponse::create([
-                'code_res' => 'RES-' . strtoupper(Str::random(10)),
+                'code_res' => 'RES-'.strtoupper(Str::random(10)),
                 'text_repone' => $request->text_repone,
                 'code_requete' => $code_requete,
-                'created_by' => Auth::Personnel()->code_pers
+                'created_by' => Auth::Personnel()->code_pers,
             ]);
 
             if ($requete->status === 'en attente') {

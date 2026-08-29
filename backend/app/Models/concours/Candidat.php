@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Models\concours;
-
 
 use App\Models\Ecole;
 use App\Models\Filiere;
@@ -15,13 +13,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-
 class Candidat extends Model
 {
     use HasFactory, Notifiable;
 
     protected $table = 'candidat';
+
     protected $primaryKey = 'ca_code';
+
     public $incrementing = false;
 
     protected $casts = [
@@ -64,7 +63,7 @@ class Candidat extends Model
         'ca_email_pere',
         'ca_deliv_cni',
         'ca_num_recu',
-        'ca_recu'
+        'ca_recu',
     ];
 
     protected static function boot(): void
@@ -112,5 +111,4 @@ class Candidat extends Model
             ->withPivot('pk_mail_candidat')
             ->withTimestamps();
     }
-
 }

@@ -5,11 +5,6 @@ namespace App\Http\Controllers\notes;
 use App\Http\Controllers\Controller;
 use App\Models\Anneescolaire;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Throwable;
-
-
 use Illuminate\Support\Facades\Validator;
 
 class AnneescolaireController extends Controller
@@ -20,6 +15,7 @@ class AnneescolaireController extends Controller
     public function index()
     {
         $annees = Anneescolaire::orderBy('code_annee', 'desc')->paginate(10);
+
         return view('sige_app.backend.annee.annee_index', compact('annees'));
     }
 
@@ -39,7 +35,7 @@ class AnneescolaireController extends Controller
         $validator = Validator::make($request->all(), [
             'code_annee' => 'required|integer|unique:anneescolaire',
             'debut_annee' => 'required|date',
-            'fin_annee' => 'required|date|after:debut_annee'
+            'fin_annee' => 'required|date|after:debut_annee',
         ]);
 
         if ($validator->fails()) {
@@ -52,7 +48,7 @@ class AnneescolaireController extends Controller
             Anneescolaire::create([
                 'code_annee' => $request->code_annee,
                 'debut_annee' => $request->debut_annee,
-                'fin_annee' => $request->fin_annee
+                'fin_annee' => $request->fin_annee,
             ]);
 
             return redirect()->route('annees.index')
@@ -70,6 +66,7 @@ class AnneescolaireController extends Controller
     public function show($code_annee)
     {
         $annee = Anneescolaire::findOrFail($code_annee);
+
         return view('sige_app.backend.annee.annee_show', compact('annee'));
     }
 
@@ -79,6 +76,7 @@ class AnneescolaireController extends Controller
     public function edit($code_annee)
     {
         $annee = Anneescolaire::findOrFail($code_annee);
+
         return view('sige_app.backend.annee.annee_edit', compact('annee'));
     }
 
@@ -89,7 +87,7 @@ class AnneescolaireController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'debut_annee' => 'required|date',
-            'fin_annee' => 'required|date|after:debut_annee'
+            'fin_annee' => 'required|date|after:debut_annee',
         ]);
 
         if ($validator->fails()) {
@@ -102,7 +100,7 @@ class AnneescolaireController extends Controller
             $annee = Anneescolaire::findOrFail($code_annee);
             $annee->update([
                 'debut_annee' => $request->debut_annee,
-                'fin_annee' => $request->fin_annee
+                'fin_annee' => $request->fin_annee,
             ]);
 
             return redirect()->route('annees.index')

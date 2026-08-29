@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
-use App\Models\notes\SessionExamen;
 use App\Models\notes\Anneescolaire;
 use App\Models\notes\Examen;
+use App\Models\notes\SessionExamen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 use Throwable;
 
 class SessionExamenController extends Controller
@@ -33,14 +32,14 @@ class SessionExamenController extends Controller
                 'sessions_en_cours' => SessionExamen::where('date_debut_session', '<=', now())
                     ->where('date_fin_session', '>=', now())
                     ->count(),
-                'examens_total' => Examen::count()
+                'examens_total' => Examen::count(),
             ];
 
             return view('sige_app.backend.gestion_notes.session_examen.index', compact('sessions', 'stats'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des sessions d\'examen: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage des sessions d\'examen: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->back()
@@ -60,8 +59,8 @@ class SessionExamenController extends Controller
             return view('sige_app.backend.gestion_notes.session_examen.create', compact('annees'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de création de session: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage du formulaire de création de session: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('sessionsExamen.index')
@@ -108,21 +107,22 @@ class SessionExamenController extends Controller
                     ->where(function ($query) use ($request) {
                         $query->whereBetween('date_debut_session', [
                             $request->date_debut_session,
-                            $request->date_fin_session ?? $request->date_debut_session
+                            $request->date_fin_session ?? $request->date_debut_session,
                         ])
-                        ->orWhereBetween('date_fin_session', [
-                            $request->date_debut_session,
-                            $request->date_fin_session ?? $request->date_debut_session
-                        ])
-                        ->orWhere(function ($q) use ($request) {
-                            $q->where('date_debut_session', '<=', $request->date_debut_session)
-                              ->where('date_fin_session', '>=', $request->date_fin_session ?? $request->date_debut_session);
-                        });
+                            ->orWhereBetween('date_fin_session', [
+                                $request->date_debut_session,
+                                $request->date_fin_session ?? $request->date_debut_session,
+                            ])
+                            ->orWhere(function ($q) use ($request) {
+                                $q->where('date_debut_session', '<=', $request->date_debut_session)
+                                    ->where('date_fin_session', '>=', $request->date_fin_session ?? $request->date_debut_session);
+                            });
                     })
                     ->exists();
 
                 if ($chevauchement) {
                     DB::rollBack();
+
                     return redirect()->back()
                         ->with('error', 'Il existe déjà une session active qui chevauche avec ces dates.')
                         ->withInput();
@@ -143,7 +143,7 @@ class SessionExamenController extends Controller
             Log::info('Session d\'examen créée avec succès', [
                 'session_id' => $session->code_session,
                 'user_id' => auth()->id(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return redirect()->route('sessionsExamen.index')
@@ -151,11 +151,11 @@ class SessionExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la création de la session d\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la création de la session d\'examen: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -180,15 +180,15 @@ class SessionExamenController extends Controller
                     return $examen->evaluations->count();
                 }),
                 'moyenne_generale' => round($session->examens->flatMap->evaluations->avg('note_eval') ?? 0, 2),
-                'taux_reussite' => $this->calculateTauxReussite($session->examens->flatMap->evaluations)
+                'taux_reussite' => $this->calculateTauxReussite($session->examens->flatMap->evaluations),
             ];
 
             return view('sige_app.backend.gestion_notes.session_examen.show', compact('session', 'stats'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage de la session d\'examen: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage de la session d\'examen: '.$e->getMessage(), [
                 'session_id' => $code_session,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('sessionsExamen.index')
@@ -210,9 +210,9 @@ class SessionExamenController extends Controller
             return view('sige_app.backend.gestion_notes.session_examen.edit', compact('session', 'annees'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification: '.$e->getMessage(), [
                 'session_id' => $code_session,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('sessionsExamen.index')
@@ -261,21 +261,22 @@ class SessionExamenController extends Controller
                     ->where(function ($query) use ($request) {
                         $query->whereBetween('date_debut_session', [
                             $request->date_debut_session,
-                            $request->date_fin_session ?? $request->date_debut_session
+                            $request->date_fin_session ?? $request->date_debut_session,
                         ])
-                        ->orWhereBetween('date_fin_session', [
-                            $request->date_debut_session,
-                            $request->date_fin_session ?? $request->date_debut_session
-                        ])
-                        ->orWhere(function ($q) use ($request) {
-                            $q->where('date_debut_session', '<=', $request->date_debut_session)
-                              ->where('date_fin_session', '>=', $request->date_fin_session ?? $request->date_debut_session);
-                        });
+                            ->orWhereBetween('date_fin_session', [
+                                $request->date_debut_session,
+                                $request->date_fin_session ?? $request->date_debut_session,
+                            ])
+                            ->orWhere(function ($q) use ($request) {
+                                $q->where('date_debut_session', '<=', $request->date_debut_session)
+                                    ->where('date_fin_session', '>=', $request->date_fin_session ?? $request->date_debut_session);
+                            });
                     })
                     ->exists();
 
                 if ($chevauchement) {
                     DB::rollBack();
+
                     return redirect()->back()
                         ->with('error', 'Il existe déjà une session active qui chevauche avec ces dates.')
                         ->withInput();
@@ -299,7 +300,7 @@ class SessionExamenController extends Controller
                 'session_id' => $code_session,
                 'user_id' => auth()->id(),
                 'old_data' => $oldData,
-                'new_data' => $request->all()
+                'new_data' => $request->all(),
             ]);
 
             return redirect()->route('sessionsExamen.index')
@@ -307,12 +308,12 @@ class SessionExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la modification de la session d\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la modification de la session d\'examen: '.$e->getMessage(), [
                 'session_id' => $code_session,
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -337,6 +338,7 @@ class SessionExamenController extends Controller
 
             if ($hasEvaluations) {
                 DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Impossible de supprimer cette session car des évaluations y sont liées.');
             }
@@ -356,7 +358,7 @@ class SessionExamenController extends Controller
             Log::info('Session d\'examen supprimée avec succès', [
                 'session_id' => $code_session,
                 'user_id' => auth()->id(),
-                'deleted_data' => $sessionData
+                'deleted_data' => $sessionData,
             ]);
 
             return redirect()->route('sessionsExamen.index')
@@ -364,11 +366,11 @@ class SessionExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la suppression de la session d\'examen: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la suppression de la session d\'examen: '.$e->getMessage(), [
                 'session_id' => $code_session,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -395,21 +397,22 @@ class SessionExamenController extends Controller
                     ->where(function ($query) use ($session) {
                         $query->whereBetween('date_debut_session', [
                             $session->date_debut_session,
-                            $session->date_fin_session ?? $session->date_debut_session
+                            $session->date_fin_session ?? $session->date_debut_session,
                         ])
-                        ->orWhereBetween('date_fin_session', [
-                            $session->date_debut_session,
-                            $session->date_fin_session ?? $session->date_debut_session
-                        ])
-                        ->orWhere(function ($q) use ($session) {
-                            $q->where('date_debut_session', '<=', $session->date_debut_session)
-                              ->where('date_fin_session', '>=', $session->date_fin_session ?? $session->date_debut_session);
-                        });
+                            ->orWhereBetween('date_fin_session', [
+                                $session->date_debut_session,
+                                $session->date_fin_session ?? $session->date_debut_session,
+                            ])
+                            ->orWhere(function ($q) use ($session) {
+                                $q->where('date_debut_session', '<=', $session->date_debut_session)
+                                    ->where('date_fin_session', '>=', $session->date_fin_session ?? $session->date_debut_session);
+                            });
                     })
                     ->exists();
 
                 if ($chevauchement) {
                     DB::rollBack();
+
                     return redirect()->back()
                         ->with('error', 'Impossible d\'activer : il existe une session active qui chevauche avec ces dates.');
                 }
@@ -425,7 +428,7 @@ class SessionExamenController extends Controller
                 'session_id' => $code_session,
                 'user_id' => auth()->id(),
                 'old_status' => $session->statut_session,
-                'new_status' => $newStatus
+                'new_status' => $newStatus,
             ]);
 
             return redirect()->back()
@@ -433,11 +436,11 @@ class SessionExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors du changement de statut de la session: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors du changement de statut de la session: '.$e->getMessage(), [
                 'session_id' => $code_session,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -461,24 +464,24 @@ class SessionExamenController extends Controller
                         'label_session' => $session->label_session,
                         'date_debut_session' => $session->date_debut_session,
                         'date_fin_session' => $session->date_fin_session,
-                        'statut_session' => $session->statut_session
+                        'statut_session' => $session->statut_session,
                     ];
                 });
 
             return response()->json([
                 'success' => true,
-                'sessions' => $sessions
+                'sessions' => $sessions,
             ]);
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la récupération des sessions par année: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la récupération des sessions par année: '.$e->getMessage(), [
                 'code_annee' => $code_annee,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la récupération des sessions'
+                'message' => 'Erreur lors de la récupération des sessions',
             ], 500);
         }
     }
@@ -512,7 +515,7 @@ class SessionExamenController extends Controller
             $newSession = SessionExamen::create([
                 'code_session' => Str::uuid(),
                 'code_annee' => $originalSession->code_annee,
-                'label_session' => $originalSession->label_session . ' (Copie)',
+                'label_session' => $originalSession->label_session.' (Copie)',
                 'date_debut_session' => $originalSession->date_debut_session,
                 'date_fin_session' => $originalSession->date_fin_session,
                 'statut_session' => 0, // Créer inactive par défaut
@@ -523,7 +526,7 @@ class SessionExamenController extends Controller
             Log::info('Session d\'examen dupliquée avec succès', [
                 'original_session_id' => $code_session,
                 'new_session_id' => $newSession->code_session,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->route('sige_app.backend.gestion_notes.session_examen.edit', $newSession->code_session)
@@ -531,11 +534,11 @@ class SessionExamenController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
-            Log::error('Erreur lors de la duplication de la session: ' . $e->getMessage(), [
+
+            Log::error('Erreur lors de la duplication de la session: '.$e->getMessage(), [
                 'session_id' => $code_session,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()

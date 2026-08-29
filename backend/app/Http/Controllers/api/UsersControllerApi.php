@@ -15,6 +15,7 @@ class UsersControllerApi extends Controller
     public function index()
     {
         $users = Users::all();
+
         return response()->json($users);
     }
 
@@ -26,10 +27,12 @@ class UsersControllerApi extends Controller
             DB::beginTransaction();
             $user = Users::create($validatedData);
             DB::commit();
+
             return response()->json($user);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error creating User: ' . $th->getMessage());
+            Log::error('Error creating User: '.$th->getMessage());
+
             return response()->json(['error' => 'Error creating User'], 500);
         }
     }
@@ -37,6 +40,7 @@ class UsersControllerApi extends Controller
     public function show(string $code_user)
     {
         $user = Users::findOrFail($code_user);
+
         return response()->json($user);
     }
 
@@ -50,10 +54,12 @@ class UsersControllerApi extends Controller
             DB::beginTransaction();
             $user->update($validatedData);
             DB::commit();
+
             return response()->json($user);
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error updating User: ' . $th->getMessage());
+            Log::error('Error updating User: '.$th->getMessage());
+
             return response()->json(['error' => 'Error updating User'], 500);
         }
     }
@@ -66,10 +72,12 @@ class UsersControllerApi extends Controller
             DB::beginTransaction();
             $user->delete();
             DB::commit();
+
             return response()->noContent();
         } catch (Throwable $th) {
             DB::rollBack();
-            Log::error('Error deleting User: ' . $th->getMessage());
+            Log::error('Error deleting User: '.$th->getMessage());
+
             return response()->json(['error' => 'Error deleting User'], 500);
         }
     }

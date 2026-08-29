@@ -11,6 +11,7 @@ class CandidatureApprovedMail extends Mailable
     use Queueable, SerializesModels;
 
     public $candidature;
+
     public $tempPassword;
 
     public function __construct($candidature, $tempPassword)

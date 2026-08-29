@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('label_ecole');
             $table->string('logo_ecole');
             $table->text('desc_ecole');
-            $table->string('tel_ecole',180);
+            $table->string('tel_ecole', 180);
             $table->string('email_ecole')->nullable();
             $table->string('bp_ecole');
             $table->unsignedBigInteger('centre_depot_code');
