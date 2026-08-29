@@ -67,7 +67,7 @@ jobs:
           echo "✅ Tests terminés."
 
     
-  # --- PARTIE 2 : BUILD FRONTEND ---
+ # --- PARTIE 2 : BUILD FRONTEND ---
   frontend-build:
     name: "🌐 Build Frontend (React)"
     needs: laravel-tests
@@ -83,21 +83,21 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./frontend/package-lock.json
 
-      - name: "🏗️ Build Vite"
+      - name: "🏗️ Build React"
         working-directory: ./frontend
         run: |
           echo "📦 Installation des modules npm..."
           npm install
           echo "🛠️ Lancement du Build de production..."
           npm run build
-          echo "📂 Structure du dossier dist :"
-          ls -R dist/
+          echo "📂 Structure du dossier build :"
+          ls -R build/
 
       - name: "📤 Archivage du Build"
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: frontend/dist/
+          path: frontend/build/
 
   # --- PARTIE 3 : DOCKER HUB ---
   docker-hub:
