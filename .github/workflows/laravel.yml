@@ -67,7 +67,7 @@ jobs:
           echo "✅ Tests terminés."
 
     
- # --- PARTIE 2 : BUILD FRONTEND ---
+  # --- PARTIE 2 : BUILD FRONTEND ---
   frontend-build:
     name: "🌐 Build Frontend (React)"
     needs: laravel-tests
