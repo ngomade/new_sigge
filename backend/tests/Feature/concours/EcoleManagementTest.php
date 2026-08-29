@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Feature\concours;
+// namespace Tests\Feature\concours;
 
-use App\Models\concours\Personnel;
-use App\Models\Ecole;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\Sanctum;
-use Tests\TestCase;
+// use App\Models\concours\Personnel;
+// use App\Models\Ecole;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Illuminate\Http\UploadedFile;
+// use Illuminate\Support\Facades\Storage;
+// use Laravel\Sanctum\Sanctum;
+// use Tests\TestCase;
 
 // class EcoleManagementTest extends TestCase
 // {

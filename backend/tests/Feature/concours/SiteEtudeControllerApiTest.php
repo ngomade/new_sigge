@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Feature\concours;
+// namespace Tests\Feature\concours;
 
-use App\Models\concours\User;
-use App\Models\SiteEtude;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+// use App\Models\concours\User;
+// use App\Models\SiteEtude;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Tests\TestCase;
 
 // class SiteEtudeControllerApiTest extends TestCase
 // {

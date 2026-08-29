@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Feature\concours;
+// namespace Tests\Feature\concours;
 
-use App\Models\concours\Compte;
-use App\Models\concours\Personnel;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\Sanctum;
-use Tests\TestCase;
+// use App\Models\concours\Compte;
+// use App\Models\concours\Personnel;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Facades\Notification;
+// use Illuminate\Support\Facades\Storage;
+// use Laravel\Sanctum\Sanctum;
+// use Tests\TestCase;
 
 // class AuthenticationTest extends TestCase
 // {

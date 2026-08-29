@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Feature\concours;
+// namespace Tests\Feature\concours;
 
-use App\Models\concours\Candidat;
-use App\Models\concours\Filiere;
-use App\Models\concours\Personnel;
-use App\Models\concours\SessionConcours;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
-use Tests\TestCase;
+// use App\Models\concours\Candidat;
+// use App\Models\concours\Filiere;
+// use App\Models\concours\Personnel;
+// use App\Models\concours\SessionConcours;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Laravel\Sanctum\Sanctum;
+// use Tests\TestCase;
 
 // class CandidatControllerTest extends TestCase
 // {
