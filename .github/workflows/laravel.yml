@@ -64,7 +64,7 @@ jobs:
           php artisan key:generate
           echo "🏃 Lancement des tests unitaires et feature..."
           php artisan test
-          echo "✅ Tests terminés."
+          echo "✅ Tests terminés.!!"
 
     
   # --- PARTIE 2 : BUILD FRONTEND ---
