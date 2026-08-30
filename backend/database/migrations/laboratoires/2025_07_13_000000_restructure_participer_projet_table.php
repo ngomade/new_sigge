@@ -17,7 +17,7 @@ return new class extends Migration
         // Recréer la table avec la nouvelle structure
         Schema::create('participer_projet', function (Blueprint $table) {
             $table->id(); // Clé primaire auto-incrémentée
-            $table->integer('code_projet')->unsigned(); // Correspond au type de projet_labo.code_projet
+            $table->unsignedBigInteger('code_projet'); // Doit matcher projet_labo.code_projet (BIGINT UNSIGNED via ->id())
             $table->string('id_pers_lab')->nullable(); // Participant interne (nullable)
             $table->unsignedBigInteger('id_user_ext')->nullable(); // Participant externe (nullable)
             $table->string('role', 100)->nullable();

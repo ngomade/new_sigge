@@ -21,5 +21,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+        $this->loadMigrationsFrom(database_path('migrations/laboratoires'));
+        $this->loadMigrationsFrom(database_path('migrations/concours'));
+        $this->loadMigrationsFrom(database_path('migrations/notes'));
+        $this->loadMigrationsFrom(database_path('migrations/requetes'));
     }
 }
