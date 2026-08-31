@@ -7,7 +7,7 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
-  # --- PARTIE 1 : QUALITÉ, TESTS & SONARQUBE ---
+  # --- PARTIE 1 : QUALITÉ, TESTS & SONARQUBE ----
   laravel-tests:
     name: "🛡️ Qualité & Tests (Backend)"
     runs-on: ubuntu-latest
