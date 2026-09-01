@@ -1,0 +1,224 @@
+/* ==========================================================================
+   HEADER — styles alignés sur theme.css (vert / doré / fond clair)
+   ========================================================================== */
+
+.app-header {
+  width: 100%;
+  height: 80px;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  box-shadow: 0 4px 20px var(--app-shadow-soft);
+  /* PAS de overflow:hidden ici : ça coupait les dropdowns du menu (position absolute) */
+  z-index: 997;
+}
+
+/* Les halos sont contenus dans leur propre calque, pas dans le header entier,
+   pour ne jamais rogner les sous-menus qui dépassent en dessous. */
+.header-glow-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Lueurs d'ambiance en fond, discrètes, cohérentes avec le reste de l'appli */
+.header-glow {
+  position: absolute;
+  top: 50%;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  transform: translateY(-50%);
+}
+
+.header-glow-left {
+  left: -100px;
+  background: radial-gradient(circle, rgba(14, 143, 116, 0.18) 0%, transparent 70%);
+}
+
+.header-glow-right {
+  right: -100px;
+  background: radial-gradient(circle, rgba(245, 200, 76, 0.16) 0%, transparent 70%);
+}
+
+.app-header .logo h1 {
+  margin: 0;
+}
+
+.app-header .logo img {
+  max-height: 52px;
+}
+
+/* ==========================================================================
+   NAVIGATION
+   ========================================================================== */
+
+#navbar {
+  position: relative;
+}
+
+#navbar ul {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-left: -10%;
+}
+
+#navbar > ul > li {
+  position: relative;
+}
+
+#navbar a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text);
+  white-space: nowrap;
+  transition: color var(--app-transition);
+}
+
+#navbar > ul > li > a:hover,
+#navbar > ul > li > a.active {
+  color: var(--app-primary);
+}
+
+/* Sous-menus (desktop : au survol) */
+#navbar .dropdown ul {
+  display: block;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  box-shadow: 0 12px 28px var(--app-shadow);
+  padding: 8px;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--app-transition), transform var(--app-transition), visibility var(--app-transition);
+  z-index: 998;
+}
+
+#navbar .dropdown:hover > ul {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#navbar .dropdown ul li {
+  position: relative;
+}
+
+#navbar .dropdown ul a {
+  padding: 8px 10px;
+  border-radius: var(--app-radius-sm);
+  font-weight: 500;
+  color: var(--app-text);
+}
+
+#navbar .dropdown ul a:hover {
+  background: var(--app-primary-soft);
+  color: var(--app-primary-dark);
+}
+
+/* Sous-sous-menu : s'ouvre sur le côté */
+#navbar .dropdown .dropdown ul {
+  top: 0;
+  left: calc(100% + 8px);
+}
+
+/* Bouton connexion / déconnexion */
+.btn-login-app,
+.btn-logout-app {
+  border-radius: 999px !important;
+  color: #fff !important;
+  padding: 8px 18px !important;
+  margin-left: 8px;
+}
+
+.btn-login-app {
+  background: var(--app-primary);
+}
+
+.btn-login-app:hover {
+  background: var(--app-primary-dark);
+}
+
+.btn-logout-app {
+  background: var(--app-danger);
+}
+
+.btn-logout-app:hover {
+  filter: brightness(0.9);
+}
+
+/* ==========================================================================
+   MOBILE
+   ========================================================================== */
+
+.mobile-nav-toggle {
+  display: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: var(--app-primary-dark);
+}
+
+@media (max-width: 991px) {
+  .mobile-nav-toggle {
+    display: block;
+  }
+
+  #navbar > ul {
+    display: none;
+  }
+
+  #navbar.navbar-mobile-active > ul {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 80px;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background: var(--app-surface);
+    padding: 16px;
+    overflow-y: auto;
+    z-index: 999;
+    box-shadow: 0 12px 28px var(--app-shadow);
+  }
+
+  #navbar.navbar-mobile-active > ul > li {
+    width: 100%;
+  }
+
+  #navbar .dropdown ul {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    display: none;
+    margin-left: 12px;
+  }
+
+  #navbar .dropdown.dropdown-active > ul {
+    display: flex;
+  }
+
+  #navbar .dropdown .dropdown ul {
+    left: 0;
+  }
+}

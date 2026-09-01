@@ -4,7 +4,7 @@ import {ToastContainer} from "react-toastify";
 import "react-toastify/ReactToastify.css";
 
 // Pages
-import Home from "./concours/pages/Home";
+import Home from "./Pages/Home";
 import LoginPage from "./concours/pages/Login";
 import Candidate from "./concours/pages/Candidate";
 import AfficheDonnee from "./concours/pages/AfficheDonnee";
@@ -33,7 +33,15 @@ function App() {
         <PersistGate loading={<Loading/>} persistor={persistor}>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<ClientLayout/>}>
+                     {/* Routes Publiques */}
+                    <Route path="/" element={<Home />} />
+
+
+
+
+
+                    {/*Ici ceux sont les routes dediés pour les concours  */}
+                    {/* <Route path="/" element={<ClientLayout/>}>
                         <Route index element={<Home/>}/>
                         <Route path="login" element={<GuestRoute/>}>
                             <Route index element={<LoginPage/>}/>
@@ -50,9 +58,9 @@ function App() {
                         <Route path="/pwd-recover" element={<GuestRoute/>}>
                             <Route index element={<PwdRecover/>}/>
                         </Route>
-                        {/*<Route path="/reset-pwd" element={<PwdReset/>} />*/}
+                        <Route path="/reset-pwd" element={<PwdReset/>} />
                         <Route path="*" element={<Page404/>}/>
-                    </Route>
+                    </Route> *
 
                     <Route path="/admin" element={<BaseLayout/>}>
                         <Route path="" element={<Dashboard/>} errorElement={<Page500/>}/>
@@ -60,7 +68,7 @@ function App() {
                         <Route path="candidates" element={<AdminCandidate/>}/>
                         <Route path="comptes" element={<Compte/>}/>
                         <Route path="*" element={<Page404/>}/>
-                    </Route>
+                    </Route> */}
                 </Routes>
 
                 <ToastContainer/>
