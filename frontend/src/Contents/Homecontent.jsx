@@ -463,7 +463,7 @@ export default function HomeContent() {
               <div className="row faq-item g-3" key={i} data-aos="fade-up" data-aos-delay={i * 100}>
                 <div className="col-lg-5 d-flex align-items-start gap-2">
                   <i className="bi bi-question-circle-fill faq-icon"></i>
-                  <h4 className="mb-0">{item.q}</h4>
+                  <h4 className="mt-2">{item.q}</h4>
                 </div>
                 <div className="col-lg-7">
                   <p>{item.a}</p>

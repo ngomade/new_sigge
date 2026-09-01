@@ -12,11 +12,7 @@ const departements = [
   { code_bureau: "ttl", label_bureau: "TTL" },
 ];
 
-// TODO: remplacer par un fetch vers /api/laboratoires
-const laboratoires = [
-  { code_lab: "lab1", label_labo: "Laboratoire 1" },
-  { code_lab: "lab2", label_labo: "Laboratoire 2" },
-];
+
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -144,13 +140,7 @@ export default function Header() {
                       </li>
                     </ul>
                   </li>
-                  {laboratoires.map((labo) => (
-                    <li key={labo.code_lab}>
-                      <a href="#" target="_blank" rel="noreferrer">
-                        {labo.label_labo} ({labo.code_lab})
-                      </a>
-                    </li>
-                  ))}
+                  
                 </ul>
               </li>
 
