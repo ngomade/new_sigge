@@ -331,12 +331,9 @@ export default function Header() {
                 </li>
               ) : (
                 <li>
-                  {/* TODO: brancher sur la modale de connexion réelle (#connexionModal) */}
                   <a
                     className="getstarted scrollto btn-login-app"
-                    data-bs-toggle="modal"
-                    data-bs-target="#connexionModal"
-                    href="#"
+                    href="/login"
                   >
                     Connexion
                   </a>

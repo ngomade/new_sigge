@@ -27,7 +27,7 @@ import SuccessPage from "./concours/pages/SuccessPage";
 import Compte from "./concours/pages/admin/pages/Compte";
 import AdminCandidate from "./concours/pages/admin/pages/AdminCandidate";
 import GuestRoute from "./concours/components/GuestRoute";
-
+import Login from "./Pages/Login";
 function App() {
     return (
         <PersistGate loading={<Loading/>} persistor={persistor}>
@@ -35,6 +35,7 @@ function App() {
                 <Routes>
                      {/* Routes Publiques */}
                     <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
 
 
 

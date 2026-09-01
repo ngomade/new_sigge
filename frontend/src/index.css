@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 body{
-    background: linear-gradient(to bottom,white,rgba(255, 255, 255, 0.801)),url("concours/img/shape2.png");
+    /* background: linear-gradient(to bottom,white,rgba(255, 255, 255, 0.801)),url("concours/img/shape2.png"); */
     background-size: cover;
     font-family: "Poppins", sans-serif;
     font-weight: 300;
