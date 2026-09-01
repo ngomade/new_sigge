@@ -343,11 +343,12 @@ export default function Header() {
                 </li>
               )}
             </ul>
-            <i
-              className={`bi ${mobileOpen ? "bi-x" : "bi-list"} mobile-nav-toggle`}
-              onClick={() => setMobileOpen(!mobileOpen)}
-            ></i>
           </nav>
+
+          <i
+            className={`bi ${mobileOpen ? "bi-x" : "bi-list"} mobile-nav-toggle`}
+            onClick={() => setMobileOpen(!mobileOpen)}
+          ></i>
         </div>
       </header>
     </>
