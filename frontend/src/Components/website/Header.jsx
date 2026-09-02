@@ -174,7 +174,7 @@ export default function Header() {
                     <a href="#">Mon Règlement intérieur</a>
                   </li>
                   <li>
-                    <a href="#">Mon Livret</a>
+                    <a href="/under-development">Mon Livret</a>
                   </li>
                   <li className="dropdown">
                     <a href="#" onClick={toggleDropdown}>
@@ -182,10 +182,10 @@ export default function Header() {
                     </a>
                     <ul>
                       <li>
-                        <a href="#">Association des étudiants</a>
+                        <a href="/under-development">Association des étudiants</a>
                       </li>
                       <li>
-                        <a href="#">Chorale</a>
+                        <a href="/under-development">Chorale</a>
                       </li>
                     </ul>
                   </li>
@@ -268,7 +268,7 @@ export default function Header() {
                 </a>
                 <ul>
                   <li>
-                    <a href="#">Organigramme</a>
+                    <a href="/organigram">Organigramme</a>
                   </li>
                   <li>
                     <a href="#">Staff Administratif</a>

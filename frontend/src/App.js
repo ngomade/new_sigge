@@ -29,6 +29,7 @@ import AdminCandidate from "./concours/pages/admin/pages/AdminCandidate";
 import GuestRoute from "./concours/components/GuestRoute";
 import Login from "./Pages/Login";
 import UnderDevelopment from "./Pages/UnderDevelopment";
+import OrganigramPage from "./Pages/OrganigramPage";
 function App() {
     return (
         <PersistGate loading={<Loading/>} persistor={persistor}>
@@ -38,6 +39,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/under-development" element={<UnderDevelopment />} />
+                    <Route path="/organigram" element={<OrganigramPage />} />
 
 
 
