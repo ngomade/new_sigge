@@ -74,6 +74,7 @@
                 </div>
               </div>
             </div>
+            
 
             <div class="col-lg-4 col-md-6 portfolio-item filter-act">
               <div class="portfolio-wrap">

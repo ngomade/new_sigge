@@ -287,13 +287,13 @@ export default function Header() {
                     </a>
                     <ul>
                       <li>
-                        <a href="#">Présentation</a>
+                        <a href="/presentation-mairie">Présentation</a>
                       </li>
                       <li>
-                        <a href="#">Organigramme</a>
+                        <a href="/organigram-mairie">Organigramme</a>
                       </li>
                       <li>
-                        <a href="#">Actualités</a>
+                        <a href="/actualite">Actualités</a>
                       </li>
                     </ul>
                   </li>

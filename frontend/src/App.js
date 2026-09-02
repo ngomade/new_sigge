@@ -31,6 +31,9 @@ import Login from "./Pages/Login";
 import UnderDevelopment from "./Pages/UnderDevelopment";
 import OrganigramPage from "./Pages/OrganigramPage";
 import StaffPage from "./Pages/StaffPage";
+import OrganigramMairiePage from "./Pages/Ville/Mairie/OrganigramMairiePage";
+import PresentationPage from "./Pages/Ville/Mairie/PresentationPage";
+import ActualitePage from "./Pages/Ville/Mairie/ActualitePage";
 function App() {
     return (
         <PersistGate loading={<Loading/>} persistor={persistor}>
@@ -42,6 +45,9 @@ function App() {
                     <Route path="/under-development" element={<UnderDevelopment />} />
                     <Route path="/organigram" element={<OrganigramPage />} />
                     <Route path="/staff" element={<StaffPage />} />
+                    <Route path="/presentation-mairie" element={<PresentationPage />} />
+                    <Route path="/organigram-mairie" element={<OrganigramMairiePage />} />
+                    <Route path="/actualite" element={<ActualitePage />} />
 
 
 
