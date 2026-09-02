@@ -1,805 +1,109 @@
 @extends("sige_app.frontend.template.frontend")
+
+@section('style')
+<style>
+:root { --app-bg:#f7faf8; --app-surface:#fff; --app-surface-alt:#edf5f0; --app-primary:#0e8f74; --app-primary-dark:#11583f; --app-primary-soft:#dff2e9; --app-accent:#f5c84c; --app-accent-hover:#c79612; --app-text:#18352b; --app-text-muted:#61756c; --app-border:#dce9e2; --app-shadow:rgba(17,61,53,.14); --app-shadow-soft:rgba(17,61,53,.08); --app-radius-md:12px; --app-radius-lg:16px; --app-transition:220ms ease; }
+html, body { max-width:100%; overflow-x:hidden; }
+body > * { max-width:100%; }
+#main, #hero, #footer { max-width:100%; overflow-x:hidden; }
+.app-section { background:var(--app-bg); } .app-section-alt { background:var(--app-surface-alt); }
+.section-title h2 { color:var(--app-primary-dark); font-weight:700; } .section-title p { color:var(--app-text-muted); }
+.app-hero { position:relative; padding:40px 0 60px; overflow:hidden; background:linear-gradient(180deg,var(--app-primary-soft) 0%,var(--app-bg) 55%); }
+.hero-animated-bg { position:absolute; inset:0; pointer-events:none; z-index:0; } .hero-glow { position:absolute; width:420px; height:420px; border-radius:50%; filter:blur(80px); }
+.hero-glow-left { top:-120px; left:-140px; background:radial-gradient(circle,rgba(14,143,116,.25) 0%,transparent 70%); } .hero-glow-right { bottom:-160px; right:-140px; background:radial-gradient(circle,rgba(245,200,76,.22) 0%,transparent 70%); }
+.floating-icon { position:absolute; color:var(--app-primary); opacity:.18; animation:float-icon 18s ease-in-out infinite; } .floating-icon:nth-child(odd) { color:var(--app-accent); }
+@keyframes float-icon { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-24px) rotate(8deg); } }
+.school-logo-icon { color:var(--app-primary); background:var(--app-surface); border:1px solid var(--app-border); border-radius:var(--app-radius-md); padding:10px; box-shadow:0 6px 16px var(--app-shadow-soft); }
+.announcement-card,.icon-box,.actu-card { background:var(--app-surface); border:1px solid var(--app-border); border-radius:var(--app-radius-lg); box-shadow:0 8px 24px var(--app-shadow-soft); }
+.announcement-card { padding:20px; } .announcement-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; } .announcement-list li { display:flex; align-items:flex-start; gap:12px; }
+.announcement-list li i { font-size:20px; color:var(--app-accent-hover); margin-top:2px; flex-shrink:0; } .announcement-list strong { color:var(--app-primary-dark); } .announcement-list p { margin:4px 0 0; color:var(--app-text-muted); font-size:.92rem; line-height:1.5; }
+.carousel-slide-visual { height:320px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--app-primary) 0%,var(--app-primary-dark) 100%); } .carousel-slide-visual i { font-size:96px; color:rgba(255,255,255,.9); } .carousel-caption h5 { color:#fff; }
+.partner-icon { font-size:44px; color:var(--app-primary); opacity:.75; transition:opacity var(--app-transition),transform var(--app-transition); } .partner-icon:hover { opacity:1; transform:translateY(-4px); color:var(--app-primary-dark); }
+.icon-box { padding:32px 24px; text-align:center; height:100%; transition:transform var(--app-transition); } .icon-box:hover { transform:translateY(-6px); } .icon-box .icon { width:64px; height:64px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--app-primary-soft); color:var(--app-primary); font-size:28px; } .icon-box .title a { color:var(--app-primary-dark); font-weight:700; } .icon-box .description { color:var(--app-text-muted); margin:0; }
+.actu-card { overflow:hidden; height:100%; display:flex; flex-direction:column; } .actu-card-icon { height:100px; display:flex; align-items:center; justify-content:center; background:var(--app-primary-soft); color:var(--app-primary); font-size:36px; } .actu-card-body { padding:16px; flex:1; } .actu-card-title { color:var(--app-text); font-weight:600; margin:0; } .actu-card-footer { padding:12px 16px; border-top:1px solid var(--app-border); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.faq-item { padding:18px 0; border-bottom:1px solid var(--app-border); } .faq-item h4 { font-size:1.05rem; color:var(--app-text); } .faq-item p { color:var(--app-text-muted); margin:0; } .faq-icon { font-size:20px; color:var(--app-accent-hover); margin-top:3px; }
+.app-hero#hero { height:auto; margin-top:0; width:100%; }
+.app-hero#hero h2 { color:var(--app-primary-dark); line-height:1.3; text-align:left; margin:0; }
+.app-hero .row.g-4 { align-items:stretch; }
+.app-hero .row.g-4 > [class*="col-"] { display:flex; flex-direction:column; }
+.app-hero .announcement-card { height:322px; box-sizing:border-box; }
+.app-hero .carousel { width:100%; height:322px; margin-top:0; }
+.app-hero .order-1.order-lg-2 { margin-top:6.5%; }
+.app-hero .carousel-inner, .app-hero .carousel-item, .app-hero .carousel-slide-visual { height:100%; }
+.app-hero .carousel-slide-visual img { min-height:100%; }
+.app-hero .btn-primary, #more-services .btn-primary { background-color:var(--app-primary); border-color:var(--app-primary); color:#fff; }
+.app-hero .btn-primary:hover, #more-services .btn-primary:hover { background-color:var(--app-primary-dark); border-color:var(--app-primary-dark); color:#fff; }
+.btn-outline { color:var(--app-primary); border:1px solid var(--app-primary); background:transparent; }
+.btn-outline:hover { color:#fff; background:var(--app-primary); border-color:var(--app-primary); }
+#header .logo img { display:block; visibility:visible; width:auto; height:46px; max-width:170px; object-fit:contain; }
+#header .logo h1 { margin:0; line-height:1; }
+#header .container > .logo:last-child { display:none; }
+#localisation { background:var(--app-bg); padding:64px 0; }
+#localisation #map { width:min(100%, 820px); margin:0 auto; border:1px solid var(--app-border); border-radius:var(--app-radius-lg); box-shadow:0 8px 24px var(--app-shadow-soft); }
+#localisation #map .card-body { padding:12px; }
+#localisation #map iframe { display:block; width:100%; height:320px; border-radius:10px; }
+#contact { background:var(--app-surface-alt); }
+.map-card { width:100%; max-width:960px; overflow:hidden; }
+.contact-about h3 { color:var(--app-primary-dark); font-weight:700; margin-bottom:12px; }
+.contact-about p { color:var(--app-text-muted); line-height:1.7; margin-bottom:16px; }
+.social-icon { width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--app-surface); border:1px solid var(--app-border); color:var(--app-primary); transition:background var(--app-transition),color var(--app-transition),transform var(--app-transition); }
+.social-icon:hover { background:var(--app-primary); color:#fff; transform:translateY(-3px); }
+.contact-info { background:var(--app-surface); border:1px solid var(--app-border); border-radius:var(--app-radius-lg); box-shadow:0 8px 24px var(--app-shadow-soft); padding:24px; }
+.contact-info-item { display:flex; align-items:flex-start; gap:12px; margin-bottom:20px; }
+.contact-info-item:last-child { margin-bottom:0; } .contact-info-item i { font-size:22px; color:var(--app-primary); margin-top:2px; flex-shrink:0; } .contact-info-item p { margin:0; color:var(--app-text); }
+.contact-form { background:var(--app-surface); border:1px solid var(--app-border); border-radius:var(--app-radius-lg); box-shadow:0 8px 24px var(--app-shadow-soft); padding:24px; }
+.form-status { font-size:.9rem; font-weight:600; } .form-status-loading { color:var(--app-text-muted); } .form-status-error { color:var(--app-danger,#dc3545); } .form-status-success { color:var(--app-success,#198754); }
+.app-footer { background:var(--app-primary-dark); color:#fff; } .app-footer .copyright { color:rgba(255,255,255,.85); font-size:.95rem; } .app-footer .copyright strong { color:var(--app-accent); } .footer-links a { color:rgba(255,255,255,.85); font-size:.9rem; transition:color var(--app-transition); } .footer-links a:hover { color:var(--app-accent); }
+.contact-form .btn-primary, #contact .btn-primary { background-color:var(--app-primary); border-color:var(--app-primary); color:#fff; }
+.contact-form .btn-primary:hover, #contact .btn-primary:hover { background-color:var(--app-primary-dark); border-color:var(--app-primary-dark); color:#fff; }
+#footer.app-footer { background:var(--app-primary-dark); box-shadow:none; padding:0; color:#fff; font-size:inherit; }
+#footer.app-footer .copyright { color:rgba(255,255,255,.85); } #footer.app-footer .copyright strong { color:var(--app-accent); }
+#footer.app-footer .footer-links a { color:rgba(255,255,255,.85); padding-left:0; } #footer.app-footer .footer-links a:hover { color:var(--app-accent); }
+.back-to-top { position:fixed; right:20px; bottom:20px; width:44px; height:44px; border-radius:50%; background:var(--app-primary); color:#fff; font-size:22px; opacity:0; visibility:hidden; transform:translateY(10px); transition:opacity var(--app-transition),transform var(--app-transition),background var(--app-transition),visibility var(--app-transition); z-index:996; box-shadow:0 8px 20px var(--app-shadow); }
+.back-to-top:hover { background:var(--app-primary-dark); color:#fff; } .back-to-top-visible { opacity:1; visibility:visible; transform:translateY(0); }
+@media (max-width:991px) { .app-hero .announcement-card, .app-hero .carousel { height:auto; min-height:322px; } .app-hero .order-1.order-lg-2 { margin-top:0; } .app-hero .carousel { margin-top:0; } }
+@media (prefers-reduced-motion:reduce) { .floating-icon { animation:none; } }
+</style>
+@endsection
+
 @section('js')
-    <script>
-       /* $(document).ready(function() {
-            $('#ConcoursModal').modal("show");
-        });*/
-        $(document).ready(function(){
-            $("#NewPasswordModal").modal('show');
-        });
-        function validatePasswords() {
-        const password = document.getElementById("npwd").value;
-        const confirmPassword = document.getElementById("npwdc").value;
-        const message = document.getElementById("message");
-
-        if (password !== confirmPassword) {
-            message.textContent = "Les mots de passe ne correspondent pas.";
-            return false; // Empêche l'envoi du formulaire
-        } else {
-            message.textContent = ""; // Réinitialise le message d'erreur
-            return true; // Formulaire valide
-        }
-    }
-
-    // Écouteur d'événement pour la vérification en temps réel
-    document.getElementById("npwdc").addEventListener("input", function() {
-        const password = document.getElementById("npwd").value;
-        const confirmPassword = document.getElementById("npwdc").value;
-        const message = document.getElementById("message");
-
-        if (password !== confirmPassword) {
-            message.textContent = "Les mots de passe ne correspondent pas.";
-        } else {
-            message.textContent = "";
-        }
-    });
-    </script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){ AOS.init({duration:1000,once:true,easing:'ease-out-quart'}); const carousel=document.getElementById('homeCarousel'); if(carousel && window.bootstrap){ const carouselInstance=bootstrap.Carousel.getOrCreateInstance(carousel,{interval:5000,pause:'hover',wrap:true,touch:true}); carouselInstance.cycle(); } const backToTop=document.querySelector('.back-to-top'); if(backToTop) window.addEventListener('scroll',function(){ backToTop.classList.toggle('back-to-top-visible',window.scrollY>300); },{passive:true}); const password=document.getElementById('npwd'); const confirmation=document.getElementById('npwdc'); const message=document.getElementById('message'); if(confirmation) confirmation.addEventListener('input',function(){ message.textContent=password.value!==confirmation.value?'Les mots de passe ne correspondent pas.':''; }); });
+function scrollToTop(event){ event.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); }
+function validatePasswords(){ const valid=document.getElementById('npwd').value===document.getElementById('npwdc').value; document.getElementById('message').textContent=valid?'':'Les mots de passe ne correspondent pas.'; return valid; }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+	const carousel=document.getElementById('homeCarousel');
+	if(!carousel || !window.bootstrap) return;
+	const slides=[
+		{icon:'bi-mortarboard-fill',title:"Concours d'entrée ESTLC",subtitle:"Rejoignez une formation d'ingénieur reconnue en transport et logistique"},
+		{icon:'bi-truck',title:'Gestion Logistique, Transport et Commerce',subtitle:'Un parcours tourné vers les métiers de la chaîne logistique'},
+		{icon:'bi-signpost-split-fill',title:'Technologie de Transport et de Logistique',subtitle:'Des compétences techniques au service de la mobilité'}
+	];
+	const instance=bootstrap.Carousel.getInstance(carousel); if(instance) instance.dispose();
+	carousel.querySelector('.carousel-indicators').innerHTML=slides.map(function(slide,index){ return '<button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="'+index+'" class="'+(index===0?'active':'')+'" aria-label="Slide '+(index+1)+'"></button>'; }).join('');
+	carousel.querySelector('.carousel-inner').innerHTML=slides.map(function(slide,index){ return '<div class="carousel-item '+(index===0?'active':'')+'"><div class="carousel-slide-visual"><i class="bi '+slide.icon+'"></i></div><div class="carousel-caption"><h5>'+slide.title+'</h5><p>'+slide.subtitle+'</p></div></div>'; }).join('');
+	bootstrap.Carousel.getOrCreateInstance(carousel,{interval:5000,pause:'hover',wrap:true,touch:true}).cycle();
+});
+</script>
 @endsection
 
 @section('content')
 @if(Session::exists("new_password"))
-
-<div class="modal fade" id="NewPasswordModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success" style="color: white">
-                <h5 class="modal-title">Changement de mot de passe</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="/changer_pwd_first" method="post">
-                {{ csrf_field() }}
-                <div class="modal-body p-3 ">
-                    <input type="hidden" name="code_user" value="{{Session::get('user')->code_user}}">
-                        <div class="row">
-                           <div class="col-sm-11 m-auto mb-4">
-                                <input type="text" name="apwd" id="apwd" class="form-control" placeholder="votre ancien mot de passe">
-                           </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-11 m-auto mb-4">
-                                <input type="password" name="npwd" id="npwd" class="form-control" required placeholder="votre nouveau mot de passe">
-
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-11 m-auto">
-                                <input type="password" name="npwdc" id="npwdc" class="form-control" required placeholder="votre nouveau mot de passe"><br>
-                                <span id="message" style="color: red;"></span><br><br>
-                            </div>
-                        </div>
-                </div>
-                <div class="modal-footer mt-0">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Connexion</button>
-                </div>
-        </form>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="NewPasswordModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header" style="background-color:var(--app-success,#198754);color:white"><h5 class="modal-title">Changement de mot de passe</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><form action="/changer_pwd_first" method="post" onsubmit="return validatePasswords()">{{ csrf_field() }}<input type="hidden" name="code_user" value="{{Session::get('user')->code_user}}"><div class="modal-body p-3"><div class="row"><div class="col-sm-11 m-auto mb-4"><input type="text" name="apwd" id="apwd" class="form-control" placeholder="votre ancien mot de passe"></div></div><div class="row"><div class="col-sm-11 m-auto mb-4"><input type="password" name="npwd" id="npwd" class="form-control" required placeholder="votre nouveau mot de passe"></div></div><div class="row"><div class="col-sm-11 m-auto"><input type="password" name="npwdc" id="npwdc" class="form-control" required placeholder="confirmez votre nouveau mot de passe"><span id="message" class="d-block mt-2 small" style="color:var(--app-danger,#dc3545)"></span></div></div></div><div class="modal-footer mt-0"><button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn btn-success">Valider</button></div></form></div></div></div>
+<script>document.addEventListener('DOMContentLoaded',function(){new bootstrap.Modal(document.getElementById('NewPasswordModal')).show();});</script>
 @endif
-    <section id="hero" class="d-flex align-items-center">
-        <div class="container mt-5" style="margin-top: 25px; clear:both;">
-            <div class="row">
-                <div class="col-lg-1 logo_home">
-                    <a href="/">
-                        <img src="{{ asset('share/img/logo_ueb.png') }}"  alt="" class="img-fluid"
-                            data-aos="zoom-in" data-aos-delay="100" title="Université d'Ebolowa">
-                    </a>
-                </div>
-                <div class="col-lg-1 logo_home">
-                    <a href="/">
-                        <img src="{{ asset('share/img/logo_estlc_ok.png') }}" class="img-fluid" alt=""
-                            data-aos="zoom-in" data-aos-delay="100" title="Ecole Supérieure de Transport, de Logistique et de Commerce">
-                    </a>
-                </div>
-                <div class="col-lg-10">
-                    <h2 data-aos="fade-up">Ecole Supérieure de Transport, de Logistique et de Commerce -- ESTLC</h2>
-                </div>
-            </div>
-            <div class="row" style="clear: both;">
-                <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
-                    <div data-aos="fade-up" data-aos-delay="600" class="mb-1 row" style="display: flex; justify-content: center; text-align: center;" >
-                        <div class="col-sm-8 mb-1">
-                            <a href="/download/Appel_Candidature_Recrutement_ESTLC" class=" blink btn btn-outline-primary" target="blank">Télécharger l'appel à candidature</a>
-                        </div>
-                        {{-- <div class="col-sm-7 mb-1">
-                            <div class="row">
-                                <div class="col-sm-10 mb-1">
-                                    <a href="{{asset("fichiers/Appel_candidature_Master_II_Recherche_UFD_TSI_Ueb.pdf")}}" download="Appel_candidature_Master_II_Recherche_UFD_TSI_Ueb.pdf" class="btn btn-outline-primary" target="blank">Appel à candidature Master II Recherche</a>
-                                </div>
-                                <div class="col-sm-6">
-                                    <a href="/download/resultat_ISLAPE_2024" class="btn btn-outline-primary" target="blank">Résultats concours ISLAPE </a>
-                                </div>
-                            </div>
-                        </div> --}}
-                   </div>
-                    {{-- <img src="{{asset('sige_app/frontend/img/team/recteur.jpg')}}" alt="Monsieur le Recteur"class="pt-5">
-                   <h5 style="padding: 0px; text-align: center; text-style:italic;" class="pt-2">Le numérique: le monde de demain</h5> --}}
-                    <h6 class="alert alert-primary" style="text-align: justify;" data-aos="flip-left" data-aos-easing="ease-out-cubic" data-aos-duration="2000">
-                        <ul style="line-height: 20px;">
-                            <li class="mb-4"> <b>Avis aux étudiants – Master Recherche à l'UFD-TSI</b>
-                                Le Coordonnateur de l'UFD-TSI informe les étudiants nouvellement sélectionnés en Master Recherche pour l'année académique 2024-2025 qu'une réunion importante se tiendra le lundi 03 mars 2025 à 14h précises, au campus de Nkoumekeke, salle C1.
-                                Présence obligatoire.
-
-                                {{-- <ol>
-                                    <li>Effectuez un paiement bancaire au numéro de compte présent sur l'arreté et scanné le reçu;</li>
-                                    <li>Cliquez sur le bouton suivant <b>Je m'inscris au concours</b> remplir les informations et imprimer votre fiche d'inscription,</li>
-                                </ol> --}}
-                            </li>
-                            <li class="mb-4"> <b>Rentrée académique – Master Recherche à l'UFD-TSI</b>
-                                📅 Lundi 03 mars 2025
-                                ℹ️ Pour les modalités d'inscription académique et administrative, veuillez vous rapprocher du secrétariat de l'UFD-TSI.  </li>
-                            <li class="mb-4">
-                                <b>📢 Recrutement de 150 Enseignants dans les Universités d'État ! 🎓</b>
-La troisième phase de recrutement de 150 enseignants est lancée pour l'exercice 2025 dans les Universités d'État de Bertoua, Ebolowa et Garoua.
-👨‍🏫 Les postes sont ouverts aux Camerounais titulaires du Doctorat ou du PhD!
-📌 Ne manquez pas cette opportunité ! Restez connectés pour plus de détails sur les modalités de candidature. 🔍✍️
-                            </li>
-                            {{--<li class="mb-4">Veuillez consulter ce site régulièrement afin d'être à jour sur les informations du concours.</li> --}}
-
-                        </ul>
-                    </h6>
-                </div>
-                <div class="col-lg-6 hero-img" data-aos="zoom-in" data-aos-delay="200">
-
-                    <div id="carouselExampleCaptions" class="carousel slide " style="width:100%; margin: auto;" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0"
-                                class="active" aria-current="true" aria-label="Slide 1"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
-                                aria-label="Slide 2"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
-                                aria-label="Slide 3"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3"
-                                aria-label="Slide 4"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="4"
-                                aria-label="Slide 5"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="5"
-                                aria-label="Slide 6"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="6"
-                                aria-label="Slide 7"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="7"
-                                aria-label="Slide 8"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="8"
-                                aria-label="Slide 9"></button>
-                            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="9"
-                                aria-label="Slide 10"></button>
-                        </div>
-                        <div class="carousel-inner">
-                            @foreach (\App\Models\Slide::orderBy("id", "desc")->take(10)->get() as $slide)
-                            @if ($loop->index == 0)
-                                <div class="carousel-item active mt-5">
-                                    <img src='{{asset("storage").DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."slides".DIRECTORY_SEPARATOR.$slide->photo }}'
-                                        class="d-block w-100 img-fluid animated" alt=" {{$slide->first_title}} ">
-                                    <div class="carousel-caption d-none d-md-block">
-                                        <h5> {{$slide->first_title}} </h5>
-                                        <p>  {{$slide->second_title}} </p>
-                                    </div>
-                                </div>
-                            @else
-                            <div class="carousel-item mt-5">
-                                <img src='{{asset("storage").DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."slides".DIRECTORY_SEPARATOR.$slide->photo }}'
-                                    class="d-block w-100 img-fluid animated" alt=" {{$slide->first_title}} ">
-                                <div class="carousel-caption d-none d-md-block">
-                                    <h5> {{$slide->first_title}} </h5>
-                                    <p> {{$slide->second_title}} </p>
-                                </div>
-                            </div>
-                            @endif
-                            @endforeach
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <main id="main">
-        <section id="clients" class="clients clients">
-            <div class="container">
-
-                <div class="row">
-
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <img src="{{ asset('share/img/logo_islape.jpg') }}" class="img-fluid" alt="" data-aos="zoom-in"
-                            title="Institut Supérieur La Perle (ISLAPE)">
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <img src="{{ asset('share/img/logo_ueb.png') }}" class="img-fluid" alt=""
-                            data-aos="zoom-in" data-aos-delay="100" title="Université d'Ebolowa">
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <img src="{{ asset('share/img/logo_ueb.png') }}" class="img-fluid" alt=""
-                            data-aos="zoom-in" data-aos-delay="200" title="Université d'Ebolowa">
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <img src="{{ asset('share/img/logo_ueb.png') }}" class="img-fluid" alt=""
-                            data-aos="zoom-in" data-aos-delay="300" title="Université d'Ebolowa">
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <img src="{{ asset('share/img/logo_ueb.png') }}" class="img-fluid" alt=""
-                            data-aos="zoom-in" data-aos-delay="400" title="Université d'Ebolowa">
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-6">
-                        <img src="{{ asset('share/img/logo_ueb.png') }}" class="img-fluid" alt=""
-                            data-aos="zoom-in" data-aos-delay="500" title="Université d'Ebolowa">
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
-
-       <!-- <section id="site" class="sites">
-            <div class="container">
-                <div class="card" style="width:80%; margin: auto; margin-top:1%; margin-bottom: 1%;">
-                    <div class="card-body">
-                      <h1 style="padding-top: 12pt;padding-left: 23pt;text-indent: 0pt;line-height: 114%;text-align: center;">Concours
-                          d'Entrée à l'Ecole Supérieure de Transport, de Logistique et de Commerce</h1><hr>
-                      <h2 style="padding-top: 10pt;padding-left: 58pt;text-indent: 0pt;text-align: center;">LISTE DES SITES DE COMPOSITION
-                      </h2><hr>
-                      <table style="border-collapse:collapse; margin: auto; font-size: 1.1em;" cellspacing="0" >
-                          <tr style="height:26pt; background-color: rgb(6, 153, 6); color: white; font-size: 1.3em; text-align: center; border: 1px solid black;">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s2" style="padding-left: 5pt;text-indent: 0pt;text-align: center;">Ville</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s2" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">Sites
-                                      de composition</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Ambam</p>
-                              </td>
-                              <td
-                                  style="width:510pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">Lycée
-                                      Bilingue d'Ambam</p>
-                              </td>
-                          </tr>
-                          <tr style="height:42pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Ebolowa</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3"
-                                      style="padding-left: 128pt;padding-right: 1pt;text-indent: -104pt;line-height: 114%;text-align: left;">
-                                      Ecole Normale Supérieure d’Enseignement Technique d’Ebolowa</p>
-                              </td>
-                          </tr>
-                          <tr style="height:42pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Maroua</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3"
-                                      style="padding-left: 128pt;padding-right: 1pt;text-indent: -118pt;line-height: 114%;text-align: left;">
-                                      Faculté des Sciences Juridiques et Politiques de l’Université de Maroua</p>
-                              </td>
-                          </tr>
-                          <tr style="height:42pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Garoua</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 129pt;text-indent: -124pt;line-height: 114%;text-align: left;">Ecole
-                                      Supérieure des Sciences Economiques et Commerciales de Garoua</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Ngaoundéré</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">Lycée
-                                      Classique de Ngaoundéré</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Yaounde</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">Ecole
-                                      Nationale Supérieure Polytechnique de Yaounde</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Buea</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">
-                                      Faculty of Engineering and Technology University of Buea</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Douala</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">
-                                      Institut Universitaire de Technologie de Douala</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Bafoussam</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">Lycée
-                                      Technique Banengo Bafoussam</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Bamenda</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s4" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">
-                                      Lycée Bilingue de Bamenda NKwen</p>
-                              </td>
-                          </tr>
-                          <tr style="height:26pt">
-                              <td
-                                  style="width:151pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 5pt;text-indent: 0pt;text-align: left;">Bertoua</p>
-                              </td>
-                              <td
-                                  style="width:310pt;border-top-style:solid;border-top-width:1pt;border-left-style:solid;border-left-width:1pt;border-bottom-style:solid;border-bottom-width:1pt;border-right-style:solid;border-right-width:1pt">
-                                  <p class="s3" style="padding-left: 10pt;padding-right: 10pt;text-indent: 0pt;text-align: center;">Ecole
-                                      Normale Supérieure de Bertoua</p>
-                              </td>
-                          </tr>
-                      </table>
-                      <div style="text-align: right;"><a href="/download/arrete_communique_ESTLC" class="btn btn-outline-success mt-2" target="blank"> Télécharger le communiqué </a> </div>
-                    </div>
-                  </div>
-            </div>
-        </section>-->
-
-        <!-- ======= Services Section ======= -->
-        <section id="services" class="services">
-            <div class="container">
-
-                <div class="section-title" data-aos="fade-up">
-                    <h2>Nos Parcours</h2>
-                    <p>Actuellement, nous possédons différents parcours permettant aux apprenants de se spécialiser dans leurs formations</p>
-                </div>
-
-                <div class="row"  style="display: flex; justify-content: center;">
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-                        <div class="icon-box" data-aos="fade-up" data-aos-delay="100">
-                            <div class="icon"><i class="bx bxl-dribbble"></i></div>
-                            <h4 class="title"><a href="">GLTCO</a></h4>
-                            <p class="description">Gestion Logistique Transport et Commerce</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0">
-                        <div class="icon-box" data-aos="fade-up" data-aos-delay="200">
-                            <div class="icon"><i class="bx bx-file"></i></div>
-                            <h4 class="title"><a href="">TTL</a></h4>
-                            <p class="description">Technologie de Transport et de Logistique</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End Services Section -->
-
-        <!-- ======= More Services Section ======= -->
-        <section id="more-services" class="more-services">
-            <div class="container">
-                <div class="section-title" data-aos="fade-up">
-                    <h2>Activités récentes</h2>
-                    <p>Découvrez la vie de l'école à travers nos articles d'actualités </p>
-                </div>
-                <div class="row">
-@foreach (\App\Models\Actualite::orderBy("created_at", "desc")->take(9)->get() as $actu)
-                    <?php
-                        $res = \App\Models\RessourceActu::where("actu_code", $actu->actu_code)->first();
-                        $src = "";
-                        if($res){
-                            $d = $actu->created_at->format("Y-m-d-H-i");
-                            $src =storage_path().DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."actualites".DIRECTORY_SEPARATOR.$actu->actu_code.DIRECTORY_SEPARATOR.$res->r_name;
-                        }
-                    ?>
-                    <div class="col-md-4 d-flex align-items-stretch mt-3">
-                        <div class="card"
-
-                    style="background-image: url('{{asset("storage".DIRECTORY_SEPARATOR."app".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."actualites".DIRECTORY_SEPARATOR.$actu->actu_code.DIRECTORY_SEPARATOR.$res->r_name)}}');"
-
-                            data-aos="fade-up" data-aos-delay="100" title="">
-                            <div class="card-body">
-                                <div class="card-title" style="text-align: justify; font-weight: lighter;">{{$actu->actu_title}}</div>
-                                <!--<p class="card-text"> { $actu->actu_content } </p>-->
-                            </div>
-                            <div class="card-footer" style="background-color: white; font-size: 0.9em;">
-                                <div style="float: left;">Publié le {{$actu->created_at->format("d/m/Y")}} à {{$actu->created_at->format("H:i:s")}} </div>
-                                <div class="read-more" style="float: right;"><a href="/details_actu/{{$actu->actu_code}}" class="btn btn-outline-info"> Lire plus <i class="bi bi-arrow-right"></i></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    <div class="mt-3" style="text-align: right;">
-                        <a href="/all_actu" class="btn btn-info" > <i class='bx bx-list-ul'></i> Toutes nos actualités </a>
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End More Services Section -->
-
-        <!--<section id="team" class="team section-bg">
-            <div class="container">
-
-                <div class="section-title" data-aos="fade-up">
-                    <h2>Notre équipe</h2>
-                    <p>Une équipe jeune et dynamique pour vous servir</p>
-                </div>
-
-                <div class="row">
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch"  style="display:flex; justify-content:center;">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/team_1.png') }}" class="img-fluid" alt="">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. TAMBA Jean Gaston, Professeur</h4>
-                                <span>Directeur</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/lankoul.jpg') }}" class="img-fluid" alt="">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. LANGOUL Francis</h4>
-                                <span>Chef de centre de documentation et des archives</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/keudem.jpg') }}" class="img-fluid" alt="" title="PLEG en Informatique Fondamentale, M. KEUDEM ZONING Steve a servi au MINESEC dans le cadre des Enseignements avant de rejoindre le projet SIGIPES ou il se spécialise dans la gestion des Systèmes informatiques ; il rejoint plus tard le projet de digitalisation de l'Enseignement Supérieur à la cellule Réseau (ENHEN), Puis le Centre de Développement du Numérique Universitaire de Douala.">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. KEUDEM ZONING Steve</h4>
-                                <span>Chef de cellule Informatique et des systèmes d'informations</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/dang.png') }}" class="img-fluid" alt="" title="Nomme en septembre 2023 comme Chef de service au Service des diplômes et de la certification de l’Ecole Supérieure de Transport de Logistique et de Commerce (ESTLC).  M.DANG KOKO Adamou est titulaire d’un PhD en Biophyque  optenu à l’UNIVERSITE DE YAOUNDE I où il est également membre du laboratoire.php de physique nucléaire, moléculaire et biophysique. Son domaine de recherche concerne la physique des rayonnements, la physique de la matière condensée et la biophysique. Ses principales publications portent sur le transport d’énergie dans l’ADN, les microtubules, la propagation de l’influ nerveux. Il travail également dans la modélisation de système biologiques. M. DANG KOKO est également membre du comité directeur de l’African Centre for Advanced Studies (ACAS)">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. DANG KOKO Adamou</h4>
-                                <span>Chef de service des diplômes et de la certification</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/mvogo.png') }}" class="img-fluid" alt="" title="Dr. Mvogo Ahanda Joseph Jean Baptiste est un spécialiste en Energie et Systèmes Electriques et Electroniques, avec une emphase sur la Robotique. Il est titulaire d’un Doctorat PhD de l’Université de Yaoundé I au Cameroun. Il est Chargé de Cours au Département d’Ingénier Médicale et Biomédicale de l’Ecole Normale d’Enseignement Technique de l’Université d’Ebolowa au Cameroun. Son domaine de recherche concerne la conception, réalisation, modélisation et commande des robots (manipulateurs ou mobiles ou mobiles-manipulateurs) évoluant en environnement aléatoires ou déterministes, ainsi que la  conception, réalisation et la commande des prothèses/orthèses pour la réhabilitation et l’assistance aux personnes handicapés. Il est membre de l’IEEE (Institute of Electrical and Electronics Emgineers).">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. NVOGO AHANDA Joseph Jean Baptiste</h4>
-                                <span>Chef de service de la recherche et de la coopération</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/iroume.jpg') }}" class="img-fluid" alt="">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. IROUME A BOUEBE Alexandre Turpin</h4>
-                                <span>Chef de service de la scolarité et des statistiques</span>
-                            </div>
-                        </div>
-                    </div>
-
-                     <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/manga.jpg') }}" class="img-fluid" alt="" title="ETEME MANGA Cédric Wilfried est un enseignant de mathématiques. Il est titulaire d’un diplôme de professeur de l’enseignement secondaire à l’école normale de Yaoundé. Il est actuellement le chef de service de la maintenance et du matériel à l’Ecole Supérieure de Transport, de Logistique et de Commerce (ESTLC) de l’université d’Ebolowa au Cameroun. Il combine à la fois sa passion pour les mathématiques et sa maîtrise des processus techniques de gestion de matériel. ">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. MANGA ETEME Cédric Wilfried</h4>
-                                <span>Chef de service de la maintenance et du matériel</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/mvondo.jpg') }}" class="img-fluid" alt="" title="M MVONDO Didier Serge est enseignant des Lycées d’enseignement général, titulaire d’un DIPES II (option CHIMIE) obtenu à l’Ecole Normale Supérieure de l’Université de Yaoundé I. Il a acquis une riche et forte expérience professionnelle dans les établissements secondaires pendant une quinzaine d’année d’une part et au Service de la Formation continue à  l’Ecole Normale d’Enseignement Technique (ENSET) de l’Université d’Ebolowa, d’autres parts. Il occupe actuellement les fonctions de Chef de Division de la Formation Continue et à Distance (DFCD) à l’Ecole Supérieures de Transport, de Logistique et de Commerce (ESTLC) de l’Université d’Ebolowa au Cameroun.">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. MVONDO Didier Serge</h4>
-                                <span>Chef de division de la formation continue et à distance</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/nkonjoh.jpg') }}" class="img-fluid" alt="" title="Dr NKONJOH NGOMADE Armel est un chercheur spécialisé dans le domaine de la programmation distribuée et parallèle. Il est titulaire d’un Doctorat PhD de l’Université de Dschang au Cameroun. En parallèle à ses recherches. Il a également travaillé en tant que professeur de Lycées de l’enseignement technique et professionnel. Il occupe actuellement la fonction de Chef de Service de la Formation à distance à l’Ecole Supérieure de Transport, de Logistique et de Commerce (ESTLC) de l’Université d’Ebolowa au Cameroun. Ses domaines de recherche concernent principalement le calcul à haute performance, le Machine Learning, l’internet des objets (Iot), la conception des systèmes intelligents et embarqués.">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. NKONJOH NGOMADE Armel</h4>
-                                <span>Chef de service de la formation à distance</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/nballa.png') }}" class="img-fluid" alt="" title="Dr MBALLA ELOUNDOU Aimé Christel est Enseignant-Chercheur et Expert-Consultant en Droit et Services publics des Transports. Titulaire d’un Doctorat Ph.D en Droit Public, il est Chargé de Cours à la Faculté des Sciences Juridiques et Politiques de l’Université de Yaoundé II (Cameroun). Enseignant vacataire à l’École Normale Supérieure d’Enseignement Technique et à l’Institut Universitaire des Technologies de l’Université de Douala-Département Génie logistique et transport (Cameroun), il est Membre-Chercheur et/ou Enseignant au Centre d’études en droit administratif et constitutionnel de l’Université Laval <br> (Canada), au Centre de recherche interdisciplinaire sur la diversité et la démocratie de l’Université du Québec à Montréal (Canada), au Centre de théorie et analyse du droit de l’Université Paris Nanterre (France) et au Laboratoire des Transports et Logistique Appliquée de l’École doctorale des sciences fondamentales et appliquées de l’Université de Douala (Cameroun). Ses domaines de recherche, d’enseignement et d’expertise-consultance couvrent les Droits et Contentieux Publics et Privés, les Marchés Publics ou Commande Publique, les NTIC, l’Environnement et le Développement durable, Responsabilité publique et Protection de la fortune publique, Droit-Politique-Sociologie des transports, les Contrats de prestations logistiques. Sur le plan académico-administratif, il est Chef de Département des Enseignements Généraux, Responsable du Tronc commun Gestion Logistique, Transport et Commerce, à l’École Supérieure de Transport, Logistique et Commerce (ESTLC) de l’Université d’Ebolowa à Ambam (Sud du Cameroun).  ">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. MBALLA ELOUNDOU Aimé Christel</h4>
-                                <span>Chef de departement des enseignements généreaux</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/diboma.jpg') }}" class="img-fluid" alt="">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. DIBOMA Benjamin Salomon</h4>
-                                <span>Chef de departement de Génie des Transports</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/kibong.jpg') }}" class="img-fluid" alt="">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. KIBONG Marius Tony</h4>
-                                <span>Chef de departement de Génie Mécatronique</span>
-                            </div>
-                        </div>
-                    </div>
-
-                     <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/messi.jpg') }}" class="img-fluid" alt="">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. MESSI NGUELE Thomas</h4>
-                                <span>Chef de departement de Génie Informatique</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
-                        <div class="member" data-aos="fade-up" data-aos-delay="100">
-                            <div class="member-img">
-                                <img src="{{ asset('sige_app/frontend/img/team/kenmoe.png') }}" class="img-fluid" alt="" data-bs-toggle="tooltip" title="Dr KENMOE SIYOU  Romuald Noel est un spécialiste en Finance Mathématique. Il est titulaire d’un Doctorat PhD de l’Université Bicocca de Milan en Italie. Il est Chargé de Cours au Département de Techniques Quantitatives à la Faculté des Sciences Economiques et de Gestion Appliquées (FSEGA) de l’université de Douala au Cameroun, enseignant à l’Ecole Supérieure Polytechnique de Yaoundé (Cameroun), professeur invité au département de Mathématiques de la faculté d’Economie de l’Université de Parme en Italie. Il occupe actuellement les fonctions de Chef de Département de  Recherche Opérationnelle  à l’Ecole Supérieures de Transport, de Logistique et de Commerce (ESTLC) de l’Université d’Ebolowa au Cameroun. Son domaine de recherche concerne la modélisation et l’optimisation des actifs financiers, l’économétrie financière, les données de haute fréquence et le E-learning.">
-                                <div class="social">
-                                    <a href="#"><i class="bi bi-twitter"></i></a>
-                                    <a href="#"><i class="bi bi-facebook"></i></a>
-                                    <a href="#"><i class="bi bi-instagram"></i></a>
-                                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                                </div>
-                            </div>
-                            <div class="member-info">
-                                <h4>M. KENMOE SIYOU Romuald Noël</h4>
-                                <span>Chef de departement de Génie de Recherche Opérationnelle</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section> End Team Section -->
-
-        <section id="faq" class="faq">
-            <div class="container">
-
-                <div class="section-title" data-aos="fade-up">
-                    <h2>Questions Utiles pour étudiants et candidats</h2>
-                </div>
-
-                <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-                    <div class="col-lg-5">
-                        <i class="ri-question-line"></i>
-                        <h4>Où est située la localité d'Ambam ?</h4>
-                    </div>
-                    <div class="col-lg-7">
-                        <p>
-                            Ambam est une ville et une communauté située dans la région du Sud-Cameroun, à la frontière de la Guinée Equatoriale et du Gabon. Cette ville est située à environ 245 km de Yaoundé.
-                        </p>
-                    </div>
-                </div><!-- End F.A.Q Item-->
-
-                <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-                    <div class="col-lg-5">
-                        <i class="ri-question-line"></i>
-                        <h4>Qui peut postuler au concours d'entrée à l'ESTLC</h4>
-                    </div>
-                    <div class="col-lg-7">
-                        <p>Les candidats au concours d'entrée à l'ESTLC doivent être titulaires d'un Baccalauréat ou d'un GCE A/L pour le premier cycle et d'une Licence pour le second cycle.
-                        </p>
-                    </div>
-                </div><!-- End F.A.Q Item-->
-
-                <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-                    <div class="col-lg-5">
-                        <i class="ri-question-line"></i>
-                        <h4>Quelles sont les départements disponibles à l'ESTLC ?</h4>
-                    </div>
-                    <div class="col-lg-7">
-                        <p>
-                            En plus des départements des Enseignements Généraux  et des Enseignements Scientifiques de base, l'ESTLC Dispose des départements de Transport, Logistique, Recherche Opérationnelle, Génie Informatique, E-Commerce et Mécatronique
-                        </p>
-                    </div>
-                </div><!-- End F.A.Q Item-->
-
-                <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-                    <div class="col-lg-5">
-                        <i class="ri-question-line"></i>
-                        <h4>Quels diplômes obtient-on au terme de sa formation à l'ESTLC ?</h4>
-                    </div>
-                    <div class="col-lg-7">
-                        <p>
-                            Au terme des 5 années de formation, l'étudiant sort titulaire d'un diplôme d'ingénieur, lequel débouchera sur un Master Recherche en Sciences de l'Ingénieur, puis d'un Doctorat Ph D.
-                        </p>
-                    </div>
-                </div><!-- End F.A.Q Item-->
-
-                <div class="row faq-item d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="500">
-                    <div class="col-lg-5">
-                        <i class="ri-question-line"></i>
-                        <h4>Comment Modifier ma fiche d'inscription au concours ?</h4>
-                    </div>
-                    <div class="col-lg-7">
-                        <p>
-                            Au terme du remplissage de votre fiche, veuillez enregistrer l'identifiant et le mot de passe qui vous sont transmis, ils vous permettront d'effectuer un éventuel retour pour modifier votre fiche.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-    </main>
+@php
+	$homeSlides = [
+		(object) ['id' => 1, 'icon' => 'bi-mortarboard-fill', 'title' => "Concours d'entrée ESTLC", 'subtitle' => "Rejoignez une formation d'ingénieur reconnue en transport et logistique"],
+		(object) ['id' => 2, 'icon' => 'bi-truck', 'title' => 'Gestion Logistique, Transport et Commerce', 'subtitle' => 'Un parcours tourné vers les métiers de la chaîne logistique'],
+		(object) ['id' => 3, 'icon' => 'bi-signpost-split-fill', 'title' => 'Technologie de Transport et de Logistique', 'subtitle' => 'Des compétences techniques au service de la mobilité'],
+	];
+@endphp
+<section id="hero" class="app-hero position-relative"><div class="hero-animated-bg" aria-hidden="true"><div class="hero-glow hero-glow-left"></div><div class="hero-glow hero-glow-right"></div>@foreach ([['bi-mortarboard',46,'12%','8%','14s','0s'],['bi-book',34,'70%','6%','18s','2s'],['bi-truck',40,'20%','88%','16s','1s'],['bi-signpost-split',30,'78%','90%','20s','3s'],['bi-lightbulb',28,'45%','50%','22s','4s']] as $shape)<i class="bi {{$shape[0]}} floating-icon" style="font-size:{{$shape[1]}}px;top:{{$shape[2]}};left:{{$shape[3]}};animation-duration:{{$shape[4]}};animation-delay:{{$shape[5]}}"></i>@endforeach</div><div class="container position-relative" style="z-index:1"><div class="row align-items-center mb-4"><div class="col-auto" data-aos="zoom-in" data-aos-delay="150"><img src="{{asset('share/img/logo_estlc_ok.png')}}" alt="Logo ESTLC" class="school-logo-icon" style="height:100px"></div><div class="col"><h2 data-aos="fade-up" class="mb-0" style="font-size:25px">Ecole Supérieure de Transport, de Logistique et de Commerce — ESTLC</h2></div></div><div class="row g-4"><div class="col-lg-6 order-2 order-lg-1"><div data-aos="fade-up" data-aos-delay="300" class="mb-3 text-center text-lg-start"><a href="/download/Appel_Candidature_Recrutement_ESTLC" class="btn btn-primary rounded-pill px-4 py-2" target="_blank"><i class="bi bi-download me-2"></i>Télécharger l'appel à candidature</a></div><div class="announcement-card" data-aos="fade-up" data-aos-delay="450"><ul class="announcement-list"><li><i class="bi bi-megaphone-fill"></i><div><strong>Avis aux étudiants – Master Recherche à l'UFD-TSI</strong><p>Le Coordonnateur de l'UFD-TSI informe les étudiants nouvellement sélectionnés en Master Recherche pour l'année académique 2024-2025 qu'une réunion importante se tiendra le lundi 03 mars 2025 à 14h précises, au campus de Nkoumekeke, salle C1. Présence obligatoire.</p></div></li><li><i class="bi bi-calendar-event-fill"></i><div><strong>Rentrée académique – Master Recherche à l'UFD-TSI</strong><p>Lundi 03 mars 2025. Pour les modalités d'inscription académique et administrative, veuillez vous rapprocher du secrétariat de l'UFD-TSI.</p></div></li><li><i class="bi bi-mortarboard-fill"></i><div><strong>Recrutement de 150 Enseignants dans les Universités d'État !</strong><p>La troisième phase de recrutement de 150 enseignants est lancée pour l'exercice 2025 dans les Universités d'État de Bertoua, Ebolowa et Garoua. Les postes sont ouverts aux Camerounais titulaires du Doctorat ou du PhD !</p></div></li></ul></div></div><div class="col-lg-6 order-1 order-lg-2" data-aos="zoom-in" data-aos-delay="200"><div id="homeCarousel" class="carousel slide rounded-4 overflow-hidden shadow" data-bs-ride="carousel"><div class="carousel-indicators">@foreach (\App\Models\Slide::orderBy('id','desc')->take(10)->get() as $slide)<button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="{{$loop->index}}" class="{{$loop->first?'active':''}}" aria-label="Slide {{$loop->iteration}}"></button>@endforeach</div><div class="carousel-inner">@forelse (\App\Models\Slide::orderBy('id','desc')->take(10)->get() as $slide)<div class="carousel-item {{$loop->first?'active':''}}"><div class="carousel-slide-visual"><img src="{{asset('storage/app/public/slides/'.$slide->photo)}}" class="d-block w-100 h-100" style="object-fit:cover" alt="{{$slide->first_title}}"></div><div class="carousel-caption"><h5>{{$slide->first_title}}</h5><p>{{$slide->second_title}}</p></div></div>@empty<div class="carousel-item active"><div class="carousel-slide-visual"><i class="bi bi-mortarboard-fill"></i></div></div>@endforelse</div><button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span><span class="visually-hidden">Précédent</span></button><button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span><span class="visually-hidden">Suivant</span></button></div></div></div></div></section>
+<main id="main"><section id="clients" class="app-section py-5"><div class="container"><div class="row justify-content-center g-4 align-items-center">@foreach ([['share/img/logo_islape.jpg','Institut Supérieur La Perle'],['share/img/logo_ueb.png','Université d’Ebolowa'],['share/img/logo_islape.jpg','Institut Supérieur La Perle'],['share/img/logo_ueb.png','Université d’Ebolowa'],['share/img/logo_islape.jpg','Institut Supérieur La Perle'],['share/img/logo_ueb.png','Université d’Ebolowa']] as $partner)<div class="col-lg-2 col-md-4 col-6 text-center" data-aos="zoom-in" data-aos-delay="{{$loop->index*80}}"><img src="{{asset($partner[0])}}" alt="{{$partner[1]}}" title="{{$partner[1]}}" class="img-fluid partner-icon" style="max-height:130px;width:auto;object-fit:contain"></div>@endforeach</div></div></section>
+<section id="services" class="app-section py-5"><div class="container"><div class="section-title text-center mb-5" data-aos="fade-up"><h2>Nos Parcours</h2><p>Actuellement, nous possédons différents parcours permettant aux apprenants de se spécialiser dans leurs formations</p></div><div class="row justify-content-center g-4">@foreach ([['bi-truck','GLTCO','Gestion Logistique Transport et Commerce'],['bi-signpost-split-fill','TTL','Technologie de Transport et de Logistique']] as $path)<div class="col-md-6 col-lg-3"><div class="icon-box" data-aos="fade-up" data-aos-delay="{{$loop->iteration*100}}"><div class="icon"><i class="bi {{$path[0]}}"></i></div><h4 class="title"><a href="#">{{$path[1]}}</a></h4><p class="description">{{$path[2]}}</p></div></div>@endforeach</div></div></section>
+<section id="more-services" class="app-section py-5"><div class="container"><div class="section-title text-center mb-5" data-aos="fade-up"><h2>Activités récentes</h2><p>Découvrez la vie de l'école à travers nos articles d'actualités</p></div><div class="row g-4">@foreach (\App\Models\Actualite::orderBy('created_at','desc')->take(9)->get() as $actu)<div class="col-md-4"><div class="actu-card" data-aos="fade-up" data-aos-delay="{{$loop->index*100}}"><div class="actu-card-icon"><i class="bi bi-newspaper"></i></div><div class="actu-card-body"><p class="actu-card-title">{{$actu->actu_title}}</p></div><div class="actu-card-footer"><span class="small text-muted">Publié le {{$actu->created_at->format('d/m/Y')}}</span><a href="/details_actu/{{$actu->actu_code}}" class="btn btn-sm btn-outline">Lire plus <i class="bi bi-arrow-right"></i></a></div></div></div>@endforeach</div><div class="mt-4 text-end"><a href="/all_actu" class="btn btn-primary"><i class="bi bi-list-ul me-1"></i>Toutes nos actualités</a></div></div></section>
+<section id="faq" class="app-section app-section-alt py-5"><div class="container"><div class="section-title text-center mb-5" data-aos="fade-up"><h2>Questions Utiles pour étudiants et candidats</h2></div>@foreach ([['Où est située la localité d’Ambam ?','Ambam est une ville et une communauté située dans la région du Sud-Cameroun, à la frontière de la Guinée Equatoriale et du Gabon. Cette ville est située à environ 245 km de Yaoundé.'],['Qui peut postuler au concours d’entrée à l’ESTLC ?','Les candidats doivent être titulaires d’un Baccalauréat ou d’un GCE A/L pour le premier cycle, et d’une Licence pour le second cycle.'],['Quels sont les départements disponibles à l’ESTLC ?','En plus des enseignements généraux et scientifiques de base, l’ESTLC dispose des départements Transport, Logistique, Recherche Opérationnelle, Génie Informatique, E-Commerce et Mécatronique.'],['Quels diplômes obtient-on au terme de sa formation à l’ESTLC ?','Au terme des 5 années de formation, l’étudiant obtient un diplôme d’ingénieur, pouvant déboucher sur un Master Recherche puis un Doctorat PhD.'],['Comment modifier ma fiche d’inscription au concours ?','Conservez l’identifiant et le mot de passe transmis après le remplissage de votre fiche : ils vous permettront d’y revenir pour la modifier.']] as $faq)<div class="row faq-item g-3" data-aos="fade-up" data-aos-delay="{{$loop->index*100}}"><div class="col-lg-5 d-flex align-items-start gap-2"><i class="bi bi-question-circle-fill faq-icon"></i><h4 class="mb-0">{{$faq[0]}}</h4></div><div class="col-lg-7"><p>{{$faq[1]}}</p></div></div>@endforeach</div></section></main>
 @endsection
