@@ -8,11 +8,31 @@ import logo_estlc from "../../assets/logo.png";
    ============================================================ */
 // TODO: remplacer par un fetch vers /api/bureaux?type=Departement
 const departements = [
-  { code_bureau: "gltco", label_bureau: "GLTCO" },
-  { code_bureau: "ttl", label_bureau: "TTL" },
+  { code_bureau: "e-commerce", label_bureau: "E-Commerce", path: "/under-development" },
+  { code_bureau: "genie_informatique", label_bureau: "Génie Informatique", path: "/under-development" },
+  { code_bureau: "genie_logistique", label_bureau: "Génie Logistique", path: "/under-development" },
+  { code_bureau: "enseignement_generaux", label_bureau: "Enseignements Généraux", path: "/under-development" },
+  { code_bureau: "genie_mecatronique", label_bureau: "Génie Mécatronique", path: "/under-development" },
+  { code_bureau: "genie_transport", label_bureau: "Génie des Transport", path: "/under-development" },
+  { code_bureau: "recherche_operationnelle", label_bureau: "Recherche Opérationnelle", path: "/under-development" },
+  { code_bureau: "enseignement_scientifique", label_bureau: "Enseignement Scientifique de Base", path: "/under-development" },
+  { code_bureau: "ufd_tsi", label_bureau: "Unité de Formation Doctorale en Technologies et Sciences de L'Innovation", path: "/under-development" },
 ];
 
-
+const ufdTsiSubMenus = [
+  { label: "Présentation", path: "#" },
+  { label: "Laboratoire d'Économie et Géographie des Transports (LAEGT)", path: "/under-development" },
+  { label: "Laboratoire de Logistique et de Transport Appliqué à l'Agriculture (LALOTA)", path: "/under-development" },
+  { label: "Laboratoire des Systèmes de Transport Intégrés en Énergie (LASTIE)", path: "/under-development" },
+  { label: "Laboratoire d'Informatique et Application (LIA)", path: "/under-development" },
+  { label: "Laboratoire d'Innovation Commerciale Appliquée (LICA)", path: "/under-development" },
+  { label: "Laboratoire d'Innovation pour les Technologies et Applications Électrogènes (LITAE)", path: "/under-development" },
+  { label: "Laboratoire de Modélisation et Simulation Appliquée à l'Industrie (LMSAI)", path: "/under-development" },
+  { label: "Laboratoire des Systèmes Logistiques et Applications Innovantes (LSLAI)", path: "/under-development" },
+  { label: "Laboratoire des Systèmes Logistiques et Miniers (LSLM)", path: "/under-development" },
+  { label: "Laboratoire des Sciences de la Mobilité et de la Réglementation Logistique (LSMRL)", path: "/under-development" },
+  { label: "Laboratoire de Technologie et Systèmes Mécatroniques Intelligents (LTSMI)", path: "/under-development" },
+];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -113,7 +133,7 @@ export default function Header() {
                 <ul>
                   {departements.map((bureau) => (
                     <li key={bureau.code_bureau}>
-                      <a href="#">{bureau.label_bureau}</a>
+                      <a href={bureau.path}>{bureau.label_bureau}</a>
                     </li>
                   ))}
                 </ul>
@@ -124,9 +144,11 @@ export default function Header() {
                   <span>UFD TSI</span> <i className="bi bi-chevron-down"></i>
                 </a>
                 <ul>
-                  <li>
-                    <a href="#">Présentation</a>
-                  </li>
+                  {ufdTsiSubMenus.map((item, index) => (
+                    <li key={index}>
+                      <a href={item.path}>{item.label}</a>
+                    </li>
+                  ))}
                   <li className="dropdown">
                     <a href="#" onClick={toggleDropdown}>
                       <span>Espace étudiant</span> <i className="bi bi-chevron-right"></i>
@@ -140,7 +162,6 @@ export default function Header() {
                       </li>
                     </ul>
                   </li>
-                  
                 </ul>
               </li>
 
@@ -298,13 +319,13 @@ export default function Header() {
                     </ul>
                   </li>
                   <li>
-                    <a href="#">Hébergement</a>
+                    <a href="/under-development">Hébergement</a>
                   </li>
                   <li>
-                    <a href="#">Activités</a>
+                    <a href="/under-development">Activités</a>
                   </li>
                   <li>
-                    <a href="#">Restauration</a>
+                    <a href="/under-development">Restauration</a>
                   </li>
                 </ul>
               </li>
