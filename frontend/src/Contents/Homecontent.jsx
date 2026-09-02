@@ -265,7 +265,7 @@ export default function HomeContent() {
                       <strong>Recrutement de 150 Enseignants dans les Universités d'État !</strong>
                       <p>
                         La troisième phase de recrutement de 150 enseignants est lancée pour l'exercice 2025 dans les Universités d'État de Bertoua, Ebolowa et Garoua.
-                         👨‍🏫 Les postes sont ouverts aux Camerounais titulaires du Doctorat ou du PhD! 📌 Ne manquez pas cette opportunité !.
+                          Les postes sont ouverts aux Camerounais titulaires du Doctorat ou du PhD!.  Ne manquez pas cette opportunité !.
                       </p>
                     </div>
                   </li>
