@@ -271,7 +271,7 @@ export default function Header() {
                     <a href="/organigram">Organigramme</a>
                   </li>
                   <li>
-                    <a href="#">Staff Administratif</a>
+                    <a href="/staff">Staff Administratif</a>
                   </li>
                 </ul>
               </li>
