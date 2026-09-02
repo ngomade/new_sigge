@@ -37,7 +37,7 @@ import estlc_sans_fond from '../assets/share/img/estlc_sans_fond.png';
 
 /* ============================================================
    DONNÉES — sections & personnel (reprises de la vue Blade)
-   ============================================================ */
+   ============================================================== */
 const SECTIONS = [
   {
     title: 'La Direction',
