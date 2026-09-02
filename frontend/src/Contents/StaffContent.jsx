@@ -246,7 +246,7 @@ export default function StaffContent() {
   const totalStaff = SECTIONS.reduce((sum, s) => sum + s.members.length, 0);
 
   return (
-    <div className="staff-page container-fluid py-4 py-md-5" style={{ maxWidth: '1200px' }}>
+    <div className="staff-page container-fluid py-4 py-md-5 w-100 px-3 px-md-4">
       {/* En-tête */}
       <div className="text-center mb-5" data-aos="fade-up">
         <span
