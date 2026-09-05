@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="utf-8"/>
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico"/>
+    <link rel="icon" href="%PUBLIC_URL%/concours/favicon.ico"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="theme-color" content="#000000"/>
     <meta name="description" content="Plateforme de d'inscription aux concours"/>
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png"/>
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/concours/logo192.png"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet"/>
 
@@ -15,10 +15,10 @@
         manifest.json provides metadata used when your web app is installed on a
         user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
       -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
-    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
+    <link rel="manifest" href="%PUBLIC_URL%/concours/manifest.json"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/concours/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/concours/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/concours/favicon-16x16.png">
     <!--
         Notice the use of %PUBLIC_URL% in the tags above.
         It will be replaced with the URL of the `public` folder during the build.
