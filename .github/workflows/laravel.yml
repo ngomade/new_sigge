@@ -151,7 +151,7 @@ jobs:
           local-dir: ./backend/
           server-dir: Backend_Code/
           exclude: |
-            **/vendor/**
+            vendor/**
             **/.env
             **/.git*
 
