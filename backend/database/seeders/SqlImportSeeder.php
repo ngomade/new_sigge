@@ -21,10 +21,10 @@ class SqlImportSeeder extends Seeder
 
             if (File::exists($path)) {
                 $this->command->info("Importation de : {$nomFichier}...");
-                
+
                 $sql = File::get($path);
                 DB::unprepared($sql);
-                
+
                 $this->command->info("{$nomFichier} importé avec succès !");
             } else {
                 $this->command->error("Fichier introuvable : {$path}");

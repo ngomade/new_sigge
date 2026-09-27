@@ -1,265 +1,162 @@
 @extends("sige_app.frontend.template.frontend")
 @section("style")
     <style>
-        :root {
-        --level-1: #ffffff;
-        --level-2: #ffffff;
-        --level-3: #7b9fe0;
-        --level-4: #f27c8d;
-        --black: black;
+        .org-mairie-section {
+            --level-1: var(--app-surface, #fff);
+            --level-2: var(--app-surface, #fff);
+            --line-color: var(--app-border, #dce9e2);
+
+            background: var(--app-bg, #f7faf8);
+            padding: 3rem 0 4rem;
         }
 
-        * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
+        .org-mairie-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .org-mairie-header .badge-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--app-primary-soft, #dff2e9);
+            color: var(--app-primary, #0e8f74);
+            font-size: 26px;
+            margin-bottom: 1rem;
+        }
+        .org-mairie-header h1 {
+            color: var(--app-primary-dark, #11583f);
+            font-weight: 700;
+            font-size: 1.7rem;
+            margin-bottom: 0.5rem;
+        }
+        .org-mairie-header p {
+            color: var(--app-text-muted, #61756c);
+            max-width: 560px;
+            margin: 0 auto;
         }
 
-        ol {
-        list-style: none;
+        .org-mairie-card {
+            background: var(--app-surface, #fff);
+            border: 1px solid var(--app-border, #dce9e2);
+            border-radius: var(--app-radius-lg, 16px);
+            box-shadow: 0 8px 24px var(--app-shadow-soft, rgba(17,61,53,.08));
+            padding: 2.5rem 1.5rem;
         }
 
-        body {
-        margin: 50px 0 100px;
-        text-align: center;
-        font-family: "Inter", sans-serif;
+        .org-mairie-section ol {
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
 
-        .rectangle {
-        position: relative;
-        /*padding: 20px;*/
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        .org-mairie-section .rectangle {
+            position: relative;
+            border-radius: var(--app-radius-md, 12px);
+            border: 1px solid var(--app-border, #dce9e2);
+            box-shadow: 0 6px 16px var(--app-shadow-soft, rgba(17,61,53,.08));
+            padding: 1.25rem 1rem;
+            text-align: center;
+        }
+        .org-mairie-section .rectangle img {
+            border: 3px solid var(--app-primary-soft, #dff2e9);
+            margin-bottom: 0.75rem;
+        }
+        .org-mairie-section .rectangle .name {
+            color: var(--app-primary-dark, #11583f);
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 0 0 0.25rem;
+        }
+        .org-mairie-section .rectangle .role {
+            color: var(--app-text-muted, #61756c);
+            font-size: 0.9rem;
+            margin: 0;
         }
 
-
-        /* LEVEL-1 STYLES
+        /* LEVEL-1
         –––––––––––––––––––––––––––––––––––––––––––––––––– */
         .level-1 {
-        width: 20%;
-        margin: 0 auto 40px;
-        background: var(--level-1);
+            width: 260px;
+            margin: 0 auto 40px;
+            background: var(--level-1);
         }
-
         .level-1::before {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 2px;
-        height: 20px;
-        background: var(--black);
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: var(--line-color);
         }
 
-
-        /* LEVEL-2 STYLES
+        /* LEVEL-2
         –––––––––––––––––––––––––––––––––––––––––––––––––– */
         .level-2-wrapper {
-        position: relative;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 700px;
+            margin: 0 auto;
+            gap: 0 20px;
         }
-
         .level-2-wrapper::before {
-        content: "";
-        position: absolute;
-        top: -20px;
-        left: 27%;
-        width: 48.7%;
-        height: 2px;
-        background: var(--black);
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: 27%;
+            width: 48.7%;
+            height: 2px;
+            background: var(--line-color);
         }
-
-        .level-2-wrapper::after {
-        display: none;
-        content: "";
-        position: absolute;
-        left: -20px;
-        bottom: -20px;
-        width: calc(100% + 20px);
-        height: 2px;
-        background: var(--black);
-        }
-
         .level-2-wrapper li {
-        position: relative;
+            position: relative;
         }
-
         .level-2-wrapper > li::before {
-        content: "";
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 2px;
-        height: 20px;
-        background: var(--black);
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: var(--line-color);
         }
-
         .level-2 {
-        width: 50%;
-        margin: 0 auto 40px;
-        background: var(--level-2);
+            width: 100%;
+            margin: 0 auto;
+            background: var(--level-2);
         }
 
-        .level-2::before {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 2px;
-        height: 20px;
-        background: var(--black);
-        }
-
-        .level-2::after {
-        display: none;
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0%;
-        transform: translate(-100%, -50%);
-        width: 20px;
-        height: 2px;
-        background: var(--black);
-        }
-
-
-        /* LEVEL-3 STYLES
-        –––––––––––––––––––––––––––––––––––––––––––––––––– */
-        .level-3-wrapper {
-        position: relative;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-column-gap: 20px;
-        width: 90%;
-        margin: 0 auto;
-        }
-
-        .level-3-wrapper::before {
-        content: "";
-        position: absolute;
-        top: -20px;
-        left: calc(25% - 5px);
-        width: calc(50% + 10px);
-        height: 2px;
-        background: var(--black);
-        }
-
-        .level-3-wrapper > li::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%, -100%);
-        width: 2px;
-        height: 20px;
-        background: var(--black);
-        }
-
-        .level-3 {
-        margin-bottom: 20px;
-        background: var(--level-3);
-        }
-
-
-        /* LEVEL-4 STYLES
-        –––––––––––––––––––––––––––––––––––––––––––––––––– */
-        .level-4-wrapper {
-        position: relative;
-        width: 80%;
-        margin-left: auto;
-        }
-
-        .level-4-wrapper::before {
-        content: "";
-        position: absolute;
-        top: -20px;
-        left: -20px;
-        width: 2px;
-        height: calc(100% + 20px);
-        background: var(--black);
-        }
-
-        .level-4-wrapper li + li {
-        margin-top: 20px;
-        }
-
-        .level-4 {
-        font-weight: normal;
-        background: var(--level-4);
-        }
-
-        .level-4::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0%;
-        transform: translate(-100%, -50%);
-        width: 20px;
-        height: 2px;
-        background: var(--black);
-        }
-
-
-        /* MQ STYLES
+        /* MOBILE
         –––––––––––––––––––––––––––––––––––––––––––––––––– */
         @media screen and (max-width: 700px) {
-        .rectangle {
-        padding: 20px 10px;
-        }
+            .org-mairie-card { padding: 2rem 1rem; }
 
-        .level-1,
-        .level-2 {
-        width: 100%;
-        }
+            .level-1 { width: 100%; }
 
-        .level-1 {
-        margin-bottom: 20px;
-        }
-
-        .level-1::before,
-        .level-2-wrapper > li::before {
-        display: none;
-        }
-
-        .level-2-wrapper,
-        .level-2-wrapper::after,
-        .level-2::after {
-        display: block;
-        }
-
-        .level-2-wrapper {
-        width: 90%;
-        margin-left: 10%;
-        }
-
-        .level-2-wrapper::before {
-        left: -20px;
-        width: 2px;
-        height: calc(100% + 40px);
-        }
-
-        .level-2-wrapper > li:not(:first-child) {
-        margin-top: 50px;
-        }
-        }
-
-
-        /* FOOTER
-        –––––––––––––––––––––––––––––––––––––––––––––––––– */
-        .page-footer {
-        position: fixed;
-        right: 0;
-        bottom: 20px;
-        display: flex;
-        align-items: center;
-        padding: 5px;
-        }
-
-        .page-footer a {
-        margin-left: 4px;
+            .level-2-wrapper {
+                display: block;
+                width: 90%;
+                margin: 0 auto;
+                position: relative;
+            }
+            .level-2-wrapper::before {
+                left: -20px;
+                top: 0;
+                width: 2px;
+                height: calc(100% + 20px);
+            }
+            .level-2-wrapper > li::before {
+                display: none;
+            }
+            .level-2-wrapper > li:not(:first-child) {
+                margin-top: 30px;
+            }
         }
     </style>
 @endsection
@@ -267,108 +164,41 @@
 
 @endsection
 @section('content')
-<div class="container mt-3">
-    <div class="card">
-        <div class="card-header p-2 pt-2" style="text-align: justify;">
-            <div style="text-align: center;" class="h3">Mairie d'AMBAM: Organigramme</div>
-        </div>
-        <div class="card-body">
-            <div class="container">
-                <div class="level-1 rectangle">
-                    <img src="{{asset("sige_app/frontend/img/mairie/maire_portrait.png")}}" alt="logo de la Mairie" style="width: 95%;" class="rounded">
-                    <p class="h5"> ZOMO OVONO SAMSON</p>
-                    <p>Maire de la Commune d'Ambam</p>
-                </div>
-                <ol class="level-2-wrapper">
-                    <li>
-                        <div class="level-2 rectangle">
-                            <img src="{{asset("sige_app/frontend/img/mairie/premier_adjoint.png")}}" alt="logo de la Mairie" style="width: 50%;" class="rounded">
-                            <p class="h5"> AVOMO EKOTO MATHILDE EPSE ELLA</p>
-                            <p>1<sup>ier</sup> Adjoint au Maire</p>
-                        </div>
-                        {{-- <ol class="level-3-wrapper">
-                            <li>
-                                <h3 class="level-3 rectangle">Manager A</h3>
-                                <ol class="level-4-wrapper">
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person A</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person B</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person C</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person D</h4>
-                                    </li>
-                                </ol>
-                            </li>
-                            <li>
-                                <h3 class="level-3 rectangle">Manager B</h3>
-                                <ol class="level-4-wrapper">
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person A</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person B</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person C</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person D</h4>
-                                    </li>
-                                </ol>
-                            </li>
-                        </ol> --}}
-                    </li>
-                    <li>
-                        <div class="level-2 rectangle">
-                            <img src="{{asset("sige_app/frontend/img/mairie/second_adjoint.png")}}" alt="logo de la Mairie" style="width: 63%;" class="rounded">
-                            <p class="h5"> NVOA JENNER PURCELL</p>
-                            <p>2<sup>ieme</sup> Adjoint au Maire</p>
-                        </div>
-                        {{-- <ol class="level-3-wrapper">
-                            <li>
-                                <h3 class="level-3 rectangle">Manager C</h3>
-                                <ol class="level-4-wrapper">
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person A</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person B</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person C</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person D</h4>
-                                    </li>
-                                </ol>
-                            </li>
-                            <li>
-                                <h3 class="level-3 rectangle">Manager D</h3>
-                                <ol class="level-4-wrapper">
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person A</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person B</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person C</h4>
-                                    </li>
-                                    <li>
-                                        <h4 class="level-4 rectangle">Person D</h4>
-                                    </li>
-                                </ol>
-                            </li>
-                        </ol> --}}
-                    </li>
-                </ol>
+<div class="org-mairie-section">
+    <div class="container">
+
+        <div class="org-mairie-header">
+            <div class="badge-icon">
+                <i class="bi bi-diagram-3-fill"></i>
             </div>
+            <h1>Mairie d'Ambam : Organigramme</h1>
         </div>
+
+        <div class="org-mairie-card">
+            <div class="level-1 rectangle">
+                <img src="{{asset("sige_app/frontend/img/mairie/maire_portrait.png")}}" alt="Le Maire d'Ambam" style="width: 95%;" class="rounded">
+                <p class="name">ZOMO OVONO SAMSON</p>
+                <p class="role">Maire de la Commune d'Ambam</p>
+            </div>
+
+            <ol class="level-2-wrapper">
+                <li>
+                    <div class="level-2 rectangle">
+                        <img src="{{asset("sige_app/frontend/img/mairie/premier_adjoint.png")}}" alt="1er Adjoint au Maire" style="width: 50%;" class="rounded">
+                        <p class="name">AVOMO EKOTO MATHILDE EPSE ELLA</p>
+                        <p class="role">1<sup>ier</sup> Adjoint au Maire</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="level-2 rectangle">
+                        <img src="{{asset("sige_app/frontend/img/mairie/second_adjoint.png")}}" alt="2e Adjoint au Maire" style="width: 63%;" class="rounded">
+                        <p class="name">NVOA JENNER PURCELL</p>
+                        <p class="role">2<sup>ieme</sup> Adjoint au Maire</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
     </div>
 </div>
 @endsection
