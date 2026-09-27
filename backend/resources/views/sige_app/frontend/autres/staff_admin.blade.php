@@ -647,6 +647,40 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     </div>
 
+                    <!-- BELINGA (manquant dans la v2, restauré depuis la v1) -->
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
+                        <div class="card personnel-card h-100 p-3">
+                            <div class="personnel-img-wrapper">
+                                <img src="{{ asset('sige_app/frontend/img/team/belinga.jpg') }}" alt="BELINGA">
+                            </div>
+                            <div class="card-body personnel-info px-0">
+                                <div class="row"><div class="col-4 label">Noms:</div><div class="col-8 value">BELINGA BESSALA</div></div>
+                                <div class="row"><div class="col-4 label">Prénoms:</div><div class="col-8 value">Jacob Patrick</div></div>
+                                <div class="row"><div class="col-4 label">Grade:</div><div class="col-8 value">Chargé de Cours</div></div>
+                                <div class="row"><div class="col-4 label">Fonction:</div><div class="col-8 value">Chef de Département (E-Commerce)</div></div>
+                                <div class="row"><div class="col-4 label">E-mail:</div><div class="col-8 value text-truncate"><a href="mailto:deptec@estlc.unv-ebolowa.cm">deptec@estlc.unv-ebolowa.cm</a></div></div>
+                                <div class="row"><div class="col-4 label">Tel:</div><div class="col-8 value">(+237)</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KENMOE (manquant dans la v2, restauré depuis la v1) -->
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="card personnel-card h-100 p-3">
+                            <div class="personnel-img-wrapper">
+                                <img src="{{ asset('sige_app/frontend/img/team/dro.png') }}" alt="KENMOE">
+                            </div>
+                            <div class="card-body personnel-info px-0">
+                                <div class="row"><div class="col-4 label">Noms:</div><div class="col-8 value">KENMOE SIYOU</div></div>
+                                <div class="row"><div class="col-4 label">Prénoms:</div><div class="col-8 value">Romuald Noel</div></div>
+                                <div class="row"><div class="col-4 label">Grade:</div><div class="col-8 value">Chargé de Cours</div></div>
+                                <div class="row"><div class="col-4 label">Fonction:</div><div class="col-8 value">Chef de Département (Recherche Opérationnelle)</div></div>
+                                <div class="row"><div class="col-4 label">E-mail:</div><div class="col-8 value text-truncate"><a href="mailto:deptro@estlc.unv-ebolowa.cm">deptro@estlc.unv-ebolowa.cm</a></div></div>
+                                <div class="row"><div class="col-4 label">Tel:</div><div class="col-8 value">(+237)</div></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>

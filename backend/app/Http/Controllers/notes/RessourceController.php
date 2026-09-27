@@ -346,33 +346,16 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.salles.index', compact('salles'));
 
         } catch (Throwable $e) {
-            Log::error<|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|><|reserved_token_163839|>I have gathered the relevant information from the RessourceController.php file.
+            Log::error('Erreur lors de l\'affichage des salles: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);             
+        }
 
-Information Gathered:
-- The method indexSalles() fetches all Salle records using `Salle::orderBy('code_salle')->get()` and passes them to the view.
-- The view expects a paginated result because it calls `$salles->links()` for pagination.
-- The current code fetches all records as a Collection, which does not have the links() method, causing the error.
+        return redirect()->route('ressources.salles.index')
+            ->with('error', 'Une erreur est survenue lors du chargement des salles.');
+    }
+            
 
-Plan:
-- Modify the indexSalles() method in RessourceController.php to use pagination instead of get().
-  Change:
-  ```php
-  $salles = Salle::orderBy('code_salle')->get();
-  ```
-  To:
-  ```php
-  $salles = Salle::orderBy('code_salle')->paginate(15);
-  ```
-- This will return a LengthAwarePaginator instance that supports the links() method.
-- No other dependent files need editing as the view and route are already set up.
-
-Followup steps:
-- Test the /ressources/salles page to confirm pagination works and the error is resolved.
-
-Please confirm if I can proceed with this plan. 
-
-<ask_followup_question>
-<question>May I proceed to update the indexSalles() method to use pagination?</question>
 
     /**
      * Show the form for creating a new salle
