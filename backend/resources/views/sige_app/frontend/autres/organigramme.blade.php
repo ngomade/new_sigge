@@ -76,7 +76,7 @@
 @section('content')
     <div class="organigramme-section">
         <div class="container">
-            <div class="organigramme-header">
+            <div class="organigramme-header" data-aos="fade-up">
                 <div class="badge-icon">
                     <i class="bi bi-diagram-3-fill"></i>
                 </div>
@@ -84,7 +84,7 @@
                 <p>Vue d'ensemble de la structure organisationnelle de l'école : direction, divisions et départements.</p>
             </div>
 
-            <div class="organigramme-card">
+            <div class="organigramme-card" data-aos="zoom-in" data-aos-delay="100">
                 <div class="organigramme-frame">
                     <a href="{{asset('sige_app/frontend/img/organigrammenew.png')}}" class="glightbox" data-title="Organigramme de l'ESTLC">
                         <img src="{{asset('sige_app/frontend/img/organigrammenew.png')}}" alt="Organigramme de l'ESTLC">
@@ -107,6 +107,9 @@
 @section('js')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        if (window.AOS) {
+            AOS.init({ duration: 800, once: true, easing: 'ease-out-quart' });
+        }
         if (window.GLightbox) {
             GLightbox({ selector: '.glightbox' });
         }

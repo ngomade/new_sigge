@@ -1,7 +1,13 @@
 @extends("sige_app.frontend.template.frontend")
 
 @section('js')
-
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.AOS) {
+        AOS.init({ duration: 800, once: true, easing: 'ease-out-quart' });
+    }
+});
+</script>
 @endsection
 
 @section('style')
@@ -173,7 +179,7 @@
     <div class="mairie-presentation">
         <div class="container">
 
-            <div class="mairie-header">
+            <div class="mairie-header" data-aos="fade-up">
                 <div class="badge-icon">
                     <i class="bi bi-bank2"></i>
                 </div>
@@ -182,7 +188,7 @@
             </div>
 
             <div class="row g-4 mb-3">
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
                     <div class="info-card">
                         <h2><i class="bi bi-info-circle-fill"></i> Fiche d'identité</h2>
                         <p><strong>Date de création :</strong> 1952</p>
@@ -197,7 +203,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="150">
                     <div class="info-card esplanade-card">
                         <h2><i class="bi bi-image-fill"></i> Esplanade de la Mairie</h2>
                         <img src="{{asset('sige_app/frontend/img/mairie/photo_12.jpg')}}" alt="Esplanade de la Mairie d'Ambam">
@@ -206,12 +212,12 @@
             </div>
 
             <section id="portfolio" class="photo-section">
-                <div class="section-title">
+                <div class="section-title" data-aos="fade-up">
                     <h2>Photothèque</h2>
                     <p>Quelques clichés de nos locaux.</p>
                 </div>
 
-                <ul id="portfolio-flters">
+                <ul id="portfolio-flters" data-aos="fade-up" data-aos-delay="100">
                     <li data-filter="*" class="filter-active">Tout</li>
                     <li data-filter=".filter-act">Esplanade</li>
                     <li data-filter=".filter-ass">Nos Bureaux</li>
@@ -220,7 +226,7 @@
 
                 <div class="row portfolio-container">
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-act">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-act" data-aos="fade-up" data-aos-delay="0">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_12.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -233,7 +239,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-act">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-act" data-aos="fade-up" data-aos-delay="80">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_11.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -246,7 +252,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-act">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-act" data-aos="fade-up" data-aos-delay="160">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_13.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -260,7 +266,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass" data-aos="fade-up" data-aos-delay="0">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_2.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -274,7 +280,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass" data-aos="fade-up" data-aos-delay="80">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_6.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -288,7 +294,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass" data-aos="fade-up" data-aos-delay="160">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_7.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -302,7 +308,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass" data-aos="fade-up" data-aos-delay="0">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_8.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -316,7 +322,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-ass" data-aos="fade-up" data-aos-delay="80">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_9.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -330,7 +336,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-mem">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-mem" data-aos="fade-up" data-aos-delay="0">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_1.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -344,7 +350,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-mem">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-mem" data-aos="fade-up" data-aos-delay="80">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_3.jpg")}}" alt="">
                             <div class="portfolio-info">
@@ -358,7 +364,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 portfolio-item filter-mem">
+                    <div class="col-lg-4 col-md-6 portfolio-item filter-mem" data-aos="fade-up" data-aos-delay="160">
                         <div class="portfolio-wrap">
                             <img src="{{asset("sige_app/frontend/img/mairie/photo_10.jpg")}}" alt="">
                             <div class="portfolio-info">

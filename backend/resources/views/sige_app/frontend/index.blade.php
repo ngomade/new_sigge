@@ -106,6 +106,9 @@
 @section('js')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    if (window.AOS) {
+        AOS.init({ duration: 1000, once: true, easing: 'ease-out-quart' });
+    }
     const carousel = document.getElementById('homeCarousel');
     if (carousel && window.bootstrap) {
         const carouselInstance = bootstrap.Carousel.getOrCreateInstance(carousel, { interval: 5000, pause: 'hover', wrap: true, touch: true });
@@ -177,19 +180,19 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
     <div class="container position-relative" style="z-index:1">
         <div class="row align-items-center mb-4">
-            <div class="col-auto">
+            <div class="col-auto" data-aos="zoom-in" data-aos-delay="100">
                 <img src="{{asset('share/img/logo_estlc_ok.png')}}" alt="Logo ESTLC" class="school-logo-icon" style="height:100px">
             </div>
-            <div class="col">
+            <div class="col" data-aos="fade-up" data-aos-delay="150">
                 <h2 class="mb-0" style="font-size:25px">Ecole Supérieure de Transport, de Logistique et de Commerce — ESTLC</h2>
             </div>
         </div>
         <div class="row g-4">
             <div class="col-lg-6 order-2 order-lg-1">
-                <div class="mb-3 text-center text-lg-start">
+                <div class="mb-3 text-center text-lg-start" data-aos="fade-up" data-aos-delay="200">
                     <a href="/download/Appel_Candidature_Recrutement_ESTLC" class="btn btn-primary rounded-pill px-4 py-2" target="_blank"><i class="bi bi-download me-2"></i>Télécharger l'appel à candidature</a>
                 </div>
-                <div class="announcement-card">
+                <div class="announcement-card" data-aos="fade-up" data-aos-delay="250">
                     <ul class="announcement-list">
                         <li><i class="bi bi-megaphone-fill"></i><div><strong>Avis aux étudiants – Master Recherche à l'UFD-TSI</strong><p>Le Coordonnateur de l'UFD-TSI informe les étudiants nouvellement sélectionnés en Master Recherche pour l'année académique 2024-2025 qu'une réunion importante se tiendra le lundi 03 mars 2025 à 14h précises, au campus de Nkoumekeke, salle C1. Présence obligatoire.</p></div></li>
                         <li><i class="bi bi-calendar-event-fill"></i><div><strong>Rentrée académique – Master Recherche à l'UFD-TSI</strong><p>Lundi 03 mars 2025. Pour les modalités d'inscription académique et administrative, veuillez vous rapprocher du secrétariat de l'UFD-TSI.</p></div></li>
@@ -197,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </ul>
                 </div>
             </div>
-            <div class="col-lg-6 order-1 order-lg-2">
+            <div class="col-lg-6 order-1 order-lg-2" data-aos="zoom-in" data-aos-delay="200">
                 <div id="homeCarousel" class="carousel slide rounded-4 overflow-hidden shadow" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         @foreach (\App\Models\Slide::orderBy('id','desc')->take(10)->get() as $slide)
@@ -229,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="container">
             <div class="row justify-content-center g-4 align-items-center">
                 @foreach ([['share/img/logo_islape.jpg','Institut Supérieur La Perle'],['share/img/logo_ueb.png','Université d’Ebolowa'],['share/img/logo_islape.jpg','Institut Supérieur La Perle'],['share/img/logo_ueb.png','Université d’Ebolowa'],['share/img/logo_islape.jpg','Institut Supérieur La Perle'],['share/img/logo_ueb.png','Université d’Ebolowa']] as $partner)
-                    <div class="col-lg-2 col-md-4 col-6 text-center">
+                    <div class="col-lg-2 col-md-4 col-6 text-center" data-aos="zoom-in" data-aos-delay="{{$loop->index*80}}">
                         <img src="{{asset($partner[0])}}" alt="{{$partner[1]}}" title="{{$partner[1]}}" class="img-fluid partner-icon" style="max-height:130px;width:auto;object-fit:contain">
                     </div>
                 @endforeach
@@ -239,13 +242,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <section id="services" class="app-section py-5">
         <div class="container">
-            <div class="section-title text-center mb-5">
+            <div class="section-title text-center mb-5" data-aos="fade-up">
                 <h2>Nos Parcours</h2>
                 <p>Actuellement, nous possédons différents parcours permettant aux apprenants de se spécialiser dans leurs formations</p>
             </div>
             <div class="row justify-content-center g-4">
                 @foreach ([['bi-truck','GLTCO','Gestion Logistique Transport et Commerce'],['bi-signpost-split-fill','TTL','Technologie de Transport et de Logistique']] as $path)
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{$loop->iteration*100}}">
                         <div class="icon-box">
                             <div class="icon"><i class="bi {{$path[0]}}"></i></div>
                             <h4 class="title"><a href="#">{{$path[1]}}</a></h4>
@@ -259,13 +262,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <section id="more-services" class="app-section py-5">
         <div class="container">
-            <div class="section-title text-center mb-5">
+            <div class="section-title text-center mb-5" data-aos="fade-up">
                 <h2>Activités récentes</h2>
                 <p>Découvrez la vie de l'école à travers nos articles d'actualités</p>
             </div>
             <div class="row g-4">
                 @foreach (\App\Models\Actualite::orderBy('created_at','desc')->take(9)->get() as $actu)
-                    <div class="col-md-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{$loop->index*100}}">
                         <div class="actu-card">
                             <div class="actu-card-icon"><i class="bi bi-newspaper"></i></div>
                             <div class="actu-card-body"><p class="actu-card-title">{{$actu->actu_title}}</p></div>
@@ -285,11 +288,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <section id="faq" class="app-section app-section-alt py-5">
         <div class="container">
-            <div class="section-title text-center mb-5">
+            <div class="section-title text-center mb-5" data-aos="fade-up">
                 <h2>Questions Utiles pour étudiants et candidats</h2>
             </div>
             @foreach ([['Où est située la localité d’Ambam ?','Ambam est une ville et une communauté située dans la région du Sud-Cameroun, à la frontière de la Guinée Equatoriale et du Gabon. Cette ville est située à environ 245 km de Yaoundé.'],['Qui peut postuler au concours d’entrée à l’ESTLC ?','Les candidats doivent être titulaires d’un Baccalauréat ou d’un GCE A/L pour le premier cycle, et d’une Licence pour le second cycle.'],['Quels sont les départements disponibles à l’ESTLC ?','En plus des enseignements généraux et scientifiques de base, l’ESTLC dispose des départements Transport, Logistique, Recherche Opérationnelle, Génie Informatique, E-Commerce et Mécatronique.'],['Quels diplômes obtient-on au terme de sa formation à l’ESTLC ?','Au terme des 5 années de formation, l’étudiant obtient un diplôme d’ingénieur, pouvant déboucher sur un Master Recherche puis un Doctorat PhD.'],['Comment modifier ma fiche d’inscription au concours ?','Conservez l’identifiant et le mot de passe transmis après le remplissage de votre fiche : ils vous permettront d’y revenir pour la modifier.']] as $faq)
-                <div class="row faq-item g-3">
+                <div class="row faq-item g-3" data-aos="fade-up" data-aos-delay="{{$loop->index*100}}">
                     <div class="col-lg-5 d-flex align-items-start gap-2"><i class="bi bi-question-circle-fill faq-icon"></i><h4 class="mb-0">{{$faq[0]}}</h4></div>
                     <div class="col-lg-7"><p>{{$faq[1]}}</p></div>
                 </div>

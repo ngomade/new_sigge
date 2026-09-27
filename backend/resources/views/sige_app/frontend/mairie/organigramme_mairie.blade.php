@@ -161,35 +161,41 @@
     </style>
 @endsection
 @section('js')
-
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.AOS) {
+        AOS.init({ duration: 800, once: true, easing: 'ease-out-quart' });
+    }
+});
+</script>
 @endsection
 @section('content')
 <div class="org-mairie-section">
     <div class="container">
 
-        <div class="org-mairie-header">
+        <div class="org-mairie-header" data-aos="fade-up">
             <div class="badge-icon">
                 <i class="bi bi-diagram-3-fill"></i>
             </div>
             <h1>Mairie d'Ambam : Organigramme</h1>
         </div>
 
-        <div class="org-mairie-card">
-            <div class="level-1 rectangle">
+        <div class="org-mairie-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="level-1 rectangle" data-aos="zoom-in" data-aos-delay="150">
                 <img src="{{asset("sige_app/frontend/img/mairie/maire_portrait.png")}}" alt="Le Maire d'Ambam" style="width: 95%;" class="rounded">
                 <p class="name">ZOMO OVONO SAMSON</p>
                 <p class="role">Maire de la Commune d'Ambam</p>
             </div>
 
             <ol class="level-2-wrapper">
-                <li>
+                <li data-aos="fade-up" data-aos-delay="200">
                     <div class="level-2 rectangle">
                         <img src="{{asset("sige_app/frontend/img/mairie/premier_adjoint.png")}}" alt="1er Adjoint au Maire" style="width: 50%;" class="rounded">
                         <p class="name">AVOMO EKOTO MATHILDE EPSE ELLA</p>
                         <p class="role">1<sup>ier</sup> Adjoint au Maire</p>
                     </div>
                 </li>
-                <li>
+                <li data-aos="fade-up" data-aos-delay="250">
                     <div class="level-2 rectangle">
                         <img src="{{asset("sige_app/frontend/img/mairie/second_adjoint.png")}}" alt="2e Adjoint au Maire" style="width: 63%;" class="rounded">
                         <p class="name">NVOA JENNER PURCELL</p>

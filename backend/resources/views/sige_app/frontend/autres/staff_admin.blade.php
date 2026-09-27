@@ -2,31 +2,43 @@
 
 @section("style")
     <style>
+        .staff-page {
+            background: var(--app-bg, #f7faf8);
+            padding: 3rem 0 4rem;
+        }
+
+        .staff-page .card-header {
+            border: none !important;
+        }
+        .staff-page .card-header h3 {
+            color: var(--app-primary-dark, #11583f) !important;
+        }
+
         .staff-section-title {
             position: relative;
-            background: linear-gradient(135deg, #28a745, #20c997);
+            background: linear-gradient(135deg, var(--app-primary, #0e8f74), var(--app-primary-dark, #11583f));
             color: white;
             text-align: center;
             padding: 12px 20px;
-            border-radius: 10px;
+            border-radius: var(--app-radius-md, 10px);
             font-size: 1.25rem;
             font-weight: 600;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 4px 6px var(--app-shadow-soft, rgba(0, 0, 0, 0.07));
             margin: 2.5rem 0 1.5rem 0;
         }
 
         .personnel-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid var(--app-border, #dce9e2);
+            border-radius: var(--app-radius-lg, 12px);
+            box-shadow: 0 0.125rem 0.25rem var(--app-shadow-soft, rgba(0, 0, 0, 0.075));
             transition: all 0.3s ease-in-out;
-            background-color: #fff;
+            background-color: var(--app-surface, #fff);
             font-size: 0.85rem;
         }
 
         .personnel-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            box-shadow: 0 0.5rem 1rem var(--app-shadow, rgba(17, 61, 53, .15));
         }
 
         .personnel-img-wrapper {
@@ -35,8 +47,8 @@
             margin: 15px auto 10px auto;
             border-radius: 50%;
             overflow: hidden;
-            border: 3px solid #e9ecef;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 3px solid var(--app-primary-soft, #dff2e9);
+            box-shadow: 0 2px 4px var(--app-shadow-soft, rgba(0,0,0,0.1));
         }
 
         .personnel-img-wrapper img {
@@ -51,12 +63,16 @@
 
         .personnel-info .label {
             font-weight: 600;
-            color: #6c757d;
+            color: var(--app-text-muted, #6c757d);
         }
 
         .personnel-info .value {
-            color: #212529;
+            color: var(--app-text, #212529);
             font-weight: 500;
+        }
+
+        .personnel-info a {
+            color: var(--app-primary, #0e8f74);
         }
 
         @media (max-width: 768px) {
@@ -67,21 +83,32 @@
     </style>
 @endsection
 
+@section('js')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.AOS) {
+        AOS.init({ duration: 800, once: true, easing: 'ease-out-quart' });
+    }
+});
+</script>
+@endsection
+
 @section('content')
-    <div class="container-fluid py-4">
+    <div class="staff-page">
+    <div class="container-fluid">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 text-center border-bottom">
-                <h3 class="mb-0 text-success fw-bold">Staff Administratif de l'ESTLC</h3>
+            <div class="card-header bg-white py-3 text-center border-bottom" data-aos="fade-up">
+                <h3 class="mb-0 fw-bold">Staff Administratif de l'ESTLC</h3>
             </div>
             
             <div class="card-body bg-light">
 
                 <!-- LA DIRECTION -->
-                <div class="staff-section-title">La Direction</div>
+                <div class="staff-section-title" data-aos="fade-up">La Direction</div>
                 <div class="row g-4 justify-content-center">
                     
                     <!-- Directeur -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/directeur.jpg') }}" alt="Directeur">
@@ -98,7 +125,7 @@
                     </div>
 
                     <!-- Directeur Adjoint -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/da.jpg') }}" alt="Directeur Adjoint">
@@ -115,7 +142,7 @@
                     </div>
 
                     <!-- CREP -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/crep.jpg') }}" alt="CREP">
@@ -132,7 +159,7 @@
                     </div>
 
                     <!-- CDA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/lankoul.jpg') }}" alt="CDA">
@@ -149,7 +176,7 @@
                     </div>
 
                     <!-- CISI -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/cisi.jpg') }}" alt="CISI">
@@ -166,7 +193,7 @@
                     </div>
 
                     <!-- SOCAS -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/socas.jpg') }}" alt="SOCAS">
@@ -183,7 +210,7 @@
                     </div>
 
                     <!-- SCRP -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('share/img/estlc_sans_fond.png') }}" alt="SCRP">
@@ -202,11 +229,11 @@
                 </div>
 
                 <!-- DIVISION DES AFFAIRES ACADÉMIQUES -->
-                <div class="staff-section-title">Division Des Affaires Académiques, de la Recherche et de la Coopération</div>
+                <div class="staff-section-title" data-aos="fade-up">Division Des Affaires Académiques, de la Recherche et de la Coopération</div>
                 <div class="row g-4 justify-content-center">
                     
                     <!-- DAARC -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/daarc.jpg') }}" alt="DAARC">
@@ -223,7 +250,7 @@
                     </div>
 
                     <!-- MBIAM -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/mbiam.jpg') }}" alt="MBIAM">
@@ -240,7 +267,7 @@
                     </div>
 
                     <!-- NANA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/nana.jpg') }}" alt="NANA">
@@ -257,7 +284,7 @@
                     </div>
 
                     <!-- AZONG -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/azong.jpg') }}" alt="AZONG">
@@ -274,7 +301,7 @@
                     </div>
 
                     <!-- MVOGO -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/mvogo.png') }}" alt="MVOGO">
@@ -291,7 +318,7 @@
                     </div>
 
                     <!-- ABENA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/abena.jpg') }}" alt="ABENA">
@@ -310,11 +337,11 @@
                 </div>
 
                 <!-- DIVISION DE LA SCOLARITÉ -->
-                <div class="staff-section-title">Division de la Scolarité et du Suivi des Etudiants</div>
+                <div class="staff-section-title" data-aos="fade-up">Division de la Scolarité et du Suivi des Etudiants</div>
                 <div class="row g-4 justify-content-center">
                     
                     <!-- DSSE -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/dsse.jpg') }}" alt="DSSE">
@@ -331,7 +358,7 @@
                     </div>
 
                     <!-- DJOMO -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/djomo.jpg') }}" alt="DJOMO">
@@ -348,7 +375,7 @@
                     </div>
 
                     <!-- ASSOUMOU -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/assoumou.jpg') }}" alt="ASSOUMOU">
@@ -367,11 +394,11 @@
                 </div>
 
                 <!-- DIVISION DES AFFAIRES ADMINISTRATIVES ET FINANCIÈRES -->
-                <div class="staff-section-title">Division des Affaires Administratives et Financières</div>
+                <div class="staff-section-title" data-aos="fade-up">Division des Affaires Administratives et Financières</div>
                 <div class="row g-4 justify-content-center">
                     
                     <!-- NTYAM ASSE -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('share/img/estlc_sans_fond.png') }}" alt="NTYAM">
@@ -388,7 +415,7 @@
                     </div>
 
                     <!-- EBOLO -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/ebolo.jpg') }}" alt="EBOLO">
@@ -405,7 +432,7 @@
                     </div>
 
                     <!-- NANGA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/nanga.jpg') }}" alt="NANGA">
@@ -422,7 +449,7 @@
                     </div>
 
                     <!-- MANGA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/manga.jpg') }}" alt="MANGA">
@@ -439,7 +466,7 @@
                     </div>
 
                     <!-- PAKI -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/paki.jpg') }}" alt="PAKI">
@@ -458,11 +485,11 @@
                 </div>
 
                 <!-- DIVISION DE LA FORMATION CONTINUE ET À DISTANCE -->
-                <div class="staff-section-title">Division de la Formation Continue et à distance</div>
+                <div class="staff-section-title" data-aos="fade-up">Division de la Formation Continue et à distance</div>
                 <div class="row g-4 justify-content-center">
                     
                     <!-- MVONDO -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/dfcd.jpg') }}" alt="MVONDO">
@@ -479,7 +506,7 @@
                     </div>
 
                     <!-- DJIEME -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/sfc.jpg') }}" alt="DJIEME">
@@ -496,7 +523,7 @@
                     </div>
 
                     <!-- NKONJOH -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/sfoad.jpg') }}" alt="NKONJOH">
@@ -515,11 +542,11 @@
                 </div>
 
                 <!-- NOS DÉPARTEMENTS -->
-                <div class="staff-section-title">Nos Départements</div>
+                <div class="staff-section-title" data-aos="fade-up">Nos Départements</div>
                 <div class="row g-4 justify-content-center">
                     
                     <!-- MBALLA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/nballa.png') }}" alt="MBALLA">
@@ -536,7 +563,7 @@
                     </div>
 
                     <!-- MBOUSSI -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/mboussi.jpg') }}" alt="MBOUSSI">
@@ -553,7 +580,7 @@
                     </div>
 
                     <!-- DIBOMA -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/dgtp.jpg') }}" alt="DIBOMA">
@@ -570,7 +597,7 @@
                     </div>
 
                     <!-- SAPNKEN -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/sapi.jpg') }}" alt="SAPNKEN">
@@ -587,7 +614,7 @@
                     </div>
 
                     <!-- KIBONG -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="0">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/dgmc.jpg') }}" alt="KIBONG">
@@ -604,7 +631,7 @@
                     </div>
 
                     <!-- MESSI -->
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                         <div class="card personnel-card h-100 p-3">
                             <div class="personnel-img-wrapper">
                                 <img src="{{ asset('sige_app/frontend/img/team/messi.jpg') }}" alt="MESSI">
@@ -624,5 +651,6 @@
 
             </div>
         </div>
+    </div>
     </div>
 @endsection
