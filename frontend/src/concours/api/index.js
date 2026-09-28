@@ -1,5 +1,7 @@
-const BASE_URL = process.env.NODE_ENV === 'production' ? '/api/concours' : 'http://localhost:8000/api/concours';
-
+const BASE_URL =
+    process.env.NODE_ENV === 'production'
+        ? 'https://estlc.cdwfs.net/api/concours'
+        : 'http://localhost:8000/api/concours';
 const getToken = () => localStorage.getItem('token');
 
 export const LOGIN_API = {
