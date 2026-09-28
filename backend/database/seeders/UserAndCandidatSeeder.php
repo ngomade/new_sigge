@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class UserAndCandidatSeeder extends Seeder
 {
@@ -17,7 +16,7 @@ class UserAndCandidatSeeder extends Seeder
     {
         // 1. Création d'un utilisateur de test dans la table `users`
         $codeUser = 'ESTLC2026002';
-        
+
         DB::table('users')->insert([
             'code_user' => $codeUser,
             'code_info_extra' => 1,
@@ -33,7 +32,7 @@ class UserAndCandidatSeeder extends Seeder
             'date_deliv_cni_user' => '2020-01-01',
             'login_user' => 'admin_test',
             // Mot de passe haché (le mot de passe en clair est "password123")
-            'pwd_user' => Hash::make('password123'), 
+            'pwd_user' => Hash::make('password123'),
             'statut_user' => 1,
             'ecole_user' => 'ESTLC',
             'created_at' => Carbon::now(),

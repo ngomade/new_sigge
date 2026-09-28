@@ -13,13 +13,15 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Personnel extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, HasRoles,Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     protected $table = 'personnel';
 
     protected $primaryKey = 'code_pers';
 
     public $incrementing = false;
+
+    protected $keyType = 'string';
 
     protected $casts = [
         'date_naissance_pers' => 'datetime',
@@ -59,17 +61,21 @@ class Personnel extends Authenticatable implements MustVerifyEmail
     protected static function boot(): void
     {
         parent::boot();
-        static::creating(function () {
-            $lastAdmin = Personnel::orderBy('code_pers', 'desc')->first();
 
-            if ($lastAdmin) {
-                $lastCode = intval(substr($lastAdmin->code_pers, 2)); // Extract the numeric part
-                $nextCode = $lastCode + 1;
-            } else {
-                $nextCode = 1;
+        static::creating(function ($model) {
+            if (empty($model->code_pers)) {
+                $lastAdmin = Personnel::orderBy('code_pers', 'desc')->first();
+
+                if ($lastAdmin) {
+                    // "PERS" fait 4 caractères : on retire ce préfixe pour ne garder que le numéro
+                    $lastCode = intval(substr($lastAdmin->code_pers, 4));
+                    $nextCode = $lastCode + 1;
+                } else {
+                    $nextCode = 1;
+                }
+
+                $model->code_pers = 'PERS'.str_pad($nextCode, 4, '0', STR_PAD_LEFT);
             }
-
-            return 'PERS'.str_pad($nextCode, 4, '0', STR_PAD_LEFT);
         });
     }
 

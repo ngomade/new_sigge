@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\notes;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bureau;
 use App\Models\notes\Document;
 use App\Models\notes\Salle;
 use App\Models\notes\SessionExamen;
-use App\Models\Bureau;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 use Throwable;
 
 class RessourceController extends Controller
@@ -21,7 +20,7 @@ class RessourceController extends Controller
     /**
      * GESTION DES DOCUMENTS
      */
-    
+
     /**
      * Afficher la liste des documents avec vue calendrier
      */
@@ -42,7 +41,7 @@ class RessourceController extends Controller
             if ($request->filled('date_debut') && $request->filled('date_fin')) {
                 $query->whereBetween('created_at', [
                     $request->date_debut,
-                    $request->date_fin
+                    $request->date_fin,
                 ]);
             }
 
@@ -55,9 +54,9 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.documents.index', compact('documents', 'sessions', 'bureaux'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des documents: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage des documents: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
 
             return redirect()->back()
@@ -77,8 +76,8 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.documents.create', compact('sessions', 'bureaux'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de création de document: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Erreur lors de l\'affichage du formulaire de création de document: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('ressources.documents.index')
@@ -97,7 +96,7 @@ class RessourceController extends Controller
             'fichier' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
             'code_session' => 'nullable|string|exists:session_examen,code_session',
             'code_bureau' => 'nullable|string|exists:bureau,code_bureau',
-            'description_doc' => 'nullable|string'
+            'description_doc' => 'nullable|string',
         ], [
             'label_doc.required' => 'Le libellé du document est obligatoire.',
             'type_doc.required' => 'Le type de document est obligatoire.',
@@ -117,7 +116,7 @@ class RessourceController extends Controller
 
             // Upload du fichier
             $file = $request->file('fichier');
-            $nomFichier = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $nomFichier = time().'_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
             $cheminFichier = $file->storeAs('documents', $nomFichier, 'public');
 
             $document = Document::create([
@@ -126,7 +125,7 @@ class RessourceController extends Controller
                 'label_doc' => $request->label_doc,
                 'description_doc' => $request->description_doc,
                 'type_doc' => $request->type_doc,
-                'nom_fichier' => $nomFichier
+                'nom_fichier' => $nomFichier,
             ]);
 
             DB::commit();
@@ -134,7 +133,7 @@ class RessourceController extends Controller
             Log::info('Document créé avec succès', [
                 'document_id' => $document->id,
                 'user_id' => auth()->id(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return redirect()->route('ressources.documents.index')
@@ -142,16 +141,16 @@ class RessourceController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
+
             // Supprimer le fichier en cas d'erreur
             if (isset($cheminFichier)) {
                 Storage::disk('public')->delete($cheminFichier);
             }
 
-            Log::error('Erreur lors de la création du document: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la création du document: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -171,9 +170,9 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.documents.show', compact('document'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du document: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du document: '.$e->getMessage(), [
                 'document_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('ressources.documents.index')
@@ -194,9 +193,9 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.documents.edit', compact('document', 'sessions', 'bureaux'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification de document: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification de document: '.$e->getMessage(), [
                 'document_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('ressources.documents.index')
@@ -215,7 +214,7 @@ class RessourceController extends Controller
             'fichier' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
             'code_session' => 'nullable|string|exists:session_examen,code_session',
             'code_bureau' => 'nullable|string|exists:bureau,code_bureau',
-            'description_doc' => 'nullable|string'
+            'description_doc' => 'nullable|string',
         ], [
             'label_doc.required' => 'Le libellé du document est obligatoire.',
             'type_doc.required' => 'Le type de document est obligatoire.',
@@ -238,12 +237,12 @@ class RessourceController extends Controller
             // Si un nouveau fichier est fourni
             if ($request->hasFile('fichier')) {
                 $file = $request->file('fichier');
-                $nomFichier = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+                $nomFichier = time().'_'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)).'.'.$file->getClientOriginalExtension();
                 $cheminFichier = $file->storeAs('documents', $nomFichier, 'public');
 
                 // Supprimer l'ancien fichier
-                if ($ancienFichier && Storage::disk('public')->exists('documents/' . $ancienFichier)) {
-                    Storage::disk('public')->delete('documents/' . $ancienFichier);
+                if ($ancienFichier && Storage::disk('public')->exists('documents/'.$ancienFichier)) {
+                    Storage::disk('public')->delete('documents/'.$ancienFichier);
                 }
 
                 $document->nom_fichier = $nomFichier;
@@ -255,7 +254,7 @@ class RessourceController extends Controller
                 'label_doc' => $request->label_doc,
                 'description_doc' => $request->description_doc,
                 'type_doc' => $request->type_doc,
-                'nom_fichier' => $document->nom_fichier
+                'nom_fichier' => $document->nom_fichier,
             ]);
 
             DB::commit();
@@ -263,7 +262,7 @@ class RessourceController extends Controller
             Log::info('Document modifié avec succès', [
                 'document_id' => $document->id,
                 'user_id' => auth()->id(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return redirect()->route('ressources.documents.index')
@@ -271,16 +270,16 @@ class RessourceController extends Controller
 
         } catch (Throwable $e) {
             DB::rollBack();
-            
+
             // Supprimer le nouveau fichier en cas d'erreur
             if (isset($cheminFichier)) {
                 Storage::disk('public')->delete($cheminFichier);
             }
 
-            Log::error('Erreur lors de la modification du document: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la modification du document: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -303,15 +302,15 @@ class RessourceController extends Controller
             $document->delete();
 
             // Supprimer le fichier physique
-            if ($nomFichier && Storage::disk('public')->exists('documents/' . $nomFichier)) {
-                Storage::disk('public')->delete('documents/' . $nomFichier);
+            if ($nomFichier && Storage::disk('public')->exists('documents/'.$nomFichier)) {
+                Storage::disk('public')->delete('documents/'.$nomFichier);
             }
 
             DB::commit();
 
             Log::info('Document supprimé avec succès', [
                 'document_id' => $id,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->route('ressources.documents.index')
@@ -320,10 +319,10 @@ class RessourceController extends Controller
         } catch (Throwable $e) {
             DB::rollBack();
 
-            Log::error('Erreur lors de la suppression du document: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la suppression du document: '.$e->getMessage(), [
                 'document_id' => $id,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -346,16 +345,14 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.salles.index', compact('salles'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage des salles: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);             
+            Log::error('Erreur lors de l\'affichage des salles: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
         return redirect()->route('ressources.salles.index')
             ->with('error', 'Une erreur est survenue lors du chargement des salles.');
     }
-            
-
 
     /**
      * Show the form for creating a new salle
@@ -374,7 +371,7 @@ class RessourceController extends Controller
             'code_salle' => 'required|string|max:32|unique:salle,code_salle',
             'nb_place_salle' => 'required|integer|min:1',
             'etat_salle' => 'required|boolean',
-            'desc_salle' => 'nullable|string'
+            'desc_salle' => 'nullable|string',
         ], [
             'code_salle.required' => 'Le code de la salle est obligatoire.',
             'code_salle.unique' => 'Ce code de salle existe déjà.',
@@ -393,17 +390,17 @@ class RessourceController extends Controller
 
             Log::info('Salle créée avec succès', [
                 'code_salle' => $request->code_salle,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->route('ressources.salles.index')
                 ->with('success', 'Salle créée avec succès.');
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la création de la salle: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la création de la salle: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -423,9 +420,9 @@ class RessourceController extends Controller
             return view('sige_app.backend.gestion_notes.ressource.salles.edit', compact('salle'));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de l\'affichage du formulaire de modification de salle: ' . $e->getMessage(), [
+            Log::error('Erreur lors de l\'affichage du formulaire de modification de salle: '.$e->getMessage(), [
                 'code_salle' => $codeSalle,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('ressources.salles.index')
@@ -439,10 +436,10 @@ class RessourceController extends Controller
     public function updateSalle(Request $request, $codeSalle)
     {
         $validator = Validator::make($request->all(), [
-            'code_salle' => 'required|string|max:32|unique:salle,code_salle,' . $codeSalle . ',code_salle',
+            'code_salle' => 'required|string|max:32|unique:salle,code_salle,'.$codeSalle.',code_salle',
             'nb_place_salle' => 'required|integer|min:1',
             'etat_salle' => 'required|boolean',
-            'desc_salle' => 'nullable|string'
+            'desc_salle' => 'nullable|string',
         ], [
             'code_salle.required' => 'Le code de la salle est obligatoire.',
             'code_salle.unique' => 'Ce code de salle existe déjà.',
@@ -462,18 +459,18 @@ class RessourceController extends Controller
 
             Log::info('Salle modifiée avec succès', [
                 'code_salle' => $codeSalle,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->route('ressources.salles.index')
                 ->with('success', 'Salle modifiée avec succès.');
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors de la modification de la salle: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la modification de la salle: '.$e->getMessage(), [
                 'code_salle' => $codeSalle,
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -491,7 +488,7 @@ class RessourceController extends Controller
             DB::beginTransaction();
 
             $salle = Salle::findOrFail($codeSalle);
-            
+
             // Vérifier si la salle est utilisée
             if ($salle->periodes()->exists()) {
                 return redirect()->back()
@@ -504,7 +501,7 @@ class RessourceController extends Controller
 
             Log::info('Salle supprimée avec succès', [
                 'code_salle' => $codeSalle,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->route('ressources.salles.index')
@@ -513,10 +510,10 @@ class RessourceController extends Controller
         } catch (Throwable $e) {
             DB::rollBack();
 
-            Log::error('Erreur lors de la suppression de la salle: ' . $e->getMessage(), [
+            Log::error('Erreur lors de la suppression de la salle: '.$e->getMessage(), [
                 'code_salle' => $codeSalle,
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             return redirect()->back()
@@ -531,19 +528,19 @@ class RessourceController extends Controller
     {
         try {
             $document = Document::findOrFail($id);
-            $cheminFichier = 'documents/' . $document->nom_fichier;
+            $cheminFichier = 'documents/'.$document->nom_fichier;
 
-            if (!Storage::disk('public')->exists($cheminFichier)) {
+            if (! Storage::disk('public')->exists($cheminFichier)) {
                 return redirect()->back()
                     ->with('error', 'Fichier non trouvé.');
             }
 
-            return Storage::disk('public')->download($cheminFichier, $document->label_doc . '.' . pathinfo($document->nom_fichier, PATHINFO_EXTENSION));
+            return Storage::disk('public')->download($cheminFichier, $document->label_doc.'.'.pathinfo($document->nom_fichier, PATHINFO_EXTENSION));
 
         } catch (Throwable $e) {
-            Log::error('Erreur lors du téléchargement du document: ' . $e->getMessage(), [
+            Log::error('Erreur lors du téléchargement du document: '.$e->getMessage(), [
                 'document_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->back()

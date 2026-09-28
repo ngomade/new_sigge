@@ -40,22 +40,23 @@ function App() {
             <BrowserRouter>
                 <Routes>
                      {/* Routes Publiques */}
-                    <Route path="/" element={<Home />} />
+
+                    {/* <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/under-development" element={<UnderDevelopment />} />
                     <Route path="/organigram" element={<OrganigramPage />} />
                     <Route path="/staff" element={<StaffPage />} />
                     <Route path="/presentation-mairie" element={<PresentationPage />} />
                     <Route path="/organigram-mairie" element={<OrganigramMairiePage />} />
-                    <Route path="/actualite" element={<ActualitePage />} />
+                    <Route path="/actualite" element={<ActualitePage />} /> */}
 
 
 
 
 
                     {/*Ici ceux sont les routes dediés pour les concours  */}
-                    {/* <Route path="/" element={<ClientLayout/>}>
-                        <Route index element={<Home/>}/>
+                     <Route path="/" element={<ClientLayout/>}>
+                        {/* <Route index element={<Home/>}/> */}
                         <Route path="login" element={<GuestRoute/>}>
                             <Route index element={<LoginPage/>}/>
                         </Route>
@@ -71,7 +72,7 @@ function App() {
                         <Route path="/pwd-recover" element={<GuestRoute/>}>
                             <Route index element={<PwdRecover/>}/>
                         </Route>
-                        <Route path="/reset-pwd" element={<PwdReset/>} />
+                        {/* <Route path="/reset-pwd" element={<PwdReset/>} /> */}
                         <Route path="*" element={<Page404/>}/>
                     </Route> *
 
@@ -81,7 +82,7 @@ function App() {
                         <Route path="candidates" element={<AdminCandidate/>}/>
                         <Route path="comptes" element={<Compte/>}/>
                         <Route path="*" element={<Page404/>}/>
-                    </Route> */}
+                    </Route> 
                 </Routes>
 
                 <ToastContainer/>

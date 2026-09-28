@@ -8,6 +8,7 @@ use App\Models\Personnel;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -20,40 +21,48 @@ class AuthController extends Controller
         Session::flash('success', $success);
 
         return redirect('/');
-        // return view("sige_app.frontend.index");
     }
 
     public function store(Request $request)
     {
-        $user = Users::where('login_user', $request->login_user)
-            ->where('pwd_user', md5($request->pwd_user))->first();
-        if ($user != null) {
+        $user = Users::where('login_user', $request->login_user)->first();
+
+        if ($user != null && Hash::check($request->pwd_user, $user->pwd_user)) {
             try {
                 Auth::login($user);
-                //  dd(Auth::user());
+
                 $new_password = $request->login_user == $request->pwd_user;
                 $success = 'Vous êtes désormais connecté.';
                 $request->session()->flash('success', $success);
                 $request->session()->put('user', $user);
+
                 $ins = Inscription::join('filiere_niveau', 'filiere_niveau.code_ins', 'inscription.code_ins')
                     ->where('code_user', $user->code_user)
                     ->orderBy('date_ins', 'desc')
                     ->first();
-                $filiere = FiliereNiveau::where('code_ins', $ins->code_ins)->first();
-                $request->session()->put('filiere', $filiere);
-                $request->session()->put('inscription', $ins);
+
+                if ($ins != null) {
+                    $filiere = FiliereNiveau::where('code_ins', $ins->code_ins)->first();
+                    $request->session()->put('filiere', $filiere);
+                    $request->session()->put('inscription', $ins);
+                }
+
                 if ($new_password) {
                     return redirect('/')->with(compact(['success', 'new_password']));
                 }
 
                 return redirect('/')->with(compact(['success']));
             } catch (\Throwable $th) {
-                dd($th);
+                report($th);
+                $errors = 'Une erreur est survenue lors de la connexion.';
+                $request->session()->flash('errors', $errors);
+
+                return redirect()->back()->withInput();
             }
         } else {
-            $personnel = Personnel::where('login_pers', $request->login_user)
-                ->where('pwd_pers', md5($request->pwd_user))->first();
-            if ($personnel != null) {
+            $personnel = Personnel::where('login_pers', $request->login_user)->first();
+
+            if ($personnel != null && Hash::check($request->pwd_user, $personnel->pwd_pers)) {
                 Auth::guard('personnel')->login($personnel);
                 $success = 'Vous êtes désormais connecté.';
                 $request->session()->flash('success', $success);

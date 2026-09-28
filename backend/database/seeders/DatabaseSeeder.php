@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\concours\Candidat;
-use App\Models\concours\Compte;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
